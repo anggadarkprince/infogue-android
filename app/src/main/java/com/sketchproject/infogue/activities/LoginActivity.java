@@ -1,7 +1,5 @@
 package com.sketchproject.infogue.activities;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -9,8 +7,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.Login;
@@ -23,7 +19,6 @@ import java.util.List;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity {
-    private Toolbar mToolbar;
 
     private TabLayout tabLayout;
 
@@ -62,6 +57,10 @@ public class LoginActivity extends AppCompatActivity {
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    public void setTabRegisterActive(){
+        viewPager.setCurrentItem(1);
     }
 
     private void setupViewPager(ViewPager viewPager) {

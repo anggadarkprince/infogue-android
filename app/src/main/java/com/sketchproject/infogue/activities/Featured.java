@@ -1,4 +1,4 @@
-package com.sketchproject.infogue;
+package com.sketchproject.infogue.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.sketchproject.infogue.activities.LoginActivity;
+import com.sketchproject.infogue.R;
 
 public class Featured extends AppCompatActivity {
 
@@ -65,7 +65,9 @@ public class Featured extends AppCompatActivity {
         buttonGetStarted.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent mainActivity = new Intent(Featured.this, Application.class);
+                startActivity(mainActivity);
+                finish();
             }
         });
 

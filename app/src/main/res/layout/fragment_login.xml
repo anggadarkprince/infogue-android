@@ -128,14 +128,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:background="@color/colorLightGray"
-            android:padding="12dp">
+            android:background="@color/colorLightGray">
 
             <TextView
+                android:id="@+id/btn_create_account"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_horizontal"
                 android:text="@string/label_create_account"
+                android:padding="12dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         </android.support.v7.widget.ButtonBarLayout>

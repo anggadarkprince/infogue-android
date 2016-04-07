@@ -41,7 +41,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Featured"
+            android:name=".activities.Featured"
             android:label="@string/title_activity_featured"
             android:parentActivityName=".Splash"
             android:theme="@style/AppTheme.NoActionBar">
@@ -52,11 +52,15 @@
         <activity
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login"
-            android:parentActivityName=".Featured">
+            android:parentActivityName=".activities.Featured">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.sketchproject.infogue.Featured" />
+                android:value=".activities.Featured" />
         </activity>
+        <activity
+            android:name=".activities.Application"
+            android:label="@string/title_activity_application"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

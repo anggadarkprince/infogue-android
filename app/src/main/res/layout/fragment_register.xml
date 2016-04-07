@@ -33,40 +33,12 @@
             android:paddingRight="20dp"
             android:paddingTop="20dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/btn_facebook"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1"
-                    android:background="@android:drawable/screen_background_light_transparent"
-                    android:contentDescription="@string/dummy_content"
-                    android:scaleType="fitStart"
-                    android:src="@drawable/btn_facebook" />
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_weight="1"
-                    android:background="@android:drawable/screen_background_light_transparent"
-                    android:contentDescription="@string/dummy_content"
-                    android:scaleType="fitStart"
-                    android:src="@drawable/btn_twitter" />
-            </LinearLayout>
-
             <TextView
                 android:id="@+id/alert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorDanger"
+                android:layout_marginBottom="10dp"
                 android:padding="10dp"
                 android:text="@string/dummy_content"
                 android:textColor="@color/colorLight"

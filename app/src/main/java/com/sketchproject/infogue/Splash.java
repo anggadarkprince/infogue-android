@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.sketchproject.infogue.activities.Featured;
+
 public class Splash extends Activity {
 
     @Override

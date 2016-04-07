@@ -128,6 +128,7 @@ public class Register extends Fragment {
         if (!mAgreeView.isChecked()) {
             cancel = true;
             focusView = mAgreeView;
+            mAlert.setText(getString(R.string.error_agreement));
             mAlert.setVisibility(View.VISIBLE);
         } else {
             mAlert.setVisibility(View.GONE);

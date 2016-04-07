@@ -9,24 +9,40 @@
     <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to auth -->
+    <string name="prompt_name">Full Name</string>
     <string name="prompt_email">Email Address</string>
     <string name="prompt_password">Password</string>
+    <string name="prompt_username_email">Username or Email</string>
+    <string name="prompt_username">Username</string>
+
     <string name="action_sign_in">Sign In</string>
     <string name="action_create_account">Create Account</string>
+
     <string name="error_invalid_username">Username only contains alpha dash</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="label_sign_in">SIGN IN</string>
     <string name="label_get_started">GET STARTED</string>
     <string name="label_create_account">Create an Account</string>
-    <string name="prompt_username_email">Username or Email</string>
     <string name="label_check_agree">I agree infogue.id terms and conditions</string>
-    <string name="prompt_username">Username</string>
-    <string name="prompt_name">Full Name</string>
+
     <string name="label_forgot_password">Forgot Password?</string>
     <string name="label_login_social">Login with Social</string>
+
+    <string name="title_activity_application">Application</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_profile">Profile</string>
+    <string name="action_logout">Sign Out</string>
+    <string name="action_search">Search</string>
+    <string name="action_article">Article</string>
+    <string name="action_exit">Exit</string>
+    <string name="action_about">About</string>
+    <string name="error_agreement">You must be agree with terms and conditions</string>
+    <string name="label_sign_navigation">Sign in to contribute article</string>
+    <string name="action_register">Register</string>
 </resources>
