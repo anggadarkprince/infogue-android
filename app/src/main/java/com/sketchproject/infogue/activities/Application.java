@@ -60,9 +60,10 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
         if (id == R.id.action_settings) {
             Intent settingActivity;
         } else if (id == R.id.action_about) {
-            Intent aboutActivity;
+            Intent aboutActivity = new Intent(Application.this, About.class);
+            startActivity(aboutActivity);
         } else if (id == R.id.action_exit) {
-            Intent aboutActivity;
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
