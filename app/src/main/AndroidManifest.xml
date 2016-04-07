@@ -29,7 +29,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".Splash"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -41,6 +40,7 @@
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
                     android:host="www.infogue.id"
                     android:pathPrefix="/"
@@ -49,7 +49,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.Featured"
             android:label="@string/title_activity_featured"
@@ -59,7 +58,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Splash" />
         </activity>
-
         <activity
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login"
@@ -68,16 +66,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.Featured" />
         </activity>
-
         <activity
             android:name=".activities.Application"
             android:label="@string/title_activity_application"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".activities.About"
             android:label="@string/title_activity_about"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.Profile"
+            android:label="@string/title_activity_profile"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

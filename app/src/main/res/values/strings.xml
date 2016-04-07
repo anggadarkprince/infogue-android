@@ -52,5 +52,10 @@
     <string name="about_contact_title">Developer Contact</string>
     <string name="about_contact_content">Mobile (+62) 85655479868\nEmail sketchprojectstudio@gmail.com\nJawa 6 No 5 Jember, East Java - Indonesia</string>
     <string name="about_social">Follow our social account</string>
+    <string name="title_activity_profile">Profile</string>
+    <string name="label_articles">Articles</string>
+    <string name="label_followers">Followers</string>
+    <string name="label_following">Following</string>
+    <string name="action_view_detail">View Detail</string>
 
 </resources>
