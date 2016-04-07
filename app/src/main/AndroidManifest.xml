@@ -19,6 +19,8 @@
 
     <!-- Permission to vibrate -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -46,6 +48,14 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sketchproject.infogue.Splash" />
+        </activity>
+        <activity
+            android:name=".activities.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:parentActivityName=".Featured">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sketchproject.infogue.Featured" />
         </activity>
     </application>
 

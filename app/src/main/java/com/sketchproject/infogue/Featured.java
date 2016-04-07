@@ -1,5 +1,6 @@
 package com.sketchproject.infogue;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,13 +10,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+
+import com.sketchproject.infogue.activities.LoginActivity;
 
 public class Featured extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private ViewPager mViewPager;
+
+    private Button buttonSignIn;
+
+    private Button buttonGetStarted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,36 +52,48 @@ public class Featured extends AppCompatActivity {
             }
         });
 
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        buttonSignIn = (Button) findViewById(R.id.btn_sign_in);
+        buttonSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent loginActivity = new Intent(Featured.this, LoginActivity.class);
+                startActivity(loginActivity);
+            }
+        });
+
+        buttonGetStarted = (Button) findViewById(R.id.btn_get_started);
+        buttonGetStarted.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
     }
 
     /**
      * @param position index position of pager view
      */
-    private void changePage(int position){
-        ImageView view;
+    private void changePage(int position) {
+        ImageView view1 = (ImageView) findViewById(R.id.page1);
+        view1.setImageResource(R.drawable.circle_featured_normal);
 
-        view = (ImageView) findViewById(R.id.page1);
-        view.setImageResource(R.drawable.circle_featured_normal);
+        ImageView view2 = (ImageView) findViewById(R.id.page2);
+        view2.setImageResource(R.drawable.circle_featured_normal);
 
-        view = (ImageView) findViewById(R.id.page2);
-        view.setImageResource(R.drawable.circle_featured_normal);
+        ImageView view3 = (ImageView) findViewById(R.id.page3);
+        view3.setImageResource(R.drawable.circle_featured_normal);
 
-        view = (ImageView) findViewById(R.id.page3);
-        view.setImageResource(R.drawable.circle_featured_normal);
-
-        switch(position){
+        switch (position) {
             case 0:
-                view = (ImageView) findViewById(R.id.page1);
-                view.setImageResource(R.drawable.circle_featured_active);
+                view1.setImageResource(R.drawable.circle_featured_active);
                 break;
             case 1:
-                view = (ImageView) findViewById(R.id.page2);
-                view.setImageResource(R.drawable.circle_featured_active);
+                view2.setImageResource(R.drawable.circle_featured_active);
                 break;
             case 2:
-                view = (ImageView) findViewById(R.id.page3);
-                view.setImageResource(R.drawable.circle_featured_active);
+                view3.setImageResource(R.drawable.circle_featured_active);
                 break;
         }
     }
@@ -89,6 +109,10 @@ public class Featured extends AppCompatActivity {
         public PlaceholderFragment() {
         }
 
+        /**
+         * @param sectionNumber index of page
+         * @return PlaceholderFragment
+         */
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
