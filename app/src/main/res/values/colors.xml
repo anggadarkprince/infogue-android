@@ -9,4 +9,5 @@
     <color name="colorGradientTo">#0cd2eb</color>
 
     <color name="blackOverlay">#66000000</color>
+    <color name="whiteOverlay">#33ffffff</color>
 </resources>
