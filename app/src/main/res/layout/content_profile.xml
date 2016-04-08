@@ -45,9 +45,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/name"
         android:layout_centerHorizontal="true"
+        android:autoLink="all"
         android:text="Jakarta, Indonesia"
         android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-        android:textColor="@color/colorGray" />
+        android:textColor="@color/colorGray"
+        android:textColorLink="@color/colorPrimary" />
 
     <LinearLayout
         android:id="@+id/statistic"
@@ -173,12 +175,14 @@
         android:layout_below="@id/statistic"
         android:layout_centerHorizontal="true"
         android:alpha="0.8"
+        android:autoLink="all"
         android:gravity="center_horizontal"
         android:paddingLeft="25dp"
         android:paddingRight="25dp"
         android:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit. ipsum dolor sit amet lo siku l briema li skie zulo."
         android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-        android:textColor="@color/colorDark" />
+        android:textColor="@color/colorDark"
+        android:textColorLink="@color/colorPrimary" />
 
     <Button
         android:id="@+id/btn_detail"
@@ -188,6 +192,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:background="@drawable/button_primary"
+        android:minHeight="40dp"
         android:paddingLeft="35dp"
         android:paddingRight="35dp"
         android:text="@string/action_view_detail"

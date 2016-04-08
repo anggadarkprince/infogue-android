@@ -2,7 +2,6 @@ package com.sketchproject.infogue.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -101,7 +100,7 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
         int id = item.getItemId();
 
         if (id == R.id.action_login) {
-            Intent loginActivity = new Intent(Application.this, LoginActivity.class);
+            Intent loginActivity = new Intent(Application.this, Authentication.class);
             startActivity(loginActivity);
         } else if (id == R.id.action_about) {
             Intent aboutActivity = new Intent(Application.this, About.class);

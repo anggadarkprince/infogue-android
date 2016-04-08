@@ -56,7 +56,7 @@ public class Featured extends AppCompatActivity {
         buttonSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent loginActivity = new Intent(Featured.this, LoginActivity.class);
+                Intent loginActivity = new Intent(Featured.this, Authentication.class);
                 startActivity(loginActivity);
             }
         });

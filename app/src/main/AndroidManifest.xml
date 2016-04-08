@@ -59,7 +59,7 @@
                 android:value=".Splash" />
         </activity>
         <activity
-            android:name=".activities.LoginActivity"
+            android:name=".activities.Authentication"
             android:label="@string/title_activity_login"
             android:parentActivityName=".activities.Featured">
             <meta-data

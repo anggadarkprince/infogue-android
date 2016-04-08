@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +18,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.activities.LoginActivity;
+import com.sketchproject.infogue.activities.Authentication;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,8 +62,8 @@ public class Login extends Fragment {
             @Override
             public void onClick(View v) {
                 Activity mActivity = getActivity();
-                if(mActivity instanceof LoginActivity){
-                    ((LoginActivity) getActivity()).setTabRegisterActive();
+                if(mActivity instanceof Authentication){
+                    ((Authentication) getActivity()).setTabRegisterActive();
                 }
             }
         });
