@@ -16,9 +16,11 @@
         tools:context="com.sketchproject.infogue.activities.Application">
 
         <android.support.design.widget.AppBarLayout
+            android:id="@+id/appBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
+            android:theme="@style/AppTheme.AppBarOverlay"
+            app:elevation="0dp">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -27,20 +29,14 @@
                 android:background="?attr/colorPrimary"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-            <android.support.design.widget.TabLayout
-                android:id="@+id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:tabGravity="fill"
-                app:tabMode="fixed" />
-
         </android.support.design.widget.AppBarLayout>
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/viewpager"
+        <FrameLayout
+            android:id="@+id/container_body"
+            android:layout_marginTop="?attr/actionBarSize"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:layout_weight="1" />
 
     </android.support.design.widget.CoordinatorLayout>
 
@@ -50,6 +46,11 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
+        android:background="@color/colorLight"
+        app:insetForeground="@color/colorPrimary"
+        app:itemBackground="@drawable/navigation_item_selector"
+        app:itemTextColor="@color/drawer_text_selector"
+        app:itemIconTint="@color/drawer_text_selector"
         app:headerLayout="@layout/navigation_header"
         app:menu="@menu/application_drawer" />
 

@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#01a9be</color>
     <color name="colorAccent">#00e2ff</color>
     <color name="colorDark">#131313</color>
-    <color name="colorGray">#acacac</color>
+    <color name="colorGray">#555555</color>
     <color name="colorLightGray">#dddddd</color>
     <color name="colorLight">#ffffff</color>
     <color name="colorGradientFrom">#00bcd4</color>
@@ -18,4 +18,5 @@
     <color name="colorInfo">#5bc0de</color>
     <color name="colorWarning">#f0ad4e</color>
     <color name="colorDanger">#d9534f</color>
+
 </resources>
