@@ -25,7 +25,7 @@
     <string name="label_sign_in">SIGN IN</string>
     <string name="label_get_started">GET STARTED</string>
     <string name="label_create_account">Create an Account</string>
-    <string name="label_check_agree">I agree infogue.id terms and conditions</string>
+    <string name="label_check_agree"><![CDATA[I agree infogue.id <a href="http://www.infogue.id/terms">terms</a> and <a href="http://www.infogue.id/terms">conditions</a>]]></string>
 
     <string name="label_forgot_password">Forgot Password?</string>
     <string name="label_login_social">Login with Social</string>

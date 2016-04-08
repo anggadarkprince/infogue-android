@@ -8,7 +8,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +58,9 @@ public class Register extends Fragment {
         mPasswordView = (EditText) getActivity().findViewById(R.id.password);
         mAgreeView = (CheckBox) getActivity().findViewById(R.id.agree);
         mAlert = (TextView) getActivity().findViewById(R.id.alert);
+
+        mAgreeView.setText(Html.fromHtml(getResources().getString(R.string.label_check_agree)));
+        mAgreeView.setMovementMethod(LinkMovementMethod.getInstance());
 
         Button mEmailSignInButton = (Button) getActivity().findViewById(R.id.btn_sign_up);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
