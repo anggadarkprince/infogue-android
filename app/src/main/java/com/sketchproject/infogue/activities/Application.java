@@ -1,5 +1,7 @@
 package com.sketchproject.infogue.activities;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -37,6 +40,7 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setLogo(R.drawable.img_logo_small);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -79,6 +83,12 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.application, menu);
+
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
         return true;
     }
 
@@ -126,6 +136,7 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
     public boolean onNavigationItemSelected(MenuItem item) {
         Fragment fragment;
         String title;
+        boolean logo;
 
         int id = item.getItemId();
         String category = item.getTitle().toString();
@@ -142,16 +153,20 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
         } else {
             if (id == R.id.nav_home) {
                 fragment = new Home();
-                title = getString(R.string.app_name);
+                title = "";
+                logo = true;
             } else if (id == R.id.nav_random) {
                 fragment = ArticleFragment.newInstance(1, "random");
                 title = "Random";
+                logo = false;
             } else if (id == R.id.nav_headline) {
                 fragment = ArticleFragment.newInstance(1, "headline");
                 title = "Headline";
+                logo = false;
             } else {
                 fragment = ArticleFragment.newInstance(1, id, category);
                 title = category;
+                logo = false;
             }
 
             if (fragment != null) {
@@ -163,6 +178,7 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
                 ActionBar actionBar = getSupportActionBar();
                 if (actionBar != null) {
                     actionBar.setTitle(title);
+                    actionBar.setDisplayUseLogoEnabled(logo);
                 }
             }
         }

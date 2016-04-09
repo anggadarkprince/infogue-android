@@ -65,5 +65,7 @@
     <string name="menu_about">About</string>
     <string name="menu_website">Infogue.id</string>
     <string name="menu_rate">Rate App</string>
+    <string name="search_hint">Find article or contributor</string>
+    <string name="title_activity_search">Search Result</string>
 
 </resources>

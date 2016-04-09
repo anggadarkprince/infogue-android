@@ -1,7 +1,5 @@
 package com.sketchproject.infogue.fragments;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -51,8 +49,9 @@ public class Home extends Fragment implements ArticleFragment.OnArticleFragmentI
 
         tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-
-        Log.i("ARTICLE", "HOME");
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_list);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_stars);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_whatshot);
     }
 
     @Override
@@ -87,11 +86,9 @@ public class Home extends Fragment implements ArticleFragment.OnArticleFragmentI
         public CharSequence getPageTitle(int position) {
             if (position == 0) {
                 return "LATEST";
-            }
-            else if (position == 1) {
+            } else if (position == 1) {
                 return "POPULAR";
-            }
-            else if (position == 2) {
+            } else if (position == 2) {
                 return "TRENDING";
             }
 
