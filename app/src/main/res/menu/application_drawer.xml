@@ -6,18 +6,21 @@
             <group android:checkableBehavior="single">
                 <item
                     android:id="@+id/nav_home"
-                    android:title="Home" />
+                    android:icon="@drawable/ic_home"
+                    android:title="@string/menu_home" />
                 <item
                     android:id="@+id/nav_random"
-                    android:title="Random" />
+                    android:icon="@drawable/ic_random"
+                    android:title="@string/menu_random" />
                 <item
                     android:id="@+id/nav_headline"
-                    android:title="Headline" />
+                    android:icon="@drawable/ic_headline"
+                    android:title="@string/menu_headline" />
             </group>
         </menu>
     </item>
 
-    <item android:title="Categories">
+    <item android:title="@string/menu_category">
         <menu>
             <group android:checkableBehavior="single">
 
@@ -25,19 +28,20 @@
         </menu>
     </item>
 
-    <item android:title="About">
+    <item android:title="@string/menu_about">
         <menu>
-            <group android:checkableBehavior="single">
-                <item
-                    android:id="@+id/nav_website"
-                    android:title="Infogue.id" />
-                <item
-                    android:id="@+id/nav_rating"
-                    android:title="Rate App" />
-                <item
-                    android:id="@+id/nav_about"
-                    android:title="About" />
-            </group>
+            <item
+                android:id="@+id/nav_website"
+                android:icon="@drawable/ic_world"
+                android:title="@string/menu_website" />
+            <item
+                android:id="@+id/nav_rating"
+                android:icon="@drawable/ic_star"
+                android:title="@string/menu_rate" />
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_info"
+                android:title="@string/menu_about" />
         </menu>
     </item>
 

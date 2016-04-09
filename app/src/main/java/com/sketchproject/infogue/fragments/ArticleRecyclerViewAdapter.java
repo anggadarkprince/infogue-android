@@ -17,7 +17,10 @@ import java.util.List;
  * specified {@link OnArticleFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecyclerViewAdapter.ViewHolder> {
+public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private static final int VIEW_TYPE_HEADER = 0;
+    private static final int VIEW_TYPE_ROW = 1;
 
     private final List<DummyItem> mValues;
     private final ArticleFragment.OnArticleFragmentInteractionListener mListener;
@@ -28,27 +31,69 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_article, parent, false);
-        return new ViewHolder(view);
+    public int getItemViewType(int position) {
+        if(position == 0){
+            return VIEW_TYPE_HEADER;
+        }
+
+        return VIEW_TYPE_ROW;
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view;
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onArticleFragmentInteraction(holder.mItem);
-                }
-            }
-        });
+        if(viewType == VIEW_TYPE_HEADER){
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_article_header, parent, false);
+            return new ArticleHeaderViewHolder(view);
+        }
+
+        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_article_row, parent, false);
+        return new ArticleRowViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+
+        switch (getItemViewType(position)){
+            case VIEW_TYPE_HEADER:
+                final ArticleHeaderViewHolder headerHolder = (ArticleHeaderViewHolder) holder;
+                headerHolder.mItem = mValues.get(position);
+                headerHolder.mTitleView.setText(mValues.get(position).title);
+                headerHolder.mDateView.setText(mValues.get(position).date);
+                headerHolder.mContentView.setText(mValues.get(position).content);
+                headerHolder.mCategoryView.setText(mValues.get(position).category);
+
+                headerHolder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (null != mListener) {
+                            // Notify the active callbacks interface (the activity, if the
+                            // fragment is attached to one) that an item has been selected.
+                            mListener.onArticleFragmentInteraction(headerHolder.mItem);
+                        }
+                    }
+                });
+
+                break;
+
+            case VIEW_TYPE_ROW:
+                final ArticleRowViewHolder rowHolder = (ArticleRowViewHolder) holder;
+                rowHolder.mItem = mValues.get(position);
+                rowHolder.mTitleView.setText(mValues.get(position).title);
+                rowHolder.mDateView.setText(mValues.get(position).date);
+
+                rowHolder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (null != mListener) {
+                            mListener.onArticleFragmentInteraction(rowHolder.mItem);
+                        }
+                    }
+                });
+
+                break;
+        }
     }
 
     @Override
@@ -56,22 +101,46 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         return mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
+
+    public class ArticleHeaderViewHolder extends RecyclerView.ViewHolder {
+        public View mView;
+        public TextView mTitleView;
+        public TextView mContentView;
+        public TextView mCategoryView;
+        public TextView mDateView;
         public DummyItem mItem;
 
-        public ViewHolder(View view) {
+        public ArticleHeaderViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
+            mTitleView = (TextView) view.findViewById(R.id.title);
             mContentView = (TextView) view.findViewById(R.id.content);
+            mCategoryView = (TextView) view.findViewById(R.id.category);
+            mDateView = (TextView) view.findViewById(R.id.date);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + mTitleView.getText() + "'";
+        }
+    }
+
+    public class ArticleRowViewHolder extends RecyclerView.ViewHolder {
+        public View mView;
+        public TextView mTitleView;
+        public TextView mDateView;
+        public DummyItem mItem;
+
+        public ArticleRowViewHolder(View view) {
+            super(view);
+            mView = view;
+            mTitleView = (TextView) view.findViewById(R.id.title);
+            mDateView = (TextView) view.findViewById(R.id.date);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + " '" + mTitleView.getText() + "'";
         }
     }
 }

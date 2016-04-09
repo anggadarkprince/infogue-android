@@ -1,6 +1,7 @@
 package com.sketchproject.infogue.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -51,14 +52,16 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
         populateMenu();
     }
 
-    private void populateMenu(){
+    private void populateMenu() {
         SubMenu navMenu = navigationView.getMenu().getItem(1).getSubMenu();
 
         String[] dataNav = {"News", "Economic", "Entertainment", "Sport", "Science", "Technology", "Education", "Photo", "Video", "Others"};
         int[] dataNavId = {11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
 
         for (int i = 0; i < dataNav.length; i++) {
-            navMenu.add(1, dataNavId[i], Menu.CATEGORY_ALTERNATIVE, "     " + dataNav[i]).setCheckable(true);
+            navMenu.add(1, dataNavId[i], Menu.CATEGORY_ALTERNATIVE, dataNav[i])
+                    .setCheckable(true)
+                    .setIcon(R.drawable.ic_circle);
         }
     }
 
@@ -92,6 +95,7 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
                 }
             }
         }
+
         return super.onPrepareOptionsPanel(view, menu);
     }
 
@@ -126,29 +130,40 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
         int id = item.getItemId();
         String category = item.getTitle().toString();
 
-        if (id == R.id.nav_home) {
-            fragment = new Home();
-            title = getString(R.string.app_name);
-        } else if (id == R.id.nav_random) {
-            fragment = ArticleFragment.newInstance(1, "random");
-            title = "Random";
-        } else if (id == R.id.nav_headline) {
-            fragment = ArticleFragment.newInstance(1, "headline");
-            title = "Headline";
+        if (id == R.id.nav_website) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://infogue.id"));
+            startActivity(browserIntent);
+        } else if (id == R.id.nav_rating) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.sketchproject.infogue"));
+            startActivity(browserIntent);
+        } else if (id == R.id.nav_about) {
+            Intent aboutActivity = new Intent(Application.this, About.class);
+            startActivity(aboutActivity);
         } else {
-            fragment = ArticleFragment.newInstance(1, id, category);
-            title = category;
-        }
+            if (id == R.id.nav_home) {
+                fragment = new Home();
+                title = getString(R.string.app_name);
+            } else if (id == R.id.nav_random) {
+                fragment = ArticleFragment.newInstance(1, "random");
+                title = "Random";
+            } else if (id == R.id.nav_headline) {
+                fragment = ArticleFragment.newInstance(1, "headline");
+                title = "Headline";
+            } else {
+                fragment = ArticleFragment.newInstance(1, id, category);
+                title = category;
+            }
 
-        if (fragment != null) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.container_body, fragment);
-            fragmentTransaction.commit();
+            if (fragment != null) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container_body, fragment);
+                fragmentTransaction.commit();
 
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle(title);
+                ActionBar actionBar = getSupportActionBar();
+                if (actionBar != null) {
+                    actionBar.setTitle(title);
+                }
             }
         }
 

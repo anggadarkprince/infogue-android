@@ -49,7 +49,14 @@ public class DummyContent {
     }
 
     private static DummyItem createDummyItem(int position) {
-        return new DummyItem(String.valueOf(position), "Item " + position, makeDetails(position));
+        return new DummyItem(
+                String.valueOf(position),
+                "Girl gone has rises the revenue up to $100 million dollar",
+                "Last nigh Box Office release update about the new arrival film Girl Gone. They announced latest revenue for 3 weeks after the date release. At the firsr tumr this film looks like similar with the mainstream story about lost girl",
+                "Entertainment",
+                "27 January 2016",
+                makeDetails(position)
+        );
     }
 
     private static String makeDetails(int position) {
@@ -65,13 +72,19 @@ public class DummyContent {
      * A dummy item representing a piece of content.
      */
     public static class DummyItem {
-        public final String id;
-        public final String content;
-        public final String details;
+        public String id;
+        public String title;
+        public String content;
+        public String date;
+        public String category;
+        public String details;
 
-        public DummyItem(String id, String content, String details) {
+        public DummyItem(String id, String title, String content, String category, String date, String details) {
             this.id = id;
+            this.title = title;
             this.content = content;
+            this.date = date;
+            this.category = category;
             this.details = details;
         }
 
