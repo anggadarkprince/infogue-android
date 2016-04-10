@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class AuthenticationActivity extends AppCompatActivity {
 
-    public static int LOGIN_SCREEN = 0;
-    public static int REGISTER_SCREEN = 1;
+    public static final int LOGIN_SCREEN = 0;
+    public static final int REGISTER_SCREEN = 1;
 
     private ViewPager viewPager;
 

@@ -70,7 +70,8 @@
     <RelativeLayout
         android:id="@+id/signed_header"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="visible">
 
         <ImageView
             android:id="@+id/cover"
@@ -83,8 +84,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:alpha=".5"
-            android:background="@color/colorPrimary" />
+            android:alpha=".3"
+            android:background="@android:color/black" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -115,7 +116,7 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:text="Angga Ari Wijaya"
-                android:textColor="@color/colorLight"
+                android:textColor="@color/colorPrimary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 

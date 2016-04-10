@@ -49,6 +49,7 @@ public class HomeFragment extends Fragment implements ArticleFragment.OnArticleF
 
         tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_list);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_stars);
         tabLayout.getTabAt(2).setIcon(R.drawable.ic_whatshot);
@@ -73,6 +74,14 @@ public class HomeFragment extends Fragment implements ArticleFragment.OnArticleF
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
+            if (position == 0) {
+                return ArticleFragment.newInstance(1, "latest");
+            } else if (position == 1) {
+                return ArticleFragment.newInstance(1, "popular");
+            } else if (position == 2) {
+                return ArticleFragment.newInstance(1, "trending");
+            }
+
             return ArticleFragment.newInstance(1);
         }
 

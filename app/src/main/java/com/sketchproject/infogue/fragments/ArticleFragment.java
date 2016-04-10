@@ -24,6 +24,8 @@ import com.sketchproject.infogue.fragments.dummy.DummyArticleContent.DummyItem;
  */
 public class ArticleFragment extends Fragment {
 
+    public static final String NOHEADER = "noheader";
+
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String ARG_CATEGORY_ID = "category-id";
@@ -31,6 +33,7 @@ public class ArticleFragment extends Fragment {
     private static final String ARG_SUBCATEGORY_ID = "subcategory-id";
     private static final String ARG_SUBCATEGORY = "subcategory";
     private static final String ARG_FEATURED = "featured";
+    private static final String ARG_AUTHOR = "author";
 
     // TODO: Customize parameters
     private int mColumnCount = 1;
@@ -39,6 +42,8 @@ public class ArticleFragment extends Fragment {
     private String mCategory;
     private String mSubcategory;
     private String mFeatured;
+    private String mAuthor;
+    private boolean hasHeader = false;
 
     private OnArticleFragmentInteractionListener mListener;
 
@@ -55,6 +60,19 @@ public class ArticleFragment extends Fragment {
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
+        return fragment;
+    }
+
+    @SuppressWarnings("unused")
+    public static ArticleFragment newInstance(String author) {
+        ArticleFragment fragment = new ArticleFragment();
+
+        Bundle args = new Bundle();
+        args.putInt(ARG_COLUMN_COUNT, 1);
+        args.putString(ARG_AUTHOR, author);
+
+        fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -112,6 +130,7 @@ public class ArticleFragment extends Fragment {
             mCategory = getArguments().getString(ARG_CATEGORY);
             mSubcategory = getArguments().getString(ARG_SUBCATEGORY);
             mFeatured = getArguments().getString(ARG_FEATURED);
+            mAuthor = getArguments().getString(ARG_AUTHOR);
         }
 
         if(mSubcategoryId > 0 && mSubcategory != null){
@@ -121,7 +140,11 @@ public class ArticleFragment extends Fragment {
             Log.i("ARTICLE", mCategory+" id : "+mCategoryId);
         }
         else if(mFeatured != null){
+            hasHeader = true;
             Log.i("ARTICLE FEATURED", mFeatured);
+        }
+        else if(mAuthor != null){
+            Log.i("ARTICLE CONTRIBUTOR", mAuthor);
         }
         else{
             Log.i("ARTICLE", "DEFAULT");
@@ -143,7 +166,7 @@ public class ArticleFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            recyclerView.setAdapter(new ArticleRecyclerViewAdapter(DummyArticleContent.ITEMS, mListener));
+            recyclerView.setAdapter(new ArticleRecyclerViewAdapter(DummyArticleContent.ITEMS, mListener, hasHeader));
         }
 
         return view;

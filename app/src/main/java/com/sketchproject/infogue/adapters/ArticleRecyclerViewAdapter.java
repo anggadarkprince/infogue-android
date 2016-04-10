@@ -25,15 +25,17 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
     private final List<DummyItem> mValues;
     private final OnArticleFragmentInteractionListener mListener;
+    private boolean header;
 
-    public ArticleRecyclerViewAdapter(List<DummyItem> items, OnArticleFragmentInteractionListener listener) {
+    public ArticleRecyclerViewAdapter(List<DummyItem> items, OnArticleFragmentInteractionListener listener, boolean hasHeader) {
         mValues = items;
         mListener = listener;
+        header = hasHeader;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if(position == 0){
+        if(position == 0 && header){
             return VIEW_TYPE_HEADER;
         }
 

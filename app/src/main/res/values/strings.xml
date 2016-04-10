@@ -77,5 +77,6 @@
     <string name="cover_content_description">Cover Image</string>
     <string name="sign_out_content_description">Sign Out</string>
     <string name="action_create_article">Create Article</string>
+    <string name="title_activity_article">ArticleActivity</string>
 
 </resources>

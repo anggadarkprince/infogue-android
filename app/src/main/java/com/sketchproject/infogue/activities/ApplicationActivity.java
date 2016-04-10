@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
@@ -34,7 +35,7 @@ public class ApplicationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         ArticleFragment.OnArticleFragmentInteractionListener {
 
-    public static final String AUTH_ACTIVITY = "authentication";
+    public static final String AUTH_ACTIVITY = "authentication-activity";
 
     private NavigationView navigationView;
 
@@ -58,7 +59,9 @@ public class ApplicationActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.nav_home);
 
-        Button mSignInButton = (Button) findViewById(R.id.btn_sign_in);
+        View navigationHeader = navigationView.getHeaderView(0);
+
+        Button mSignInButton = (Button) navigationHeader.findViewById(R.id.btn_sign_in);
         mSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,7 +70,8 @@ public class ApplicationActivity extends AppCompatActivity
                 startActivity(loginIntent);
             }
         });
-        Button mSignUpButton = (Button) findViewById(R.id.btn_sign_up);
+
+        Button mSignUpButton = (Button) navigationHeader.findViewById(R.id.btn_sign_up);
         mSignUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,9 +81,29 @@ public class ApplicationActivity extends AppCompatActivity
             }
         });
 
+        Button mCreateArticleButton = (Button) navigationHeader.findViewById(R.id.btn_create_article);
+        mCreateArticleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        ImageButton mSignOutButton = (ImageButton) navigationHeader.findViewById(R.id.btn_sign_out);
+        mSignOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent loginIntent = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
+                loginIntent.putExtra(AUTH_ACTIVITY, AuthenticationActivity.LOGIN_SCREEN);
+                startActivity(loginIntent);
+            }
+        });
+
         MenuItem home = navigationView.getMenu().getItem(0).getSubMenu().getItem(0);
         onNavigationItemSelected(home);
         populateMenu();
+
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
     }
 
     private void populateMenu() {
@@ -155,9 +179,17 @@ public class ApplicationActivity extends AppCompatActivity
 
         } else if (id == R.id.action_profile) {
             Intent profileActivity = new Intent(ApplicationActivity.this, ProfileActivity.class);
+            profileActivity.putExtra("id", 1);
+            profileActivity.putExtra("username", "imeldadwi");
+            profileActivity.putExtra("name", "Imelda Dwi Agustine");
+            profileActivity.putExtra("location", "Jakarta, Indonesia");
+            profileActivity.putExtra("avatar", R.drawable.dummy_avatar);
             startActivity(profileActivity);
         } else if (id == R.id.action_article) {
-
+            Intent articleActivity = new Intent(ApplicationActivity.this, ArticleActivity.class);
+            articleActivity.putExtra("id", 1);
+            articleActivity.putExtra("username", "imeldadwi");
+            startActivity(articleActivity);
         }
 
         return super.onOptionsItemSelected(item);
