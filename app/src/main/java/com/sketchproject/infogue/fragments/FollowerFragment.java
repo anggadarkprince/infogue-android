@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.adapters.FollowerRecyclerViewAdapter;
-import com.sketchproject.infogue.fragments.dummy.DummyContent;
-import com.sketchproject.infogue.fragments.dummy.DummyContent.DummyItem;
+import com.sketchproject.infogue.fragments.dummy.DummyFollowerContent;
+import com.sketchproject.infogue.fragments.dummy.DummyFollowerContent.DummyItem;
 
 /**
  * A fragment representing a list of Items.
@@ -69,7 +69,7 @@ public class FollowerFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new FollowerRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new FollowerRecyclerViewAdapter(DummyFollowerContent.ITEMS, mListener));
         }
         return view;
     }

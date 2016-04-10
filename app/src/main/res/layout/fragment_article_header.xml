@@ -32,6 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
+            android:textColor="@color/colorGray"
             android:ellipsize="end"
             android:maxLines="4"
             android:text="Last nigh Box Office release update about the new arrival film Girl Gone. They announced latest revenue for 3 weeks after the date release. At the firsr tumr this film looks like similar with the mainstream story about lost girl" />

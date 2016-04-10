@@ -68,5 +68,7 @@
     <string name="search_hint">Find article or contributor</string>
     <string name="title_activity_search">Search Result</string>
     <string name="title_activity_follower">Followers</string>
+    <string name="follow_content_description">Follow</string>
+    <string name="avatar_content_description">Avatar</string>
 
 </resources>

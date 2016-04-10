@@ -4,11 +4,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.FollowerFragment.OnListFragmentInteractionListener;
-import com.sketchproject.infogue.fragments.dummy.DummyContent.DummyItem;
+import com.sketchproject.infogue.fragments.dummy.DummyFollowerContent.DummyItem;
 
 import java.util.List;
 
@@ -37,8 +39,12 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<FollowerRe
     @Override
     public void onBindViewHolder(final FollowerViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.mNameView.setText(mValues.get(position).name);
+        holder.mLocationView.setText(mValues.get(position).location);
+        holder.mAvatarImage.setImageResource(mValues.get(position).avatar);
+        if(mValues.get(position).isFollowing){
+            holder.mFollowButton.setImageResource(R.drawable.btn_unfollow);
+        }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,20 +65,24 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<FollowerRe
 
     public class FollowerViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
+        public final TextView mNameView;
+        public final TextView mLocationView;
+        public final ImageButton mFollowButton;
+        public final ImageView mAvatarImage;
         public DummyItem mItem;
 
         public FollowerViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            mNameView = (TextView) view.findViewById(R.id.name);
+            mLocationView = (TextView) view.findViewById(R.id.location);
+            mFollowButton = (ImageButton) view.findViewById(R.id.follow);
+            mAvatarImage = (ImageView) view.findViewById(R.id.avatar);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + mNameView.getText() + "'";
         }
     }
 }

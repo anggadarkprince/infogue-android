@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sketchproject.infogue.R;
@@ -63,6 +64,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 headerHolder.mDateView.setText(mValues.get(position).date);
                 headerHolder.mContentView.setText(mValues.get(position).content);
                 headerHolder.mCategoryView.setText(mValues.get(position).category);
+                headerHolder.mFeaturedImage.setImageResource(mValues.get(position).featured);
 
                 headerHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -82,6 +84,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 rowHolder.mItem = mValues.get(position);
                 rowHolder.mTitleView.setText(mValues.get(position).title);
                 rowHolder.mDateView.setText(mValues.get(position).date);
+                rowHolder.mFeaturedImage.setImageResource(mValues.get(position).featured);
 
                 rowHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -108,6 +111,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         public TextView mContentView;
         public TextView mCategoryView;
         public TextView mDateView;
+        public ImageView mFeaturedImage;
         public DummyItem mItem;
 
         public ArticleHeaderViewHolder(View view) {
@@ -117,6 +121,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             mContentView = (TextView) view.findViewById(R.id.content);
             mCategoryView = (TextView) view.findViewById(R.id.category);
             mDateView = (TextView) view.findViewById(R.id.date);
+            mFeaturedImage = (ImageView) view.findViewById(R.id.featured);
         }
 
         @Override
@@ -129,6 +134,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         public View mView;
         public TextView mTitleView;
         public TextView mDateView;
+        public ImageView mFeaturedImage;
         public DummyItem mItem;
 
         public ArticleRowViewHolder(View view) {
@@ -136,6 +142,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             mView = view;
             mTitleView = (TextView) view.findViewById(R.id.title);
             mDateView = (TextView) view.findViewById(R.id.date);
+            mFeaturedImage = (ImageView) view.findViewById(R.id.featured);
         }
 
         @Override

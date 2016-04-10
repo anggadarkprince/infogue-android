@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="90dp"
     android:layout_marginRight="@dimen/activity_horizontal_margin"
     android:layout_marginLeft="@dimen/activity_horizontal_margin"
     android:layout_marginTop="@dimen/space_medium"
-    android:background="@drawable/background_white_shadow"
-    android:padding="@dimen/activity_horizontal_margin">
+    android:paddingBottom="1dp"
+    android:background="@drawable/background_white_shadow">
 
     <ImageView
         android:id="@+id/featured"
-        android:layout_width="80dp"
-        android:layout_height="70dp"
-        android:layout_marginEnd="@dimen/text_margin"
-        android:layout_marginRight="@dimen/text_margin"
+        android:layout_width="100dp"
+        android:layout_height="87dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
         android:scaleType="centerCrop"
         android:src="@drawable/dummy_featured_1"
         android:contentDescription="@string/dummy_content" />
@@ -22,11 +22,17 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/colorGray"
         android:layout_toEndOf="@id/featured"
         android:layout_toRightOf="@id/featured"
+        android:lineSpacingMultiplier="1"
+        android:ellipsize="end"
+        android:maxLines="3"
         android:text="Buble party begin, crowd of society around the city"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/date"
@@ -37,15 +43,18 @@
         android:layout_marginTop="5dp"
         android:layout_toRightOf="@id/featured"
         android:text="13 January 2016"
+        android:textSize="12sp"
+        android:layout_marginBottom="5dp"
         android:textColor="@color/colorPrimary" />
 
     <ImageView
         android:id="@+id/more"
         android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_below="@id/title"
+        android:layout_height="20dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp"
         android:tint="@color/colorGray"
         android:src="@drawable/ic_ellipsis" />
 

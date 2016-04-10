@@ -3,10 +3,11 @@ package com.sketchproject.infogue.activities;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.FollowerFragment;
-import com.sketchproject.infogue.fragments.dummy.DummyContent;
+import com.sketchproject.infogue.fragments.dummy.DummyFollowerContent;
 
 public class FollowerActivity extends AppCompatActivity implements FollowerFragment.OnListFragmentInteractionListener {
 
@@ -20,7 +21,7 @@ public class FollowerActivity extends AppCompatActivity implements FollowerFragm
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
-
+    public void onListFragmentInteraction(DummyFollowerContent.DummyItem item) {
+        Log.i("RESULT", item.username);
     }
 }

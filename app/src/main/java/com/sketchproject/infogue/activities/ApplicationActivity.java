@@ -128,7 +128,7 @@ public class ApplicationActivity extends AppCompatActivity implements Navigation
 
     @Override
     public void onArticleFragmentInteraction(DummyArticleContent.DummyItem item) {
-        Log.i("RESULT", item.details);
+        Log.i("RESULT", item.slug + " " + item.details);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
