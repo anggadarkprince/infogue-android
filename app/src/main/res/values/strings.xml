@@ -71,5 +71,11 @@
     <string name="follow_content_description">Follow</string>
     <string name="avatar_content_description">Avatar</string>
     <string name="featured_content_description">Featured</string>
+    <string name="facebook_content_description">Facebook</string>
+    <string name="twitter_content_description">Twitter</string>
+    <string name="logo_content_description">Logo</string>
+    <string name="cover_content_description">Cover Image</string>
+    <string name="sign_out_content_description">Sign Out</string>
+    <string name="action_create_article">Create Article</string>
 
 </resources>

@@ -20,7 +20,8 @@ import java.util.List;
  */
 public class AuthenticationActivity extends AppCompatActivity {
 
-    private TabLayout tabLayout;
+    public static int LOGIN_SCREEN = 0;
+    public static int REGISTER_SCREEN = 1;
 
     private ViewPager viewPager;
 
@@ -29,11 +30,17 @@ public class AuthenticationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authentication);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setElevation(0);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setElevation(0);
+        }
+
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new LoginFragment(), "Log In");
+        adapter.addFragment(new RegisterFragment(), "Register");
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
+        viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -55,19 +62,26 @@ public class AuthenticationActivity extends AppCompatActivity {
             }
         });
 
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            int screen = extras.getInt(ApplicationActivity.AUTH_ACTIVITY);
+            if (screen == LOGIN_SCREEN) {
+                setTabLoginActive();
+            } else if (screen == REGISTER_SCREEN) {
+                setTabRegisterActive();
+            }
+        }
     }
 
-    public void setTabRegisterActive(){
-        viewPager.setCurrentItem(1);
+    public void setTabRegisterActive() {
+        viewPager.setCurrentItem(REGISTER_SCREEN);
     }
 
-    private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new LoginFragment(), "Log In");
-        adapter.addFragment(new RegisterFragment(), "Register");
-        viewPager.setAdapter(adapter);
+    public void setTabLoginActive() {
+        viewPager.setCurrentItem(LOGIN_SCREEN);
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -99,4 +113,3 @@ public class AuthenticationActivity extends AppCompatActivity {
         }
     }
 }
-

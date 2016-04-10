@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.widget.Button;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
@@ -29,7 +30,11 @@ import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
 
 import java.lang.reflect.Method;
 
-public class ApplicationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ArticleFragment.OnArticleFragmentInteractionListener {
+public class ApplicationActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener,
+        ArticleFragment.OnArticleFragmentInteractionListener {
+
+    public static final String AUTH_ACTIVITY = "authentication";
 
     private NavigationView navigationView;
 
@@ -40,7 +45,9 @@ public class ApplicationActivity extends AppCompatActivity implements Navigation
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setLogo(R.drawable.img_logo_small);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setLogo(R.drawable.img_logo_small);
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -50,6 +57,25 @@ public class ApplicationActivity extends AppCompatActivity implements Navigation
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.nav_home);
+
+        Button mSignInButton = (Button) findViewById(R.id.btn_sign_in);
+        mSignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent loginIntent = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
+                loginIntent.putExtra(AUTH_ACTIVITY, AuthenticationActivity.LOGIN_SCREEN);
+                startActivity(loginIntent);
+            }
+        });
+        Button mSignUpButton = (Button) findViewById(R.id.btn_sign_up);
+        mSignUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent registerIntent = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
+                registerIntent.putExtra(AUTH_ACTIVITY, AuthenticationActivity.REGISTER_SCREEN);
+                startActivity(registerIntent);
+            }
+        });
 
         MenuItem home = navigationView.getMenu().getItem(0).getSubMenu().getItem(0);
         onNavigationItemSelected(home);
@@ -82,7 +108,7 @@ public class ApplicationActivity extends AppCompatActivity implements Navigation
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu, menu);
+        getMenuInflater().inflate(R.menu.account, menu);
 
         // Associate searchable configuration with the SearchView
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -114,13 +140,24 @@ public class ApplicationActivity extends AppCompatActivity implements Navigation
         int id = item.getItemId();
 
         if (id == R.id.action_login) {
-            Intent loginActivity = new Intent(ApplicationActivity.this, FollowerActivity.class);
+            Intent loginActivity = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
             startActivity(loginActivity);
         } else if (id == R.id.action_about) {
             Intent aboutActivity = new Intent(ApplicationActivity.this, AboutActivity.class);
             startActivity(aboutActivity);
         } else if (id == R.id.action_exit) {
             finish();
+        } else if (id == R.id.action_logout) {
+            Intent loginActivity = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
+            startActivity(loginActivity);
+            finish();
+        } else if (id == R.id.action_settings) {
+
+        } else if (id == R.id.action_profile) {
+            Intent profileActivity = new Intent(ApplicationActivity.this, ProfileActivity.class);
+            startActivity(profileActivity);
+        } else if (id == R.id.action_article) {
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -188,5 +225,4 @@ public class ApplicationActivity extends AppCompatActivity implements Navigation
 
         return true;
     }
-
 }

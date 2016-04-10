@@ -17,14 +17,6 @@ import com.sketchproject.infogue.R;
 
 public class FeaturedActivity extends AppCompatActivity {
 
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    private ViewPager mViewPager;
-
-    private Button buttonSignIn;
-
-    private Button buttonGetStarted;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,10 +24,10 @@ public class FeaturedActivity extends AppCompatActivity {
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -52,7 +44,7 @@ public class FeaturedActivity extends AppCompatActivity {
             }
         });
 
-        buttonSignIn = (Button) findViewById(R.id.btn_sign_in);
+        Button buttonSignIn = (Button) findViewById(R.id.btn_sign_in);
         buttonSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,7 +53,7 @@ public class FeaturedActivity extends AppCompatActivity {
             }
         });
 
-        buttonGetStarted = (Button) findViewById(R.id.btn_get_started);
+        Button buttonGetStarted = (Button) findViewById(R.id.btn_get_started);
         buttonGetStarted.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,16 +124,16 @@ public class FeaturedActivity extends AppCompatActivity {
 
             switch (getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
-                    featuredBackground.setImageDrawable(getResources().getDrawable(R.drawable.bg_featured_1));
-                    featuredContent.setImageDrawable(getResources().getDrawable(R.drawable.img_featured_1));
+                    featuredBackground.setImageResource(R.drawable.bg_featured_1);
+                    featuredContent.setImageResource(R.drawable.img_featured_1);
                     break;
                 case 2:
-                    featuredBackground.setImageDrawable(getResources().getDrawable(R.drawable.bg_featured_2));
-                    featuredContent.setImageDrawable(getResources().getDrawable(R.drawable.img_featured_2));
+                    featuredBackground.setImageResource(R.drawable.bg_featured_2);
+                    featuredContent.setImageResource(R.drawable.img_featured_2);
                     break;
                 case 3:
-                    featuredBackground.setImageDrawable(getResources().getDrawable(R.drawable.bg_featured_3));
-                    featuredContent.setImageDrawable(getResources().getDrawable(R.drawable.img_featured_3));
+                    featuredBackground.setImageResource(R.drawable.bg_featured_3);
+                    featuredContent.setImageResource(R.drawable.img_featured_3);
                     break;
             }
 

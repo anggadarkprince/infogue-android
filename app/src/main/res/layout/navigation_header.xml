@@ -4,53 +4,170 @@
     android:layout_height="@dimen/nav_header_height"
     android:background="@drawable/side_nav_bar"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="25dp"
-    android:paddingRight="25dp"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="160dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="@dimen/nav_header_margin_top"
-        android:src="@drawable/img_logo_medium" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/label_sign_navigation"
-        android:textColor="@color/colorLight"
-        android:textSize="17sp" />
-
     <LinearLayout
+        android:id="@+id/unsigned_header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:visibility="gone">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
-            android:minHeight="40dp"
-            android:layout_weight="1"
-            android:background="@drawable/button_light"
-            android:text="@string/action_sign_in"
-            android:textColor="@color/colorPrimary" />
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="160dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="@dimen/nav_header_margin_top"
+            android:contentDescription="@string/logo_content_description"
+            android:src="@drawable/img_logo_medium" />
 
-        <Button
-            android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:background="@drawable/button_light"
-            android:minHeight="40dp"
-            android:text="@string/action_register"
-            android:textColor="@color/colorPrimary" />
+            android:text="@string/label_sign_navigation"
+            android:textColor="@color/colorLight"
+            android:textSize="17sp" />
+
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_sign_in"
+                style="?android:attr/buttonBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_light"
+                android:minHeight="40dp"
+                android:text="@string/action_sign_in"
+                android:textColor="@color/colorPrimary" />
+
+            <Button
+                android:id="@id/btn_sign_up"
+                style="?android:attr/buttonBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:background="@drawable/button_light"
+                android:minHeight="40dp"
+                android:text="@string/action_register"
+                android:textColor="@color/colorPrimary" />
+
+        </LinearLayout>
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/signed_header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/cover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/cover_content_description"
+            android:scaleType="centerCrop"
+            android:src="@drawable/dummy_featured_2" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha=".5"
+            android:background="@color/colorPrimary" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="20dp"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:paddingTop="@dimen/nav_header_margin_top_profile">
+
+            <ImageView
+                android:id="@+id/avatar"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginRight="15dp"
+                android:contentDescription="@string/avatar_content_description"
+                android:scaleType="centerCrop"
+                android:src="@drawable/dummy_avatar" />
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_toEndOf="@id/avatar"
+                android:layout_toRightOf="@id/avatar"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="Angga Ari Wijaya"
+                android:textColor="@color/colorLight"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/name"
+                android:layout_marginBottom="15dp"
+                android:layout_toEndOf="@id/avatar"
+                android:layout_toRightOf="@id/avatar"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="Jakarta, Indonesia"
+                android:textColor="@color/colorLight"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btn_create_article"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/location"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_toEndOf="@id/avatar"
+                android:layout_toRightOf="@id/avatar"
+                android:background="@drawable/button_primary"
+                android:minHeight="36dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="@string/action_create_article"
+                android:textColor="@color/colorLight" />
+
+            <ImageButton
+                android:id="@+id/btn_sign_out"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/location"
+                android:layout_toEndOf="@id/btn_create_article"
+                android:layout_toRightOf="@id/btn_create_article"
+                android:background="@drawable/button_primary"
+                android:contentDescription="@string/sign_out_content_description"
+                android:minHeight="36dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:src="@drawable/ic_exit"
+                android:textColor="@color/colorLight"
+                android:tint="@color/colorLight" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
 
 
 </LinearLayout>
