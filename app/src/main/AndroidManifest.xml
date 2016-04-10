@@ -2,13 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sketchproject.infogue">
 
-    <!-- Application requires an internet connection. -->
+    <!-- ApplicationActivity requires an internet connection. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Application need to save session file. -->
+    <!-- ApplicationActivity need to save session file. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <!-- Application need to check internet connection to perform the request. -->
+    <!-- ApplicationActivity need to check internet connection to perform the request. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- GCM requires a Google account. -->
@@ -30,7 +30,6 @@
         android:logo="@drawable/img_logo_small"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".Splash"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -52,7 +51,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.Featured"
+            android:name=".activities.FeaturedActivity"
             android:label="@string/title_activity_featured"
             android:parentActivityName=".Splash"
             android:theme="@style/AppTheme.NoActionBar">
@@ -61,15 +60,15 @@
                 android:value=".Splash" />
         </activity>
         <activity
-            android:name=".activities.Authentication"
+            android:name=".activities.AuthenticationActivity"
             android:label="@string/title_activity_login"
-            android:parentActivityName=".activities.Featured">
+            android:parentActivityName=".activities.FeaturedActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.Featured" />
+                android:value=".activities.FeaturedActivity" />
         </activity>
         <activity
-            android:name=".activities.Application"
+            android:name=".activities.ApplicationActivity"
             android:label="@string/title_activity_application"
             android:logo="@drawable/img_logo_small"
             android:theme="@style/AppTheme.NoActionBar">
@@ -78,11 +77,11 @@
                 android:value=".activities.SearchActivity" />
         </activity>
         <activity
-            android:name=".activities.About"
+            android:name=".activities.AboutActivity"
             android:label="@string/title_activity_about"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.Profile"
+            android:name=".activities.ProfileActivity"
             android:label="@string/title_activity_profile"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -91,9 +90,19 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+        </activity>
+        <activity
+            android:name=".activities.FollowerActivity"
+            android:label="@string/title_activity_follower"
+            android:parentActivityName=".activities.ProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.ProfileActivity" />
         </activity>
     </application>
 

@@ -12,16 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.fragments.dummy.DummyContent;
+import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
 
-public class Home extends Fragment implements ArticleFragment.OnArticleFragmentInteractionListener {
+public class HomeFragment extends Fragment implements ArticleFragment.OnArticleFragmentInteractionListener {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    public Home() {
+    public HomeFragment() {
         // Required empty public constructor
     }
 
@@ -55,7 +55,7 @@ public class Home extends Fragment implements ArticleFragment.OnArticleFragmentI
     }
 
     @Override
-    public void onArticleFragmentInteraction(DummyContent.DummyItem item) {
+    public void onArticleFragmentInteraction(DummyArticleContent.DummyItem item) {
         Log.i("RESULT", item.details);
     }
 

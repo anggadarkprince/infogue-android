@@ -12,8 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.fragments.dummy.DummyContent;
-import com.sketchproject.infogue.fragments.dummy.DummyContent.DummyItem;
+import com.sketchproject.infogue.adapters.ArticleRecyclerViewAdapter;
+import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
+import com.sketchproject.infogue.fragments.dummy.DummyArticleContent.DummyItem;
 
 /**
  * A fragment representing a list of Items.
@@ -142,7 +143,7 @@ public class ArticleFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            recyclerView.setAdapter(new ArticleRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new ArticleRecyclerViewAdapter(DummyArticleContent.ITEMS, mListener));
         }
 
         return view;

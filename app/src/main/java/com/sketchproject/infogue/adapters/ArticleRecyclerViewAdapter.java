@@ -1,4 +1,4 @@
-package com.sketchproject.infogue.fragments;
+package com.sketchproject.infogue.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment.OnArticleFragmentInteractionListener;
-import com.sketchproject.infogue.fragments.dummy.DummyContent.DummyItem;
+import com.sketchproject.infogue.fragments.dummy.DummyArticleContent.DummyItem;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     private static final int VIEW_TYPE_ROW = 1;
 
     private final List<DummyItem> mValues;
-    private final ArticleFragment.OnArticleFragmentInteractionListener mListener;
+    private final OnArticleFragmentInteractionListener mListener;
 
     public ArticleRecyclerViewAdapter(List<DummyItem> items, OnArticleFragmentInteractionListener listener) {
         mValues = items;

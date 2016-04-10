@@ -20,7 +20,7 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setElevation(0);
+        getSupportActionBar().setElevation(2);
 
         handleIntent(getIntent());
     }

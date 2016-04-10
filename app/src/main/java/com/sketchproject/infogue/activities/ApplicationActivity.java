@@ -24,12 +24,12 @@ import android.view.View;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
-import com.sketchproject.infogue.fragments.Home;
-import com.sketchproject.infogue.fragments.dummy.DummyContent;
+import com.sketchproject.infogue.fragments.HomeFragment;
+import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
 
 import java.lang.reflect.Method;
 
-public class Application extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ArticleFragment.OnArticleFragmentInteractionListener {
+public class ApplicationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ArticleFragment.OnArticleFragmentInteractionListener {
 
     private NavigationView navigationView;
 
@@ -82,7 +82,7 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.application, menu);
+        getMenuInflater().inflate(R.menu.menu, menu);
 
         // Associate searchable configuration with the SearchView
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -114,10 +114,10 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
         int id = item.getItemId();
 
         if (id == R.id.action_login) {
-            Intent loginActivity = new Intent(Application.this, Authentication.class);
+            Intent loginActivity = new Intent(ApplicationActivity.this, FollowerActivity.class);
             startActivity(loginActivity);
         } else if (id == R.id.action_about) {
-            Intent aboutActivity = new Intent(Application.this, About.class);
+            Intent aboutActivity = new Intent(ApplicationActivity.this, AboutActivity.class);
             startActivity(aboutActivity);
         } else if (id == R.id.action_exit) {
             finish();
@@ -127,7 +127,7 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
     }
 
     @Override
-    public void onArticleFragmentInteraction(DummyContent.DummyItem item) {
+    public void onArticleFragmentInteraction(DummyArticleContent.DummyItem item) {
         Log.i("RESULT", item.details);
     }
 
@@ -148,11 +148,11 @@ public class Application extends AppCompatActivity implements NavigationView.OnN
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.sketchproject.infogue"));
             startActivity(browserIntent);
         } else if (id == R.id.nav_about) {
-            Intent aboutActivity = new Intent(Application.this, About.class);
+            Intent aboutActivity = new Intent(ApplicationActivity.this, AboutActivity.class);
             startActivity(aboutActivity);
         } else {
             if (id == R.id.nav_home) {
-                fragment = new Home();
+                fragment = new HomeFragment();
                 title = "";
                 logo = true;
             } else if (id == R.id.nav_random) {

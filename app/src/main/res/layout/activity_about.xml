@@ -8,7 +8,7 @@
     android:paddingLeft="25dp"
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".activities.About">
+    tools:context=".activities.AboutActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -42,11 +42,10 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
                     android:textColor="@color/colorLight" />
 
-
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="50dp"
+                    android:layout_marginTop="60dp"
                     android:contentDescription="@string/dummy_content"
                     android:src="@drawable/img_logo_medium" />
 
@@ -89,7 +88,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="30dp"
                     android:text="@string/about_social"
                     android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
                     android:textColor="@color/colorLight"
@@ -97,7 +96,7 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -109,10 +108,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="1"
                     android:background="@color/transparent"
                     android:contentDescription="@string/dummy_content"
-                    android:scaleType="fitStart"
                     android:src="@drawable/btn_facebook" />
 
                 <ImageButton
@@ -121,12 +118,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:layout_marginStart="5dp"
-                    android:layout_weight="1"
+                    android:layout_toRightOf="@id/btn_facebook"
+                    android:layout_toEndOf="@id/btn_facebook"
                     android:background="@color/transparent"
                     android:contentDescription="@string/dummy_content"
                     android:scaleType="fitStart"
                     android:src="@drawable/btn_twitter" />
-            </LinearLayout>
+            </RelativeLayout>
 
         </LinearLayout>
 

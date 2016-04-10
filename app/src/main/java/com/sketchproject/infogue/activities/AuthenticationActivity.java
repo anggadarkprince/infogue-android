@@ -9,8 +9,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.fragments.Login;
-import com.sketchproject.infogue.fragments.Register;
+import com.sketchproject.infogue.fragments.LoginFragment;
+import com.sketchproject.infogue.fragments.RegisterFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * A login screen that offers login via email/password.
  */
-public class Authentication extends AppCompatActivity {
+public class AuthenticationActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
 
@@ -65,8 +65,8 @@ public class Authentication extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new Login(), "Log In");
-        adapter.addFragment(new Register(), "Register");
+        adapter.addFragment(new LoginFragment(), "Log In");
+        adapter.addFragment(new RegisterFragment(), "Register");
         viewPager.setAdapter(adapter);
     }
 

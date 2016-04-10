@@ -6,7 +6,7 @@ import android.view.View;
 
 import com.sketchproject.infogue.R;
 
-public class About extends AppCompatActivity {
+public class AboutActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

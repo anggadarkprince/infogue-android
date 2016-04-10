@@ -18,12 +18,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.activities.Authentication;
+import com.sketchproject.infogue.activities.AuthenticationActivity;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Login extends Fragment {
+public class LoginFragment extends Fragment {
 
     private UserLoginTask mAuthTask = null;
 
@@ -32,7 +32,7 @@ public class Login extends Fragment {
     private View mProgressView;
     private View mLoginFormView;
 
-    public Login() {
+    public LoginFragment() {
         // Required empty public constructor
     }
 
@@ -62,8 +62,8 @@ public class Login extends Fragment {
             @Override
             public void onClick(View v) {
                 Activity mActivity = getActivity();
-                if(mActivity instanceof Authentication){
-                    ((Authentication) getActivity()).setTabRegisterActive();
+                if(mActivity instanceof AuthenticationActivity){
+                    ((AuthenticationActivity) getActivity()).setTabRegisterActive();
                 }
             }
         });

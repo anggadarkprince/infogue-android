@@ -15,7 +15,7 @@ import android.widget.ImageView;
 
 import com.sketchproject.infogue.R;
 
-public class Featured extends AppCompatActivity {
+public class FeaturedActivity extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -56,7 +56,7 @@ public class Featured extends AppCompatActivity {
         buttonSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent loginActivity = new Intent(Featured.this, Authentication.class);
+                Intent loginActivity = new Intent(FeaturedActivity.this, AuthenticationActivity.class);
                 startActivity(loginActivity);
             }
         });
@@ -65,7 +65,7 @@ public class Featured extends AppCompatActivity {
         buttonGetStarted.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainActivity = new Intent(Featured.this, Application.class);
+                Intent mainActivity = new Intent(FeaturedActivity.this, ApplicationActivity.class);
                 startActivity(mainActivity);
                 finish();
             }

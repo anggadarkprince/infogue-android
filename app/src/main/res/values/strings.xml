@@ -67,5 +67,6 @@
     <string name="menu_rate">Rate App</string>
     <string name="search_hint">Find article or contributor</string>
     <string name="title_activity_search">Search Result</string>
+    <string name="title_activity_follower">Followers</string>
 
 </resources>

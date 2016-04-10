@@ -24,7 +24,7 @@ import com.sketchproject.infogue.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Register extends Fragment {
+public class RegisterFragment extends Fragment {
 
     private UserRegisterTask mRegisterTask = null;
 
@@ -37,7 +37,7 @@ public class Register extends Fragment {
     private View mProgressView;
     private View mRegisterFormView;
 
-    public Register() {
+    public RegisterFragment() {
         // Required empty public constructor
     }
 
