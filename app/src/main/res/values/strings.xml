@@ -70,5 +70,6 @@
     <string name="title_activity_follower">Followers</string>
     <string name="follow_content_description">Follow</string>
     <string name="avatar_content_description">Avatar</string>
+    <string name="featured_content_description">Featured</string>
 
 </resources>

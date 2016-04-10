@@ -52,10 +52,10 @@ public class DummyArticleContent {
 
     private static DummyItem createDummyItem(int position) {
         String[] slug = {"article-slug-1", "article-slug-2", "article-slug-3", "article-slug-4", "article-slug-5"};
-        String[] titles = {"Girl gone has rises the revenue up to $100 million dollar",
-                "Indonesia for the first time become olympic host",
-                "New technology from the future",
-                "Running and healthy"};
+        String[] titles = {"Girl gone has rises the revenue up to $100 million dollar, bring new competitors",
+                "Indonesia for the first time become olympic host now and later",
+                "New technology from the future more intuitive more elegant",
+                "Running and healthy build your body perfectly"};
         String[] content = {"Last nigh Box Office release update about the new arrival film Girl Gone. They announced latest revenue for 3 weeks after the date release. At the first turn this film looks like similar with the mainstream story about lost girl",
                 "They announced latest revenue for 3 weeks after the date release. At the first turn this film looks like similar with the mainstream story about lost girl",
                 "At the first turn this film looks like similar with the mainstream story about lost girl. They announced latest revenue for 3 weeks after the date release."
