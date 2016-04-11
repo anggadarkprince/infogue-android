@@ -77,6 +77,17 @@
     <string name="cover_content_description">Cover Image</string>
     <string name="sign_out_content_description">Sign Out</string>
     <string name="action_create_article">Create Article</string>
-    <string name="title_activity_article">ArticleActivity</string>
+    <string name="title_activity_article">Article</string>
+    <string name="title_activity_article_create">Create Article</string>
+    <string name="action_feedback">Feedback</string>
+    <string name="action_help"><![CDATA[Help & Faq]]></string>
+    <string name="action_rating">Rate App</string>
+    <string name="prompt_title">Title Article</string>
+    <string name="prompt_slug">Article Unique Slug</string>
+    <string name="prompt_tag">Article Tags</string>
+    <string name="prompt_category">Select Category</string>
+    <string name="prompt_subcategory">Select Subcategory</string>
+    <string name="prompt_content">Write Content Here</string>
+    <string name="prompt_excerpt">Optional Excerpt</string>
 
 </resources>

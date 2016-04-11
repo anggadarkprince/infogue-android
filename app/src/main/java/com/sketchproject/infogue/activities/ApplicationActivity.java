@@ -97,7 +97,8 @@ public class ApplicationActivity extends AppCompatActivity
         mCreateArticleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent createArticleIntent = new Intent(ApplicationActivity.this, ArticleCreateActivity.class);
+                startActivity(createArticleIntent);
             }
         });
 

@@ -10,7 +10,7 @@
     </style>
 
     <style name="AppTheme" parent="AppTheme.Base">
-        <!-- Customize your theme here. -->
+
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -21,5 +21,39 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="TextLabel" parent="TextAppearance.AppCompat">
+        <!-- Hint color and label color in FALSE state -->
+        <item name="android:textColorHint">@color/colorPrimary</item>
+        <item name="android:textSize">16sp</item>
+        <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/colorPrimary</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
+    </style>
+
+    <style name="Tag" parent="TagGroup">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="atg_isAppendMode">false</item>
+        <item name="atg_inputHint">ADD TAG</item>
+        <item name="atg_borderColor">@color/colorPrimary</item>
+        <item name="atg_textColor">@color/colorLight</item>
+        <item name="atg_backgroundColor">@color/colorPrimary</item>
+        <item name="atg_dashBorderColor">@color/transparent</item>
+        <item name="atg_inputHintColor">#CCFFFFFF</item>
+        <item name="atg_inputTextColor">@color/colorLight</item>
+        <item name="atg_checkedBorderColor">@color/colorAccent</item>
+        <item name="atg_checkedTextColor">@color/colorLight</item>
+        <item name="atg_checkedMarkerColor">@color/colorLight</item>
+        <item name="atg_checkedBackgroundColor">@color/colorAccent</item>
+        <item name="atg_pressedBackgroundColor">@color/colorAccent</item>
+        <item name="atg_borderStrokeWidth">0.5dp</item>
+        <item name="atg_textSize">13sp</item>
+        <item name="atg_horizontalSpacing">8dp</item>
+        <item name="atg_verticalSpacing">4dp</item>
+        <item name="atg_horizontalPadding">12dp</item>
+        <item name="atg_verticalPadding">3dp</item>
+    </style>
 
 </resources>
