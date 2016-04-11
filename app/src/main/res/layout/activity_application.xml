@@ -33,10 +33,9 @@
 
         <FrameLayout
             android:id="@+id/container_body"
-            android:layout_marginTop="?attr/actionBarSize"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_marginTop="?attr/actionBarSize" />
 
     </android.support.design.widget.CoordinatorLayout>
 
@@ -45,13 +44,13 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
         android:background="@color/colorLight"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/navigation_header"
         app:insetForeground="@color/colorPrimary"
         app:itemBackground="@drawable/navigation_item_selector"
-        app:itemTextColor="@color/drawer_text_selector"
         app:itemIconTint="@color/drawer_text_selector"
-        app:headerLayout="@layout/navigation_header"
+        app:itemTextColor="@color/drawer_text_selector"
         app:menu="@menu/navigation" />
 
 </android.support.v4.widget.DrawerLayout>

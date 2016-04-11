@@ -57,7 +57,7 @@ public class HomeFragment extends Fragment implements ArticleFragment.OnArticleF
 
     @Override
     public void onArticleFragmentInteraction(DummyArticleContent.DummyItem item) {
-        Log.i("RESULT", item.slug + " " + item.details);
+        Log.i("ARTICLE", item.id + " " + item.slug + " " + item.details);
     }
 
     /**

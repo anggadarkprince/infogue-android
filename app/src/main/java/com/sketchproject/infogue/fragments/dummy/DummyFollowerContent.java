@@ -34,6 +34,17 @@ public class DummyFollowerContent {
         }
     }
 
+    public static List<DummyItem> generateDummy(int offset) {
+        List<DummyItem> items = new ArrayList<>();
+        int index = offset * COUNT;
+
+        for (int i = index; i < (index + COUNT); i++) {
+            items.add(createDummyItem(i));
+        }
+
+        return items;
+    }
+
     private static void addItem(DummyItem item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);

@@ -6,7 +6,7 @@
     android:name="com.sketchproject.infogue.fragments.FollowerFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorLight"
+    android:background="@color/colorBackground"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.sketchproject.infogue.fragments.FollowerFragment"
     tools:listitem="@layout/fragment_follower_row" />

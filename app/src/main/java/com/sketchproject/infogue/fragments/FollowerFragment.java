@@ -2,18 +2,25 @@ package com.sketchproject.infogue.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.adapters.ArticleRecyclerViewAdapter;
 import com.sketchproject.infogue.adapters.FollowerRecyclerViewAdapter;
+import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
 import com.sketchproject.infogue.fragments.dummy.DummyFollowerContent;
 import com.sketchproject.infogue.fragments.dummy.DummyFollowerContent.DummyItem;
+import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
+
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -63,12 +70,41 @@ public class FollowerFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
+
+            final List<DummyFollowerContent.DummyItem> allFollowers = DummyFollowerContent.generateDummy(0);
+            final FollowerRecyclerViewAdapter followerAdapter = new FollowerRecyclerViewAdapter(allFollowers, mListener);
+            recyclerView.setAdapter(followerAdapter);
+
+            final LinearLayoutManager linearLayoutManager;
+
             if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                linearLayoutManager = new LinearLayoutManager(context);
             } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                linearLayoutManager = new GridLayoutManager(context, mColumnCount);
             }
-            recyclerView.setAdapter(new FollowerRecyclerViewAdapter(DummyFollowerContent.ITEMS, mListener));
+
+            recyclerView.setLayoutManager(linearLayoutManager);
+            recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+                @Override
+                public void onLoadMore(final int page, int totalItemsCount) {
+                    allFollowers.add(null);
+                    followerAdapter.notifyItemInserted(allFollowers.size() - 1);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            allFollowers.remove(allFollowers.size() - 1);
+                            followerAdapter.notifyItemRemoved(allFollowers.size());
+
+                            List<DummyFollowerContent.DummyItem> moreFollowers = DummyFollowerContent.generateDummy(page);
+                            int curSize = followerAdapter.getItemCount();
+                            allFollowers.addAll(moreFollowers);
+                            followerAdapter.notifyItemRangeInserted(curSize, allFollowers.size() - 1);
+                            Log.i("FOLLOWER LOAD", "MORE");
+                        }
+                    }, 3000);
+                }
+            });
         }
         return view;
     }

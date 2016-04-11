@@ -23,7 +23,9 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.HomeFragment;
@@ -60,6 +62,16 @@ public class ApplicationActivity extends AppCompatActivity
         navigationView.setCheckedItem(R.id.nav_home);
 
         View navigationHeader = navigationView.getHeaderView(0);
+
+        ImageView avatar = (ImageView) navigationHeader.findViewById(R.id.avatar);
+        Glide.with(this).load("http://infogue.id/images/contributors/twitter-294039766.jpg")
+                .dontAnimate()
+                .into(avatar);
+
+        ImageView cover = (ImageView) navigationHeader.findViewById(R.id.cover);
+        Glide.with(this).load("http://infogue.id/images/covers/twitter-294039766.jpg")
+                .crossFade()
+                .into(cover);
 
         Button mSignInButton = (Button) navigationHeader.findViewById(R.id.btn_sign_in);
         mSignInButton.setOnClickListener(new View.OnClickListener() {
@@ -197,7 +209,7 @@ public class ApplicationActivity extends AppCompatActivity
 
     @Override
     public void onArticleFragmentInteraction(DummyArticleContent.DummyItem item) {
-        Log.i("RESULT", item.slug + " " + item.details);
+        Log.i("ARTICLE", item.id + " " + item.slug + " " + item.details);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

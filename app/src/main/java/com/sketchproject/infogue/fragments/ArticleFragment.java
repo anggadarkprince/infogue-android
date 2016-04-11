@@ -2,6 +2,7 @@ package com.sketchproject.infogue.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,6 +16,9 @@ import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.adapters.ArticleRecyclerViewAdapter;
 import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
 import com.sketchproject.infogue.fragments.dummy.DummyArticleContent.DummyItem;
+import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
+
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -160,13 +164,41 @@ public class ArticleFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
 
+            final List<DummyItem> allArticles = DummyArticleContent.generateDummy(0);
+            final ArticleRecyclerViewAdapter articleAdapter = new ArticleRecyclerViewAdapter(allArticles, mListener, hasHeader);
+            recyclerView.setAdapter(articleAdapter);
+
+            final LinearLayoutManager linearLayoutManager;
+
             if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                linearLayoutManager = new LinearLayoutManager(context);
             } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                linearLayoutManager = new GridLayoutManager(context, mColumnCount);
             }
 
-            recyclerView.setAdapter(new ArticleRecyclerViewAdapter(DummyArticleContent.ITEMS, mListener, hasHeader));
+            recyclerView.setLayoutManager(linearLayoutManager);
+            recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+                @Override
+                public void onLoadMore(final int page, int totalItemsCount) {
+                    allArticles.add(null);
+                    articleAdapter.notifyItemInserted(allArticles.size() - 1);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            allArticles.remove(allArticles.size() - 1);
+                            articleAdapter.notifyItemRemoved(allArticles.size());
+
+                            List<DummyItem> moreArticles = DummyArticleContent.generateDummy(page);
+                            int curSize = articleAdapter.getItemCount();
+                            allArticles.addAll(moreArticles);
+                            articleAdapter.notifyItemRangeInserted(curSize, allArticles.size() - 1);
+                            Log.i("ARTICLE LOAD", "MORE");
+                        }
+                    }, 3000);
+                }
+            });
+
         }
 
         return view;

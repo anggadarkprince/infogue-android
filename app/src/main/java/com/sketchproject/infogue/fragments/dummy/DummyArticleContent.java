@@ -34,11 +34,11 @@ public class DummyArticleContent {
         }
     }
 
-    public static List<DummyItem> generateDummy() {
+    public static List<DummyItem> generateDummy(int offset) {
         List<DummyItem> items = new ArrayList<>();
-        int length = 20 + (int) Math.round(Math.random() * 1000);
+        int index = offset * COUNT;
 
-        for (int i = 1; i <= length; i++) {
+        for (int i = index; i < (index + COUNT); i++) {
             items.add(createDummyItem(i));
         }
 

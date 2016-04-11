@@ -4,7 +4,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.sketchproject.infogue.R;
@@ -20,12 +23,15 @@ import java.util.List;
  */
 public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int VIEW_TYPE_HEADER = 0;
-    private static final int VIEW_TYPE_ROW = 1;
+    private static final int VIEW_TYPE_LOADING = 0;
+    private static final int VIEW_TYPE_HEADER = 1;
+    private static final int VIEW_TYPE_ROW = 2;
 
     private final List<DummyItem> mValues;
     private final OnArticleFragmentInteractionListener mListener;
     private boolean header;
+
+    private int lastPosition = -1;
 
     public ArticleRecyclerViewAdapter(List<DummyItem> items, OnArticleFragmentInteractionListener listener, boolean hasHeader) {
         mValues = items;
@@ -35,7 +41,11 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public int getItemViewType(int position) {
-        if(position == 0 && header){
+        if (mValues.get(position) == null) {
+            return VIEW_TYPE_LOADING;
+        }
+
+        if (position == 0 && header) {
             return VIEW_TYPE_HEADER;
         }
 
@@ -46,19 +56,25 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
 
-        if(viewType == VIEW_TYPE_HEADER){
+        if (viewType == VIEW_TYPE_HEADER) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_article_header, parent, false);
             return new ArticleHeaderViewHolder(view);
+        } else if (viewType == VIEW_TYPE_ROW) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_article_row, parent, false);
+            return new ArticleRowViewHolder(view);
         }
 
-        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_article_row, parent, false);
-        return new ArticleRowViewHolder(view);
+        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_loading, parent, false);
+        return new ArticleProgressViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+        Animation animation = AnimationUtils.loadAnimation(holder.itemView.getContext(), (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
+        holder.itemView.startAnimation(animation);
+        lastPosition = position;
 
-        switch (getItemViewType(position)){
+        switch (getItemViewType(position)) {
             case VIEW_TYPE_HEADER:
                 final ArticleHeaderViewHolder headerHolder = (ArticleHeaderViewHolder) holder;
                 headerHolder.mItem = mValues.get(position);
@@ -88,6 +104,13 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 rowHolder.mDateView.setText(mValues.get(position).date);
                 rowHolder.mFeaturedImage.setImageResource(mValues.get(position).featured);
 
+                /*
+                Glide.with(rowHolder.mView.getContext())
+                        .load("http://infogue.id/images/covers/twitter-294039766.jpg")
+                        .placeholder(R.drawable.loading)
+                        .crossFade()
+                        .into(rowHolder.mFeaturedImage); */
+
                 rowHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -98,12 +121,31 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 });
 
                 break;
+            case VIEW_TYPE_LOADING:
+                final ArticleProgressViewHolder progressbarHolder = (ArticleProgressViewHolder) holder;
+                progressbarHolder.progressBar.setIndeterminate(true);
+                break;
         }
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.itemView.clearAnimation();
     }
 
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    public class ArticleProgressViewHolder extends RecyclerView.ViewHolder {
+        public ProgressBar progressBar;
+
+        public ArticleProgressViewHolder(View view) {
+            super(view);
+            progressBar = (ProgressBar) view.findViewById(R.id.load_more_progress);
+        }
     }
 
 

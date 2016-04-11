@@ -84,7 +84,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:alpha=".3"
+            android:alpha=".5"
             android:background="@android:color/black" />
 
         <RelativeLayout
@@ -95,7 +95,7 @@
             android:paddingRight="25dp"
             android:paddingTop="@dimen/nav_header_margin_top_profile">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/avatar"
                 android:layout_width="65dp"
                 android:layout_height="65dp"

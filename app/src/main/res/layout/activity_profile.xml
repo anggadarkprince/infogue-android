@@ -25,6 +25,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/colorLight"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context=".activities.ProfileActivity"
         tools:showIn="@layout/activity_profile">
@@ -37,23 +38,17 @@
             android:scaleType="centerCrop"
             android:src="@drawable/dummy_featured_1" />
 
-        <View
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="118dp"
-            android:background="@color/colorLight"/>
-
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/avatar"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="120dp"
-            android:background="@color/colorLight"
+            android:layout_marginTop="110dp"
             android:contentDescription="@string/dummy_content"
             android:scaleType="centerCrop"
-            android:src="@drawable/dummy_avatar" />
+            android:src="@drawable/dummy_avatar"
+            app:civ_border_width="4dp"
+            app:civ_border_color="#AAFFFFFF" />
 
         <TextView
             android:id="@+id/name"
@@ -61,7 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/avatar"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginTop="10dp"
             android:text="Imelda Dwi Agustine"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
             android:textColor="@color/colorPrimary" />
@@ -74,7 +69,7 @@
             android:layout_centerHorizontal="true"
             android:autoLink="all"
             android:text="Jakarta, Indonesia"
-            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+            android:textSize="15sp"
             android:textColor="@color/colorGray"
             android:textColorLink="@color/colorPrimary" />
 
@@ -83,7 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/location"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginTop="10dp"
             android:baselineAligned="false"
             android:orientation="horizontal"
             android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -120,9 +115,10 @@
 
             </RelativeLayout>
 
-            <ImageView
+            <View
                 android:layout_width="1dp"
                 android:layout_height="50dp"
+                android:layout_marginTop="5dp"
                 android:background="@color/colorGray"
                 android:contentDescription="@string/dummy_content" />
 
@@ -156,9 +152,10 @@
 
             </RelativeLayout>
 
-            <ImageView
+            <View
                 android:layout_width="1dp"
                 android:layout_height="50dp"
+                android:layout_marginTop="5dp"
                 android:background="@color/colorGray"
                 android:contentDescription="@string/dummy_content" />
 
@@ -207,7 +204,7 @@
             android:paddingLeft="25dp"
             android:paddingRight="25dp"
             android:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit. ipsum dolor sit amet lo siku l briema li skie zulo."
-            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+            android:textSize="15sp"
             android:textColor="@color/colorGray"
             android:textColorLink="@color/colorPrimary" />
 
@@ -217,7 +214,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/about"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="15dp"
             android:background="@drawable/button_primary"
             android:minHeight="40dp"
             android:paddingLeft="35dp"
