@@ -76,7 +76,7 @@
     <string name="logo_content_description">Logo</string>
     <string name="cover_content_description">Cover Image</string>
     <string name="sign_out_content_description">Sign Out</string>
-    <string name="action_create_article">Create Article</string>
+    <string name="action_create_article">Post Article</string>
     <string name="title_activity_article">Article</string>
     <string name="title_activity_article_create">Create Article</string>
     <string name="action_feedback">Feedback</string>

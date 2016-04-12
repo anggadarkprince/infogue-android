@@ -26,6 +26,7 @@
             android:layout_marginBottom="10dp"
             android:text="Girl gone has rises the revenue up to $100 million dollar"
             android:fontFamily="sans-serif-medium"
+            android:textColor="@color/colorDark"
             android:textSize="18sp" />
 
         <TextView

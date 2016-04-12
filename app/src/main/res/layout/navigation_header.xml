@@ -48,7 +48,7 @@
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/button_light"
-                android:minHeight="40dp"
+                android:minHeight="36dp"
                 android:text="@string/action_sign_in"
                 android:textColor="@color/colorPrimary" />
 
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:background="@drawable/button_light"
-                android:minHeight="40dp"
+                android:minHeight="36dp"
                 android:text="@string/action_register"
                 android:textColor="@color/colorPrimary" />
 
@@ -84,8 +84,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:alpha=".5"
-            android:background="@android:color/black" />
+            android:alpha=".45"
+            android:background="@color/colorPrimary" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -109,16 +109,16 @@
                 android:id="@+id/name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="3dp"
                 android:layout_marginTop="5dp"
                 android:layout_toEndOf="@id/avatar"
                 android:layout_toRightOf="@id/avatar"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:text="Angga Ari Wijaya"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/colorLight"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:fontFamily="sans-serif-medium" />
 
             <TextView
                 android:id="@+id/location"
@@ -143,12 +143,12 @@
                 android:layout_marginRight="5dp"
                 android:layout_toEndOf="@id/avatar"
                 android:layout_toRightOf="@id/avatar"
-                android:background="@drawable/button_primary"
+                android:background="@drawable/button_light"
                 android:minHeight="36dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
                 android:text="@string/action_create_article"
-                android:textColor="@color/colorLight" />
+                android:textColor="@color/colorPrimary" />
 
             <ImageButton
                 android:id="@+id/btn_sign_out"
@@ -157,14 +157,13 @@
                 android:layout_below="@id/location"
                 android:layout_toEndOf="@id/btn_create_article"
                 android:layout_toRightOf="@id/btn_create_article"
-                android:background="@drawable/button_primary"
+                android:background="@drawable/button_light"
                 android:contentDescription="@string/sign_out_content_description"
                 android:minHeight="36dp"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:src="@drawable/ic_exit"
-                android:textColor="@color/colorLight"
-                android:tint="@color/colorLight" />
+                android:tint="@color/colorPrimary" />
 
         </RelativeLayout>
 
