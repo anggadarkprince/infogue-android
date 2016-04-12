@@ -19,7 +19,7 @@ import java.util.List;
  * A login screen that offers login via email/password.
  */
 public class AuthenticationActivity extends AppCompatActivity {
-
+    public static final String SCREEN_REQUEST = "AuthScreen";
     public static final int LOGIN_SCREEN = 0;
     public static final int REGISTER_SCREEN = 1;
 
@@ -67,7 +67,7 @@ public class AuthenticationActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            int screen = extras.getInt(ApplicationActivity.AUTH_ACTIVITY);
+            int screen = extras.getInt(SCREEN_REQUEST);
             if (screen == LOGIN_SCREEN) {
                 setTabLoginActive();
             } else if (screen == REGISTER_SCREEN) {

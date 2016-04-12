@@ -5,6 +5,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,9 +17,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.activities.ApplicationActivity;
 import com.sketchproject.infogue.activities.AuthenticationActivity;
+import com.sketchproject.infogue.modules.SessionManager;
+
+import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -177,7 +183,16 @@ public class LoginFragment extends Fragment {
             showProgress(false);
 
             if (success) {
-                getActivity().finish();
+                if(demoOnly()){
+                    getActivity().finish();
+                    Intent applicationIntent = new Intent(getActivity().getBaseContext(), ApplicationActivity.class);
+                    applicationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    applicationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(applicationIntent);
+                } else{
+                    Toast.makeText(getContext(), "Something is getting wrong", Toast.LENGTH_LONG).show();
+                }
+
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
@@ -189,5 +204,22 @@ public class LoginFragment extends Fragment {
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+    private boolean demoOnly(){
+        SessionManager sessionManager = new SessionManager(getActivity().getBaseContext());
+        HashMap<String, Object> user = new HashMap<>();
+        user.put(SessionManager.KEY_ID, 1);
+        user.put(SessionManager.KEY_TOKEN, "6224573472634636534");
+        user.put(SessionManager.KEY_USERNAME, "anggadarkprince");
+        user.put(SessionManager.KEY_NAME, "Angga Ari Wijaya");
+        user.put(SessionManager.KEY_LOCATION, "Gresik, Indonesia");
+        user.put(SessionManager.KEY_ABOUT, "Freelancer UI/UX Designer, The wind at my back so it's time to fly. angga-ari.com");
+        user.put(SessionManager.KEY_AVATAR, "http://infogue.id/images/contributors/avatar_1.jpg");
+        user.put(SessionManager.KEY_COVER, "http://infogue.id/images/covers/cover_5.jpg");
+        user.put(SessionManager.KEY_ARTICLE, 234);
+        user.put(SessionManager.KEY_FOLLOWER, 362);
+        user.put(SessionManager.KEY_FOLLOWING, 345);
+        return sessionManager.createLoginSession(user);
     }
 }

@@ -10,14 +10,15 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment.OnArticleFragmentInteractionListener;
-import com.sketchproject.infogue.fragments.dummy.DummyArticleContent.DummyItem;
+import com.sketchproject.infogue.models.Article;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link Article} and makes a call to the
  * specified {@link OnArticleFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
@@ -27,21 +28,21 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     private static final int VIEW_TYPE_HEADER = 1;
     private static final int VIEW_TYPE_ROW = 2;
 
-    private final List<DummyItem> mValues;
+    private final List<Article> mArticles;
     private final OnArticleFragmentInteractionListener mListener;
     private boolean header;
 
     private int lastPosition = -1;
 
-    public ArticleRecyclerViewAdapter(List<DummyItem> items, OnArticleFragmentInteractionListener listener, boolean hasHeader) {
-        mValues = items;
+    public ArticleRecyclerViewAdapter(List<Article> items, OnArticleFragmentInteractionListener listener, boolean hasHeader) {
+        mArticles = items;
         mListener = listener;
         header = hasHeader;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (mValues.get(position) == null) {
+        if (mArticles.get(position) == null) {
             return VIEW_TYPE_LOADING;
         }
 
@@ -77,12 +78,16 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         switch (getItemViewType(position)) {
             case VIEW_TYPE_HEADER:
                 final ArticleHeaderViewHolder headerHolder = (ArticleHeaderViewHolder) holder;
-                headerHolder.mItem = mValues.get(position);
-                headerHolder.mTitleView.setText(mValues.get(position).title);
-                headerHolder.mDateView.setText(mValues.get(position).date);
-                headerHolder.mContentView.setText(mValues.get(position).content);
-                headerHolder.mCategoryView.setText(mValues.get(position).category);
-                headerHolder.mFeaturedImage.setImageResource(mValues.get(position).featured);
+                headerHolder.mItem = mArticles.get(position);
+                headerHolder.mTitleView.setText(mArticles.get(position).getTitle());
+                headerHolder.mDateView.setText(mArticles.get(position).getPublishedAt());
+                headerHolder.mContentView.setText(mArticles.get(position).getContent());
+                headerHolder.mCategoryView.setText(mArticles.get(position).getCategory());
+                Glide.with(headerHolder.mView.getContext())
+                        .load(mArticles.get(position).getFeatured())
+                        .placeholder(R.drawable.placeholder_logo)
+                        .crossFade()
+                        .into(headerHolder.mFeaturedImage);
 
                 headerHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -99,17 +104,14 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
             case VIEW_TYPE_ROW:
                 final ArticleRowViewHolder rowHolder = (ArticleRowViewHolder) holder;
-                rowHolder.mItem = mValues.get(position);
-                rowHolder.mTitleView.setText(mValues.get(position).title);
-                rowHolder.mDateView.setText(mValues.get(position).date);
-                rowHolder.mFeaturedImage.setImageResource(mValues.get(position).featured);
-
-                /*
+                rowHolder.mItem = mArticles.get(position);
+                rowHolder.mTitleView.setText(mArticles.get(position).getTitle());
+                rowHolder.mDateView.setText(mArticles.get(position).getPublishedAt());
                 Glide.with(rowHolder.mView.getContext())
-                        .load("http://infogue.id/images/covers/twitter-294039766.jpg")
-                        .placeholder(R.drawable.loading)
+                        .load(mArticles.get(position).getFeatured())
+                        .placeholder(R.drawable.placeholder_logo)
                         .crossFade()
-                        .into(rowHolder.mFeaturedImage); */
+                        .into(rowHolder.mFeaturedImage);
 
                 rowHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -136,7 +138,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mArticles.size();
     }
 
     public class ArticleProgressViewHolder extends RecyclerView.ViewHolder {
@@ -156,7 +158,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         public TextView mCategoryView;
         public TextView mDateView;
         public ImageView mFeaturedImage;
-        public DummyItem mItem;
+        public Article mItem;
 
         public ArticleHeaderViewHolder(View view) {
             super(view);
@@ -179,7 +181,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         public TextView mTitleView;
         public TextView mDateView;
         public ImageView mFeaturedImage;
-        public DummyItem mItem;
+        public Article mItem;
 
         public ArticleRowViewHolder(View view) {
             super(view);

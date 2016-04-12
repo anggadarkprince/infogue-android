@@ -8,7 +8,7 @@
     <color name="colorLightGray">#dddddd</color>
     <color name="colorBackground">#ededed</color>
     <color name="colorLight">#ffffff</color>
-    <color name="colorGradientFrom">#00bcd4</color>
+    <color name="colorGradientFrom">#0cc4db</color>
     <color name="colorGradientTo">#0cd2eb</color>
 
     <color name="blackOverlay">#66000000</color>

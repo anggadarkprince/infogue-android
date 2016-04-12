@@ -2,18 +2,29 @@
     <string name="app_name">Infogue</string>
 
     <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY CONTENT</string>
+    <string name="dummy_content">Dummy Content</string>
 
     <string name="title_activity_featured">Featured</string>
     <string name="title_activity_login">Sign in</string>
     <string name="title_activity_application">Infogue.id</string>
     <string name="title_activity_about">About</string>
+    <string name="title_activity_search">Search Result</string>
+    <string name="title_activity_follower">Followers</string>
+    <string name="title_activity_article">Article</string>
+    <string name="title_activity_article_create">Create Article</string>
 
     <string name="prompt_name">Full Name</string>
     <string name="prompt_email">Email Address</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_username_email">Username or Email</string>
     <string name="prompt_username">Username</string>
+    <string name="prompt_title">Title Article</string>
+    <string name="prompt_slug">Article Unique Slug</string>
+    <string name="prompt_tag">Article Tags</string>
+    <string name="prompt_category">Select Category</string>
+    <string name="prompt_subcategory">Select Subcategory</string>
+    <string name="prompt_content">Write Content Here</string>
+    <string name="prompt_excerpt">Optional Excerpt</string>
 
     <string name="error_invalid_username">Username only contains alpha dash</string>
     <string name="error_invalid_email">This email address is invalid</string>
@@ -44,6 +55,11 @@
     <string name="action_article">Article</string>
     <string name="action_about">About</string>
     <string name="action_exit">Exit</string>
+    <string name="action_feedback">Feedback</string>
+    <string name="action_help"><![CDATA[Help & FAQ]]></string>
+    <string name="action_rating">Rate App</string>
+    <string name="action_followers">Followers</string>
+    <string name="action_following">Following</string>
 
     <string name="about_thanks">Thanks for using our app</string>
     <string name="about_credit">Infogue.id was originally develop by Infogue Developer Team and Angga Ari Wijaya.</string>
@@ -65,31 +81,25 @@
     <string name="menu_about">About</string>
     <string name="menu_website">Infogue.id</string>
     <string name="menu_rate">Rate App</string>
+
     <string name="search_hint">Find article or contributor</string>
-    <string name="title_activity_search">Search Result</string>
-    <string name="title_activity_follower">Followers</string>
-    <string name="follow_content_description">Follow</string>
-    <string name="avatar_content_description">Avatar</string>
-    <string name="featured_content_description">Featured</string>
-    <string name="facebook_content_description">Facebook</string>
-    <string name="twitter_content_description">Twitter</string>
-    <string name="logo_content_description">Logo</string>
+
+    <string name="follow_content_description">Button Follow</string>
+    <string name="avatar_content_description">Avatar Image</string>
+    <string name="featured_content_description">Featured Image</string>
+    <string name="facebook_content_description">Button Facebook</string>
+    <string name="twitter_content_description">Button Twitter</string>
+    <string name="logo_content_description">Logo Infogue</string>
     <string name="cover_content_description">Cover Image</string>
-    <string name="sign_out_content_description">Sign Out</string>
+    <string name="sign_out_content_description">Button Sign Out</string>
     <string name="action_create_article">Post Article</string>
-    <string name="title_activity_article">Article</string>
-    <string name="title_activity_article_create">Create Article</string>
-    <string name="action_feedback">Feedback</string>
-    <string name="action_help"><![CDATA[Help & FAQ]]></string>
-    <string name="action_rating">Rate App</string>
-    <string name="prompt_title">Title Article</string>
-    <string name="prompt_slug">Article Unique Slug</string>
-    <string name="prompt_tag">Article Tags</string>
-    <string name="prompt_category">Select Category</string>
-    <string name="prompt_subcategory">Select Subcategory</string>
-    <string name="prompt_content">Write Content Here</string>
-    <string name="prompt_excerpt">Optional Excerpt</string>
-    <string name="action_followers">Followers</string>
-    <string name="action_following">Following</string>
+    <string name="action_follow">FOLLOW</string>
+    <string name="action_unfollow">UNFOLLOW</string>
+    <string name="placeholder_about">The description will be placed here, multiline and wrapped by this container</string>
+    <string name="placeholder_statistic">0</string>
+    <string name="placeholder_name">Anonymous</string>
+    <string name="placeholder_location">No Location</string>
+    <string name="message_content_description">Button Message</string>
+    <string name="info_content_description">Button Detail Info</string>
 
 </resources>

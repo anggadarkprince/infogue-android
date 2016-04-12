@@ -1,6 +1,6 @@
 package com.sketchproject.infogue.fragments.dummy;
 
-import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.models.Article;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,20 +10,18 @@ import java.util.Map;
 /**
  * Helper class for providing sample content for user interfaces created by
  * Android template wizards.
- * <p/>
- * TODO: Replace all uses of this class before publishing your app.
  */
 public class DummyArticleContent {
 
     /**
      * An array of sample (dummy) items.
      */
-    public static final List<DummyItem> ITEMS = new ArrayList<DummyItem>();
+    public static final List<Article> ITEMS = new ArrayList<>();
 
     /**
      * A map of sample (dummy) items, by ID.
      */
-    public static final Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
+    public static final Map<String, Article> ITEM_MAP = new HashMap<>();
 
     private static final int COUNT = 25;
 
@@ -34,8 +32,8 @@ public class DummyArticleContent {
         }
     }
 
-    public static List<DummyItem> generateDummy(int offset) {
-        List<DummyItem> items = new ArrayList<>();
+    public static List<Article> generateDummy(int offset) {
+        List<Article> items = new ArrayList<>();
         int index = offset * COUNT;
 
         for (int i = index; i < (index + COUNT); i++) {
@@ -45,82 +43,44 @@ public class DummyArticleContent {
         return items;
     }
 
-    private static void addItem(DummyItem item) {
+    private static void addItem(Article item) {
         ITEMS.add(item);
-        ITEM_MAP.put(item.id, item);
+        ITEM_MAP.put(String.valueOf(item.getId()), item);
     }
 
-    private static DummyItem createDummyItem(int position) {
+    private static Article createDummyItem(int position) {
         String[] slug = {"article-slug-1", "article-slug-2", "article-slug-3", "article-slug-4", "article-slug-5"};
-        String[] titles = {"Girl gone has rises the revenue up to $100 million dollar, bring new competitors",
+        String[] titles = {
+                "Girl gone has rises the revenue up to $100 million dollar, bring new competitors",
                 "Indonesia for the first time become olympic host now and later",
                 "New technology from the future more intuitive more elegant",
                 "Running and healthy build your body perfectly"};
-        String[] content = {"Last nigh Box Office release update about the new arrival film Girl Gone. They announced latest revenue for 3 weeks after the date release. At the first turn this film looks like similar with the mainstream story about lost girl",
+        String[] content = {
+                "Last nigh Box Office release update about the new arrival film Girl Gone. They announced latest revenue for 3 weeks after the date release. At the first turn this film looks like similar with the mainstream story about lost girl",
                 "They announced latest revenue for 3 weeks after the date release. At the first turn this film looks like similar with the mainstream story about lost girl",
                 "At the first turn this film looks like similar with the mainstream story about lost girl. They announced latest revenue for 3 weeks after the date release."
         };
-        String[] categories = {"News",
-                "Sport",
-                "Entertainment",
-                "Technology",
-                "Science"};
-        String[] months = {"January",
-                "February",
-                "March",
-                "April",
-                "May"};
-        int[] featured = {R.drawable.dummy_featured_1, R.drawable.dummy_featured_2,
-                R.drawable.dummy_featured_3, R.drawable.dummy_featured_4};
+        String[] categories = {"News", "Sport", "Entertainment", "Technology", "Science"};
+        String[] subcategories = {"Government", "Lifestyle", "Soccer", "Research", "Relationship"};
+        String[] months = {"January", "February", "March", "April", "May", "June"};
+        List<String> tags = new ArrayList<>();
+        tags.add("Hello");
+        tags.add("New");
+        tags.add("Trending");
+        tags.add("2016");
+        tags.add("Vacation");
+        tags.add("New President");
+        tags.add("Anime Spring");
 
-        return new DummyItem(
-                String.valueOf(position),
-                slug[(int) Math.floor(Math.random() * slug.length)],
-                titles[(int) Math.floor(Math.random() * titles.length)],
-                content[(int) Math.floor(Math.random() * content.length)],
-                categories[(int) Math.floor(Math.random() * categories.length)],
-                (int) Math.ceil(Math.random() * 31)+" "+months[(int) Math.floor(Math.random() * months.length)]+" 2016",
-                featured[(int) Math.floor(Math.random() * featured.length)],
-                makeDetails(position)
-        );
-    }
-
-    private static String makeDetails(int position) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Details about Item: ").append(position);
-        for (int i = 0; i < position; i++) {
-            builder.append("\nMore details information here.");
-        }
-        return builder.toString();
-    }
-
-    /**
-     * A dummy item representing a piece of content.
-     */
-    public static class DummyItem {
-        public String id;
-        public String slug;
-        public String title;
-        public String content;
-        public String date;
-        public String category;
-        public String details;
-        public int featured;
-
-        public DummyItem(String id, String slug, String title, String content, String category, String date, int featured, String details) {
-            this.id = id;
-            this.slug = slug;
-            this.title = title;
-            this.content = content;
-            this.date = date;
-            this.category = category;
-            this.details = details;
-            this.featured = featured;
-        }
-
-        @Override
-        public String toString() {
-            return content;
-        }
+        Article article = new Article(position + 1, slug[(int) Math.floor(Math.random() * slug.length)], titles[(int) Math.floor(Math.random() * titles.length)]);
+        article.setFeatured("http://infogue.id/images/featured/featured_" + (int) Math.ceil(Math.random() * 25) + ".jpg");
+        article.setCategory(categories[(int) Math.floor(Math.random() * categories.length)]);
+        article.setSubcategory(subcategories[(int) Math.floor(Math.random() * subcategories.length)]);
+        article.setContent(content[(int) Math.floor(Math.random() * content.length)]);
+        article.setPublishedAt((int) Math.ceil(Math.random() * 31) + " " + months[(int) Math.floor(Math.random() * months.length)] + " 2016");
+        article.setTags(tags);
+        article.setView((int) Math.round(Math.random() * 1000));
+        article.setRating((int) Math.ceil(Math.random() * 5));
+        return article;
     }
 }

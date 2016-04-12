@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.adapters.ArticleRecyclerViewAdapter;
 import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
-import com.sketchproject.infogue.fragments.dummy.DummyArticleContent.DummyItem;
+import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 
 import java.util.List;
@@ -28,9 +28,6 @@ import java.util.List;
  */
 public class ArticleFragment extends Fragment {
 
-    public static final String NOHEADER = "noheader";
-
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String ARG_CATEGORY_ID = "category-id";
     private static final String ARG_CATEGORY = "category";
@@ -39,7 +36,6 @@ public class ArticleFragment extends Fragment {
     private static final String ARG_FEATURED = "featured";
     private static final String ARG_AUTHOR = "author";
 
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private int mCategoryId = 0;
     private int mSubcategoryId = 0;
@@ -58,7 +54,6 @@ public class ArticleFragment extends Fragment {
     public ArticleFragment() {
     }
 
-    @SuppressWarnings("unused")
     public static ArticleFragment newInstance(int columnCount) {
         ArticleFragment fragment = new ArticleFragment();
         Bundle args = new Bundle();
@@ -164,7 +159,7 @@ public class ArticleFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
 
-            final List<DummyItem> allArticles = DummyArticleContent.generateDummy(0);
+            final List<Article> allArticles = DummyArticleContent.generateDummy(0);
             final ArticleRecyclerViewAdapter articleAdapter = new ArticleRecyclerViewAdapter(allArticles, mListener, hasHeader);
             recyclerView.setAdapter(articleAdapter);
 
@@ -189,7 +184,7 @@ public class ArticleFragment extends Fragment {
                             allArticles.remove(allArticles.size() - 1);
                             articleAdapter.notifyItemRemoved(allArticles.size());
 
-                            List<DummyItem> moreArticles = DummyArticleContent.generateDummy(page);
+                            List<Article> moreArticles = DummyArticleContent.generateDummy(page);
                             int curSize = articleAdapter.getItemCount();
                             allArticles.addAll(moreArticles);
                             articleAdapter.notifyItemRangeInserted(curSize, allArticles.size() - 1);
@@ -226,12 +221,8 @@ public class ArticleFragment extends Fragment {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnArticleFragmentInteractionListener {
-        void onArticleFragmentInteraction(DummyItem item);
+        void onArticleFragmentInteraction(Article article);
     }
 }

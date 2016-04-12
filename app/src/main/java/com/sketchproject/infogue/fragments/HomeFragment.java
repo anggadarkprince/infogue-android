@@ -12,14 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
+import com.sketchproject.infogue.models.Article;
 
 public class HomeFragment extends Fragment implements ArticleFragment.OnArticleFragmentInteractionListener {
-
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
-
-    private SectionsPagerAdapter mSectionsPagerAdapter;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -41,23 +36,33 @@ public class HomeFragment extends Fragment implements ArticleFragment.OnArticleF
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getActivity().getSupportFragmentManager());
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getActivity().getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        viewPager = (ViewPager) getActivity().findViewById(R.id.viewpager);
+        ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.viewpager);
         viewPager.setAdapter(mSectionsPagerAdapter);
 
-        tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
+        TabLayout tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        tabLayout.getTabAt(0).setIcon(R.drawable.ic_list);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_stars);
-        tabLayout.getTabAt(2).setIcon(R.drawable.ic_whatshot);
+        TabLayout.Tab tab;
+        tab = tabLayout.getTabAt(0);
+        if(tab != null){
+            tab.setIcon(R.drawable.ic_layers);
+        }
+        tab = tabLayout.getTabAt(1);
+        if(tab != null){
+            tab.setIcon(R.drawable.ic_stars);
+        }
+        tab = tabLayout.getTabAt(2);
+        if(tab != null){
+            tab.setIcon(R.drawable.ic_whatshot);
+        }
     }
 
     @Override
-    public void onArticleFragmentInteraction(DummyArticleContent.DummyItem item) {
-        Log.i("ARTICLE", item.id + " " + item.slug + " " + item.details);
+    public void onArticleFragmentInteraction(Article article) {
+        Log.i("INFOGUE/Article", article.getId() + " " + article.getSlug() + " " + article.getTitle());
     }
 
     /**

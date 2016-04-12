@@ -1,10 +1,11 @@
 package com.sketchproject.infogue.models;
 
 /**
- * Created by Angga on 10/04/2016.
+ * Sketch Project Studio
+ * Created by Angga on 10/04/2016 21.32.
  */
 public class Contributor {
-    private int userId;
+    private int id;
     private String username;
     private String name;
     private String location;
@@ -14,13 +15,19 @@ public class Contributor {
     private int article;
     private int followers;
     private int following;
+    private boolean isFollowing;
 
-    public int getUserId() {
-        return userId;
+    public Contributor(int id, String username) {
+        this.id = id;
+        this.username = username;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -91,8 +98,15 @@ public class Contributor {
         return following;
     }
 
+    public boolean isFollowing() {
+        return isFollowing;
+    }
+
     public void setFollowing(int following) {
         this.following = following;
     }
 
+    public void setIsFollowing(boolean isFollowing) {
+        this.isFollowing = isFollowing;
+    }
 }

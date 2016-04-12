@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -18,6 +17,7 @@ import android.view.View;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
+import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.utils.Constant;
 
 public class ArticleActivity extends AppCompatActivity implements ArticleFragment.OnArticleFragmentInteractionListener {
@@ -67,13 +67,13 @@ public class ArticleActivity extends AppCompatActivity implements ArticleFragmen
         if (id == android.R.id.home) {
             finish();
         } else if (id == R.id.action_feedback) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.feedbackUrl));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_FEEDBACK));
             startActivity(browserIntent);
         } else if (id == R.id.action_help) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.helpUrl));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_HELP));
             startActivity(browserIntent);
         } else if (id == R.id.action_rating) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.appUrl));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_APP));
             startActivity(browserIntent);
         } else if (id == R.id.action_about) {
             Intent aboutActivity = new Intent(getBaseContext(), AboutActivity.class);
@@ -84,7 +84,7 @@ public class ArticleActivity extends AppCompatActivity implements ArticleFragmen
     }
 
     @Override
-    public void onArticleFragmentInteraction(DummyArticleContent.DummyItem item) {
-        Log.i("RESULT", item.slug + " " + item.details);
+    public void onArticleFragmentInteraction(Article article) {
+        Log.i("INFOGUE/Article", article.getId() + " " + article.getSlug() + " " + article.getTitle());
     }
 }

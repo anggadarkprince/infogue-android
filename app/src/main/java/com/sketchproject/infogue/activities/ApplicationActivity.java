@@ -2,10 +2,12 @@ package com.sketchproject.infogue.activities;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -13,6 +15,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -21,32 +24,45 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.HomeFragment;
-import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
+import com.sketchproject.infogue.models.Article;
+import com.sketchproject.infogue.modules.ConnectionDetector;
+import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.DialogStyleHelper;
 
 import java.lang.reflect.Method;
 
 public class ApplicationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        ArticleFragment.OnArticleFragmentInteractionListener {
-
-    public static final String AUTH_ACTIVITY = "authentication-activity";
+        ArticleFragment.OnArticleFragmentInteractionListener,
+        ConnectionDetector.OnLostConnectionListener {
 
     private NavigationView navigationView;
+
+    private SessionManager session;
+
+    private ConnectionDetector connectionDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_application);
+
+        connectionDetector = new ConnectionDetector(getBaseContext());
+        connectionDetector.setLostConnectionListener(this);
+        session = new SessionManager(getBaseContext());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -69,82 +85,230 @@ public class ApplicationActivity extends AppCompatActivity
 
         View navigationHeader = navigationView.getHeaderView(0);
 
-        ImageView mAvatarImage = (ImageView) navigationHeader.findViewById(R.id.avatar);
-        mAvatarImage.setOnClickListener(new View.OnClickListener() {
+        handleNavigationLayout(navigationHeader);
+
+        if(!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)){
+            drawer.openDrawer(GravityCompat.START);
+            session.setSessionData(SessionManager.KEY_USER_LEARNED, true);
+        }
+    }
+
+    /**
+     * Decide to show which header and set according login status.
+     *
+     * @param navigationHeader handle header view
+     */
+    private void handleNavigationLayout(View navigationHeader) {
+        ViewGroup headerSigned = (RelativeLayout) navigationHeader.findViewById(R.id.signed_header);
+        ViewGroup headerUnsigned = (LinearLayout) navigationHeader.findViewById(R.id.unsigned_header);
+
+        if (session.isLoggedIn()) {
+            // Select signed as visible view
+            headerSigned.setVisibility(View.VISIBLE);
+            headerUnsigned.setVisibility(View.GONE);
+
+            // Avatar image view delegating event and download image async
+            ImageView mAvatarImage = (ImageView) navigationHeader.findViewById(R.id.avatar);
+            mAvatarImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showProfile();
+                }
+            });
+            Glide.with(this).load(session.getSessionData(SessionManager.KEY_AVATAR, Constant.URL_AVATAR_DEFAULT))
+                    .dontAnimate()
+                    .into(mAvatarImage);
+
+            // Cover image view delegating event and download image async with cross fade effect
+            ImageView mCoverImage = (ImageView) navigationHeader.findViewById(R.id.cover);
+            Glide.with(this).load(session.getSessionData(SessionManager.KEY_COVER, Constant.URL_COVER_DEFAULT))
+                    .crossFade()
+                    .into(mCoverImage);
+
+            // Name view delegating event
+            TextView mNameView = (TextView) navigationHeader.findViewById(R.id.name);
+            mNameView.setText(session.getSessionData(SessionManager.KEY_NAME, "Anonymous"));
+            mNameView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showProfile();
+                }
+            });
+
+            // Set location text view
+            TextView mLocationView = (TextView) navigationHeader.findViewById(R.id.location);
+            mLocationView.setText(session.getSessionData(SessionManager.KEY_LOCATION, "No Location"));
+
+            // Delegating create article event
+            Button mCreateArticleButton = (Button) navigationHeader.findViewById(R.id.btn_create_article);
+            mCreateArticleButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (session.isLoggedIn()) {
+                        Intent createArticleIntent = new Intent(ApplicationActivity.this, ArticleCreateActivity.class);
+                        startActivity(createArticleIntent);
+                    } else {
+                        signOutUser();
+                    }
+                }
+            });
+
+            // Delegating sign out event
+            ImageButton mSignOutButton = (ImageButton) navigationHeader.findViewById(R.id.btn_sign_out);
+            mSignOutButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    confirmSignOut();
+                }
+            });
+        } else {
+            // Select unsigned as visible view
+            headerSigned.setVisibility(View.GONE);
+            headerUnsigned.setVisibility(View.VISIBLE);
+
+            final Intent authIntent = new Intent(getBaseContext(), AuthenticationActivity.class);
+
+            // Delegating sign in event
+            Button mSignInButton = (Button) navigationHeader.findViewById(R.id.btn_sign_in);
+            mSignInButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    authIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.LOGIN_SCREEN);
+                    startActivity(authIntent);
+                }
+            });
+
+            // Delegating sign up event
+            Button mSignUpButton = (Button) navigationHeader.findViewById(R.id.btn_sign_up);
+            mSignUpButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    authIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.REGISTER_SCREEN);
+                    startActivity(authIntent);
+                }
+            });
+        }
+    }
+
+    /**
+     * Show confirm dialog before exit.
+     */
+    private void confirmExit() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+        builder.setTitle("Infogue.id");
+        builder.setMessage("Exit from app?");
+        builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                callProfileActivity();
-            }
-        });
-
-        TextView mNameView = (TextView) navigationHeader.findViewById(R.id.name);
-        mNameView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                callProfileActivity();
-            }
-        });
-
-        /*Glide.with(this).load("http://infogue.id/images/contributors/twitter-294039766.jpg")
-                .dontAnimate()
-                .into(mAvatarImage);
-
-        ImageView cover = (ImageView) navigationHeader.findViewById(R.id.cover);
-        Glide.with(this).load("http://infogue.id/images/covers/twitter-294039766.jpg")
-                .crossFade()
-                .into(cover);*/
-
-        Button mSignInButton = (Button) navigationHeader.findViewById(R.id.btn_sign_in);
-        mSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent loginIntent = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
-                loginIntent.putExtra(AUTH_ACTIVITY, AuthenticationActivity.LOGIN_SCREEN);
-                startActivity(loginIntent);
-            }
-        });
-
-        Button mSignUpButton = (Button) navigationHeader.findViewById(R.id.btn_sign_up);
-        mSignUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent registerIntent = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
-                registerIntent.putExtra(AUTH_ACTIVITY, AuthenticationActivity.REGISTER_SCREEN);
-                startActivity(registerIntent);
-            }
-        });
-
-        Button mCreateArticleButton = (Button) navigationHeader.findViewById(R.id.btn_create_article);
-        mCreateArticleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent createArticleIntent = new Intent(ApplicationActivity.this, ArticleCreateActivity.class);
-                startActivity(createArticleIntent);
-            }
-        });
-
-        ImageButton mSignOutButton = (ImageButton) navigationHeader.findViewById(R.id.btn_sign_out);
-        mSignOutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent loginIntent = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
-                loginIntent.putExtra(AUTH_ACTIVITY, AuthenticationActivity.LOGIN_SCREEN);
-                startActivity(loginIntent);
+            public void onClick(DialogInterface dialog, int which) {
                 finish();
             }
         });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNeutralButton("Open Infogue.id", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.BASE_URL));
+                startActivity(browserIntent);
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        DialogStyleHelper.buttonTheme(dialog);
+        dialog.show();
     }
 
-    private void callProfileActivity(){
-        Intent profileActivity = new Intent(ApplicationActivity.this, ProfileActivity.class);
-        profileActivity.putExtra("id", 1);
-        profileActivity.putExtra("username", "imeldadwi");
-        profileActivity.putExtra("name", "Imelda Dwi Agustine");
-        profileActivity.putExtra("location", "Jakarta, Indonesia");
-        profileActivity.putExtra("avatar", R.drawable.dummy_avatar);
-        startActivity(profileActivity);
+    /**
+     * Show dialog confirmation before signin out.
+     */
+    private void confirmSignOut() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+        builder.setTitle("Sign Out");
+        builder.setMessage("Do you want to sign out?");
+        builder.setPositiveButton("Sign Out", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                signOutUser();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        DialogStyleHelper.buttonTheme(dialog);
+        dialog.show();
     }
 
+    /**
+     * Signing out user and make sure persist process is success.
+     */
+    private void signOutUser() {
+        if (session.logoutUser()) {
+            Intent loginIntent = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
+            loginIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.LOGIN_SCREEN);
+
+            // Closing all the Activities
+            loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            // Add new Flag to start new Activity
+            loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            finish();
+        } else {
+            // Notify remove persistent session data is failed
+            final Snackbar snackbar = Snackbar.make(findViewById(R.id.article_form), "Signing out failed!", Snackbar.LENGTH_LONG);
+
+            // noinspection deprecation
+            snackbar.setActionTextColor(getResources().getColor(R.color.colorLight));
+            snackbar.setAction("RETRY", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    snackbar.dismiss();
+                    signOutUser();
+                }
+            }).show();
+
+            View snackbarView = snackbar.getView();
+
+            // noinspection deprecation
+            snackbarView.setBackgroundColor(getResources().getColor(R.color.colorDanger));
+        }
+    }
+
+    /**
+     * Call profile activity and passing session data.
+     */
+    private void showProfile() {
+        Intent profileIntent = new Intent(ApplicationActivity.this, ProfileActivity.class);
+        // Populate extra data from session
+        profileIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
+        profileIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
+        profileIntent.putExtra(SessionManager.KEY_NAME, session.getSessionData(SessionManager.KEY_NAME, null));
+        profileIntent.putExtra(SessionManager.KEY_LOCATION, session.getSessionData(SessionManager.KEY_LOCATION, null));
+        profileIntent.putExtra(SessionManager.KEY_ABOUT, session.getSessionData(SessionManager.KEY_ABOUT, null));
+        profileIntent.putExtra(SessionManager.KEY_AVATAR, session.getSessionData(SessionManager.KEY_AVATAR, null));
+        profileIntent.putExtra(SessionManager.KEY_COVER, session.getSessionData(SessionManager.KEY_COVER, null));
+        profileIntent.putExtra(SessionManager.KEY_ARTICLE, session.getSessionData(SessionManager.KEY_ARTICLE, 0));
+        profileIntent.putExtra(SessionManager.KEY_FOLLOWER, session.getSessionData(SessionManager.KEY_FOLLOWER, 0));
+        profileIntent.putExtra(SessionManager.KEY_FOLLOWING, session.getSessionData(SessionManager.KEY_FOLLOWING, 0));
+        profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, false);
+        startActivity(profileIntent);
+    }
+
+    /**
+     * Create category menu on navigation drawer.
+     */
     private void populateMenu() {
         SubMenu navMenu = navigationView.getMenu().getItem(1).getSubMenu();
 
@@ -158,6 +322,10 @@ public class ApplicationActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Take care of popping the fragment back stack or finishing the activity
+     * as appropriate.
+     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -168,10 +336,20 @@ public class ApplicationActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Create option menu.
+     *
+     * @param menu content of option menu
+     * @return boolean
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu, menu);
+        if (session.isLoggedIn()) {
+            getMenuInflater().inflate(R.menu.account, menu);
+        } else {
+            getMenuInflater().inflate(R.menu.menu, menu);
+        }
 
         // Associate searchable configuration with the SearchView
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -181,6 +359,13 @@ public class ApplicationActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Force application show icon in option menu.
+     *
+     * @param view which handle option menu
+     * @param menu content of option menu
+     * @return boolean
+     */
     @Override
     protected boolean onPrepareOptionsPanel(View view, Menu menu) {
         if (menu != null) {
@@ -198,63 +383,121 @@ public class ApplicationActivity extends AppCompatActivity
         return super.onPrepareOptionsPanel(view, menu);
     }
 
+    /**
+     * Select option menu.
+     *
+     * @param item of selected option menu
+     * @return boolean
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_login) {
-            Intent loginActivity = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
-            startActivity(loginActivity);
-        } else if (id == R.id.action_feedback) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.feedbackUrl));
-            startActivity(browserIntent);
-        } else if (id == R.id.action_help) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.helpUrl));
-            startActivity(browserIntent);
-        } else if (id == R.id.action_rating) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.appUrl));
-            startActivity(browserIntent);
-        } else if (id == R.id.action_about) {
-            Intent aboutActivity = new Intent(ApplicationActivity.this, AboutActivity.class);
-            startActivity(aboutActivity);
-        } else if (id == R.id.action_exit) {
-            finish();
-        } else if (id == R.id.action_logout) {
-            Intent loginActivity = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
-            startActivity(loginActivity);
-            finish();
-        } else if (id == R.id.action_settings) {
+        switch (id) {
+            case R.id.action_login:
+                Intent loginActivity = new Intent(getBaseContext(), AuthenticationActivity.class);
+                startActivity(loginActivity);
+                break;
+            case R.id.action_feedback: {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_FEEDBACK));
+                startActivity(browserIntent);
+                break;
+            }
+            case R.id.action_help: {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_HELP));
+                startActivity(browserIntent);
+                break;
+            }
+            case R.id.action_rating: {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_APP));
+                startActivity(browserIntent);
+                break;
+            }
+            case R.id.action_about:
+                Intent aboutActivity = new Intent(getBaseContext(), AboutActivity.class);
+                startActivity(aboutActivity);
+                break;
+            case R.id.action_exit:
+                confirmExit();
+                break;
+            case R.id.action_logout:
+                signOutUser();
+                break;
+            case R.id.action_settings:
+                if (session.isLoggedIn()) {
+                    Log.i("INFOGUE/App", "Setting");
+                } else {
+                    signOutUser();
+                }
+                break;
+            case R.id.action_profile:
+                if (session.isLoggedIn()) {
+                    showProfile();
+                } else {
+                    signOutUser();
+                }
+                break;
+            case R.id.action_article:
+                if (session.isLoggedIn()) {
+                    Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
 
-        } else if (id == R.id.action_profile) {
-            callProfileActivity();
-        } else if (id == R.id.action_article) {
-            Intent articleActivity = new Intent(ApplicationActivity.this, ArticleActivity.class);
-            articleActivity.putExtra("id", 1);
-            articleActivity.putExtra("username", "imeldadwi");
-            startActivity(articleActivity);
-        } else if (id == R.id.action_follower) {
-            Intent followerIntent = new Intent(getBaseContext(), FollowerActivity.class);
-            followerIntent.putExtra(ProfileActivity.FOLLOWER_ACTIVITY, FollowerActivity.FOLLOWER_SCREEN);
-            followerIntent.putExtra("id", 1);
-            followerIntent.putExtra("username", "imeldadwi");
-            startActivity(followerIntent);
-        } else if (id == R.id.action_following) {
-            Intent followingIntent = new Intent(getBaseContext(), FollowerActivity.class);
-            followingIntent.putExtra(ProfileActivity.FOLLOWER_ACTIVITY, FollowerActivity.FOLLOWING_SCREEN);
-            followingIntent.putExtra("id", 1);
-            followingIntent.putExtra("username", "imeldadwi");
-            startActivity(followingIntent);
+                    articleIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
+                    articleIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
+
+                    startActivity(articleIntent);
+                } else {
+                    signOutUser();
+                }
+                break;
+            case R.id.action_follower:
+                if (session.isLoggedIn()) {
+                    Intent followerIntent = new Intent(getBaseContext(), FollowerActivity.class);
+
+                    followerIntent.putExtra(FollowerActivity.SCREEN_REQUEST, FollowerActivity.FOLLOWER_SCREEN);
+                    followerIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
+                    followerIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
+
+                    startActivity(followerIntent);
+                } else {
+                    signOutUser();
+                }
+                break;
+            case R.id.action_following:
+                if (session.isLoggedIn()) {
+                    Intent followingIntent = new Intent(getBaseContext(), FollowerActivity.class);
+
+                    followingIntent.putExtra(FollowerActivity.SCREEN_REQUEST, FollowerActivity.FOLLOWING_SCREEN);
+                    followingIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
+                    followingIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
+
+                    startActivity(followingIntent);
+                }
+                break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Interaction with article row.
+     *
+     * @param article contain article model data
+     */
     @Override
-    public void onArticleFragmentInteraction(DummyArticleContent.DummyItem item) {
-        Log.i("ARTICLE", item.id + " " + item.slug + " " + item.details);
+    public void onArticleFragmentInteraction(Article article) {
+        if (connectionDetector.isNetworkAvailable()) {
+            Log.i("INFOGUE/Article", article.getId() + " " + article.getSlug() + " " + article.getTitle());
+        } else {
+            onLostConnectionNotified(getBaseContext());
+        }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
+    /**
+     * Select navigation menu.
+     *
+     * @param item of selected navigation drawer menu
+     * @return boolean
+     */
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         Fragment fragment;
@@ -265,10 +508,10 @@ public class ApplicationActivity extends AppCompatActivity
         String category = item.getTitle().toString();
 
         if (id == R.id.nav_website) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.baseUrl));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.BASE_URL));
             startActivity(browserIntent);
         } else if (id == R.id.nav_rating) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.appUrl));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_APP));
             startActivity(browserIntent);
         } else if (id == R.id.nav_about) {
             Intent aboutActivity = new Intent(ApplicationActivity.this, AboutActivity.class);
@@ -310,5 +553,16 @@ public class ApplicationActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
 
         return true;
+    }
+
+    @Override
+    public void onLostConnectionNotified(Context context) {
+        connectionDetector.snackbarDisconnectNotification(findViewById(android.R.id.content), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // reload and dismiss
+                connectionDetector.dismissNotification();
+            }
+        });
     }
 }

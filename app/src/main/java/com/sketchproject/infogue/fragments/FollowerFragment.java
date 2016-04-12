@@ -13,11 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.adapters.ArticleRecyclerViewAdapter;
 import com.sketchproject.infogue.adapters.FollowerRecyclerViewAdapter;
-import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
 import com.sketchproject.infogue.fragments.dummy.DummyFollowerContent;
-import com.sketchproject.infogue.fragments.dummy.DummyFollowerContent.DummyItem;
+import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 
 import java.util.List;
@@ -30,9 +28,8 @@ import java.util.List;
  */
 public class FollowerFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
+
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
@@ -43,7 +40,6 @@ public class FollowerFragment extends Fragment {
     public FollowerFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static FollowerFragment newInstance(int columnCount) {
         FollowerFragment fragment = new FollowerFragment();
@@ -71,7 +67,7 @@ public class FollowerFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
 
-            final List<DummyFollowerContent.DummyItem> allFollowers = DummyFollowerContent.generateDummy(0);
+            final List<Contributor> allFollowers = DummyFollowerContent.generateDummy(0);
             final FollowerRecyclerViewAdapter followerAdapter = new FollowerRecyclerViewAdapter(allFollowers, mListener);
             recyclerView.setAdapter(followerAdapter);
 
@@ -96,7 +92,7 @@ public class FollowerFragment extends Fragment {
                             allFollowers.remove(allFollowers.size() - 1);
                             followerAdapter.notifyItemRemoved(allFollowers.size());
 
-                            List<DummyFollowerContent.DummyItem> moreFollowers = DummyFollowerContent.generateDummy(page);
+                            List<Contributor> moreFollowers = DummyFollowerContent.generateDummy(page);
                             int curSize = followerAdapter.getItemCount();
                             allFollowers.addAll(moreFollowers);
                             followerAdapter.notifyItemRangeInserted(curSize, allFollowers.size() - 1);
@@ -116,8 +112,7 @@ public class FollowerFragment extends Fragment {
         if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+            throw new RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener");
         }
     }
 
@@ -132,13 +127,8 @@ public class FollowerFragment extends Fragment {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(Contributor contributor);
     }
 }

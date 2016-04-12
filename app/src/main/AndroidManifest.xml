@@ -2,14 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sketchproject.infogue">
 
-    <!-- ApplicationActivity requires an internet connection. -->
+    <!-- Application requires an internet connection. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- ApplicationActivity need to save session file. -->
+    <!-- Application need to save session file. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <!-- ApplicationActivity need to check internet connection to perform the request. -->
+    <!-- Application need to check internet connection to perform the request. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Application need to check internet connection to perform the request. -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <!-- GCM requires a Google account. -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />

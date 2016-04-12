@@ -11,14 +11,15 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.FollowerFragment.OnListFragmentInteractionListener;
-import com.sketchproject.infogue.fragments.dummy.DummyFollowerContent.DummyItem;
+import com.sketchproject.infogue.models.Contributor;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link Contributor} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
@@ -27,19 +28,19 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     private static final int VIEW_TYPE_LOADING = 0;
     private static final int VIEW_TYPE_FOLLOWER = 1;
 
-    private final List<DummyItem> mValues;
+    private final List<Contributor> mContributors;
     private final OnListFragmentInteractionListener mListener;
 
     private int lastPosition = -1;
 
-    public FollowerRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
-        mValues = items;
+    public FollowerRecyclerViewAdapter(List<Contributor> items, OnListFragmentInteractionListener listener) {
+        mContributors = items;
         mListener = listener;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (mValues.get(position) == null) {
+        if (mContributors.get(position) == null) {
             return VIEW_TYPE_LOADING;
         }
 
@@ -68,12 +69,15 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         switch (getItemViewType(position)) {
             case VIEW_TYPE_FOLLOWER:
                 final FollowerViewHolder followerHolder = (FollowerViewHolder) holder;
-                followerHolder.mItem = mValues.get(position);
-                followerHolder.mNameView.setText(mValues.get(position).name);
-                followerHolder.mLocationView.setText(mValues.get(position).location);
-                followerHolder.mAvatarImage.setImageResource(mValues.get(position).avatar);
-
-                if (mValues.get(position).isFollowing) {
+                followerHolder.mItem = mContributors.get(position);
+                followerHolder.mNameView.setText(mContributors.get(position).getName());
+                followerHolder.mLocationView.setText(mContributors.get(position).getLocation());
+                Glide.with(followerHolder.mView.getContext())
+                        .load(mContributors.get(position).getAvatar())
+                        .placeholder(R.drawable.placeholder_square)
+                        .crossFade()
+                        .into(followerHolder.mAvatarImage);
+                if (mContributors.get(position).isFollowing()) {
                     followerHolder.mFollowButton.setImageResource(R.drawable.btn_unfollow);
                 }
 
@@ -103,7 +107,7 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mContributors.size();
     }
 
     public class FollowerProgressViewHolder extends RecyclerView.ViewHolder {
@@ -121,7 +125,7 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         public final TextView mLocationView;
         public final ImageButton mFollowButton;
         public final ImageView mAvatarImage;
-        public DummyItem mItem;
+        public Contributor mItem;
 
         public FollowerViewHolder(View view) {
             super(view);

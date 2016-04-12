@@ -3,10 +3,10 @@ package com.sketchproject.infogue.activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -200,7 +200,7 @@ public class ArticleCreateActivity extends AppCompatActivity {
 
                 final EditText link = new EditText(v.getContext());
                 link.setHint("Link URL");
-                link.setText(Constant.appUrl);
+                link.setText(Constant.URL_APP);
                 link.setLayoutParams(params);
                 layout.addView(link);
 
@@ -243,11 +243,37 @@ public class ArticleCreateActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.save, menu);
+
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
             discardConfirmation();
+        }
+        else if(id == R.id.action_save){
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+            builder.setTitle("Save Article");
+            builder.setMessage("Publish and waiting for editor confirmation?");
+            builder.setPositiveButton("Publish", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
         }
 
         return super.onOptionsItemSelected(item);
@@ -288,17 +314,5 @@ public class ArticleCreateActivity extends AppCompatActivity {
         if (mButton2 != null) {
             mButton2.setTextColor(getResources().getColor(R.color.colorPrimary));
         }
-
-        final Snackbar snackbar = Snackbar.make(findViewById(R.id.article_form), "Discard the article?", Snackbar.LENGTH_LONG);
-        snackbar.setActionTextColor(getResources().getColor(R.color.colorLight));
-        snackbar.setAction("Dismiss", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snackbar.dismiss();
-            }
-        }).show();
-
-        View snackbarView = snackbar.getView();
-        snackbarView.setBackgroundColor(getResources().getColor(R.color.colorDanger));
     }
 }
