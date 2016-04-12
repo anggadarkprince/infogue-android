@@ -3,6 +3,7 @@ package com.sketchproject.infogue.activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,6 +18,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.utils.Constant;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 import jp.wasabeef.richeditor.RichEditor;
@@ -34,7 +36,7 @@ public class ArticleCreateActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        String[] ITEMS = {"Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6"};
+        String[] ITEMS = {"News", "Economic", "Entertainment", "Sport", "Science", "Technology", "Education", "Photo", "Video", "Others"};
         ArrayAdapter<String> adapterCategory = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, ITEMS);
         adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         MaterialSpinner spinnerCategory = (MaterialSpinner) findViewById(R.id.spinner_category);
@@ -198,7 +200,7 @@ public class ArticleCreateActivity extends AppCompatActivity {
 
                 final EditText link = new EditText(v.getContext());
                 link.setHint("Link URL");
-                link.setText("http://www.infogue.id");
+                link.setText(Constant.appUrl);
                 link.setLayoutParams(params);
                 layout.addView(link);
 
@@ -286,5 +288,17 @@ public class ArticleCreateActivity extends AppCompatActivity {
         if (mButton2 != null) {
             mButton2.setTextColor(getResources().getColor(R.color.colorPrimary));
         }
+
+        final Snackbar snackbar = Snackbar.make(findViewById(R.id.article_form), "Discard the article?", Snackbar.LENGTH_LONG);
+        snackbar.setActionTextColor(getResources().getColor(R.color.colorLight));
+        snackbar.setAction("Dismiss", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                snackbar.dismiss();
+            }
+        }).show();
+
+        View snackbarView = snackbar.getView();
+        snackbarView.setBackgroundColor(getResources().getColor(R.color.colorDanger));
     }
 }

@@ -24,12 +24,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.HomeFragment;
 import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
+import com.sketchproject.infogue.utils.Constant;
 
 import java.lang.reflect.Method;
 
@@ -61,17 +63,36 @@ public class ApplicationActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.nav_home);
 
+        MenuItem home = navigationView.getMenu().getItem(0).getSubMenu().getItem(0);
+        onNavigationItemSelected(home);
+        populateMenu();
+
         View navigationHeader = navigationView.getHeaderView(0);
 
-        ImageView avatar = (ImageView) navigationHeader.findViewById(R.id.avatar);
-        Glide.with(this).load("http://infogue.id/images/contributors/twitter-294039766.jpg")
+        ImageView mAvatarImage = (ImageView) navigationHeader.findViewById(R.id.avatar);
+        mAvatarImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callProfileActivity();
+            }
+        });
+
+        TextView mNameView = (TextView) navigationHeader.findViewById(R.id.name);
+        mNameView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callProfileActivity();
+            }
+        });
+
+        /*Glide.with(this).load("http://infogue.id/images/contributors/twitter-294039766.jpg")
                 .dontAnimate()
-                .into(avatar);
+                .into(mAvatarImage);
 
         ImageView cover = (ImageView) navigationHeader.findViewById(R.id.cover);
         Glide.with(this).load("http://infogue.id/images/covers/twitter-294039766.jpg")
                 .crossFade()
-                .into(cover);
+                .into(cover);*/
 
         Button mSignInButton = (Button) navigationHeader.findViewById(R.id.btn_sign_in);
         mSignInButton.setOnClickListener(new View.OnClickListener() {
@@ -109,14 +130,19 @@ public class ApplicationActivity extends AppCompatActivity
                 Intent loginIntent = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
                 loginIntent.putExtra(AUTH_ACTIVITY, AuthenticationActivity.LOGIN_SCREEN);
                 startActivity(loginIntent);
+                finish();
             }
         });
+    }
 
-        MenuItem home = navigationView.getMenu().getItem(0).getSubMenu().getItem(0);
-        onNavigationItemSelected(home);
-        populateMenu();
-
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+    private void callProfileActivity(){
+        Intent profileActivity = new Intent(ApplicationActivity.this, ProfileActivity.class);
+        profileActivity.putExtra("id", 1);
+        profileActivity.putExtra("username", "imeldadwi");
+        profileActivity.putExtra("name", "Imelda Dwi Agustine");
+        profileActivity.putExtra("location", "Jakarta, Indonesia");
+        profileActivity.putExtra("avatar", R.drawable.dummy_avatar);
+        startActivity(profileActivity);
     }
 
     private void populateMenu() {
@@ -145,7 +171,7 @@ public class ApplicationActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.account, menu);
+        getMenuInflater().inflate(R.menu.menu, menu);
 
         // Associate searchable configuration with the SearchView
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -179,6 +205,15 @@ public class ApplicationActivity extends AppCompatActivity
         if (id == R.id.action_login) {
             Intent loginActivity = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
             startActivity(loginActivity);
+        } else if (id == R.id.action_feedback) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.feedbackUrl));
+            startActivity(browserIntent);
+        } else if (id == R.id.action_help) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.helpUrl));
+            startActivity(browserIntent);
+        } else if (id == R.id.action_rating) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.appUrl));
+            startActivity(browserIntent);
         } else if (id == R.id.action_about) {
             Intent aboutActivity = new Intent(ApplicationActivity.this, AboutActivity.class);
             startActivity(aboutActivity);
@@ -191,18 +226,24 @@ public class ApplicationActivity extends AppCompatActivity
         } else if (id == R.id.action_settings) {
 
         } else if (id == R.id.action_profile) {
-            Intent profileActivity = new Intent(ApplicationActivity.this, ProfileActivity.class);
-            profileActivity.putExtra("id", 1);
-            profileActivity.putExtra("username", "imeldadwi");
-            profileActivity.putExtra("name", "Imelda Dwi Agustine");
-            profileActivity.putExtra("location", "Jakarta, Indonesia");
-            profileActivity.putExtra("avatar", R.drawable.dummy_avatar);
-            startActivity(profileActivity);
+            callProfileActivity();
         } else if (id == R.id.action_article) {
             Intent articleActivity = new Intent(ApplicationActivity.this, ArticleActivity.class);
             articleActivity.putExtra("id", 1);
             articleActivity.putExtra("username", "imeldadwi");
             startActivity(articleActivity);
+        } else if (id == R.id.action_follower) {
+            Intent followerIntent = new Intent(getBaseContext(), FollowerActivity.class);
+            followerIntent.putExtra(ProfileActivity.FOLLOWER_ACTIVITY, FollowerActivity.FOLLOWER_SCREEN);
+            followerIntent.putExtra("id", 1);
+            followerIntent.putExtra("username", "imeldadwi");
+            startActivity(followerIntent);
+        } else if (id == R.id.action_following) {
+            Intent followingIntent = new Intent(getBaseContext(), FollowerActivity.class);
+            followingIntent.putExtra(ProfileActivity.FOLLOWER_ACTIVITY, FollowerActivity.FOLLOWING_SCREEN);
+            followingIntent.putExtra("id", 1);
+            followingIntent.putExtra("username", "imeldadwi");
+            startActivity(followingIntent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -224,10 +265,10 @@ public class ApplicationActivity extends AppCompatActivity
         String category = item.getTitle().toString();
 
         if (id == R.id.nav_website) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://infogue.id"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.baseUrl));
             startActivity(browserIntent);
         } else if (id == R.id.nav_rating) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.sketchproject.infogue"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.appUrl));
             startActivity(browserIntent);
         } else if (id == R.id.nav_about) {
             Intent aboutActivity = new Intent(ApplicationActivity.this, AboutActivity.class);

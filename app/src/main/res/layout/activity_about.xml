@@ -10,124 +10,112 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".activities.AboutActivity">
 
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/credit"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:alpha="0.8"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginBottom="20dp"
+            android:singleLine="false"
+            android:text="@string/about_thanks"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title"
+            android:textColor="@color/colorLight" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
-                android:alpha="0.8"
-                android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/about_credit"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+            android:textColor="@color/colorLight" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:singleLine="false"
-                    android:text="@string/about_thanks"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title"
-                    android:textColor="@color/colorLight" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:contentDescription="@string/dummy_content"
+            android:src="@drawable/img_logo_medium" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/about_credit"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-                    android:textColor="@color/colorLight" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/about_copyright"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+            android:textColor="@color/colorLight"
+            android:textStyle="bold" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="60dp"
-                    android:contentDescription="@string/dummy_content"
-                    android:src="@drawable/img_logo_medium" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/about_copyright_owner"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor="@color/colorLight" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="@string/about_copyright"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-                    android:textColor="@color/colorLight"
-                    android:textStyle="bold" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/about_contact_title"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+            android:textColor="@color/colorLight"
+            android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/about_copyright_owner"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    android:textColor="@color/colorLight" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:autoLink="all"
+            android:text="@string/about_contact_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor="@color/colorLight"
+            android:textColorLink="@color/colorPrimary" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="@string/about_contact_title"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-                    android:textColor="@color/colorLight"
-                    android:textStyle="bold" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/about_social"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+            android:textColor="@color/colorLight"
+            android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:autoLink="all"
-                    android:textColorLink="@color/colorPrimary"
-                    android:text="@string/about_contact_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    android:textColor="@color/colorLight" />
+    </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:text="@string/about_social"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-                    android:textColor="@color/colorLight"
-                    android:textStyle="bold" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/credit"
+        android:paddingTop="15dp">
 
-            </LinearLayout>
+        <ImageButton
+            android:id="@+id/btn_facebook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@color/transparent"
+            android:contentDescription="@string/facebook_content_description"
+            android:src="@drawable/btn_facebook" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="15dp">
-
-                <ImageButton
-                    android:id="@+id/btn_facebook"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginRight="5dp"
-                    android:background="@color/transparent"
-                    android:contentDescription="@string/facebook_content_description"
-                    android:src="@drawable/btn_facebook" />
-
-                <ImageButton
-                    android:id="@+id/btn_twitter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_toRightOf="@id/btn_facebook"
-                    android:layout_toEndOf="@id/btn_facebook"
-                    android:background="@color/transparent"
-                    android:contentDescription="@string/twitter_content_description"
-                    android:scaleType="fitStart"
-                    android:src="@drawable/btn_twitter" />
-            </RelativeLayout>
-
-        </LinearLayout>
-
-    </ScrollView>
+        <ImageButton
+            android:id="@+id/btn_twitter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@id/btn_facebook"
+            android:layout_toRightOf="@id/btn_facebook"
+            android:background="@color/transparent"
+            android:contentDescription="@string/twitter_content_description"
+            android:scaleType="fitStart"
+            android:src="@drawable/btn_twitter" />
+    </RelativeLayout>
 
 </RelativeLayout>

@@ -10,10 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.utils.Constant;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -46,11 +46,11 @@ public class ProfileActivity extends AppCompatActivity {
         mCoverImage = (ImageView) findViewById(R.id.cover);
 
         final Bundle extras = getIntent().getExtras();
-        if(extras != null){
+        if (extras != null) {
             mNameView.setText(extras.getString("name"));
             mLocationView.setText(extras.getString("location"));
-            mArticleView.setText(String.valueOf((int)(Math.random() * 50)));
-            mFollowerView.setText(String.valueOf((int)(Math.random() * 50)));
+            mArticleView.setText(String.valueOf((int) (Math.random() * 50)));
+            mFollowerView.setText(String.valueOf((int) (Math.random() * 50)));
             mFollowingView.setText(String.valueOf((int) (Math.random() * 50)));
             mAvatarImage.setImageResource(extras.getInt("avatar"));
 
@@ -98,11 +98,19 @@ public class ProfileActivity extends AppCompatActivity {
             mDetailButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://infogue.id/contributor/"+extras.getString("username")+"/detail"));
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://infogue.id/contributor/" + extras.getString("username") + "/detail"));
                     startActivity(browserIntent);
                 }
             });
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.info, menu);
+
+        return true;
     }
 
     @Override
@@ -111,6 +119,18 @@ public class ProfileActivity extends AppCompatActivity {
 
         if (id == android.R.id.home) {
             finish();
+        } else if (id == R.id.action_feedback) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.feedbackUrl));
+            startActivity(browserIntent);
+        } else if (id == R.id.action_help) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.helpUrl));
+            startActivity(browserIntent);
+        } else if (id == R.id.action_rating) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.appUrl));
+            startActivity(browserIntent);
+        } else if (id == R.id.action_about) {
+            Intent aboutActivity = new Intent(getBaseContext(), AboutActivity.class);
+            startActivity(aboutActivity);
         }
 
         return super.onOptionsItemSelected(item);

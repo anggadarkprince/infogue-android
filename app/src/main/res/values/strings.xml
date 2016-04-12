@@ -80,7 +80,7 @@
     <string name="title_activity_article">Article</string>
     <string name="title_activity_article_create">Create Article</string>
     <string name="action_feedback">Feedback</string>
-    <string name="action_help"><![CDATA[Help & Faq]]></string>
+    <string name="action_help"><![CDATA[Help & FAQ]]></string>
     <string name="action_rating">Rate App</string>
     <string name="prompt_title">Title Article</string>
     <string name="prompt_slug">Article Unique Slug</string>
@@ -89,5 +89,7 @@
     <string name="prompt_subcategory">Select Subcategory</string>
     <string name="prompt_content">Write Content Here</string>
     <string name="prompt_excerpt">Optional Excerpt</string>
+    <string name="action_followers">Followers</string>
+    <string name="action_following">Following</string>
 
 </resources>
