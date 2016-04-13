@@ -278,6 +278,7 @@ public class ProfileActivity extends AppCompatActivity implements
         applicationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         applicationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(applicationIntent);
+        finish();
     }
 
     @Override

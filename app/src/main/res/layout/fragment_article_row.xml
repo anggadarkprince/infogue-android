@@ -55,7 +55,8 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="8dp"
         android:tint="@color/gray"
-        android:src="@drawable/ic_ellipsis" />
+        android:src="@drawable/ic_ellipsis"
+        android:contentDescription="@string/more_content_description" />
 
 
 </RelativeLayout>

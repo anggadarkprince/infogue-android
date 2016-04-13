@@ -18,9 +18,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -32,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
@@ -238,7 +241,7 @@ public class ApplicationActivity extends AppCompatActivity
 
         AlertDialog dialog = builder.create();
         dialog.show();
-        DialogStyleHelper.buttonTheme(dialog);
+        DialogStyleHelper.buttonTheme(this, dialog);
     }
 
     /**
@@ -264,7 +267,7 @@ public class ApplicationActivity extends AppCompatActivity
 
         dialogExit = builder.create();
         dialogExit.show();
-        DialogStyleHelper.buttonTheme(dialogExit);
+        DialogStyleHelper.buttonTheme(this, dialogExit);
     }
 
     /**
@@ -447,7 +450,7 @@ public class ApplicationActivity extends AppCompatActivity
                 confirmExit();
                 break;
             case R.id.action_logout:
-                signOutUser();
+                confirmSignOut();
                 break;
             case R.id.action_settings:
                 if (session.isLoggedIn()) {
@@ -510,12 +513,37 @@ public class ApplicationActivity extends AppCompatActivity
      * @param article contain article model data
      */
     @Override
-    public void onArticleFragmentInteraction(Article article) {
+    public void onArticleFragmentInteraction(View view, Article article) {
         if (connectionDetector.isNetworkAvailable()) {
             Log.i("INFOGUE/Article", article.getId() + " " + article.getSlug() + " " + article.getTitle());
         } else {
             onLostConnectionNotified(getBaseContext());
         }
+    }
+
+    @Override
+    public void onArticlePopupInteraction(final View view, final Article article) {
+        PopupMenu popup = new PopupMenu(new ContextThemeWrapper(view.getContext(), R.style.AppTheme_PopupOverlay), view);
+        popup.inflate(R.menu.article);
+        popup.setGravity(Gravity.END);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.action_view) {
+                    Toast.makeText(view.getContext(), "view " + article.getTitle(), Toast.LENGTH_LONG).show();
+                } else if (id == R.id.action_browse) {
+                    Toast.makeText(view.getContext(), "browse " + article.getTitle(), Toast.LENGTH_LONG).show();
+                } else if (id == R.id.action_share) {
+                    Toast.makeText(view.getContext(), "share " + article.getTitle(), Toast.LENGTH_LONG).show();
+                } else if (id == R.id.action_rate) {
+                    Toast.makeText(view.getContext(), "rate 5 " + article.getTitle(), Toast.LENGTH_LONG).show();
+                }
+
+                return false;
+            }
+        });
+        popup.show();
     }
 
     /**

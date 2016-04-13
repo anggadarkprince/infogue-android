@@ -8,11 +8,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
@@ -95,7 +99,32 @@ public class ArticleActivity extends AppCompatActivity implements ArticleFragmen
     }
 
     @Override
-    public void onArticleFragmentInteraction(Article article) {
+    public void onArticleFragmentInteraction(View view, Article article) {
         Log.i("INFOGUE/Article", article.getId() + " " + article.getSlug() + " " + article.getTitle());
+    }
+
+    @Override
+    public void onArticlePopupInteraction(final View view, final Article article) {
+        PopupMenu popup = new PopupMenu(new ContextThemeWrapper(view.getContext(), R.style.AppTheme_PopupOverlay), view);
+        popup.inflate(R.menu.article);
+        popup.setGravity(Gravity.END);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.action_view) {
+                    Toast.makeText(view.getContext(), "view " + article.getTitle(), Toast.LENGTH_LONG).show();
+                } else if (id == R.id.action_browse) {
+                    Toast.makeText(view.getContext(), "browse " + article.getTitle(), Toast.LENGTH_LONG).show();
+                } else if (id == R.id.action_share) {
+                    Toast.makeText(view.getContext(), "share " + article.getTitle(), Toast.LENGTH_LONG).show();
+                } else if (id == R.id.action_rate) {
+                    Toast.makeText(view.getContext(), "rate 5 " + article.getTitle(), Toast.LENGTH_LONG).show();
+                }
+
+                return false;
+            }
+        });
+        popup.show();
     }
 }

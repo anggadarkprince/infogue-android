@@ -6,15 +6,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.models.Article;
 
-public class HomeFragment extends Fragment implements ArticleFragment.OnArticleFragmentInteractionListener {
+public class HomeFragment extends Fragment {
 
     public HomeFragment() {
         // Required empty public constructor
@@ -58,11 +63,6 @@ public class HomeFragment extends Fragment implements ArticleFragment.OnArticleF
         if(tab != null){
             tab.setIcon(R.drawable.tab_icon_whatshot_selector);
         }
-    }
-
-    @Override
-    public void onArticleFragmentInteraction(Article article) {
-        Log.i("INFOGUE/Article", article.getId() + " " + article.getSlug() + " " + article.getTitle());
     }
 
     /**

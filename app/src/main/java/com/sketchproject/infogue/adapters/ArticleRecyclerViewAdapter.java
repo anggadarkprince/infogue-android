@@ -1,7 +1,10 @@
 package com.sketchproject.infogue.adapters;
 
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -9,6 +12,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
@@ -85,17 +89,17 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 headerHolder.mCategoryView.setText(mArticles.get(position).getCategory());
                 Glide.with(headerHolder.mView.getContext())
                         .load(mArticles.get(position).getFeatured())
-                        .placeholder(R.drawable.placeholder_logo)
+                        .placeholder(R.drawable.placeholder_logo_wide)
                         .crossFade()
                         .into(headerHolder.mFeaturedImage);
 
                 headerHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(View view) {
                         if (null != mListener) {
                             // Notify the active callbacks interface (the activity, if the
                             // fragment is attached to one) that an item has been selected.
-                            mListener.onArticleFragmentInteraction(headerHolder.mItem);
+                            mListener.onArticleFragmentInteraction(view, headerHolder.mItem);
                         }
                     }
                 });
@@ -115,9 +119,20 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
                 rowHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(View view) {
                         if (null != mListener) {
-                            mListener.onArticleFragmentInteraction(rowHolder.mItem);
+                            mListener.onArticleFragmentInteraction(view, rowHolder.mItem);
+                        }
+                    }
+                });
+
+                rowHolder.mMoreImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.i("INFOGUE", "popup");
+                        if (null != mListener) {
+                            Log.i("INFOGUE", "popup send notify");
+                            mListener.onArticlePopupInteraction(view, rowHolder.mItem);
                         }
                     }
                 });
@@ -181,6 +196,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         public TextView mTitleView;
         public TextView mDateView;
         public ImageView mFeaturedImage;
+        public ImageView mMoreImage;
         public Article mItem;
 
         public ArticleRowViewHolder(View view) {
@@ -189,11 +205,13 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             mTitleView = (TextView) view.findViewById(R.id.title);
             mDateView = (TextView) view.findViewById(R.id.date);
             mFeaturedImage = (ImageView) view.findViewById(R.id.featured);
+            mMoreImage = (ImageView) view.findViewById(R.id.more);
         }
 
         @Override
         public String toString() {
             return super.toString() + " '" + mTitleView.getText() + "'";
         }
+
     }
 }

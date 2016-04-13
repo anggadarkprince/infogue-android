@@ -21,5 +21,6 @@
     <color name="color_info">#5bc0de</color>
     <color name="color_warning">#f0ad4e</color>
     <color name="color_danger">#d9534f</color>
+    <color name="black">#b53232</color>
 
 </resources>

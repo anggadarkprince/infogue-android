@@ -193,7 +193,6 @@ public class ArticleFragment extends Fragment {
                     }, 3000);
                 }
             });
-
         }
 
         return view;
@@ -223,6 +222,8 @@ public class ArticleFragment extends Fragment {
      * activity.
      */
     public interface OnArticleFragmentInteractionListener {
-        void onArticleFragmentInteraction(Article article);
+        void onArticleFragmentInteraction(View view, Article article);
+
+        void onArticlePopupInteraction(View view, Article article);
     }
 }

@@ -101,5 +101,10 @@
     <string name="placeholder_location">No Location</string>
     <string name="message_content_description">Button Message</string>
     <string name="info_content_description">Button Detail Info</string>
+    <string name="more_content_description">Button More</string>
+    <string name="action_view">View Article</string>
+    <string name="action_browse">Open Web Version</string>
+    <string name="action_share">Share Article</string>
+    <string name="action_rate">Give 5 Stars</string>
 
 </resources>
