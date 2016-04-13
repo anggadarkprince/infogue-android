@@ -25,6 +25,7 @@ import jp.wasabeef.richeditor.RichEditor;
 import me.gujun.android.taggroup.TagGroup;
 
 public class ArticleCreateActivity extends AppCompatActivity {
+    private AlertDialog dialogDiscard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,11 +181,11 @@ public class ArticleCreateActivity extends AppCompatActivity {
 
                 Button mButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
                 if (mButton != null) {
-                    mButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    mButton.setTextColor(getResources().getColor(R.color.primary));
                 }
                 Button mButton2 = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
                 if (mButton2 != null) {
-                    mButton2.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    mButton2.setTextColor(getResources().getColor(R.color.primary));
                 }
             }
         });
@@ -232,11 +233,11 @@ public class ArticleCreateActivity extends AppCompatActivity {
 
                 Button mButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
                 if (mButton != null) {
-                    mButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    mButton.setTextColor(getResources().getColor(R.color.primary));
                 }
                 Button mButton2 = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
                 if (mButton2 != null) {
-                    mButton2.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    mButton2.setTextColor(getResources().getColor(R.color.primary));
                 }
             }
         });
@@ -256,8 +257,7 @@ public class ArticleCreateActivity extends AppCompatActivity {
 
         if (id == android.R.id.home) {
             discardConfirmation();
-        }
-        else if(id == R.id.action_save){
+        } else if (id == R.id.action_save) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
             builder.setTitle("Save Article");
             builder.setMessage("Publish and waiting for editor confirmation?");
@@ -274,6 +274,9 @@ public class ArticleCreateActivity extends AppCompatActivity {
                     dialog.dismiss();
                 }
             });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
 
         return super.onOptionsItemSelected(item);
@@ -281,7 +284,11 @@ public class ArticleCreateActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        discardConfirmation();
+        if (dialogDiscard != null && dialogDiscard.isShowing()) {
+            dialogDiscard.cancel();
+        } else {
+            discardConfirmation();
+        }
     }
 
     private void discardConfirmation() {
@@ -303,16 +310,16 @@ public class ArticleCreateActivity extends AppCompatActivity {
             }
         });
 
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        dialogDiscard = builder.create();
+        dialogDiscard.show();
 
-        Button mButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        Button mButton = dialogDiscard.getButton(DialogInterface.BUTTON_POSITIVE);
         if (mButton != null) {
-            mButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+            mButton.setTextColor(getResources().getColor(R.color.primary));
         }
-        Button mButton2 = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+        Button mButton2 = dialogDiscard.getButton(DialogInterface.BUTTON_NEGATIVE);
         if (mButton2 != null) {
-            mButton2.setTextColor(getResources().getColor(R.color.colorPrimary));
+            mButton2.setTextColor(getResources().getColor(R.color.primary));
         }
     }
 }

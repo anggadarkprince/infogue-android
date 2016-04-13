@@ -1,7 +1,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorLight">
+    android:background="@color/primary">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -9,12 +9,11 @@
 
         <ProgressBar
             android:id="@+id/login_progress"
-            style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="20dp"
-            android:layout_centerInParent="true"
             android:visibility="gone" />
     </RelativeLayout>
 
@@ -26,7 +25,8 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="45dp">
+            android:layout_marginBottom="45dp"
+            android:layout_marginTop="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -36,38 +36,87 @@
                 android:paddingRight="20dp"
                 android:paddingTop="20dp">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/label_login_social"
+                    android:textAllCaps="true"
+                    android:textColor="@color/light_transparent" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="15dp"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btn_facebook"
+                        style="?android:borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:background="@color/transparent"
+                        android:contentDescription="@string/dummy_content"
+                        android:scaleType="fitEnd"
+                        android:src="@drawable/btn_facebook" />
+
+                    <ImageButton
+                        android:id="@+id/btn_twitter"
+                        style="?android:borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_weight="1"
+                        android:background="@color/transparent"
+                        android:contentDescription="@string/dummy_content"
+                        android:scaleType="fitStart"
+                        android:src="@drawable/btn_twitter" />
+                </LinearLayout>
+
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/input_layout_username"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:theme="@style/AppTheme.TextInvert">
 
                     <EditText
                         android:id="@+id/input_username"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/prompt_username_email"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        android:textColor="@color/light" />
                 </android.support.design.widget.TextInputLayout>
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/input_layout_password"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:theme="@style/AppTheme.TextInvert">
 
                     <EditText
                         android:id="@+id/input_password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/prompt_password"
-                        android:inputType="textPassword" />
+                        android:inputType="textPassword"
+                        android:textColor="@color/light" />
                 </android.support.design.widget.TextInputLayout>
 
                 <Button
                     android:id="@+id/btn_sign_in"
+                    style="?android:borderlessButtonStyle"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:background="@drawable/button_primary"
+                    android:background="@drawable/button_primary_dark"
                     android:text="@string/action_sign_in"
                     android:textColor="@android:color/white" />
 
@@ -78,49 +127,9 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="10dp"
                     android:padding="10dp"
-                    android:text="@string/label_forgot_password" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="30dp"
-                    android:text="@string/label_login_social"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@color/colorGray" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="15dp">
-
-                    <ImageButton
-                        android:id="@+id/btn_facebook"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_weight="1"
-                        style="?android:borderlessButtonStyle"
-                        android:background="@color/transparent"
-                        android:contentDescription="@string/dummy_content"
-                        android:scaleType="fitStart"
-                        android:src="@drawable/btn_facebook" />
-
-                    <ImageButton
-                        android:id="@+id/btn_twitter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginStart="5dp"
-                        style="?android:borderlessButtonStyle"
-                        android:layout_weight="1"
-                        android:background="@color/transparent"
-                        android:contentDescription="@string/dummy_content"
-                        android:scaleType="fitStart"
-                        android:src="@drawable/btn_twitter" />
-                </LinearLayout>
+                    android:text="@string/label_forgot_password"
+                    android:textColor="@color/light"
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -130,16 +139,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:background="@color/colorLightGray">
+            android:background="@color/white_overlay">
 
             <TextView
                 android:id="@+id/btn_create_account"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_horizontal"
-                android:text="@string/label_create_account"
                 android:padding="12dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:text="@string/label_create_account"
+                android:textColor="@color/light_transparent"
+                android:textSize="16sp" />
 
         </android.support.v7.widget.ButtonBarLayout>
 

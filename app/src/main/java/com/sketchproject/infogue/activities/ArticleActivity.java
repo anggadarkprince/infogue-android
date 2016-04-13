@@ -18,14 +18,18 @@ import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
 import com.sketchproject.infogue.models.Article;
+import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.utils.Constant;
 
 public class ArticleActivity extends AppCompatActivity implements ArticleFragment.OnArticleFragmentInteractionListener {
+    SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
+
+        session = new SessionManager(getBaseContext());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -44,7 +48,14 @@ public class ArticleActivity extends AppCompatActivity implements ArticleFragmen
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            Fragment fragment = ArticleFragment.newInstance(extras.getString("username"));
+            String username = extras.getString(SessionManager.KEY_USERNAME);
+            if(session.isLoggedIn()){
+                if(session.getSessionData(SessionManager.KEY_USERNAME, "").equals(username)){
+                    fab.setVisibility(View.VISIBLE);
+                }
+            }
+
+            Fragment fragment = ArticleFragment.newInstance(username);
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.fragment, fragment);

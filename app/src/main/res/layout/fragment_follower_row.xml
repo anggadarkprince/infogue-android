@@ -8,7 +8,7 @@
         android:id="@+id/border_top"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:background="@color/colorLightGray" />
+        android:background="@color/gray_light" />
 
     <RelativeLayout
         android:id="@+id/follower"
@@ -42,7 +42,7 @@
             android:paddingRight="50dp"
             android:singleLine="true"
             android:text="Imelda Dwi Agustine"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/primary"
             android:textSize="16sp" />
 
         <TextView
@@ -57,7 +57,7 @@
             android:paddingRight="50dp"
             android:singleLine="true"
             android:text="Jakarta, Indonesia"
-            android:textColor="@color/colorGray"
+            android:textColor="@color/gray"
             android:textSize="12sp" />
 
         <ImageButton
@@ -79,5 +79,5 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_below="@id/follower"
-        android:background="@color/colorLightGray" />
+        android:background="@color/gray_light" />
 </RelativeLayout>

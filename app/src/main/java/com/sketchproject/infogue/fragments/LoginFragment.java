@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.activities.ApplicationActivity;
 import com.sketchproject.infogue.activities.AuthenticationActivity;
+import com.sketchproject.infogue.activities.ProfileActivity;
 import com.sketchproject.infogue.modules.SessionManager;
 
 import java.util.HashMap;
@@ -180,20 +181,33 @@ public class LoginFragment extends Fragment {
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            showProgress(false);
 
             if (success) {
                 if(demoOnly()){
                     getActivity().finish();
-                    Intent applicationIntent = new Intent(getActivity().getBaseContext(), ApplicationActivity.class);
-                    applicationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    applicationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(applicationIntent);
+                    Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
+                    SessionManager session = new SessionManager(getContext());
+                    profileIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
+                    profileIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
+                    profileIntent.putExtra(SessionManager.KEY_NAME, session.getSessionData(SessionManager.KEY_NAME, null));
+                    profileIntent.putExtra(SessionManager.KEY_LOCATION, session.getSessionData(SessionManager.KEY_LOCATION, null));
+                    profileIntent.putExtra(SessionManager.KEY_ABOUT, session.getSessionData(SessionManager.KEY_ABOUT, null));
+                    profileIntent.putExtra(SessionManager.KEY_AVATAR, session.getSessionData(SessionManager.KEY_AVATAR, null));
+                    profileIntent.putExtra(SessionManager.KEY_COVER, session.getSessionData(SessionManager.KEY_COVER, null));
+                    profileIntent.putExtra(SessionManager.KEY_ARTICLE, session.getSessionData(SessionManager.KEY_ARTICLE, 0));
+                    profileIntent.putExtra(SessionManager.KEY_FOLLOWER, session.getSessionData(SessionManager.KEY_FOLLOWER, 0));
+                    profileIntent.putExtra(SessionManager.KEY_FOLLOWING, session.getSessionData(SessionManager.KEY_FOLLOWING, 0));
+                    profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, false);
+                    profileIntent.putExtra(AuthenticationActivity.AFTER_LOGIN, true);
+                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    profileIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(profileIntent);
                 } else{
                     Toast.makeText(getContext(), "Something is getting wrong", Toast.LENGTH_LONG).show();
                 }
 
             } else {
+                showProgress(false);
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }

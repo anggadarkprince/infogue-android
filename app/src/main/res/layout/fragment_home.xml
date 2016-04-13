@@ -13,6 +13,7 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:tabTextColor="@color/tab_text_selector"
             app:tabGravity="fill"
             app:tabMode="fixed" />
     </android.support.design.widget.AppBarLayout>

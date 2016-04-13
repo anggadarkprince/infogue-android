@@ -13,16 +13,21 @@ import com.sketchproject.infogue.R;
  */
 public class DialogStyleHelper {
 
-    public static void buttonTheme(AlertDialog dialog){
+    @SuppressWarnings("deprecation")
+    public static AlertDialog buttonTheme(AlertDialog dialog){
         Button mButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
         if (mButton != null) {
-            //noinspection deprecation
-            mButton.setTextColor(Resources.getSystem().getColor(R.color.colorPrimary));
+            mButton.setTextColor(Resources.getSystem().getColor(R.color.primary));
         }
         Button mButton2 = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
         if (mButton2 != null) {
-            //noinspection deprecation
-            mButton2.setTextColor(Resources.getSystem().getColor(R.color.colorPrimary));
+            mButton2.setTextColor(Resources.getSystem().getColor(R.color.primary));
         }
+        Button mButton3 = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+        if (mButton3 != null) {
+            mButton3.setTextColor(Resources.getSystem().getColor(R.color.primary));
+        }
+
+        return dialog;
     }
 }

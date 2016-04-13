@@ -17,6 +17,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -55,6 +56,8 @@ public class ApplicationActivity extends AppCompatActivity
 
     private ConnectionDetector connectionDetector;
 
+    private AlertDialog dialogExit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +90,7 @@ public class ApplicationActivity extends AppCompatActivity
 
         handleNavigationLayout(navigationHeader);
 
-        if(!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)){
+        if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
             drawer.openDrawer(GravityCompat.START);
             session.setSessionData(SessionManager.KEY_USER_LEARNED, true);
         }
@@ -173,8 +176,10 @@ public class ApplicationActivity extends AppCompatActivity
             mSignInButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    authIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.LOGIN_SCREEN);
-                    startActivity(authIntent);
+                    if (!isSessionActive()) {
+                        authIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.LOGIN_SCREEN);
+                        startActivity(authIntent);
+                    }
                 }
             });
 
@@ -183,28 +188,40 @@ public class ApplicationActivity extends AppCompatActivity
             mSignUpButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    authIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.REGISTER_SCREEN);
-                    startActivity(authIntent);
+                    if (!isSessionActive()) {
+                        authIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.REGISTER_SCREEN);
+                        startActivity(authIntent);
+                    }
                 }
             });
         }
+    }
+
+    private boolean isSessionActive() {
+        if (session.isLoggedIn()) {
+            finish();
+            Intent applicationIntent = new Intent(getBaseContext(), ApplicationActivity.class);
+            startActivity(applicationIntent);
+            return true;
+        }
+        return false;
     }
 
     /**
      * Show confirm dialog before exit.
      */
     private void confirmExit() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
         builder.setTitle("Infogue.id");
-        builder.setMessage("Exit from app?");
-        builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+        builder.setMessage("Do you want to exit?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 finish();
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -220,15 +237,15 @@ public class ApplicationActivity extends AppCompatActivity
         });
 
         AlertDialog dialog = builder.create();
-        DialogStyleHelper.buttonTheme(dialog);
         dialog.show();
+        DialogStyleHelper.buttonTheme(dialog);
     }
 
     /**
      * Show dialog confirmation before signin out.
      */
     private void confirmSignOut() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
         builder.setTitle("Sign Out");
         builder.setMessage("Do you want to sign out?");
         builder.setPositiveButton("Sign Out", new DialogInterface.OnClickListener() {
@@ -245,9 +262,9 @@ public class ApplicationActivity extends AppCompatActivity
             }
         });
 
-        AlertDialog dialog = builder.create();
-        DialogStyleHelper.buttonTheme(dialog);
-        dialog.show();
+        dialogExit = builder.create();
+        dialogExit.show();
+        DialogStyleHelper.buttonTheme(dialogExit);
     }
 
     /**
@@ -256,6 +273,7 @@ public class ApplicationActivity extends AppCompatActivity
     private void signOutUser() {
         if (session.logoutUser()) {
             Intent loginIntent = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
+            loginIntent.putExtra(AuthenticationActivity.AFTER_LOGOUT, true);
             loginIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.LOGIN_SCREEN);
 
             // Closing all the Activities
@@ -264,13 +282,15 @@ public class ApplicationActivity extends AppCompatActivity
             // Add new Flag to start new Activity
             loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+            startActivity(loginIntent);
+
             finish();
         } else {
             // Notify remove persistent session data is failed
             final Snackbar snackbar = Snackbar.make(findViewById(R.id.article_form), "Signing out failed!", Snackbar.LENGTH_LONG);
 
             // noinspection deprecation
-            snackbar.setActionTextColor(getResources().getColor(R.color.colorLight));
+            snackbar.setActionTextColor(getResources().getColor(R.color.light));
             snackbar.setAction("RETRY", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -282,7 +302,7 @@ public class ApplicationActivity extends AppCompatActivity
             View snackbarView = snackbar.getView();
 
             // noinspection deprecation
-            snackbarView.setBackgroundColor(getResources().getColor(R.color.colorDanger));
+            snackbarView.setBackgroundColor(getResources().getColor(R.color.color_danger));
         }
     }
 
@@ -290,7 +310,7 @@ public class ApplicationActivity extends AppCompatActivity
      * Call profile activity and passing session data.
      */
     private void showProfile() {
-        Intent profileIntent = new Intent(ApplicationActivity.this, ProfileActivity.class);
+        Intent profileIntent = new Intent(getBaseContext(), ProfileActivity.class);
         // Populate extra data from session
         profileIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
         profileIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
@@ -332,7 +352,11 @@ public class ApplicationActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if (dialogExit != null && dialogExit.isShowing()) {
+                dialogExit.cancel();
+            } else {
+                confirmExit();
+            }
         }
     }
 
@@ -395,8 +419,10 @@ public class ApplicationActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.action_login:
-                Intent loginActivity = new Intent(getBaseContext(), AuthenticationActivity.class);
-                startActivity(loginActivity);
+                if (!isSessionActive()) {
+                    Intent loginIntent = new Intent(getBaseContext(), AuthenticationActivity.class);
+                    startActivity(loginIntent);
+                }
                 break;
             case R.id.action_feedback: {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_FEEDBACK));
@@ -414,8 +440,8 @@ public class ApplicationActivity extends AppCompatActivity
                 break;
             }
             case R.id.action_about:
-                Intent aboutActivity = new Intent(getBaseContext(), AboutActivity.class);
-                startActivity(aboutActivity);
+                Intent aboutIntent = new Intent(getBaseContext(), AboutActivity.class);
+                startActivity(aboutIntent);
                 break;
             case R.id.action_exit:
                 confirmExit();

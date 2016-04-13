@@ -29,9 +29,12 @@ import java.util.List;
 public class FollowerFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_RELATED = "related";
 
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+
+    private String mRelated;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -45,6 +48,15 @@ public class FollowerFragment extends Fragment {
         FollowerFragment fragment = new FollowerFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static FollowerFragment newInstance(int columnCount, String related) {
+        FollowerFragment fragment = new FollowerFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putString(ARG_RELATED, related);
         fragment.setArguments(args);
         return fragment;
     }

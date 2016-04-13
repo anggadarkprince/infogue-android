@@ -22,12 +22,11 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <fragment
+    <FrameLayout
         android:id="@+id/fragment"
-        android:name="com.sketchproject.infogue.fragments.FollowerFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:layout="@layout/fragment_follower_list" />
+        android:layout_weight="1"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </android.support.design.widget.CoordinatorLayout>

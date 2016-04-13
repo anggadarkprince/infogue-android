@@ -50,27 +50,27 @@ public class ConnectionDetector extends BroadcastReceiver {
 
     @SuppressWarnings("deprecation")
     public void snackbarDisconnectNotification(View view, View.OnClickListener callbackRetry) {
-        buildSnackNotification(view, callbackRetry, "No Internet Connection!", "RETRY", Resources.getSystem().getColor(R.color.colorDanger));
+        buildSnackNotification(view, callbackRetry, "No Internet Connection!", "RETRY", Resources.getSystem().getColor(R.color.color_danger));
     }
 
     @SuppressWarnings("deprecation")
     public void snackbarDisconnectNotification(View view, View.OnClickListener callbackRetry, String message, String action) {
-        buildSnackNotification(view, callbackRetry, message, action, Resources.getSystem().getColor(R.color.colorDanger));
+        buildSnackNotification(view, callbackRetry, message, action, Resources.getSystem().getColor(R.color.color_danger));
     }
 
     @SuppressWarnings("deprecation")
     public void snackbarConnectedNotification(View view, View.OnClickListener callbackRetry) {
-        buildSnackNotification(view, callbackRetry, "Connection Established.", "OK", Resources.getSystem().getColor(R.color.colorSuccess));
+        buildSnackNotification(view, callbackRetry, "Connection Established.", "OK", Resources.getSystem().getColor(R.color.color_success));
     }
 
     @SuppressWarnings("deprecation")
     public void snackbarConnectedNotification(View view, View.OnClickListener callbackRetry, String message, String action) {
-        buildSnackNotification(view, callbackRetry, message, action, Resources.getSystem().getColor(R.color.colorSuccess));
+        buildSnackNotification(view, callbackRetry, message, action, Resources.getSystem().getColor(R.color.color_success));
     }
 
     private void buildSnackNotification(View view, View.OnClickListener callbackRetry, String message, String action, int backgroundColor) {
         snackbar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-        snackbar.setActionTextColor(Resources.getSystem().getColor(R.color.colorLight));
+        snackbar.setActionTextColor(Resources.getSystem().getColor(R.color.light));
         if (callbackRetry != null) {
             snackbar.setAction(action, callbackRetry).show();
         }

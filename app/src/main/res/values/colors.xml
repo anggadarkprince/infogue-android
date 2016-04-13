@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#00bcd4</color>
-    <color name="colorPrimaryDark">#01a9be</color>
-    <color name="colorAccent">#00e2ff</color>
-    <color name="colorDark">#131313</color>
-    <color name="colorGray">#555555</color>
-    <color name="colorLightGray">#dddddd</color>
-    <color name="colorBackground">#ededed</color>
-    <color name="colorLight">#ffffff</color>
-    <color name="colorGradientFrom">#0cc4db</color>
-    <color name="colorGradientTo">#0cd2eb</color>
+    <color name="primary">#00bcd4</color>
+    <color name="primary_dark">#01a9be</color>
+    <color name="primary_darker">#00798A</color>
+    <color name="accent">#0cd2eb</color>
+    <color name="dark">#131313</color>
+    <color name="gray">#555555</color>
+    <color name="gray_light">#dcdcdc</color>
+    <color name="background">#ededed</color>
+    <color name="light">#ffffff</color>
+    <color name="light_transparent">#bbffffff</color>
+    <color name="gradient_primary_from">#0cc4db</color>
+    <color name="gradient_primary_to">#0cd2eb</color>
 
-    <color name="blackOverlay">#66000000</color>
-    <color name="whiteOverlay">#33ffffff</color>
+    <color name="black_overlay">#66000000</color>
+    <color name="white_overlay">#33ffffff</color>
     <color name="transparent">#00ffffff</color>
 
-    <color name="colorSuccess">#5cb85c</color>
-    <color name="colorInfo">#5bc0de</color>
-    <color name="colorWarning">#f0ad4e</color>
-    <color name="colorDanger">#d9534f</color>
+    <color name="color_success">#5cb85c</color>
+    <color name="color_info">#5bc0de</color>
+    <color name="color_warning">#f0ad4e</color>
+    <color name="color_danger">#d9534f</color>
 
 </resources>

@@ -5,7 +5,7 @@
     android:id="@+id/article_form"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
+    android:background="@color/background"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.sketchproject.infogue.activities.ArticleCreateActivity"
     tools:showIn="@layout/activity_article_create">
@@ -34,7 +34,7 @@
                     android:layout_marginBottom="10dp"
                     android:alpha="0.5"
                     android:text="BASIC INFO"
-                    android:textColor="@color/colorGray" />
+                    android:textColor="@color/gray" />
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/input_layout_title"
@@ -59,26 +59,26 @@
                     android:id="@+id/spinner_category"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:ms_arrowColor="@color/colorGray"
-                    app:ms_baseColor="@color/colorPrimary"
-                    app:ms_errorColor="@color/colorDanger"
+                    app:ms_arrowColor="@color/gray"
+                    app:ms_baseColor="@color/primary"
+                    app:ms_errorColor="@color/color_danger"
                     app:ms_floatingLabelText="@string/prompt_category"
-                    app:ms_highlightColor="@color/colorAccent"
+                    app:ms_highlightColor="@color/accent"
                     app:ms_hint="@string/prompt_category"
-                    app:ms_hintColor="@color/colorPrimary"
+                    app:ms_hintColor="@color/primary"
                     app:ms_multiline="false" />
 
                 <fr.ganfra.materialspinner.MaterialSpinner
                     android:id="@+id/spinner_subcategory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:ms_arrowColor="@color/colorGray"
-                    app:ms_baseColor="@color/colorPrimary"
-                    app:ms_errorColor="@color/colorDanger"
+                    app:ms_arrowColor="@color/gray"
+                    app:ms_baseColor="@color/primary"
+                    app:ms_errorColor="@color/color_danger"
                     app:ms_floatingLabelText="@string/prompt_subcategory"
-                    app:ms_highlightColor="@color/colorAccent"
+                    app:ms_highlightColor="@color/accent"
                     app:ms_hint="@string/prompt_subcategory"
-                    app:ms_hintColor="@color/colorPrimary"
+                    app:ms_hintColor="@color/primary"
                     app:ms_multiline="false" />
 
             </LinearLayout>
@@ -97,7 +97,7 @@
                     android:layout_marginBottom="5dp"
                     android:alpha="0.5"
                     android:text="FEATURED"
-                    android:textColor="@color/colorGray" />
+                    android:textColor="@color/gray" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -113,7 +113,7 @@
                         android:paddingRight="10dp"
                         android:paddingStart="10dp"
                         android:text="Image Featured"
-                        android:textColor="@color/colorPrimary"
+                        android:textColor="@color/primary"
                         android:textSize="13sp" />
 
                     <Button
@@ -127,7 +127,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:text="SELECT IMAGE"
-                        android:textColor="@color/colorLight" />
+                        android:textColor="@color/light" />
 
                 </RelativeLayout>
 
@@ -147,7 +147,7 @@
                     android:layout_marginBottom="10dp"
                     android:alpha="0.5"
                     android:text="SEARCH ENGINE OPTIMIZATION"
-                    android:textColor="@color/colorGray" />
+                    android:textColor="@color/gray" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -158,7 +158,7 @@
                     android:paddingRight="10dp"
                     android:paddingStart="10dp"
                     android:text="Article Tags"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/primary"
                     android:textSize="13sp" />
 
                 <me.gujun.android.taggroup.TagGroup
@@ -206,7 +206,7 @@
                     android:layout_marginBottom="10dp"
                     android:alpha="0.5"
                     android:text="CONTENT"
-                    android:textColor="@color/colorGray" />
+                    android:textColor="@color/gray" />
 
 
                 <TextView
@@ -218,7 +218,7 @@
                     android:paddingRight="10dp"
                     android:paddingStart="10dp"
                     android:text="Article Content"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/primary"
                     android:textSize="13sp" />
 
                 <jp.wasabeef.richeditor.RichEditor
@@ -256,7 +256,7 @@
                     android:paddingRight="10dp"
                     android:paddingStart="10dp"
                     android:text="Article Status"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/primary"
                     android:textSize="13sp" />
 
                 <RadioGroup
@@ -296,7 +296,7 @@
                 android:background="@drawable/button_primary"
                 android:minHeight="40dp"
                 android:text="CREATE ARTICLE"
-                android:textColor="@color/colorLight" />
+                android:textColor="@color/light" />
 
         </LinearLayout>
 

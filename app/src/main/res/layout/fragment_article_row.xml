@@ -24,7 +24,7 @@
         android:layout_marginRight="15dp"
         android:layout_marginEnd="15dp"
         android:layout_marginTop="5dp"
-        android:textColor="@color/colorGray"
+        android:textColor="@color/gray"
         android:layout_toEndOf="@id/featured"
         android:layout_toRightOf="@id/featured"
         android:lineSpacingMultiplier="1"
@@ -44,7 +44,7 @@
         android:text="13 January 2016"
         android:textSize="12sp"
         android:layout_marginBottom="5dp"
-        android:textColor="@color/colorPrimary" />
+        android:textColor="@color/primary" />
 
     <ImageView
         android:id="@+id/more"
@@ -54,7 +54,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="8dp"
-        android:tint="@color/colorGray"
+        android:tint="@color/gray"
         android:src="@drawable/ic_ellipsis" />
 
 

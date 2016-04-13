@@ -48,15 +48,15 @@ public class HomeFragment extends Fragment implements ArticleFragment.OnArticleF
         TabLayout.Tab tab;
         tab = tabLayout.getTabAt(0);
         if(tab != null){
-            tab.setIcon(R.drawable.ic_layers);
+            tab.setIcon(R.drawable.tab_icon_layer_selector);
         }
         tab = tabLayout.getTabAt(1);
         if(tab != null){
-            tab.setIcon(R.drawable.ic_stars);
+            tab.setIcon(R.drawable.tab_icon_star_selector);
         }
         tab = tabLayout.getTabAt(2);
         if(tab != null){
-            tab.setIcon(R.drawable.ic_whatshot);
+            tab.setIcon(R.drawable.tab_icon_whatshot_selector);
         }
     }
 

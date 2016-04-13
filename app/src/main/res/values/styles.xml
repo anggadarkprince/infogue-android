@@ -2,15 +2,15 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorControlHighlight">@color/colorAccent</item>
-        <item name="android:textColorSecondary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorControlHighlight">@color/accent</item>
+        <item name="android:textColorSecondary">@color/primary</item>
     </style>
 
     <style name="AppTheme" parent="AppTheme.Base">
-
+        <item name="android:windowBackground">@color/light</item>
     </style>
 
     <style name="AppTheme.Navigation" parent="AppTheme.Base">
@@ -26,14 +26,32 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="AppTheme.Dark.Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="colorAccent">@color/light</item>
+        <item name="android:textColorPrimary">@color/light</item>
+        <item name="android:background">@color/primary</item>
+    </style>
+
     <style name="TextLabel" parent="TextAppearance.AppCompat">
         <!-- Hint color and label color in FALSE state -->
-        <item name="android:textColorHint">@color/colorPrimary</item>
+        <item name="android:textColorHint">@color/primary</item>
         <item name="android:textSize">16sp</item>
         <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorControlNormal">@color/colorPrimary</item>
-        <item name="colorControlActivated">@color/colorAccent</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorControlNormal">@color/primary</item>
+        <item name="colorControlActivated">@color/accent</item>
+    </style>
+
+    <style name="AppTheme.TextInvert" parent="AppTheme">
+        <!-- Hint color and label color in FALSE state -->
+        <item name="android:textColorHint">@color/light_transparent</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/light</item>
+        <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
+        <item name="colorAccent">@color/light</item>
+        <item name="colorControlHighlight">@color/light</item>
+        <item name="colorControlNormal">@color/light_transparent</item>
+        <item name="colorControlActivated">@color/light</item>
     </style>
 
     <style name="Tag" parent="TagGroup">
@@ -41,17 +59,17 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="atg_isAppendMode">false</item>
         <item name="atg_inputHint">ADD TAG</item>
-        <item name="atg_borderColor">@color/colorPrimary</item>
-        <item name="atg_textColor">@color/colorLight</item>
-        <item name="atg_backgroundColor">@color/colorPrimary</item>
+        <item name="atg_borderColor">@color/primary</item>
+        <item name="atg_textColor">@color/light</item>
+        <item name="atg_backgroundColor">@color/primary</item>
         <item name="atg_dashBorderColor">@color/transparent</item>
         <item name="atg_inputHintColor">#CCFFFFFF</item>
-        <item name="atg_inputTextColor">@color/colorLight</item>
-        <item name="atg_checkedBorderColor">@color/colorAccent</item>
-        <item name="atg_checkedTextColor">@color/colorLight</item>
-        <item name="atg_checkedMarkerColor">@color/colorLight</item>
-        <item name="atg_checkedBackgroundColor">@color/colorAccent</item>
-        <item name="atg_pressedBackgroundColor">@color/colorAccent</item>
+        <item name="atg_inputTextColor">@color/light</item>
+        <item name="atg_checkedBorderColor">@color/accent</item>
+        <item name="atg_checkedTextColor">@color/light</item>
+        <item name="atg_checkedMarkerColor">@color/light</item>
+        <item name="atg_checkedBackgroundColor">@color/accent</item>
+        <item name="atg_pressedBackgroundColor">@color/accent</item>
         <item name="atg_borderStrokeWidth">0.5dp</item>
         <item name="atg_textSize">13sp</item>
         <item name="atg_horizontalSpacing">8dp</item>

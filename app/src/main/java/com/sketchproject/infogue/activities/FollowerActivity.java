@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -12,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.FollowerFragment;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.ConnectionDetector;
@@ -40,15 +44,22 @@ public class FollowerActivity extends AppCompatActivity implements
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle(activityTitle);
-        }
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            activityTitle = extras.getString(SCREEN_REQUEST);
             Log.i("INFOGUE/" + activityTitle, String.valueOf(extras.getInt(SessionManager.KEY_ID)) + " " + extras.getString(SessionManager.KEY_USERNAME));
+            activityTitle = extras.getString(SCREEN_REQUEST);
+
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setTitle(activityTitle);
+            }
+
+            Fragment fragment = FollowerFragment.newInstance(1, extras.getString(SessionManager.KEY_USERNAME));
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.fragment, fragment);
+            fragmentTransaction.commit();
         }
     }
 

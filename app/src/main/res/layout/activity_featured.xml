@@ -5,7 +5,7 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="@color/primary"
     android:fitsSystemWindows="true"
     tools:context=".activities.FeaturedActivity">
 
@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:background="@color/whiteOverlay"
+            android:background="@color/white_overlay"
             android:orientation="horizontal"
             android:paddingBottom="30dp"
             android:paddingLeft="@dimen/fab_margin"
@@ -53,7 +53,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/button_primary_dark"
                 android:text="@string/label_sign_in"
-                android:textColor="@color/colorLight" />
+                android:textColor="@color/light" />
 
             <Button
                 android:id="@+id/btn_get_started"
@@ -65,7 +65,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/button_light"
                 android:text="@string/label_get_started"
-                android:textColor="@color/colorPrimary" />
+                android:textColor="@color/primary" />
 
         </LinearLayout>
 

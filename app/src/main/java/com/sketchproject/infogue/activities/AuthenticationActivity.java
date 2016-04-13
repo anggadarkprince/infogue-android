@@ -1,12 +1,16 @@
 package com.sketchproject.infogue.activities;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.LoginFragment;
@@ -20,10 +24,13 @@ import java.util.List;
  */
 public class AuthenticationActivity extends AppCompatActivity {
     public static final String SCREEN_REQUEST = "AuthScreen";
+    public static final String AFTER_LOGOUT = "AfterLogout";
+    public static final String AFTER_LOGIN = "AfterLogin";
     public static final int LOGIN_SCREEN = 0;
     public static final int REGISTER_SCREEN = 1;
 
     private ViewPager viewPager;
+    private boolean isAfterLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,7 @@ public class AuthenticationActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            isAfterLogout = extras.getBoolean(AFTER_LOGOUT, false);
             int screen = extras.getInt(SCREEN_REQUEST);
             if (screen == LOGIN_SCREEN) {
                 setTabLoginActive();
@@ -74,6 +82,41 @@ public class AuthenticationActivity extends AppCompatActivity {
                 setTabRegisterActive();
             }
         }
+        else{
+            isAfterLogout = false;
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            if(isAfterLogout){
+                launchMainActivity();
+            }
+            else{
+                finish();
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(isAfterLogout){
+            launchMainActivity();
+        }
+
+        super.onBackPressed();
+    }
+
+    private void launchMainActivity(){
+        Intent applicationIntent = new Intent(getBaseContext(), ApplicationActivity.class);
+        applicationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        applicationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(applicationIntent);
     }
 
     public void setTabRegisterActive() {

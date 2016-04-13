@@ -3,6 +3,6 @@
     android:shape="oval" >
 
     <!-- If you want to add solid background color -->
-    <solid android:color="@color/colorAccent" />
+    <solid android:color="@color/accent" />
 
 </shape>

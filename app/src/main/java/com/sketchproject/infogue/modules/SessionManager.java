@@ -108,8 +108,7 @@ public class SessionManager {
      * @param defValue session
      * @return boolean
      */
-    @Nullable
-    public String getSessionData(String key, @Nullable String defValue) {
+    public String getSessionData(String key, String defValue) {
         return pref.getString(key, defValue);
     }
 

@@ -1,7 +1,8 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorLight">
+    android:background="@color/primary">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -9,7 +10,6 @@
 
         <ProgressBar
             android:id="@+id/register_progress"
-            style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -38,16 +38,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:background="@color/colorDanger"
+                android:background="@color/color_danger"
                 android:padding="10dp"
                 android:text="@string/dummy_content"
-                android:textColor="@color/colorLight"
+                android:textColor="@color/light"
                 android:visibility="gone" />
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/input_layout_name"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:theme="@style/AppTheme.TextInvert">
 
                 <EditText
                     android:id="@+id/name"
@@ -56,14 +58,15 @@
                     android:hint="@string/prompt_name"
                     android:inputType="textPersonName"
                     android:singleLine="true"
-                    android:textColor="@color/colorPrimary"
-                    android:textColorHint="@color/colorGray" />
+                    android:textColor="@color/light" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/input_layout_username"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:theme="@style/AppTheme.TextInvert">
 
                 <EditText
                     android:id="@+id/username"
@@ -71,14 +74,15 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_username"
                     android:singleLine="true"
-                    android:textColor="@color/colorPrimary"
-                    android:textColorHint="@color/colorGray" />
+                    android:textColor="@color/light" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/input_layout_email"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:theme="@style/AppTheme.TextInvert">
 
                 <EditText
                     android:id="@+id/email"
@@ -86,14 +90,16 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_email"
                     android:inputType="textEmailAddress"
-                    android:textColor="@color/colorPrimary"
-                    android:textColorHint="@color/colorGray" />
+                    android:textColor="@color/light" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/input_layout_password"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:theme="@style/AppTheme.TextInvert"
+                app:errorTextAppearance="@style/AppTheme.TextInvert">
 
                 <EditText
                     android:id="@+id/password"
@@ -101,8 +107,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password"
                     android:inputType="textPassword"
-                    android:textColor="@color/colorPrimary"
-                    android:textColorHint="@color/colorGray" />
+                    android:textColor="@color/light" />
             </android.support.design.widget.TextInputLayout>
 
             <CheckBox
@@ -110,16 +115,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/appbar_padding_top"
+                android:checked="true"
                 android:text="@string/label_check_agree"
-                android:textColor="@color/colorGray"
-                android:textColorLink="@color/colorPrimary" />
+                android:textColor="@color/light"
+                android:textColorLink="@color/light_transparent" />
 
             <Button
                 android:id="@+id/btn_sign_up"
+                style="?android:borderlessButtonStyle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:background="@drawable/button_primary"
+                android:background="@drawable/button_primary_dark"
                 android:text="@string/action_create_account"
                 android:textColor="@android:color/white" />
 

@@ -25,14 +25,14 @@
             android:singleLine="false"
             android:text="@string/about_thanks"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title"
-            android:textColor="@color/colorLight" />
+            android:textColor="@color/light" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/about_credit"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-            android:textColor="@color/colorLight" />
+            android:textColor="@color/light" />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -47,7 +47,7 @@
             android:layout_marginTop="20dp"
             android:text="@string/about_copyright"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-            android:textColor="@color/colorLight"
+            android:textColor="@color/light"
             android:textStyle="bold" />
 
         <TextView
@@ -56,7 +56,7 @@
             android:layout_marginTop="5dp"
             android:text="@string/about_copyright_owner"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textColor="@color/colorLight" />
+            android:textColor="@color/light" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -64,7 +64,7 @@
             android:layout_marginTop="20dp"
             android:text="@string/about_contact_title"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-            android:textColor="@color/colorLight"
+            android:textColor="@color/light"
             android:textStyle="bold" />
 
         <TextView
@@ -74,8 +74,8 @@
             android:autoLink="all"
             android:text="@string/about_contact_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textColor="@color/colorLight"
-            android:textColorLink="@color/colorPrimary" />
+            android:textColor="@color/light"
+            android:textColorLink="@color/primary" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -83,7 +83,7 @@
             android:layout_marginTop="30dp"
             android:text="@string/about_social"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-            android:textColor="@color/colorLight"
+            android:textColor="@color/light"
             android:textStyle="bold" />
 
     </LinearLayout>

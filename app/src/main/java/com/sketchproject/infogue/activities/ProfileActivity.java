@@ -32,7 +32,8 @@ public class ProfileActivity extends AppCompatActivity implements
 
     private int id;
     private String username;
-    private Boolean isFollowing;
+    private boolean isFollowing;
+    private boolean isAfterLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +82,8 @@ public class ProfileActivity extends AppCompatActivity implements
                     .centerCrop()
                     .crossFade()
                     .into(mCoverImage);
+
+            isAfterLogin = extras.getBoolean(AuthenticationActivity.AFTER_LOGIN);
 
             buildProfileEventHandler(id, username);
         } else {
@@ -214,14 +217,14 @@ public class ProfileActivity extends AppCompatActivity implements
     @SuppressWarnings("deprecation")
     private void stateFollow(Button mFollowButton) {
         mFollowButton.setBackgroundResource(R.drawable.button_light);
-        mFollowButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+        mFollowButton.setTextColor(getResources().getColor(R.color.primary));
         mFollowButton.setText(getString(R.string.action_follow));
     }
 
     @SuppressWarnings("deprecation")
     private void stateUnfollow(Button mFollowButton) {
         mFollowButton.setBackgroundResource(R.drawable.button_primary);
-        mFollowButton.setTextColor(getResources().getColor(R.color.colorLight));
+        mFollowButton.setTextColor(getResources().getColor(R.color.light));
         mFollowButton.setText(getString(R.string.action_unfollow));
     }
 
@@ -238,7 +241,12 @@ public class ProfileActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            finish();
+            if(isAfterLogin){
+                launchMainActivity();
+            }
+            else{
+                finish();
+            }
         } else if (id == R.id.action_feedback) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_FEEDBACK));
             startActivity(browserIntent);
@@ -254,6 +262,22 @@ public class ProfileActivity extends AppCompatActivity implements
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(isAfterLogin){
+            launchMainActivity();
+        }
+
+        super.onBackPressed();
+    }
+
+    private void launchMainActivity(){
+        Intent applicationIntent = new Intent(getBaseContext(), ApplicationActivity.class);
+        applicationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        applicationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(applicationIntent);
     }
 
     @Override
