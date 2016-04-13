@@ -2,5 +2,5 @@
 <resources>
     <dimen name="nav_header_margin_top">28dp</dimen>
     <dimen name="nav_header_margin_top_profile">44dp</dimen>
-    <dimen name="padding_translucent">0dp</dimen>
+    <dimen name="padding_translucent">24dp</dimen>
 </resources>

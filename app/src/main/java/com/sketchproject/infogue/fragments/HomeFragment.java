@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.activities.ApplicationActivity;
 import com.sketchproject.infogue.models.Article;
 
 public class HomeFragment extends Fragment {

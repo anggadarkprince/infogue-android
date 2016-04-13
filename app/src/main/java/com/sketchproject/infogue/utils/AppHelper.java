@@ -13,10 +13,10 @@ import com.sketchproject.infogue.R;
  * Sketch Project Studio
  * Created by Angga on 12/04/2016 14.27.
  */
-public class DialogStyleHelper {
+public class AppHelper {
 
     @SuppressWarnings("deprecation")
-    public static AlertDialog buttonTheme(Context context, AlertDialog dialog){
+    public static AlertDialog dialogButtonTheme(Context context, AlertDialog dialog){
         Button mButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
         if (mButton != null) {
             mButton.setTextColor(context.getResources().getColor(R.color.primary));
@@ -27,7 +27,7 @@ public class DialogStyleHelper {
         }
         Button mButton3 = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
         if (mButton3 != null) {
-            mButton3.setTextColor(context.getResources().getColor(R.color.primary));
+            mButton3.setTextColor(context.getResources().getColor(R.color.gray));
         }
 
         return dialog;

@@ -125,13 +125,12 @@ public class FollowerActivity extends AppCompatActivity implements
                 connectionDetector.dismissNotification();
 
                 if (!connectionDetector.isNetworkAvailable()) {
-                    String[] jokes = {"Syahrini", "Jupe", "Depe", "Nabilah"};
                     connectionDetector.snackbarDisconnectNotification(findViewById(android.R.id.content), new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             onLostConnectionNotified(getBaseContext());
                         }
-                    }, jokes[(int) Math.floor(Math.random() * jokes.length)] + "steal my internet T_T", "RETRY");
+                    }, Constant.jokes[(int) Math.floor(Math.random() * Constant.jokes.length)] + " stole my internet T_T", "RETRY");
                 } else {
                     connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
                         @Override

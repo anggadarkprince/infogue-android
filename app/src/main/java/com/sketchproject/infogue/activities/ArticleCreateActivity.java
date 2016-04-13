@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +19,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
@@ -178,15 +180,7 @@ public class ArticleCreateActivity extends AppCompatActivity {
 
                 AlertDialog dialog = builder.create();
                 dialog.show();
-
-                Button mButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-                if (mButton != null) {
-                    mButton.setTextColor(getResources().getColor(R.color.primary));
-                }
-                Button mButton2 = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-                if (mButton2 != null) {
-                    mButton2.setTextColor(getResources().getColor(R.color.primary));
-                }
+                AppHelper.dialogButtonTheme(v.getContext(), dialog);
             }
         });
 
@@ -230,15 +224,7 @@ public class ArticleCreateActivity extends AppCompatActivity {
 
                 AlertDialog dialog = builder.create();
                 dialog.show();
-
-                Button mButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-                if (mButton != null) {
-                    mButton.setTextColor(getResources().getColor(R.color.primary));
-                }
-                Button mButton2 = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-                if (mButton2 != null) {
-                    mButton2.setTextColor(getResources().getColor(R.color.primary));
-                }
+                AppHelper.dialogButtonTheme(v.getContext(), dialog);
             }
         });
     }
@@ -258,7 +244,7 @@ public class ArticleCreateActivity extends AppCompatActivity {
         if (id == android.R.id.home) {
             discardConfirmation();
         } else if (id == R.id.action_save) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+            final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
             builder.setTitle("Save Article");
             builder.setMessage("Publish and waiting for editor confirmation?");
             builder.setPositiveButton("Publish", new DialogInterface.OnClickListener() {
@@ -275,8 +261,9 @@ public class ArticleCreateActivity extends AppCompatActivity {
                 }
             });
 
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            AlertDialog dialogSave = builder.create();
+            dialogSave.show();
+            AppHelper.dialogButtonTheme(this, dialogSave);
         }
 
         return super.onOptionsItemSelected(item);
@@ -312,14 +299,6 @@ public class ArticleCreateActivity extends AppCompatActivity {
 
         dialogDiscard = builder.create();
         dialogDiscard.show();
-
-        Button mButton = dialogDiscard.getButton(DialogInterface.BUTTON_POSITIVE);
-        if (mButton != null) {
-            mButton.setTextColor(getResources().getColor(R.color.primary));
-        }
-        Button mButton2 = dialogDiscard.getButton(DialogInterface.BUTTON_NEGATIVE);
-        if (mButton2 != null) {
-            mButton2.setTextColor(getResources().getColor(R.color.primary));
-        }
+        AppHelper.dialogButtonTheme(this, dialogDiscard);
     }
 }

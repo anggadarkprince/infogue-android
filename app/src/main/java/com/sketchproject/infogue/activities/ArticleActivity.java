@@ -1,5 +1,6 @@
 package com.sketchproject.infogue.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,9 +8,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
@@ -20,13 +21,15 @@ import android.widget.Toast;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
-import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
 import com.sketchproject.infogue.models.Article;
+import com.sketchproject.infogue.modules.IconizedMenu;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.utils.Constant;
 
 public class ArticleActivity extends AppCompatActivity implements ArticleFragment.OnArticleFragmentInteractionListener {
-    SessionManager session;
+    private SessionManager session;
+
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +55,9 @@ public class ArticleActivity extends AppCompatActivity implements ArticleFragmen
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String username = extras.getString(SessionManager.KEY_USERNAME);
-            if(session.isLoggedIn()){
-                if(session.getSessionData(SessionManager.KEY_USERNAME, "").equals(username)){
+            username = extras.getString(SessionManager.KEY_USERNAME);
+            if (session.isLoggedIn()) {
+                if (session.getSessionData(SessionManager.KEY_USERNAME, "").equals(username)) {
                     fab.setVisibility(View.VISIBLE);
                 }
             }
@@ -105,26 +108,64 @@ public class ArticleActivity extends AppCompatActivity implements ArticleFragmen
 
     @Override
     public void onArticlePopupInteraction(final View view, final Article article) {
-        PopupMenu popup = new PopupMenu(new ContextThemeWrapper(view.getContext(), R.style.AppTheme_PopupOverlay), view);
-        popup.inflate(R.menu.article);
+        IconizedMenu popup = new IconizedMenu(new ContextThemeWrapper(view.getContext(), R.style.AppTheme_PopupOverlay), view);
+        if (session.getSessionData(SessionManager.KEY_USERNAME, "").equals(username)) {
+            popup.inflate(R.menu.post);
+        }
+        else{
+            popup.inflate(R.menu.article);
+        }
+
         popup.setGravity(Gravity.END);
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+        popup.setOnMenuItemClickListener(new IconizedMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.action_view) {
                     Toast.makeText(view.getContext(), "view " + article.getTitle(), Toast.LENGTH_LONG).show();
-                } else if (id == R.id.action_browse) {
-                    Toast.makeText(view.getContext(), "browse " + article.getTitle(), Toast.LENGTH_LONG).show();
-                } else if (id == R.id.action_share) {
-                    Toast.makeText(view.getContext(), "share " + article.getTitle(), Toast.LENGTH_LONG).show();
-                } else if (id == R.id.action_rate) {
-                    Toast.makeText(view.getContext(), "rate 5 " + article.getTitle(), Toast.LENGTH_LONG).show();
+                } else if (id == R.id.action_publish) {
+                    Toast.makeText(view.getContext(), "publish " + article.getTitle(), Toast.LENGTH_LONG).show();
+                } else if (id == R.id.action_draft) {
+                    Toast.makeText(view.getContext(), "draft " + article.getTitle(), Toast.LENGTH_LONG).show();
+                } else if (id == R.id.action_edit) {
+                    Toast.makeText(view.getContext(), "edit " + article.getTitle(), Toast.LENGTH_LONG).show();
+                } else if (id == R.id.action_delete) {
+                    Toast.makeText(view.getContext(), "delete " + article.getTitle(), Toast.LENGTH_LONG).show();
                 }
 
                 return false;
             }
         });
         popup.show();
+    }
+
+    @Override
+    public void onArticleLongClickInteraction(final View view, final Article article) {
+        final CharSequence[] postItems = {
+                "View / Open", "Browse in Web", "Share Article", "Publish Now", "Set as Draft", "Edit Article", "Delete Article"
+        };
+
+        final CharSequence[] articleItems = {
+                "View / Open", "Browse in Web", "Share Article", "Give 5 Stars"
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if (session.getSessionData(SessionManager.KEY_USERNAME, "").equals(username)) {
+            builder.setItems(postItems, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
+                    Toast.makeText(view.getContext(), postItems[item] + article.getTitle(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+        else{
+            builder.setItems(articleItems, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
+                    Toast.makeText(view.getContext(), articleItems[item] + article.getTitle(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }

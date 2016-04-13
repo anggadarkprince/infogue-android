@@ -50,30 +50,31 @@ public class ConnectionDetector extends BroadcastReceiver {
 
     @SuppressWarnings("deprecation")
     public void snackbarDisconnectNotification(View view, View.OnClickListener callbackRetry) {
-        buildSnackNotification(view, callbackRetry, "No Internet Connection!", "RETRY", Resources.getSystem().getColor(R.color.color_danger));
+        buildSnackNotification(view, callbackRetry, "No Internet Connection!", "RETRY", mContext.getResources().getColor(R.color.color_danger), Snackbar.LENGTH_INDEFINITE);
     }
 
     @SuppressWarnings("deprecation")
     public void snackbarDisconnectNotification(View view, View.OnClickListener callbackRetry, String message, String action) {
-        buildSnackNotification(view, callbackRetry, message, action, Resources.getSystem().getColor(R.color.color_danger));
+        buildSnackNotification(view, callbackRetry, message, action, mContext.getResources().getColor(R.color.color_danger), Snackbar.LENGTH_INDEFINITE);
     }
 
     @SuppressWarnings("deprecation")
     public void snackbarConnectedNotification(View view, View.OnClickListener callbackRetry) {
-        buildSnackNotification(view, callbackRetry, "Connection Established.", "OK", Resources.getSystem().getColor(R.color.color_success));
+        buildSnackNotification(view, callbackRetry, "Connection Established.", "OK", mContext.getResources().getColor(R.color.color_success), Snackbar.LENGTH_LONG);
     }
 
     @SuppressWarnings("deprecation")
     public void snackbarConnectedNotification(View view, View.OnClickListener callbackRetry, String message, String action) {
-        buildSnackNotification(view, callbackRetry, message, action, Resources.getSystem().getColor(R.color.color_success));
+        buildSnackNotification(view, callbackRetry, message, action, mContext.getResources().getColor(R.color.color_success), Snackbar.LENGTH_LONG);
     }
 
-    private void buildSnackNotification(View view, View.OnClickListener callbackRetry, String message, String action, int backgroundColor) {
-        snackbar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-        snackbar.setActionTextColor(Resources.getSystem().getColor(R.color.light));
+    private void buildSnackNotification(View view, View.OnClickListener callbackRetry, String message, String action, int backgroundColor, int duration) {
+        snackbar = Snackbar.make(view, message, duration);
+        snackbar.setActionTextColor(mContext.getResources().getColor(R.color.light));
         if (callbackRetry != null) {
-            snackbar.setAction(action, callbackRetry).show();
+            snackbar.setAction(action, callbackRetry);
         }
+        snackbar.show();
 
         View snackbarView = snackbar.getView();
         snackbarView.setBackgroundColor(backgroundColor);

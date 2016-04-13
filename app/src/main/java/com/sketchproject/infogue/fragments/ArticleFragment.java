@@ -225,5 +225,7 @@ public class ArticleFragment extends Fragment {
         void onArticleFragmentInteraction(View view, Article article);
 
         void onArticlePopupInteraction(View view, Article article);
+
+        void onArticleLongClickInteraction(View view, Article article);
     }
 }

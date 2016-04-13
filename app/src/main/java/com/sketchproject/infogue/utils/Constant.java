@@ -12,4 +12,6 @@ public interface Constant {
 
     String URL_AVATAR_DEFAULT = "http://infogue.id/images/contributors/noavatar.jpg";
     String URL_COVER_DEFAULT = "http://infogue.id/images/covers/noavatar.jpg";
+
+    String[] jokes = {"Syahrini", "Jupe", "Depe", "Nabilah JKT48", "Raisa"};
 }

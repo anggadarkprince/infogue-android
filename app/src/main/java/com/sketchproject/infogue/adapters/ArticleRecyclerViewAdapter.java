@@ -104,6 +104,16 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                     }
                 });
 
+                headerHolder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        if (null != mListener) {
+                            mListener.onArticleLongClickInteraction(view, headerHolder.mItem);
+                        }
+                        return false;
+                    }
+                });
+
                 break;
 
             case VIEW_TYPE_ROW:
@@ -123,6 +133,16 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                         if (null != mListener) {
                             mListener.onArticleFragmentInteraction(view, rowHolder.mItem);
                         }
+                    }
+                });
+
+                rowHolder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        if (null != mListener) {
+                            mListener.onArticleLongClickInteraction(view, rowHolder.mItem);
+                        }
+                        return false;
                     }
                 });
 

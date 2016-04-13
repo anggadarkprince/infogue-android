@@ -18,7 +18,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -42,9 +41,10 @@ import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.HomeFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.ConnectionDetector;
+import com.sketchproject.infogue.modules.IconizedMenu;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
-import com.sketchproject.infogue.utils.DialogStyleHelper;
 
 import java.lang.reflect.Method;
 
@@ -241,7 +241,7 @@ public class ApplicationActivity extends AppCompatActivity
 
         AlertDialog dialog = builder.create();
         dialog.show();
-        DialogStyleHelper.buttonTheme(this, dialog);
+        AppHelper.dialogButtonTheme(this, dialog);
     }
 
     /**
@@ -267,7 +267,7 @@ public class ApplicationActivity extends AppCompatActivity
 
         dialogExit = builder.create();
         dialogExit.show();
-        DialogStyleHelper.buttonTheme(this, dialogExit);
+        AppHelper.dialogButtonTheme(this, dialogExit);
     }
 
     /**
@@ -516,6 +516,7 @@ public class ApplicationActivity extends AppCompatActivity
     public void onArticleFragmentInteraction(View view, Article article) {
         if (connectionDetector.isNetworkAvailable()) {
             Log.i("INFOGUE/Article", article.getId() + " " + article.getSlug() + " " + article.getTitle());
+            connectionDetector.dismissNotification();
         } else {
             onLostConnectionNotified(getBaseContext());
         }
@@ -523,27 +524,53 @@ public class ApplicationActivity extends AppCompatActivity
 
     @Override
     public void onArticlePopupInteraction(final View view, final Article article) {
-        PopupMenu popup = new PopupMenu(new ContextThemeWrapper(view.getContext(), R.style.AppTheme_PopupOverlay), view);
+        IconizedMenu popup = new IconizedMenu(new ContextThemeWrapper(view.getContext(), R.style.AppTheme_PopupOverlay), view);
         popup.inflate(R.menu.article);
         popup.setGravity(Gravity.END);
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+        popup.setOnMenuItemClickListener(new IconizedMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 int id = item.getItemId();
-                if (id == R.id.action_view) {
-                    Toast.makeText(view.getContext(), "view " + article.getTitle(), Toast.LENGTH_LONG).show();
-                } else if (id == R.id.action_browse) {
-                    Toast.makeText(view.getContext(), "browse " + article.getTitle(), Toast.LENGTH_LONG).show();
-                } else if (id == R.id.action_share) {
-                    Toast.makeText(view.getContext(), "share " + article.getTitle(), Toast.LENGTH_LONG).show();
-                } else if (id == R.id.action_rate) {
-                    Toast.makeText(view.getContext(), "rate 5 " + article.getTitle(), Toast.LENGTH_LONG).show();
+
+                if (connectionDetector.isNetworkAvailable()) {
+                    if (id == R.id.action_view) {
+                        Toast.makeText(view.getContext(), "view " + article.getTitle(), Toast.LENGTH_LONG).show();
+                    } else if (id == R.id.action_browse) {
+                        Toast.makeText(view.getContext(), "browse " + article.getTitle(), Toast.LENGTH_LONG).show();
+                    } else if (id == R.id.action_share) {
+                        Toast.makeText(view.getContext(), "share " + article.getTitle(), Toast.LENGTH_LONG).show();
+                    } else if (id == R.id.action_rate) {
+                        Toast.makeText(view.getContext(), "rate 5 " + article.getTitle(), Toast.LENGTH_LONG).show();
+                    }
+                    connectionDetector.dismissNotification();
+                } else{
+                    onLostConnectionNotified(getBaseContext());
                 }
 
                 return false;
             }
         });
         popup.show();
+    }
+
+    @Override
+    public void onArticleLongClickInteraction(final View view, final Article article) {
+        final CharSequence[] items = {
+                "View / Open", "Browse in Web", "Share Article", "Give 5 Stars"
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                if (connectionDetector.isNetworkAvailable()) {
+                    Toast.makeText(view.getContext(), items[item] + article.getTitle(), Toast.LENGTH_LONG).show();
+                } else{
+                    onLostConnectionNotified(getBaseContext());
+                }
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     /**
@@ -614,9 +641,25 @@ public class ApplicationActivity extends AppCompatActivity
         connectionDetector.snackbarDisconnectNotification(findViewById(android.R.id.content), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // reload and dismiss
                 connectionDetector.dismissNotification();
+
+                if (!connectionDetector.isNetworkAvailable()) {
+                    connectionDetector.snackbarDisconnectNotification(findViewById(android.R.id.content), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onLostConnectionNotified(getBaseContext());
+                        }
+                    }, Constant.jokes[(int) Math.floor(Math.random() * Constant.jokes.length)] + " stole my internet T_T", "RETRY");
+                } else {
+                    connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            connectionDetector.dismissNotification();
+                        }
+                    });
+                }
             }
         });
     }
+
 }

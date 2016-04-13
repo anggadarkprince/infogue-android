@@ -103,8 +103,12 @@
     <string name="info_content_description">Button Detail Info</string>
     <string name="more_content_description">Button More</string>
     <string name="action_view">View Article</string>
-    <string name="action_browse">Open Web Version</string>
-    <string name="action_share">Share Article</string>
+    <string name="action_browse">Open in Web</string>
+    <string name="action_share">Share</string>
     <string name="action_rate">Give 5 Stars</string>
+    <string name="action_draft">Set as Draft</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_publish">Publish Now</string>
 
 </resources>
