@@ -142,11 +142,19 @@ public class ArticleActivity extends AppCompatActivity implements ArticleFragmen
     @Override
     public void onArticleLongClickInteraction(final View view, final Article article) {
         final CharSequence[] postItems = {
-                "View / Open", "Browse in Web", "Share Article", "Publish Now", "Set as Draft", "Edit Article", "Delete Article"
+                getString(R.string.action_long_open),
+                getString(R.string.action_long_browse), getString(R.string.action_long_share),
+                getString(R.string.action_long_publish),
+                getString(R.string.action_long_draft),
+                getString(R.string.action_long_edit),
+                getString(R.string.action_long_delete)
         };
 
         final CharSequence[] articleItems = {
-                "View / Open", "Browse in Web", "Share Article", "Give 5 Stars"
+                getString(R.string.action_long_open),
+                getString(R.string.action_long_browse),
+                getString(R.string.action_long_share),
+                getString(R.string.action_long_rate)
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

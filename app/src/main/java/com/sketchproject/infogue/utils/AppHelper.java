@@ -3,9 +3,14 @@ package com.sketchproject.infogue.utils;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sketchproject.infogue.R;
 
@@ -31,5 +36,20 @@ public class AppHelper {
         }
 
         return dialog;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static Toast toastColored(Context context, String message) {
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
+        View view = toast.getView();
+        view.setBackgroundColor(Color.parseColor("#dd00bcd4"));
+        view.setPadding(20, 20, 20, 20);
+        TextView tv = (TextView) view.findViewById(android.R.id.message);
+        tv.setShadowLayer(0, 0, 0, context.getResources().getColor(R.color.transparent));
+        tv.setGravity(Gravity.CENTER);
+        toast.setView(view);
+        toast.show();
+
+        return toast;
     }
 }

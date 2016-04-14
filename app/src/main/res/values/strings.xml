@@ -10,6 +10,7 @@
     <string name="title_activity_about">About</string>
     <string name="title_activity_search">Search Result</string>
     <string name="title_activity_follower">Followers</string>
+    <string name="title_activity_profile">Profile</string>
     <string name="title_activity_article">Article</string>
     <string name="title_activity_article_create">Create Article</string>
 
@@ -37,7 +38,6 @@
     <string name="label_get_started">GET STARTED</string>
     <string name="label_create_account">Create an Account</string>
     <string name="label_check_agree"><![CDATA[I agree infogue.id <a href="http://www.infogue.id/terms">terms</a> and <a href="http://www.infogue.id/terms">conditions</a>]]></string>
-
     <string name="label_forgot_password">Forgot Password?</string>
     <string name="label_login_social">Login with Social</string>
     <string name="label_sign_navigation">Sign in to contribute article</string>
@@ -60,6 +60,10 @@
     <string name="action_rating">Rate App</string>
     <string name="action_followers">Followers</string>
     <string name="action_following">Following</string>
+    <string name="action_view_detail">View Detail</string>
+    <string name="action_create_article">Post Article</string>
+    <string name="action_follow">FOLLOW</string>
+    <string name="action_unfollow">UNFOLLOW</string>
 
     <string name="about_thanks">Thanks for using our app</string>
     <string name="about_credit">Infogue.id was originally develop by Infogue Developer Team and Angga Ari Wijaya.</string>
@@ -68,11 +72,11 @@
     <string name="about_contact_title">Developer Contact</string>
     <string name="about_contact_content">Mobile (+62) 85655479868\nEmail sketchprojectstudio@gmail.com\nJawa 6 No 5 Jember, East Java - Indonesia</string>
     <string name="about_social">Follow our social account</string>
-    <string name="title_activity_profile">Profile</string>
     <string name="label_articles">Articles</string>
     <string name="label_followers">Followers</string>
     <string name="label_following">Following</string>
-    <string name="action_view_detail">View Detail</string>
+    <string name="label_send_to">Share infogue.id to</string>
+    <string name="label_search_hint">Find article or contributor</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_random">Random</string>
@@ -82,7 +86,23 @@
     <string name="menu_website">Infogue.id</string>
     <string name="menu_rate">Rate App</string>
 
-    <string name="search_hint">Find article or contributor</string>
+    <string name="action_view">View Article</string>
+    <string name="action_browse">Open in Web</string>
+    <string name="action_share">Share</string>
+    <string name="action_rate">Give 5 Stars</string>
+    <string name="action_draft">Set as Draft</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_publish">Publish Now</string>
+
+    <string name="action_long_rate">Give 5 Stars</string>
+    <string name="action_long_share">Share Article</string>
+    <string name="action_long_browse">Browse in Web</string>
+    <string name="action_long_open">View / Open</string>
+    <string name="action_long_publish">Publish Now</string>
+    <string name="action_long_draft">Set as Draft</string>
+    <string name="action_long_edit">Edit Article</string>
+    <string name="action_long_delete">Delete Article</string>
 
     <string name="follow_content_description">Button Follow</string>
     <string name="avatar_content_description">Avatar Image</string>
@@ -92,23 +112,13 @@
     <string name="logo_content_description">Logo Infogue</string>
     <string name="cover_content_description">Cover Image</string>
     <string name="sign_out_content_description">Button Sign Out</string>
-    <string name="action_create_article">Post Article</string>
-    <string name="action_follow">FOLLOW</string>
-    <string name="action_unfollow">UNFOLLOW</string>
+    <string name="message_content_description">Button Message</string>
+    <string name="info_content_description">Button Detail Info</string>
+    <string name="more_content_description">Button More</string>
+
     <string name="placeholder_about">The description will be placed here, multiline and wrapped by this container</string>
     <string name="placeholder_statistic">0</string>
     <string name="placeholder_name">Anonymous</string>
     <string name="placeholder_location">No Location</string>
-    <string name="message_content_description">Button Message</string>
-    <string name="info_content_description">Button Detail Info</string>
-    <string name="more_content_description">Button More</string>
-    <string name="action_view">View Article</string>
-    <string name="action_browse">Open in Web</string>
-    <string name="action_share">Share</string>
-    <string name="action_rate">Give 5 Stars</string>
-    <string name="action_draft">Set as Draft</string>
-    <string name="action_delete">Delete</string>
-    <string name="action_edit">Edit</string>
-    <string name="action_publish">Publish Now</string>
 
 </resources>

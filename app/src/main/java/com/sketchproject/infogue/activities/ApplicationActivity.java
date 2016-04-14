@@ -45,6 +45,7 @@ import com.sketchproject.infogue.modules.IconizedMenu;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.UrlHelper;
 
 import java.lang.reflect.Method;
 
@@ -534,16 +535,22 @@ public class ApplicationActivity extends AppCompatActivity
 
                 if (connectionDetector.isNetworkAvailable()) {
                     if (id == R.id.action_view) {
-                        Toast.makeText(view.getContext(), "view " + article.getTitle(), Toast.LENGTH_LONG).show();
+                        AppHelper.toastColored(view.getContext(), "View " + article.getTitle());
                     } else if (id == R.id.action_browse) {
-                        Toast.makeText(view.getContext(), "browse " + article.getTitle(), Toast.LENGTH_LONG).show();
+                        String articleUrl = UrlHelper.getBrowseArticleUrl(article.getSlug());
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
+                        startActivity(browserIntent);
                     } else if (id == R.id.action_share) {
-                        Toast.makeText(view.getContext(), "share " + article.getTitle(), Toast.LENGTH_LONG).show();
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareText(article.getSlug()));
+                        sendIntent.setType("text/plain");
+                        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
                     } else if (id == R.id.action_rate) {
-                        Toast.makeText(view.getContext(), "rate 5 " + article.getTitle(), Toast.LENGTH_LONG).show();
+                        AppHelper.toastColored(view.getContext(), "Awesome!, you give 5 Stars on \"" + article.getTitle() + "\"");
                     }
                     connectionDetector.dismissNotification();
-                } else{
+                } else {
                     onLostConnectionNotified(getBaseContext());
                 }
 
@@ -556,15 +563,35 @@ public class ApplicationActivity extends AppCompatActivity
     @Override
     public void onArticleLongClickInteraction(final View view, final Article article) {
         final CharSequence[] items = {
-                "View / Open", "Browse in Web", "Share Article", "Give 5 Stars"
+                getString(R.string.action_long_open),
+                getString(R.string.action_long_browse),
+                getString(R.string.action_long_share),
+                getString(R.string.action_long_rate)
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
                 if (connectionDetector.isNetworkAvailable()) {
-                    Toast.makeText(view.getContext(), items[item] + article.getTitle(), Toast.LENGTH_LONG).show();
-                } else{
+                    if (items[item].toString().equals(getString(R.string.action_long_open))) {
+                        AppHelper.toastColored(view.getContext(), "View " + article.getTitle());
+                    }
+                    if (items[item].toString().equals(getString(R.string.action_long_browse))) {
+                        String articleUrl = UrlHelper.getBrowseArticleUrl(article.getSlug());
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
+                        startActivity(browserIntent);
+                    }
+                    if (items[item].toString().equals(getString(R.string.action_long_share))) {
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareText(article.getSlug()));
+                        sendIntent.setType("text/plain");
+                        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
+                    }
+                    if (items[item].toString().equals(getString(R.string.action_long_rate))) {
+                        AppHelper.toastColored(view.getContext(), "Awesome!, you give 5 Stars on \"" + article.getTitle() + "\"");
+                    }
+                } else {
                     onLostConnectionNotified(getBaseContext());
                 }
             }
@@ -661,5 +688,4 @@ public class ApplicationActivity extends AppCompatActivity
             }
         });
     }
-
 }
