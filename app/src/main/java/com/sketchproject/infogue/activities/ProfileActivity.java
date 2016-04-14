@@ -88,6 +88,7 @@ public class ProfileActivity extends AppCompatActivity implements
             buildProfileEventHandler(id, username);
         } else {
             Toast.makeText(getBaseContext(), "Invalid user profile", Toast.LENGTH_LONG).show();
+            finish();
         }
     }
 

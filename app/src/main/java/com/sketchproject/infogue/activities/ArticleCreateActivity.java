@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
@@ -102,21 +101,21 @@ public class ArticleCreateActivity extends AppCompatActivity {
         findViewById(R.id.action_heading1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEditor.setHeading(1);
+                mEditor.setHeading(3);
             }
         });
 
         findViewById(R.id.action_heading2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEditor.setHeading(2);
+                mEditor.setHeading(4);
             }
         });
 
         findViewById(R.id.action_heading3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEditor.setHeading(3);
+                mEditor.setHeading(5);
             }
         });
 

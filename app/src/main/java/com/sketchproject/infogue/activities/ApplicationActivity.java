@@ -33,7 +33,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
@@ -517,6 +516,12 @@ public class ApplicationActivity extends AppCompatActivity
     public void onArticleFragmentInteraction(View view, Article article) {
         if (connectionDetector.isNetworkAvailable()) {
             Log.i("INFOGUE/Article", article.getId() + " " + article.getSlug() + " " + article.getTitle());
+            Intent postIntent = new Intent(getBaseContext(), PostActivity.class);
+            postIntent.putExtra(Article.ARTICLE_ID, article.getId());
+            postIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
+            postIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
+            postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
+            startActivity(postIntent);
             connectionDetector.dismissNotification();
         } else {
             onLostConnectionNotified(getBaseContext());
@@ -535,7 +540,12 @@ public class ApplicationActivity extends AppCompatActivity
 
                 if (connectionDetector.isNetworkAvailable()) {
                     if (id == R.id.action_view) {
-                        AppHelper.toastColored(view.getContext(), "View " + article.getTitle());
+                        Intent postIntent = new Intent(getBaseContext(), PostActivity.class);
+                        postIntent.putExtra(Article.ARTICLE_ID, article.getId());
+                        postIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
+                        postIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
+                        postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
+                        startActivity(postIntent);
                     } else if (id == R.id.action_browse) {
                         String articleUrl = UrlHelper.getBrowseArticleUrl(article.getSlug());
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
@@ -574,7 +584,12 @@ public class ApplicationActivity extends AppCompatActivity
             public void onClick(DialogInterface dialog, int item) {
                 if (connectionDetector.isNetworkAvailable()) {
                     if (items[item].toString().equals(getString(R.string.action_long_open))) {
-                        AppHelper.toastColored(view.getContext(), "View " + article.getTitle());
+                        Intent postIntent = new Intent(getBaseContext(), PostActivity.class);
+                        postIntent.putExtra(Article.ARTICLE_ID, article.getId());
+                        postIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
+                        postIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
+                        postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
+                        startActivity(postIntent);
                     }
                     if (items[item].toString().equals(getString(R.string.action_long_browse))) {
                         String articleUrl = UrlHelper.getBrowseArticleUrl(article.getSlug());

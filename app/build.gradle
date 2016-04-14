@@ -31,4 +31,5 @@ dependencies {
     compile 'com.github.ganfra:material-spinner:1.1.1'
     compile 'me.gujun.android.taggroup:library:1.4@aar'
     compile 'jp.wasabeef:richeditor-android:1.2.0'
+    compile 'org.sufficientlysecure:html-textview:1.5'
 }

@@ -52,7 +52,7 @@
         <activity
             android:name=".activities.AuthenticationActivity"
             android:label="@string/title_activity_login"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.ApplicationActivity"
             android:label="@string/title_activity_application"
@@ -61,6 +61,7 @@
             <meta-data
                 android:name="android.app.default_searchable"
                 android:value=".activities.SearchActivity" />
+
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
@@ -99,11 +100,19 @@
         <activity
             android:name=".activities.ArticleActivity"
             android:label="@string/title_activity_article"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.ArticleCreateActivity"
             android:label="@string/title_activity_article_create"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.PostActivity"
+            android:label="@string/title_activity_post"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.CommentActivity"
+            android:label="@string/title_activity_comment"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

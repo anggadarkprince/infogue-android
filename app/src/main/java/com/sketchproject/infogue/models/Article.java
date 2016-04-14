@@ -7,6 +7,18 @@ import java.util.List;
  * Created by Angga on 12/04/2016 22.09.
  */
 public class Article {
+    public static final String ARTICLE_ID = "article_id";
+    public static final String ARTICLE_SLUG = "slug";
+    public static final String ARTICLE_TITLE = "title";
+    public static final String ARTICLE_FEATURED = "featured";
+    public static final String ARTICLE_CATEGORY = "category";
+    public static final String ARTICLE_SUBCATEGORY = "subcategory";
+    public static final String ARTICLE_CONTENT = "content";
+    public static final String ARTICLE_PUBLISHED_AT = "published_at";
+    public static final String ARTICLE_TAGS = "tags";
+    public static final String ARTICLE_VIEW = "view";
+    public static final String ARTICLE_RATING = "rating";
+
     private int id;
     private String slug;
     private String title;

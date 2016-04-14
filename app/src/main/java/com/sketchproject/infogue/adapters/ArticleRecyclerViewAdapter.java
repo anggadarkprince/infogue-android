@@ -1,10 +1,8 @@
 package com.sketchproject.infogue.adapters;
 
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -12,7 +10,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
@@ -24,7 +21,6 @@ import java.util.List;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Article} and makes a call to the
  * specified {@link OnArticleFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
 public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

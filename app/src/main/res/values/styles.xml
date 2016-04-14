@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -59,7 +59,7 @@
         <item name="colorControlActivated">@color/light</item>
     </style>
 
-    <style name="Tag" parent="TagGroup">
+    <style name="AppTheme.Tag" parent="TagGroup">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="atg_isAppendMode">false</item>
@@ -81,6 +81,16 @@
         <item name="atg_verticalSpacing">4dp</item>
         <item name="atg_horizontalPadding">12dp</item>
         <item name="atg_verticalPadding">3dp</item>
+    </style>
+
+    <style name="AppTheme.ExpandedTransparentText" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/transparent</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="AppTheme.CollapseLightText" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/light</item>
+        <item name="android:textSize" tools:ignore="SpUsage">18dp</item>
     </style>
 
 </resources>

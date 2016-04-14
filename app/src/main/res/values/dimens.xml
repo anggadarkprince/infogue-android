@@ -15,4 +15,5 @@
     <dimen name="space_large">20dp</dimen>
     <dimen name="nav_header_margin_top_profile">20dp</dimen>
     <dimen name="padding_translucent">0dp</dimen>
+    <dimen name="app_bar_height">200dp</dimen>
 </resources>

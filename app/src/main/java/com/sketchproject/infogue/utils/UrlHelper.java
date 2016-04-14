@@ -16,4 +16,9 @@ public class UrlHelper {
     public static String getBrowseArticleUrl(String slug) {
         return Constant.BASE_URL + slug;
     }
+
+    public static String wrapHtmlString(String html) {
+        String content = "<html><head><style>img{display:block; width:100%}</style></head><body>" + html + "</body></html>";
+        return "<![CDATA[" + html + "]]>";
+    }
 }
