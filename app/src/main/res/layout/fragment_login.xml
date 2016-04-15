@@ -1,4 +1,5 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primary">
@@ -34,7 +35,7 @@
                 android:orientation="vertical"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                android:paddingTop="20dp">
+                android:paddingTop="15dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -78,6 +79,14 @@
                         android:src="@drawable/btn_twitter" />
                 </LinearLayout>
 
+                <fragment
+                    android:id="@+id/alert_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:name="com.sketchproject.infogue.fragments.AlertFragment"
+                    tools:layout="@layout/fragment_alert" />
+
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/input_layout_username"
                     android:layout_width="match_parent"
@@ -115,7 +124,7 @@
                     style="?android:borderlessButtonStyle"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="15dp"
                     android:background="@drawable/button_primary_dark"
                     android:text="@string/action_sign_in"
                     android:textColor="@android:color/white" />

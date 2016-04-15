@@ -52,6 +52,7 @@
         <activity
             android:name=".activities.AuthenticationActivity"
             android:label="@string/title_activity_login"
+            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.ApplicationActivity"

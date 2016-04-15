@@ -2,6 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/primary">
 
     <RelativeLayout
@@ -33,16 +34,13 @@
             android:paddingRight="20dp"
             android:paddingTop="20dp">
 
-            <TextView
-                android:id="@+id/alert"
+            <fragment
+                android:id="@+id/alert_register"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:background="@color/color_danger"
-                android:padding="10dp"
-                android:text="@string/dummy_content"
-                android:textColor="@color/light"
-                android:visibility="gone" />
+                android:name="com.sketchproject.infogue.fragments.AlertFragment"
+                tools:layout="@layout/fragment_alert" />
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/input_layout_name"

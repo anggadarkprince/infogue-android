@@ -3,9 +3,7 @@ package com.sketchproject.infogue.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -17,9 +15,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.sketchproject.infogue.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,7 +33,6 @@ public class RegisterFragment extends Fragment {
     private EditText mUsernameView;
     private EditText mPasswordView;
     private CheckBox mAgreeView;
-    private TextView mAlert;
     private View mProgressView;
     private View mRegisterFormView;
 
@@ -57,8 +56,6 @@ public class RegisterFragment extends Fragment {
         mUsernameView = (EditText) getActivity().findViewById(R.id.username);
         mPasswordView = (EditText) getActivity().findViewById(R.id.password);
         mAgreeView = (CheckBox) getActivity().findViewById(R.id.agree);
-        mAlert = (TextView) getActivity().findViewById(R.id.alert);
-
         mAgreeView.setText(Html.fromHtml(getResources().getString(R.string.label_check_agree)));
         mAgreeView.setMovementMethod(LinkMovementMethod.getInstance());
 
@@ -79,11 +76,7 @@ public class RegisterFragment extends Fragment {
             return;
         }
 
-        // Reset errors.
-        mNameView.setError(null);
-        mUsernameView.setError(null);
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
+        List<String> validationMessage = new ArrayList<>();
 
         // Store values at the time of the login attempt.
         String name = mNameView.getText().toString();
@@ -95,53 +88,53 @@ public class RegisterFragment extends Fragment {
         View focusView = null;
 
         if (TextUtils.isEmpty(name)) {
-            mNameView.setError(getString(R.string.error_field_required));
+            validationMessage.add(getString(R.string.error_name_required));
             focusView = mNameView;
             cancel = true;
         }
 
         if (TextUtils.isEmpty(username)) {
-            mUsernameView.setError(getString(R.string.error_field_required));
+            validationMessage.add(getString(R.string.error_username_required));
             focusView = mUsernameView;
             cancel = true;
         }
 
         if (!isValidUsername(username)) {
-            mUsernameView.setError(getString(R.string.error_invalid_username));
+            validationMessage.add(getString(R.string.error_invalid_username));
             focusView = mUsernameView;
             cancel = true;
         }
 
         if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
+            validationMessage.add(getString(R.string.error_email_required));
             focusView = mEmailView;
             cancel = true;
         }
 
         if (!isValidEmail(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
+            validationMessage.add(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
         }
 
         if (TextUtils.isEmpty(password)) {
-            mPasswordView.setError(getString(R.string.error_field_required));
+            validationMessage.add(getString(R.string.error_password_required));
             focusView = mPasswordView;
             cancel = true;
         }
 
         if (!mAgreeView.isChecked()) {
-            cancel = true;
+            validationMessage.add(getString(R.string.error_agreement));
             focusView = mAgreeView;
-            mAlert.setText(getString(R.string.error_agreement));
-            mAlert.setVisibility(View.VISIBLE);
-        } else {
-            mAlert.setVisibility(View.GONE);
+            cancel = true;
         }
-
 
         if (cancel) {
             focusView.requestFocus();
+            AlertFragment fragment = (AlertFragment) getChildFragmentManager().findFragmentById(R.id.alert_register);
+            fragment.setAlertType(AlertFragment.ALERT_WARNING);
+            fragment.setAlertMessage(validationMessage);
+            fragment.show();
         } else {
             showProgress(true);
             mRegisterTask = new UserRegisterTask(name, email, username, password);
@@ -150,7 +143,7 @@ public class RegisterFragment extends Fragment {
     }
 
     private boolean isValidUsername(String username) {
-        return !username.contains(" ");
+        return username.matches("^[a-zA-Z0-9-_]*$");
     }
 
     private boolean isValidEmail(String email) {
@@ -160,37 +153,31 @@ public class RegisterFragment extends Fragment {
     /**
      * Shows the progress UI and hides the login form.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        int mediumAnimTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);
 
-            mRegisterFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mRegisterFormView
-                    .animate()
-                    .setDuration(shortAnimTime)
-                    .alpha(show ? 0 : 1)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            mRegisterFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                        }
-                    });
+        mRegisterFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        mRegisterFormView
+                .animate()
+                .setDuration(mediumAnimTime)
+                .alpha(show ? 0 : 1)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mRegisterFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                    }
+                });
 
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate()
-                    .setDuration(shortAnimTime)
-                    .alpha(show ? 1 : 0)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                        }
-                    });
-        } else {
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mRegisterFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.animate()
+                .setDuration(mediumAnimTime)
+                .alpha(show ? 1 : 0)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                    }
+                });
     }
 
     /**
@@ -231,8 +218,10 @@ public class RegisterFragment extends Fragment {
             if (success) {
                 getActivity().finish();
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+                AlertFragment fragment = (AlertFragment) getChildFragmentManager().findFragmentById(R.id.alert_fragment);
+                fragment.setAlertType(AlertFragment.ALERT_DANGER);
+                fragment.setAlertMessage("Server error occurred, Try again!");
+                fragment.show();
             }
         }
 

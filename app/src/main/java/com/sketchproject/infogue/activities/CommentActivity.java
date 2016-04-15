@@ -37,7 +37,7 @@ public class CommentActivity extends AppCompatActivity {
         }
 
         progress = new ProgressDialog(this);
-        progress.setMessage("Loading Article Data");
+        progress.setMessage("Loading Comment Data");
         progress.setIndeterminate(true);
         progress.show();
 
@@ -48,7 +48,7 @@ public class CommentActivity extends AppCompatActivity {
             String title = extras.getString(Article.ARTICLE_TITLE);
             final String urlDisqus = UrlHelper.getDisqusUrl(id, slug, title, Constant.SHORT_NAME);
 
-            final String[] patterns = {"disqus.com/next/login-success", "disqus.com/_ax/google/complete", "disqus.com/_ax/twitter/complete", "disqus.com/_ax/facebook/complete"};
+            final String[] patterns = {"http://disqus.com/next/login-success/", "http://disqus.com/_ax/google/complete/", "http://disqus.com/_ax/twitter/complete/", "http://disqus.com/_ax/facebook/complete/"};
 
             final WebView webDisqus = (WebView) findViewById(R.id.disqus_comment);
             WebSettings webSettings = webDisqus.getSettings();
@@ -59,10 +59,12 @@ public class CommentActivity extends AppCompatActivity {
             webDisqus.setWebViewClient(new WebViewClient() {
                 @Override
                 public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                    Log.i("INFOGUE/Comment", url);
+                    Log.i("INFOGUE/Comment web", url);
                     for (String pattern : patterns) {
                         if (url.matches("^" + pattern)) {
                             webDisqus.loadUrl(urlDisqus);
+                            Log.i("INFOGUE/Comment", "Match");
+                            break;
                         }
                     }
                     super.onPageStarted(view, url, favicon);
@@ -74,21 +76,7 @@ public class CommentActivity extends AppCompatActivity {
                     progress.dismiss();
                 }
             });
-            webDisqus.setWebChromeClient(new WebChromeClient() {
-                @Override
-                public void onProgressChanged(WebView view, int newProgress) {
-                    super.onProgressChanged(view, newProgress);
-                    if (newProgress == 100) {
-                        progress.dismiss();
-                        Log.i("INFOGUE/Comment", view.getUrl());
-                        for (String pattern : patterns) {
-                            if (view.getUrl().matches("^" + pattern)) {
-                                webDisqus.loadUrl(urlDisqus);
-                            }
-                        }
-                    }
-                }
-            });
+
             webDisqus.loadUrl(urlDisqus);
         } else {
             Toast.makeText(getBaseContext(), "Invalid comment data", Toast.LENGTH_LONG).show();

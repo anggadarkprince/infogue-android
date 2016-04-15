@@ -5,6 +5,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,8 +23,11 @@ import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.activities.AuthenticationActivity;
 import com.sketchproject.infogue.activities.ProfileActivity;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.utils.Constant;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -72,6 +77,17 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        ImageButton mFacebookButton = (ImageButton) getActivity().findViewById(R.id.btn_facebook);
+        ImageButton mTwitterButton = (ImageButton) getActivity().findViewById(R.id.btn_twitter);
+        TextView mForgotPassword = (TextView) getActivity().findViewById(R.id.btn_forgot);
+        mForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_FEEDBACK));
+                startActivity(browserIntent);
+            }
+        });
+
         mLoginFormView = getActivity().findViewById(R.id.login_form);
         mProgressView = getActivity().findViewById(R.id.login_progress);
     }
@@ -82,9 +98,7 @@ public class LoginFragment extends Fragment {
             return;
         }
 
-        // Reset errors.
-        mUsernameView.setError(null);
-        mPasswordView.setError(null);
+        List<String> validationMessage = new ArrayList<>();
 
         // Store values at the time of the login attempt.
         String username = mUsernameView.getText().toString();
@@ -94,19 +108,23 @@ public class LoginFragment extends Fragment {
         View focusView = null;
 
         if (TextUtils.isEmpty(password)) {
-            mPasswordView.setError(getString(R.string.error_field_required));
+            validationMessage.add(getString(R.string.error_password_required));
             focusView = mPasswordView;
             cancel = true;
         }
 
         if (TextUtils.isEmpty(username)) {
-            mUsernameView.setError(getString(R.string.error_field_required));
+            validationMessage.add(getString(R.string.error_username_required));
             focusView = mUsernameView;
             cancel = true;
         }
 
         if (cancel) {
             focusView.requestFocus();
+            AlertFragment fragment = (AlertFragment) getChildFragmentManager().findFragmentById(R.id.alert_fragment);
+            fragment.setAlertType(AlertFragment.ALERT_WARNING);
+            fragment.setAlertMessage(validationMessage);
+            fragment.show();
         } else {
             showProgress(true);
             mAuthTask = new UserLoginTask(username, password);
@@ -217,8 +235,11 @@ public class LoginFragment extends Fragment {
 
             } else {
                 showProgress(false);
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+                AlertFragment fragment = (AlertFragment) getChildFragmentManager().findFragmentById(R.id.alert_fragment);
+                fragment.setAlertType(AlertFragment.ALERT_DANGER);
+                fragment.setAlertMessage(getString(R.string.error_auth_credential));
+                fragment.show();
             }
         }
 

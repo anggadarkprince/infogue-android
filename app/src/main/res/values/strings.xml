@@ -27,7 +27,7 @@
     <string name="prompt_content">Write Content Here</string>
     <string name="prompt_excerpt">Optional Excerpt</string>
 
-    <string name="error_invalid_username">Username only contains alpha dash</string>
+    <string name="error_invalid_username">Username only contains alpha dash underscore</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
@@ -229,5 +229,11 @@
     <string name="action_comment">Comment</string>
     <string name="action_leave_comment">LEAVE A COMMENT</string>
     <string name="title_activity_comment">Leave a Comment</string>
+
+    <string name="error_password_required">Password is required</string>
+    <string name="error_username_required">Username is required</string>
+    <string name="error_auth_credential">The credential is invalid</string>
+    <string name="error_email_required">Email is required</string>
+    <string name="error_name_required">Name is required</string>
 
 </resources>

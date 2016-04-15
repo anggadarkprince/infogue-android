@@ -20,6 +20,14 @@
             android:orientation="vertical"
             android:padding="@dimen/activity_vertical_margin">
 
+            <fragment
+                android:id="@+id/alert_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:name="com.sketchproject.infogue.fragments.AlertFragment"
+                android:layout_marginBottom="10dp"
+                tools:layout="@layout/fragment_alert" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -290,6 +298,7 @@
             </LinearLayout>
 
             <Button
+                android:id="@+id/btn_create_article"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="50dp"

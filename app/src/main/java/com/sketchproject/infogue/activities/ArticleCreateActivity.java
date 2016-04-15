@@ -13,11 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.fragments.AlertFragment;
 import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
 
@@ -224,6 +226,17 @@ public class ArticleCreateActivity extends AppCompatActivity {
                 AlertDialog dialog = builder.create();
                 dialog.show();
                 AppHelper.dialogButtonTheme(v.getContext(), dialog);
+            }
+        });
+
+        Button mCreateButton = (Button) findViewById(R.id.btn_create_article);
+        mCreateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertFragment fragment = (AlertFragment) getSupportFragmentManager().findFragmentById(R.id.alert_fragment);
+                fragment.setAlertType(AlertFragment.ALERT_DANGER);
+                fragment.setAlertMessage("Tes error");
+                fragment.show();
             }
         });
     }
