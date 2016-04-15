@@ -18,7 +18,10 @@ public class UrlHelper {
     }
 
     public static String wrapHtmlString(String html) {
-        String content = "<html><head><style>img{display:block; width:100%}</style></head><body>" + html + "</body></html>";
-        return "<![CDATA[" + html + "]]>";
+        return "<html><head><style>img{display:block; width:100%}</style></head><body>" + html + "</body></html>";
+    }
+
+    public static String getDisqusUrl(int idPost, String slug, String title, String shortName) {
+        return Constant.URL_DISQUS_TEMPLATE + "?shortname=" + shortName + "&identifier=" + idPost + "&url=" + Constant.BASE_URL + slug + "&title=" + title;
     }
 }

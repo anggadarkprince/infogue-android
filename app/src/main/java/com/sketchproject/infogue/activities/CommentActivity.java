@@ -2,9 +2,11 @@ package com.sketchproject.infogue.activities;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebChromeClient;
@@ -15,6 +17,8 @@ import android.widget.Toast;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.models.Article;
+import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.UrlHelper;
 
 public class CommentActivity extends AppCompatActivity {
 
@@ -39,39 +43,60 @@ public class CommentActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String htmlComments = getHtmlComment(extras.getString(Article.ARTICLE_SLUG), "info-gue");
+            int id = extras.getInt(Article.ARTICLE_ID);
+            String slug = extras.getString(Article.ARTICLE_SLUG);
+            String title = extras.getString(Article.ARTICLE_TITLE);
+            final String urlDisqus = UrlHelper.getDisqusUrl(id, slug, title, Constant.SHORT_NAME);
 
-            WebView webDisqus = (WebView) findViewById(R.id.disqus_comment);
-            // set up disqus
+            final String[] patterns = {"disqus.com/next/login-success", "disqus.com/_ax/google/complete", "disqus.com/_ax/twitter/complete", "disqus.com/_ax/facebook/complete"};
+
+            final WebView webDisqus = (WebView) findViewById(R.id.disqus_comment);
             WebSettings webSettings = webDisqus.getSettings();
             webSettings.setJavaScriptEnabled(true);
             webSettings.setBuiltInZoomControls(false);
             webSettings.setDisplayZoomControls(false);
             webDisqus.requestFocusFromTouch();
-            webDisqus.setWebViewClient(new WebViewClient(){
+            webDisqus.setWebViewClient(new WebViewClient() {
+                @Override
+                public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                    Log.i("INFOGUE/Comment", url);
+                    for (String pattern : patterns) {
+                        if (url.matches("^" + pattern)) {
+                            webDisqus.loadUrl(urlDisqus);
+                        }
+                    }
+                    super.onPageStarted(view, url, favicon);
+                }
+
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     super.onPageFinished(view, url);
                     progress.dismiss();
                 }
             });
-            webDisqus.setWebChromeClient(new WebChromeClient(){
+            webDisqus.setWebChromeClient(new WebChromeClient() {
                 @Override
                 public void onProgressChanged(WebView view, int newProgress) {
                     super.onProgressChanged(view, newProgress);
-                    if(newProgress == 100){
+                    if (newProgress == 100) {
                         progress.dismiss();
+                        Log.i("INFOGUE/Comment", view.getUrl());
+                        for (String pattern : patterns) {
+                            if (view.getUrl().matches("^" + pattern)) {
+                                webDisqus.loadUrl(urlDisqus);
+                            }
+                        }
                     }
                 }
             });
-            webDisqus.loadData(htmlComments, "text/html", null);
+            webDisqus.loadUrl(urlDisqus);
         } else {
             Toast.makeText(getBaseContext(), "Invalid comment data", Toast.LENGTH_LONG).show();
             finish();
         }
     }
 
-    public String getHtmlComment(String idPost, String shortName) {
+    public String getHtmlComment(int idPost, int idSlug, int idTitle, String shortName) {
 
         return "<div id='disqus_thread'></div>"
                 + "<script type='text/javascript'>"

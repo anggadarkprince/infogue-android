@@ -3,11 +3,9 @@ package com.sketchproject.infogue.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -20,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.activities.ApplicationActivity;
 import com.sketchproject.infogue.activities.AuthenticationActivity;
 import com.sketchproject.infogue.activities.ProfileActivity;
 import com.sketchproject.infogue.modules.SessionManager;
@@ -80,6 +77,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void attemptLogin() {
+        // Escape if mAuthTask is defined it means login still process.
         if (mAuthTask != null) {
             return;
         }
@@ -119,37 +117,48 @@ public class LoginFragment extends Fragment {
     /**
      * Shows the progress UI and hides the login form.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        int mediumAnimTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);
 
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView
-                    .animate()
-                    .setDuration(shortAnimTime)
-                    .alpha(show ? 0 : 1)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                        }
-                    });
+        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        mLoginFormView
+                .animate()
+                .setDuration(mediumAnimTime)
+                .alpha(show ? 0 : 1)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                    }
+                });
 
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate()
-                    .setDuration(shortAnimTime)
-                    .alpha(show ? 1 : 0)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                        }
-                    });
-        } else {
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.animate()
+                .setDuration(mediumAnimTime)
+                .alpha(show ? 1 : 0)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                    }
+                });
+    }
+
+    private boolean demoOnly() {
+        SessionManager sessionManager = new SessionManager(getActivity().getBaseContext());
+        HashMap<String, Object> user = new HashMap<>();
+        user.put(SessionManager.KEY_ID, 1);
+        user.put(SessionManager.KEY_TOKEN, "6224573472634636534");
+        user.put(SessionManager.KEY_USERNAME, "anggadarkprince");
+        user.put(SessionManager.KEY_NAME, "Angga Ari Wijaya");
+        user.put(SessionManager.KEY_LOCATION, "Gresik, Indonesia");
+        user.put(SessionManager.KEY_ABOUT, "Freelancer UI/UX Designer, The wind at my back so it's time to fly. angga-ari.com");
+        user.put(SessionManager.KEY_AVATAR, "http://infogue.id/images/contributors/avatar_1.jpg");
+        user.put(SessionManager.KEY_COVER, "http://infogue.id/images/covers/cover_5.jpg");
+        user.put(SessionManager.KEY_ARTICLE, 234);
+        user.put(SessionManager.KEY_FOLLOWER, 362);
+        user.put(SessionManager.KEY_FOLLOWING, 345);
+        return sessionManager.createLoginSession(user);
     }
 
     /**
@@ -218,22 +227,5 @@ public class LoginFragment extends Fragment {
             mAuthTask = null;
             showProgress(false);
         }
-    }
-
-    private boolean demoOnly(){
-        SessionManager sessionManager = new SessionManager(getActivity().getBaseContext());
-        HashMap<String, Object> user = new HashMap<>();
-        user.put(SessionManager.KEY_ID, 1);
-        user.put(SessionManager.KEY_TOKEN, "6224573472634636534");
-        user.put(SessionManager.KEY_USERNAME, "anggadarkprince");
-        user.put(SessionManager.KEY_NAME, "Angga Ari Wijaya");
-        user.put(SessionManager.KEY_LOCATION, "Gresik, Indonesia");
-        user.put(SessionManager.KEY_ABOUT, "Freelancer UI/UX Designer, The wind at my back so it's time to fly. angga-ari.com");
-        user.put(SessionManager.KEY_AVATAR, "http://infogue.id/images/contributors/avatar_1.jpg");
-        user.put(SessionManager.KEY_COVER, "http://infogue.id/images/covers/cover_5.jpg");
-        user.put(SessionManager.KEY_ARTICLE, 234);
-        user.put(SessionManager.KEY_FOLLOWER, 362);
-        user.put(SessionManager.KEY_FOLLOWING, 345);
-        return sessionManager.createLoginSession(user);
     }
 }

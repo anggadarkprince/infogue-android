@@ -30,6 +30,7 @@ import me.gujun.android.taggroup.TagGroup;
 public class PostActivity extends AppCompatActivity {
     private int id;
     private String slug;
+    private String title;
 
     private LinearLayout mArticleWrapper;
     private ImageView mArticleFeatured;
@@ -86,6 +87,7 @@ public class PostActivity extends AppCompatActivity {
                 Intent commentIntent = new Intent(getBaseContext(), CommentActivity.class);
                 commentIntent.putExtra(Article.ARTICLE_ID, id);
                 commentIntent.putExtra(Article.ARTICLE_SLUG, slug);
+                commentIntent.putExtra(Article.ARTICLE_TITLE, title);
                 startActivity(commentIntent);
             }
         });
@@ -98,6 +100,7 @@ public class PostActivity extends AppCompatActivity {
         if (extras != null) {
             id = extras.getInt(Article.ARTICLE_ID);
             slug = extras.getString(Article.ARTICLE_SLUG);
+            title = extras.getString(Article.ARTICLE_TITLE);
             progress.show();
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -178,6 +181,7 @@ public class PostActivity extends AppCompatActivity {
             Intent commentIntent = new Intent(getBaseContext(), CommentActivity.class);
             commentIntent.putExtra(Article.ARTICLE_ID, id);
             commentIntent.putExtra(Article.ARTICLE_SLUG, slug);
+            commentIntent.putExtra(Article.ARTICLE_TITLE, title);
             startActivity(commentIntent);
         }
 
