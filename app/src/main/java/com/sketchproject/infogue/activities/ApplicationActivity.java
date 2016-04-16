@@ -48,17 +48,15 @@ import com.sketchproject.infogue.utils.UrlHelper;
 
 import java.lang.reflect.Method;
 
-public class ApplicationActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
+public class ApplicationActivity extends AppCompatActivity implements
+        NavigationView.OnNavigationItemSelectedListener,
         ArticleFragment.OnArticleFragmentInteractionListener,
-        ConnectionDetector.OnLostConnectionListener {
+        ConnectionDetector.OnLostConnectionListener,
+        ConnectionDetector.OnConnectionEstablished {
 
     private NavigationView navigationView;
-
     private SessionManager session;
-
     private ConnectionDetector connectionDetector;
-
     private AlertDialog dialogExit;
 
     @Override
@@ -215,23 +213,21 @@ public class ApplicationActivity extends AppCompatActivity
      */
     private void confirmExit() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
-        builder.setTitle("Infogue.id");
-        builder.setMessage("Do you want to exit?");
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.app_name);
+        builder.setMessage(R.string.message_exit_confirm);
+        builder.setPositiveButton(R.string.action_yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 finish();
             }
         });
-
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.action_no, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         });
-
-        builder.setNeutralButton("Open Infogue.id", new DialogInterface.OnClickListener() {
+        builder.setNeutralButton(R.string.action_open_infogue, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.BASE_URL));
@@ -245,20 +241,19 @@ public class ApplicationActivity extends AppCompatActivity
     }
 
     /**
-     * Show dialog confirmation before signin out.
+     * Show dialog confirmation before sign out.
      */
     private void confirmSignOut() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
-        builder.setTitle("Sign Out");
-        builder.setMessage("Do you want to sign out?");
-        builder.setPositiveButton("Sign Out", new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.action_sign_out);
+        builder.setMessage(R.string.message_signout_confirm);
+        builder.setPositiveButton(R.string.action_sign_out, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 signOutUser();
             }
         });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -290,11 +285,11 @@ public class ApplicationActivity extends AppCompatActivity
             finish();
         } else {
             // Notify remove persistent session data is failed
-            final Snackbar snackbar = Snackbar.make(findViewById(R.id.article_form), "Signing out failed!", Snackbar.LENGTH_LONG);
+            final Snackbar snackbar = Snackbar.make(findViewById(R.id.article_form), R.string.message_signout_failed, Snackbar.LENGTH_LONG);
 
             // noinspection deprecation
             snackbar.setActionTextColor(getResources().getColor(R.color.light));
-            snackbar.setAction("RETRY", new View.OnClickListener() {
+            snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     snackbar.dismiss();
@@ -303,9 +298,7 @@ public class ApplicationActivity extends AppCompatActivity
             }).show();
 
             View snackbarView = snackbar.getView();
-
-            // noinspection deprecation
-            snackbarView.setBackgroundColor(getResources().getColor(R.color.color_danger));
+            snackbarView.setBackgroundResource(R.color.color_danger);
         }
     }
 
@@ -625,7 +618,7 @@ public class ApplicationActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         Fragment fragment;
         String title;
-        String subtitle = null;
+        String subtitle;
         boolean logo;
 
         int id = item.getItemId();
@@ -672,8 +665,10 @@ public class ApplicationActivity extends AppCompatActivity
                 ActionBar actionBar = getSupportActionBar();
                 if (actionBar != null) {
                     actionBar.setTitle(title);
-                    if(subtitle != null && !subtitle.isEmpty()){
+                    if (!subtitle.trim().isEmpty()) {
                         actionBar.setSubtitle(subtitle);
+                    } else {
+                        actionBar.setSubtitle(null);
                     }
                     actionBar.setDisplayUseLogoEnabled(logo);
                 }
@@ -699,7 +694,7 @@ public class ApplicationActivity extends AppCompatActivity
                         public void onClick(View v) {
                             onLostConnectionNotified(getBaseContext());
                         }
-                    }, Constant.jokes[(int) Math.floor(Math.random() * Constant.jokes.length)] + " stole my internet T_T", "RETRY");
+                    }, Constant.jokes[(int) Math.floor(Math.random() * Constant.jokes.length)] + " stole my internet T_T", getString(R.string.action_retry));
                 } else {
                     connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
                         @Override
@@ -708,6 +703,16 @@ public class ApplicationActivity extends AppCompatActivity
                         }
                     });
                 }
+            }
+        });
+    }
+
+    @Override
+    public void onConnectionEstablished(Context context) {
+        connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                connectionDetector.dismissNotification();
             }
         });
     }

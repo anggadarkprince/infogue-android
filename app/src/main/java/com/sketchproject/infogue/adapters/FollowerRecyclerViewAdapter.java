@@ -17,6 +17,7 @@ import com.sketchproject.infogue.fragments.FollowerFragment.OnListFragmentIntera
 import com.sketchproject.infogue.fragments.holders.ListInfoViewHolder;
 import com.sketchproject.infogue.fragments.holders.LoadingViewHolder;
 import com.sketchproject.infogue.models.Contributor;
+import com.sketchproject.infogue.modules.SessionManager;
 
 import java.util.List;
 
@@ -101,13 +102,23 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     followerHolder.mFollowButton.setImageResource(R.drawable.btn_unfollow);
                 }
 
+                SessionManager session = new SessionManager(followerHolder.itemView.getContext());
+                if(session.isLoggedIn()){
+                    if(followerHolder.mItem.getId() == session.getSessionData(SessionManager.KEY_ID, 0)){
+                        followerHolder.mFollowButton.setVisibility(View.GONE);
+                    }
+                    else{
+                        followerHolder.mFollowButton.setVisibility(View.VISIBLE);
+                    }
+                }
+
                 followerHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (null != mListener) {
                             // Notify the active callbacks interface (the activity, if the
                             // fragment is attached to one) that an item has been selected.
-                            mListener.onListFragmentInteraction(followerHolder.mItem);
+                            mListener.onListFragmentInteraction(followerHolder.mItem, followerHolder.mFollowButton);
                         }
                     }
                 });

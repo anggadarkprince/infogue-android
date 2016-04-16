@@ -48,7 +48,6 @@ public class FollowerFragment extends Fragment {
     private List<Contributor> allFollowers;
     private FollowerRecyclerViewAdapter followerAdapter;
     private OnListFragmentInteractionListener mListener;
-    private SessionManager session;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -81,7 +80,7 @@ public class FollowerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        session = new SessionManager(getContext());
+        SessionManager session = new SessionManager(getContext());
         mLoggedId = session.getSessionData(SessionManager.KEY_ID, 0);
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
@@ -91,7 +90,7 @@ public class FollowerFragment extends Fragment {
         }
 
         double random = Math.random();
-        isEmptyPage = random > 0.8;
+        isEmptyPage = random > 0.9;
         Log.i("INFOGUE/random", isEmptyPage+" "+String.valueOf(random));
     }
 
@@ -119,14 +118,14 @@ public class FollowerFragment extends Fragment {
                 @Override
                 public void onLoadMore(final int page, int totalItemsCount) {
                     if(!isFirstCall){
-                        loadFollowers(page, totalItemsCount);
+                        loadFollowers(page);
                     }
                 }
             });
 
             if(isFirstCall){
                 isFirstCall = false;
-                loadFollowers(0, 0);
+                loadFollowers(0);
             }
         }
         return view;
@@ -134,9 +133,8 @@ public class FollowerFragment extends Fragment {
 
     /**
      * @param page starts at 0
-     * @param totalItemsCount total of article row view
      */
-    private void loadFollowers(final int page, int totalItemsCount) {
+    private void loadFollowers(final int page) {
         if (!isEndOfPage) {
             allFollowers.add(null);
             followerAdapter.notifyItemInserted(allFollowers.size() - 1);
@@ -194,7 +192,7 @@ public class FollowerFragment extends Fragment {
      * activity.
      */
     public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(Contributor contributor);
+        void onListFragmentInteraction(Contributor contributor, View followControl);
 
         void onListFollowControlInteraction(View view, View followControl, Contributor contributor);
 

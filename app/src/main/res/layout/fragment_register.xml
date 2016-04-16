@@ -124,7 +124,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:background="@drawable/button_primary_dark"
+                android:background="@drawable/btn_primary_dark"
                 android:text="@string/action_create_account"
                 android:textColor="@android:color/white" />
 

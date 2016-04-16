@@ -35,7 +35,7 @@ public class ArticleFragment extends Fragment {
     private static final String ARG_SUBCATEGORY_ID = "subcategory-id";
     private static final String ARG_SUBCATEGORY = "subcategory";
     private static final String ARG_FEATURED = "featured";
-    private static final String ARG_AUTHOR = "author";
+    private static final String ARG_AUTHOR_ID = "author-id";
 
     private int mColumnCount = 1;
     private int mCategoryId = 0;
@@ -43,7 +43,7 @@ public class ArticleFragment extends Fragment {
     private String mCategory;
     private String mSubcategory;
     private String mFeatured;
-    private String mAuthor;
+    private int mAuthor;
     private boolean hasHeader = false;
     private boolean isFirstCall = true;
     private boolean isEndOfPage = false;
@@ -69,12 +69,12 @@ public class ArticleFragment extends Fragment {
     }
 
     @SuppressWarnings("unused")
-    public static ArticleFragment newInstance(String author) {
+    public static ArticleFragment newInstance(int columnCount, int id) {
         ArticleFragment fragment = new ArticleFragment();
 
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, 1);
-        args.putString(ARG_AUTHOR, author);
+        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putInt(ARG_AUTHOR_ID, id);
 
         fragment.setArguments(args);
 
@@ -135,7 +135,7 @@ public class ArticleFragment extends Fragment {
             mCategory = getArguments().getString(ARG_CATEGORY);
             mSubcategory = getArguments().getString(ARG_SUBCATEGORY);
             mFeatured = getArguments().getString(ARG_FEATURED);
-            mAuthor = getArguments().getString(ARG_AUTHOR);
+            mAuthor = getArguments().getInt(ARG_AUTHOR_ID);
         }
 
         if(mSubcategoryId > 0 && mSubcategory != null){
@@ -148,15 +148,15 @@ public class ArticleFragment extends Fragment {
             hasHeader = true;
             Log.i("ARTICLE FEATURED", mFeatured);
         }
-        else if(mAuthor != null){
-            Log.i("ARTICLE CONTRIBUTOR", mAuthor);
+        else if(mAuthor != 0){
+            Log.i("ARTICLE CONTRIBUTOR", String.valueOf(mAuthor));
         }
         else{
             Log.i("ARTICLE", "DEFAULT");
         }
 
         double random = Math.random();
-        isEmptyPage = random > 0.8;
+        isEmptyPage = random > 0.9;
         Log.i("INFOGUE/random", isEmptyPage+" "+String.valueOf(random));
     }
 
@@ -184,14 +184,14 @@ public class ArticleFragment extends Fragment {
                 @Override
                 public void onLoadMore(final int page, int totalItemsCount) {
                     if(!isFirstCall){
-                        loadArticles(page, totalItemsCount);
+                        loadArticles(page);
                     }
                 }
             });
 
             if(isFirstCall){
                 isFirstCall = false;
-                loadArticles(0, 0);
+                loadArticles(0);
             }
         }
         return view;
@@ -199,9 +199,8 @@ public class ArticleFragment extends Fragment {
 
     /**
      * @param page starts at 0
-     * @param totalItemsCount total of article row view
      */
-    private void loadArticles(final int page, int totalItemsCount){
+    private void loadArticles(final int page){
         if(!isEndOfPage){
             allArticles.add(null);
             articleAdapter.notifyItemInserted(allArticles.size() - 1);

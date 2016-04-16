@@ -1,5 +1,6 @@
 package com.sketchproject.infogue.activities;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -22,14 +23,19 @@ import android.widget.Toast;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.models.Article;
+import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.IconizedMenu;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.utils.Constant;
 
-public class ArticleActivity extends AppCompatActivity implements ArticleFragment.OnArticleFragmentInteractionListener {
-    private SessionManager session;
+public class ArticleActivity extends AppCompatActivity implements
+        ArticleFragment.OnArticleFragmentInteractionListener,
+        ConnectionDetector.OnLostConnectionListener,
+        ConnectionDetector.OnConnectionEstablished {
 
-    private String username;
+    private SessionManager session;
+    private ConnectionDetector connectionDetector;
+    private int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +43,9 @@ public class ArticleActivity extends AppCompatActivity implements ArticleFragmen
         setContentView(R.layout.activity_article);
 
         session = new SessionManager(getBaseContext());
+        connectionDetector = new ConnectionDetector(getBaseContext());
+        connectionDetector.setLostConnectionListener(this);
+        connectionDetector.setEstablishedConnectionListener(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -55,14 +64,14 @@ public class ArticleActivity extends AppCompatActivity implements ArticleFragmen
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            username = extras.getString(SessionManager.KEY_USERNAME);
+            id = extras.getInt(SessionManager.KEY_ID);
             if (session.isLoggedIn()) {
-                if (session.getSessionData(SessionManager.KEY_USERNAME, "").equals(username)) {
+                if (session.getSessionData(SessionManager.KEY_ID, 0) == id) {
                     fab.setVisibility(View.VISIBLE);
                 }
             }
 
-            Fragment fragment = ArticleFragment.newInstance(username);
+            Fragment fragment = ArticleFragment.newInstance(1, id);
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.fragment, fragment);
@@ -109,7 +118,7 @@ public class ArticleActivity extends AppCompatActivity implements ArticleFragmen
     @Override
     public void onArticlePopupInteraction(final View view, final Article article) {
         IconizedMenu popup = new IconizedMenu(new ContextThemeWrapper(view.getContext(), R.style.AppTheme_PopupOverlay), view);
-        if (session.getSessionData(SessionManager.KEY_USERNAME, "").equals(username)) {
+        if (session.getSessionData(SessionManager.KEY_ID, 0) == id) {
             popup.inflate(R.menu.post);
         }
         else{
@@ -158,7 +167,7 @@ public class ArticleActivity extends AppCompatActivity implements ArticleFragmen
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        if (session.getSessionData(SessionManager.KEY_USERNAME, "").equals(username)) {
+        if (session.getSessionData(SessionManager.KEY_ID, 0) == id) {
             builder.setItems(postItems, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
                     Toast.makeText(view.getContext(), postItems[item] + article.getTitle(), Toast.LENGTH_LONG).show();
@@ -175,5 +184,41 @@ public class ArticleActivity extends AppCompatActivity implements ArticleFragmen
 
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    @Override
+    public void onConnectionEstablished(Context context) {
+        connectionDetector.snackbarDisconnectNotification(findViewById(android.R.id.content), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                connectionDetector.dismissNotification();
+
+                if (!connectionDetector.isNetworkAvailable()) {
+                    connectionDetector.snackbarDisconnectNotification(findViewById(android.R.id.content), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onLostConnectionNotified(getBaseContext());
+                        }
+                    }, Constant.jokes[(int) Math.floor(Math.random() * Constant.jokes.length)] + " stole my internet T_T", getString(R.string.action_retry));
+                } else {
+                    connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            connectionDetector.dismissNotification();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onLostConnectionNotified(Context context) {
+        connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                connectionDetector.dismissNotification();
+            }
+        });
     }
 }

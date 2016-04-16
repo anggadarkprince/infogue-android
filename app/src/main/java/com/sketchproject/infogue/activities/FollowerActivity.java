@@ -36,6 +36,8 @@ public class FollowerActivity extends AppCompatActivity implements
     public static final String FOLLOWING_SCREEN = "Following";
 
     private ConnectionDetector connectionDetector;
+    private View mControlButton;
+    private Contributor mContributor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +100,9 @@ public class FollowerActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    private void showProfile(Contributor contributor) {
+    private void showProfile(Contributor contributor, View buttonControl) {
         Log.i("INFOGUE/Contributor", contributor.getId() + " " + contributor.getUsername());
+        mControlButton = buttonControl;
 
         Intent profileIntent = new Intent(getBaseContext(), ProfileActivity.class);
         profileIntent.putExtra(SessionManager.KEY_ID, contributor.getId());
@@ -113,13 +116,32 @@ public class FollowerActivity extends AppCompatActivity implements
         profileIntent.putExtra(SessionManager.KEY_FOLLOWER, contributor.getFollowers());
         profileIntent.putExtra(SessionManager.KEY_FOLLOWING, contributor.getFollowing());
         profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, contributor.isFollowing());
-        startActivity(profileIntent);
+        startActivityForResult(profileIntent, 200);
     }
 
     @Override
-    public void onListFragmentInteraction(Contributor contributor) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 200){
+            if(resultCode == AppCompatActivity.RESULT_OK){
+                boolean isFollowing = data.getBooleanExtra(SessionManager.KEY_IS_FOLLOWING, false);
+                Log.i("INFOGUE/Follower", "Result "+isFollowing);
+                mContributor.setIsFollowing(isFollowing);
+                if(isFollowing){
+                    ((ImageButton) mControlButton).setImageResource(R.drawable.btn_unfollow);
+                }
+                else{
+                    ((ImageButton) mControlButton).setImageResource(R.drawable.btn_follow);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onListFragmentInteraction(Contributor contributor, View followControl) {
         if (connectionDetector.isNetworkAvailable()) {
-            showProfile(contributor);
+            showProfile(contributor, followControl);
+            mContributor = contributor;
         } else {
             onLostConnectionNotified(getBaseContext());
         }
@@ -153,37 +175,72 @@ public class FollowerActivity extends AppCompatActivity implements
                 contributor.isFollowing() ? getString(R.string.action_long_unfollow) : getString(R.string.action_long_follow)
         };
 
+        final CharSequence[] itemsWithoutControl = {
+                getString(R.string.action_long_open),
+                getString(R.string.action_long_browse),
+                getString(R.string.action_long_share),
+        };
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                if (connectionDetector.isNetworkAvailable()) {
-                    String selectedItem = items[item].toString();
-                    if (selectedItem.equals(getString(R.string.action_long_open))) {
-                        showProfile(contributor);
-                    } else if (selectedItem.equals(getString(R.string.action_long_browse))) {
-                        String articleUrl = UrlHelper.getContributorUrl(contributor.getUsername());
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
-                        startActivity(browserIntent);
-                    } else if (selectedItem.equals(getString(R.string.action_long_share))) {
-                        Intent sendIntent = new Intent();
-                        sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareContributorText(contributor.getUsername()));
-                        sendIntent.setType("text/plain");
-                        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
-                    } else if (selectedItem.equals(getString(R.string.action_long_follow))) {
-                        ((ImageButton) followControl).setImageResource(R.drawable.btn_unfollow);
-                        contributor.setIsFollowing(true);
-                        AppHelper.toastColored(view.getContext(), "Awesome!, you now is following \"" + contributor.getName() + "\"");
-                    } else if (selectedItem.equals(getString(R.string.action_long_unfollow))) {
-                        ((ImageButton) followControl).setImageResource(R.drawable.btn_follow);
-                        contributor.setIsFollowing(false);
-                        AppHelper.toastColored(view.getContext(), "Too bad!, you stop following \"" + contributor.getName() + "\"");
+        SessionManager session = new SessionManager(getBaseContext());
+        if (session.getSessionData(SessionManager.KEY_ID, 0) == contributor.getId()) {
+            builder.setItems(itemsWithoutControl, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
+                    if (connectionDetector.isNetworkAvailable()) {
+                        String selectedItem = items[item].toString();
+                        if (selectedItem.equals(getString(R.string.action_long_open))) {
+                            showProfile(contributor, followControl);
+                            mContributor = contributor;
+                        } else if (selectedItem.equals(getString(R.string.action_long_browse))) {
+                            String articleUrl = UrlHelper.getContributorUrl(contributor.getUsername());
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
+                            startActivity(browserIntent);
+                        } else if (selectedItem.equals(getString(R.string.action_long_share))) {
+                            Intent sendIntent = new Intent();
+                            sendIntent.setAction(Intent.ACTION_SEND);
+                            sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareContributorText(contributor.getUsername()));
+                            sendIntent.setType("text/plain");
+                            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
+                        }
+                    } else {
+                        onLostConnectionNotified(getBaseContext());
                     }
-                } else {
-                    onLostConnectionNotified(getBaseContext());
                 }
-            }
-        });
+            });
+        }
+        else{
+            builder.setItems(items, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
+                    if (connectionDetector.isNetworkAvailable()) {
+                        String selectedItem = items[item].toString();
+                        if (selectedItem.equals(getString(R.string.action_long_open))) {
+                            showProfile(contributor, followControl);
+                            mContributor = contributor;
+                        } else if (selectedItem.equals(getString(R.string.action_long_browse))) {
+                            String articleUrl = UrlHelper.getContributorUrl(contributor.getUsername());
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
+                            startActivity(browserIntent);
+                        } else if (selectedItem.equals(getString(R.string.action_long_share))) {
+                            Intent sendIntent = new Intent();
+                            sendIntent.setAction(Intent.ACTION_SEND);
+                            sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareContributorText(contributor.getUsername()));
+                            sendIntent.setType("text/plain");
+                            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
+                        } else if (selectedItem.equals(getString(R.string.action_long_follow))) {
+                            ((ImageButton) followControl).setImageResource(R.drawable.btn_unfollow);
+                            contributor.setIsFollowing(true);
+                            AppHelper.toastColored(view.getContext(), "Awesome!, you now is following\n\"" + contributor.getName() + "\"");
+                        } else if (selectedItem.equals(getString(R.string.action_long_unfollow))) {
+                            ((ImageButton) followControl).setImageResource(R.drawable.btn_follow);
+                            contributor.setIsFollowing(false);
+                            AppHelper.toastColored(view.getContext(), "Too bad!, you stop following\n\"" + contributor.getName() + "\"");
+                        }
+                    } else {
+                        onLostConnectionNotified(getBaseContext());
+                    }
+                }
+            });
+        }
         AlertDialog alert = builder.create();
         alert.show();
     }
@@ -201,7 +258,7 @@ public class FollowerActivity extends AppCompatActivity implements
                         public void onClick(View v) {
                             onLostConnectionNotified(getBaseContext());
                         }
-                    }, Constant.jokes[(int) Math.floor(Math.random() * Constant.jokes.length)] + " stole my internet T_T", "RETRY");
+                    }, Constant.jokes[(int) Math.floor(Math.random() * Constant.jokes.length)] + " stole my internet T_T", getString(R.string.action_retry));
                 } else {
                     connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
                         @Override

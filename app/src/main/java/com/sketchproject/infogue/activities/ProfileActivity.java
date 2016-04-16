@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
 import com.sketchproject.infogue.utils.UrlHelper;
 
@@ -88,6 +89,8 @@ public class ProfileActivity extends AppCompatActivity implements
             buildProfileEventHandler(contributorId, username);
         } else {
             Toast.makeText(getBaseContext(), "Invalid user profile", Toast.LENGTH_LONG).show();
+            Intent returnIntent = new Intent();
+            setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
             finish();
         }
     }
@@ -160,9 +163,9 @@ public class ProfileActivity extends AppCompatActivity implements
             mInfoButton.setVisibility(View.VISIBLE);
 
             if (isFollowing) {
-                stateUnfollow(mFollowButton);
-            } else {
                 stateFollow(mFollowButton);
+            } else {
+                stateUnfollow(mFollowButton);
             }
 
             mMessageButton.setOnClickListener(new View.OnClickListener() {
@@ -193,24 +196,10 @@ public class ProfileActivity extends AppCompatActivity implements
     private void toggleFollowHandler(final Button mFollowButton) {
         if (isFollowing) {
             stateUnfollow(mFollowButton);
-
-            mFollowButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i("INFOGUE/PROFILE", "Unfollow " + contributorId + " " + username);
-                    stateFollow(mFollowButton);
-                }
-            });
+            Log.i("INFOGUE/PROFILE", "Unfollow " + contributorId + " " + username);
         } else {
             stateFollow(mFollowButton);
-
-            mFollowButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i("INFOGUE/PROFILE", "Follow " + contributorId + " " + username);
-                    stateUnfollow(mFollowButton);
-                }
-            });
+            Log.i("INFOGUE/PROFILE", "Follow " + contributorId + " " + username);
         }
 
         isFollowing = !isFollowing;
@@ -218,16 +207,16 @@ public class ProfileActivity extends AppCompatActivity implements
 
     @SuppressWarnings("deprecation")
     private void stateFollow(Button mFollowButton) {
-        mFollowButton.setBackgroundResource(R.drawable.button_light);
-        mFollowButton.setTextColor(getResources().getColor(R.color.primary));
-        mFollowButton.setText(getString(R.string.action_follow));
+        mFollowButton.setBackgroundResource(R.drawable.btn_primary);
+        mFollowButton.setTextColor(getResources().getColor(R.color.light));
+        mFollowButton.setText(getString(R.string.action_unfollow));
     }
 
     @SuppressWarnings("deprecation")
     private void stateUnfollow(Button mFollowButton) {
-        mFollowButton.setBackgroundResource(R.drawable.button_primary);
-        mFollowButton.setTextColor(getResources().getColor(R.color.light));
-        mFollowButton.setText(getString(R.string.action_unfollow));
+        mFollowButton.setBackgroundResource(R.drawable.btn_toggle);
+        mFollowButton.setTextColor(getResources().getColor(R.color.primary));
+        mFollowButton.setText(getString(R.string.action_follow));
     }
 
     @Override
@@ -243,10 +232,12 @@ public class ProfileActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            if(isAfterLogin){
+            if (isAfterLogin) {
                 launchMainActivity();
-            }
-            else{
+            } else {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, isFollowing);
+                setResult(AppCompatActivity.RESULT_OK, returnIntent);
                 finish();
             }
         } else if (id == R.id.action_feedback) {
@@ -268,14 +259,18 @@ public class ProfileActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        if(isAfterLogin){
+        if (isAfterLogin) {
             launchMainActivity();
+        } else {
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, isFollowing);
+            setResult(AppCompatActivity.RESULT_OK, returnIntent);
         }
 
         super.onBackPressed();
     }
 
-    private void launchMainActivity(){
+    private void launchMainActivity() {
         Intent applicationIntent = new Intent(getBaseContext(), ApplicationActivity.class);
         applicationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         applicationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -296,9 +291,8 @@ public class ProfileActivity extends AppCompatActivity implements
                         public void onClick(View v) {
                             onLostConnectionNotified(getBaseContext());
                         }
-                    }, "Holy Molly Connection T_T", "RETRY");
-                }
-                else{
+                    }, Constant.jokes[(int) Math.floor(Math.random() * Constant.jokes.length)] + " stole my internet T_T", getString(R.string.action_retry));
+                } else {
                     connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {

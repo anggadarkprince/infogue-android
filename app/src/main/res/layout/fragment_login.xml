@@ -125,7 +125,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
-                    android:background="@drawable/button_primary_dark"
+                    android:background="@drawable/btn_primary_dark"
                     android:text="@string/action_sign_in"
                     android:textColor="@android:color/white" />
 
