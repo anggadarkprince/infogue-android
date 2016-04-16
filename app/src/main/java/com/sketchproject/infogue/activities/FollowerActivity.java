@@ -31,7 +31,6 @@ public class FollowerActivity extends AppCompatActivity implements
     public static final String FOLLOWER_SCREEN = "Followers";
     public static final String FOLLOWING_SCREEN = "Following";
 
-    private String activityTitle = "Followers";
     private ConnectionDetector connectionDetector;
 
     @Override
@@ -47,15 +46,16 @@ public class FollowerActivity extends AppCompatActivity implements
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            Log.i("INFOGUE/" + activityTitle, String.valueOf(extras.getInt(SessionManager.KEY_ID)) + " " + extras.getString(SessionManager.KEY_USERNAME));
-            activityTitle = extras.getString(SCREEN_REQUEST);
+            String activityTitle = extras.getString(SCREEN_REQUEST);
+            int id = extras.getInt(SessionManager.KEY_ID);
+            String username = extras.getString(SessionManager.KEY_USERNAME);
 
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setTitle(activityTitle);
             }
 
-            Fragment fragment = FollowerFragment.newInstance(1, extras.getString(SessionManager.KEY_USERNAME));
+            Fragment fragment = FollowerFragment.newInstance(1, id, username, activityTitle);
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.fragment, fragment);

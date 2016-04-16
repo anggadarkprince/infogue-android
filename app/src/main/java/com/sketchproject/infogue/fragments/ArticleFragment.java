@@ -18,6 +18,7 @@ import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,7 +45,12 @@ public class ArticleFragment extends Fragment {
     private String mFeatured;
     private String mAuthor;
     private boolean hasHeader = false;
+    private boolean isFirstCall = true;
+    private boolean isEndOfPage = false;
+    private boolean isEmptyPage = false;
 
+    private List<Article> allArticles;
+    private ArticleRecyclerViewAdapter articleAdapter;
     private OnArticleFragmentInteractionListener mListener;
 
     /**
@@ -148,6 +154,10 @@ public class ArticleFragment extends Fragment {
         else{
             Log.i("ARTICLE", "DEFAULT");
         }
+
+        double random = Math.random();
+        isEmptyPage = random > 0.8;
+        Log.i("INFOGUE/random", isEmptyPage+" "+String.valueOf(random));
     }
 
     @Override
@@ -159,45 +169,71 @@ public class ArticleFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
 
-            final List<Article> allArticles = DummyArticleContent.generateDummy(0);
-            final ArticleRecyclerViewAdapter articleAdapter = new ArticleRecyclerViewAdapter(allArticles, mListener, hasHeader);
-            recyclerView.setAdapter(articleAdapter);
-
-            final LinearLayoutManager linearLayoutManager;
-
+            LinearLayoutManager linearLayoutManager;
             if (mColumnCount <= 1) {
                 linearLayoutManager = new LinearLayoutManager(context);
             } else {
                 linearLayoutManager = new GridLayoutManager(context, mColumnCount);
             }
 
+            allArticles = new ArrayList<>();
+            articleAdapter = new ArticleRecyclerViewAdapter(allArticles, mListener, hasHeader);
+            recyclerView.setAdapter(articleAdapter);
             recyclerView.setLayoutManager(linearLayoutManager);
             recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
                 @Override
                 public void onLoadMore(final int page, int totalItemsCount) {
-                    allArticles.add(null);
-                    articleAdapter.notifyItemInserted(allArticles.size() - 1);
-
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            allArticles.remove(allArticles.size() - 1);
-                            articleAdapter.notifyItemRemoved(allArticles.size());
-
-                            List<Article> moreArticles = DummyArticleContent.generateDummy(page);
-                            int curSize = articleAdapter.getItemCount();
-                            allArticles.addAll(moreArticles);
-                            articleAdapter.notifyItemRangeInserted(curSize, allArticles.size() - 1);
-                            Log.i("ARTICLE LOAD", "MORE");
-                        }
-                    }, 3000);
+                    if(!isFirstCall){
+                        loadArticles(page, totalItemsCount);
+                    }
                 }
             });
-        }
 
+            if(isFirstCall){
+                isFirstCall = false;
+                loadArticles(0, 0);
+            }
+        }
         return view;
     }
 
+    /**
+     * @param page starts at 0
+     * @param totalItemsCount total of article row view
+     */
+    private void loadArticles(final int page, int totalItemsCount){
+        if(!isEndOfPage){
+            allArticles.add(null);
+            articleAdapter.notifyItemInserted(allArticles.size() - 1);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    allArticles.remove(allArticles.size() - 1);
+                    articleAdapter.notifyItemRemoved(allArticles.size());
+
+                    List<Article> moreArticles = !isEmptyPage ? DummyArticleContent.generateDummy(page) : new ArrayList<Article>();
+                    int curSize = articleAdapter.getItemCount();
+                    allArticles.addAll(moreArticles);
+
+                    if (allArticles.size() <= 0) {
+                        isEndOfPage = true;
+                        Log.i("INFOGUE/Article", "EMPTY on page " + page);
+                        Article emptyArticle = new Article(0, null, "Empty page");
+                        allArticles.add(emptyArticle);
+                    } else if (allArticles.size() >= 100) {
+                        isEndOfPage = true;
+                        Log.i("INFOGUE/Article", "END on page " + page);
+                        Article endArticle = new Article(-1, null, "End of page");
+                        allArticles.add(endArticle);
+                    }
+
+                    articleAdapter.notifyItemRangeInserted(curSize, allArticles.size() - 1);
+                    Log.i("INFOGUE/Article", "Load More page " + page);
+                }
+            }, 3000);
+        }
+    }
 
     @Override
     public void onAttach(Context context) {

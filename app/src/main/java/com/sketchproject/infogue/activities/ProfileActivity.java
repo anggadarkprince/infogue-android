@@ -30,7 +30,7 @@ public class ProfileActivity extends AppCompatActivity implements
     private SessionManager session;
     private ConnectionDetector connectionDetector;
 
-    private int id;
+    private int contributorId;
     private String username;
     private boolean isFollowing;
     private boolean isAfterLogin;
@@ -59,7 +59,7 @@ public class ProfileActivity extends AppCompatActivity implements
 
         final Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            id = extras.getInt(SessionManager.KEY_ID);
+            contributorId = extras.getInt(SessionManager.KEY_ID);
             username = extras.getString(SessionManager.KEY_USERNAME);
             isFollowing = extras.getBoolean(SessionManager.KEY_IS_FOLLOWING);
 
@@ -85,7 +85,7 @@ public class ProfileActivity extends AppCompatActivity implements
 
             isAfterLogin = extras.getBoolean(AuthenticationActivity.AFTER_LOGIN);
 
-            buildProfileEventHandler(id, username);
+            buildProfileEventHandler(contributorId, username);
         } else {
             Toast.makeText(getBaseContext(), "Invalid user profile", Toast.LENGTH_LONG).show();
             finish();
@@ -139,7 +139,8 @@ public class ProfileActivity extends AppCompatActivity implements
         final Button mFollowButton = (Button) findViewById(R.id.btn_follow_control);
 
         // Open my profile
-        if (session.getSessionData(SessionManager.KEY_ID, 0) == idContributor) {
+        int loggedUserId = session.getSessionData(SessionManager.KEY_ID, 0);
+        if (session.isLoggedIn() && loggedUserId == idContributor) {
             mDetailButton.setVisibility(View.VISIBLE);
             mFollowButton.setVisibility(View.GONE);
             mMessageButton.setVisibility(View.GONE);
@@ -196,7 +197,7 @@ public class ProfileActivity extends AppCompatActivity implements
             mFollowButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.i("INFOGUE/PROFILE", "Unfollow " + id + " " + username);
+                    Log.i("INFOGUE/PROFILE", "Unfollow " + contributorId + " " + username);
                     stateFollow(mFollowButton);
                 }
             });
@@ -206,7 +207,7 @@ public class ProfileActivity extends AppCompatActivity implements
             mFollowButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.i("INFOGUE/PROFILE", "Follow " + id + " " + username);
+                    Log.i("INFOGUE/PROFILE", "Follow " + contributorId + " " + username);
                     stateUnfollow(mFollowButton);
                 }
             });

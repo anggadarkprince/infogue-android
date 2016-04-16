@@ -1,5 +1,6 @@
 package com.sketchproject.infogue.adapters;
 
+import android.annotation.SuppressLint;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,12 +9,13 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment.OnArticleFragmentInteractionListener;
+import com.sketchproject.infogue.fragments.holders.ListInfoViewHolder;
+import com.sketchproject.infogue.fragments.holders.LoadingViewHolder;
 import com.sketchproject.infogue.models.Article;
 
 import java.util.List;
@@ -27,30 +29,37 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     private static final int VIEW_TYPE_LOADING = 0;
     private static final int VIEW_TYPE_HEADER = 1;
     private static final int VIEW_TYPE_ROW = 2;
+    private static final int VIEW_TYPE_END = 3;
+    private static final int VIEW_TYPE_EMPTY = 4;
 
     private final List<Article> mArticles;
     private final OnArticleFragmentInteractionListener mListener;
-    private boolean header;
 
-    private int lastPosition = -1;
+    private boolean mHeader;
+    private int mLastPosition = -1;
 
     public ArticleRecyclerViewAdapter(List<Article> items, OnArticleFragmentInteractionListener listener, boolean hasHeader) {
         mArticles = items;
         mListener = listener;
-        header = hasHeader;
+        mHeader = hasHeader;
     }
 
     @Override
     public int getItemViewType(int position) {
         if (mArticles.get(position) == null) {
             return VIEW_TYPE_LOADING;
-        }
+        } else {
+            Article article = mArticles.get(position);
+            if (article.getId() == -1) {
+                return VIEW_TYPE_END;
+            } else if (article.getId() == 0) {
+                return VIEW_TYPE_EMPTY;
+            } else if (article.getId() > 0 && position == 0 && mHeader) {
+                return VIEW_TYPE_HEADER;
+            }
 
-        if (position == 0 && header) {
-            return VIEW_TYPE_HEADER;
+            return VIEW_TYPE_ROW;
         }
-
-        return VIEW_TYPE_ROW;
     }
 
     @Override
@@ -63,17 +72,24 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         } else if (viewType == VIEW_TYPE_ROW) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_article_row, parent, false);
             return new ArticleRowViewHolder(view);
+        } else if (viewType == VIEW_TYPE_END) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
+            return new ListInfoViewHolder(view);
+        } else if (viewType == VIEW_TYPE_EMPTY) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
+            return new ListInfoViewHolder(view);
         }
 
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_loading, parent, false);
-        return new ArticleProgressViewHolder(view);
+        return new LoadingViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
-        Animation animation = AnimationUtils.loadAnimation(holder.itemView.getContext(), (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
+        Animation animation = AnimationUtils.loadAnimation(holder.itemView.getContext(), (position > mLastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         holder.itemView.startAnimation(animation);
-        lastPosition = position;
+        mLastPosition = position;
 
         switch (getItemViewType(position)) {
             case VIEW_TYPE_HEADER:
@@ -155,8 +171,18 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
                 break;
             case VIEW_TYPE_LOADING:
-                final ArticleProgressViewHolder progressbarHolder = (ArticleProgressViewHolder) holder;
-                progressbarHolder.progressBar.setIndeterminate(true);
+                final LoadingViewHolder progressbarHolder = (LoadingViewHolder) holder;
+                progressbarHolder.mProgressBar.setIndeterminate(true);
+                break;
+            case VIEW_TYPE_END:
+                final ListInfoViewHolder endHolder = (ListInfoViewHolder) holder;
+                endHolder.mMessageView.setVisibility(View.GONE);
+                Log.i("INFOGUE", "END");
+                break;
+            case VIEW_TYPE_EMPTY:
+                final ListInfoViewHolder emptyHolder = (ListInfoViewHolder) holder;
+                emptyHolder.mMessageView.setText("NO ARTICLE AVAILABLE");
+                Log.i("INFOGUE", "EMPTY");
                 break;
         }
     }
@@ -171,16 +197,6 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     public int getItemCount() {
         return mArticles.size();
     }
-
-    public class ArticleProgressViewHolder extends RecyclerView.ViewHolder {
-        public ProgressBar progressBar;
-
-        public ArticleProgressViewHolder(View view) {
-            super(view);
-            progressBar = (ProgressBar) view.findViewById(R.id.load_more_progress);
-        }
-    }
-
 
     public class ArticleHeaderViewHolder extends RecyclerView.ViewHolder {
         public View mView;

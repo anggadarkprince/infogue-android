@@ -1,5 +1,6 @@
 package com.sketchproject.infogue.adapters;
 
+import android.annotation.SuppressLint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,12 +9,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.FollowerFragment.OnListFragmentInteractionListener;
+import com.sketchproject.infogue.fragments.holders.ListInfoViewHolder;
+import com.sketchproject.infogue.fragments.holders.LoadingViewHolder;
 import com.sketchproject.infogue.models.Contributor;
 
 import java.util.List;
@@ -26,15 +28,19 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     private static final int VIEW_TYPE_LOADING = 0;
     private static final int VIEW_TYPE_FOLLOWER = 1;
+    private static final int VIEW_TYPE_END = 2;
+    private static final int VIEW_TYPE_EMPTY = 3;
 
     private final List<Contributor> mContributors;
     private final OnListFragmentInteractionListener mListener;
 
-    private int lastPosition = -1;
+    private int mLastPosition = -1;
+    private String mScreenType;
 
-    public FollowerRecyclerViewAdapter(List<Contributor> items, OnListFragmentInteractionListener listener) {
+    public FollowerRecyclerViewAdapter(List<Contributor> items, OnListFragmentInteractionListener listener, String type) {
         mContributors = items;
         mListener = listener;
+        mScreenType = type;
     }
 
     @Override
@@ -42,8 +48,16 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         if (mContributors.get(position) == null) {
             return VIEW_TYPE_LOADING;
         }
+        else{
+            Contributor contributor = mContributors.get(position);
+            if (contributor.getId() == -1) {
+                return VIEW_TYPE_END;
+            } else if (contributor.getId() == 0) {
+                return VIEW_TYPE_EMPTY;
+            }
 
-        return VIEW_TYPE_FOLLOWER;
+            return VIEW_TYPE_FOLLOWER;
+        }
     }
 
     @Override
@@ -53,17 +67,24 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         if (viewType == VIEW_TYPE_FOLLOWER) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_follower_row, parent, false);
             return new FollowerViewHolder(view);
+        } else if (viewType == VIEW_TYPE_END) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
+            return new ListInfoViewHolder(view);
+        } else if (viewType == VIEW_TYPE_EMPTY) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
+            return new ListInfoViewHolder(view);
         }
 
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_loading, parent, false);
-        return new FollowerProgressViewHolder(view);
+        return new LoadingViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
-        Animation animation = AnimationUtils.loadAnimation(holder.itemView.getContext(), (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
+        Animation animation = AnimationUtils.loadAnimation(holder.itemView.getContext(), (position > mLastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         holder.itemView.startAnimation(animation);
-        lastPosition = position;
+        mLastPosition = position;
 
         switch (getItemViewType(position)) {
             case VIEW_TYPE_FOLLOWER:
@@ -92,8 +113,16 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 });
                 break;
             case VIEW_TYPE_LOADING:
-                final FollowerProgressViewHolder progressbarHolder = (FollowerProgressViewHolder) holder;
-                progressbarHolder.progressBar.setIndeterminate(true);
+                final LoadingViewHolder progressbarHolder = (LoadingViewHolder) holder;
+                progressbarHolder.mProgressBar.setIndeterminate(true);
+                break;
+            case VIEW_TYPE_END:
+                final ListInfoViewHolder endHolder = (ListInfoViewHolder) holder;
+                endHolder.mMessageView.setVisibility(View.GONE);
+                break;
+            case VIEW_TYPE_EMPTY:
+                final ListInfoViewHolder emptyHolder = (ListInfoViewHolder) holder;
+                emptyHolder.mMessageView.setText("NO "+ mScreenType.toUpperCase()+" AVAILABLE");
                 break;
         }
     }
@@ -107,15 +136,6 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     @Override
     public int getItemCount() {
         return mContributors.size();
-    }
-
-    public class FollowerProgressViewHolder extends RecyclerView.ViewHolder {
-        public ProgressBar progressBar;
-
-        public FollowerProgressViewHolder(View view) {
-            super(view);
-            progressBar = (ProgressBar) view.findViewById(R.id.load_more_progress);
-        }
     }
 
     public class FollowerViewHolder extends RecyclerView.ViewHolder {

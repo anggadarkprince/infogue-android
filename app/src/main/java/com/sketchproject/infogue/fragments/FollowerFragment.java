@@ -17,7 +17,9 @@ import com.sketchproject.infogue.adapters.FollowerRecyclerViewAdapter;
 import com.sketchproject.infogue.fragments.dummy.DummyFollowerContent;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
+import com.sketchproject.infogue.modules.SessionManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,12 +31,23 @@ import java.util.List;
 public class FollowerFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String ARG_RELATED = "related";
+    private static final String ARG_RELATED_ID = "contributor-id";
+    private static final String ARG_RELATED_USERNAME = "contributor-username";
+    private static final String ARG_TYPE = "screen-type";
 
     private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
+    private int mLoggedId;
+    private int mId;
+    private String mUsername;
+    private String mType;
+    private boolean isFirstCall = true;
+    private boolean isEndOfPage = false;
+    private boolean isEmptyPage = false;
 
-    private String mRelated;
+    private List<Contributor> allFollowers;
+    private FollowerRecyclerViewAdapter followerAdapter;
+    private OnListFragmentInteractionListener mListener;
+    private SessionManager session;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -52,11 +65,13 @@ public class FollowerFragment extends Fragment {
         return fragment;
     }
 
-    public static FollowerFragment newInstance(int columnCount, String related) {
+    public static FollowerFragment newInstance(int columnCount, int id, String username, String type) {
         FollowerFragment fragment = new FollowerFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-        args.putString(ARG_RELATED, related);
+        args.putInt(ARG_RELATED_ID, id);
+        args.putString(ARG_RELATED_USERNAME, username);
+        args.putString(ARG_TYPE, type);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,9 +80,18 @@ public class FollowerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        session = new SessionManager(getContext());
+        mLoggedId = session.getSessionData(SessionManager.KEY_ID, 0);
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            mId =  getArguments().getInt(ARG_RELATED_ID);
+            mUsername =  getArguments().getString(ARG_RELATED_USERNAME);
+            mType = getArguments().getString(ARG_TYPE);
         }
+
+        double random = Math.random();
+        isEmptyPage = random > 0.5;
+        Log.i("INFOGUE/random", isEmptyPage+" "+String.valueOf(random));
     }
 
     @Override
@@ -79,42 +103,70 @@ public class FollowerFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
 
-            final List<Contributor> allFollowers = DummyFollowerContent.generateDummy(0);
-            final FollowerRecyclerViewAdapter followerAdapter = new FollowerRecyclerViewAdapter(allFollowers, mListener);
-            recyclerView.setAdapter(followerAdapter);
-
-            final LinearLayoutManager linearLayoutManager;
-
+            LinearLayoutManager linearLayoutManager;
             if (mColumnCount <= 1) {
                 linearLayoutManager = new LinearLayoutManager(context);
             } else {
                 linearLayoutManager = new GridLayoutManager(context, mColumnCount);
             }
 
+            allFollowers = new ArrayList<>();
+            followerAdapter = new FollowerRecyclerViewAdapter(allFollowers, mListener, mType);
+            recyclerView.setAdapter(followerAdapter);
             recyclerView.setLayoutManager(linearLayoutManager);
             recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
                 @Override
                 public void onLoadMore(final int page, int totalItemsCount) {
-                    allFollowers.add(null);
-                    followerAdapter.notifyItemInserted(allFollowers.size() - 1);
-
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            allFollowers.remove(allFollowers.size() - 1);
-                            followerAdapter.notifyItemRemoved(allFollowers.size());
-
-                            List<Contributor> moreFollowers = DummyFollowerContent.generateDummy(page);
-                            int curSize = followerAdapter.getItemCount();
-                            allFollowers.addAll(moreFollowers);
-                            followerAdapter.notifyItemRangeInserted(curSize, allFollowers.size() - 1);
-                            Log.i("FOLLOWER LOAD", "MORE");
-                        }
-                    }, 3000);
+                    if(!isFirstCall){
+                        loadFollowers(page, totalItemsCount);
+                    }
                 }
             });
+
+            if(isFirstCall){
+                isFirstCall = false;
+                loadFollowers(0, 0);
+            }
         }
         return view;
+    }
+
+    /**
+     * @param page starts at 0
+     * @param totalItemsCount total of article row view
+     */
+    private void loadFollowers(final int page, int totalItemsCount) {
+        if (!isEndOfPage) {
+            allFollowers.add(null);
+            followerAdapter.notifyItemInserted(allFollowers.size() - 1);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    allFollowers.remove(allFollowers.size() - 1);
+                    followerAdapter.notifyItemRemoved(allFollowers.size());
+
+                    List<Contributor> moreFollowers = !isEmptyPage ? DummyFollowerContent.generateDummy(page) : new ArrayList<Contributor>();
+                    int curSize = followerAdapter.getItemCount();
+                    allFollowers.addAll(moreFollowers);
+
+                    if (allFollowers.size() <= 0) {
+                        isEndOfPage = true;
+                        Log.i("INFOGUE/Contributor", "EMPTY on page " + page);
+                        Contributor emptyContributor = new Contributor(0, null);
+                        allFollowers.add(emptyContributor);
+                    } else if (allFollowers.size() >= 100) {
+                        isEndOfPage = true;
+                        Log.i("INFOGUE/Contributor", "END on page " + page);
+                        Contributor endContributor = new Contributor(-1, null);
+                        allFollowers.add(endContributor);
+                    }
+
+                    followerAdapter.notifyItemRangeInserted(curSize, allFollowers.size() - 1);
+                    Log.i("INFOGUE/Contributor", "Load More page " + page);
+                }
+            }, 3000);
+        }
     }
 
 
