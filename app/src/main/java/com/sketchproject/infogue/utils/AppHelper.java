@@ -52,4 +52,8 @@ public class AppHelper {
 
         return toast;
     }
+    
+    public static String wrapHtmlString(String html) {
+        return "<html><head><style>img{display: inline; height: auto; max-width: 100%;}</style></head><body>" + html + "</body></html>";
+    }
 }

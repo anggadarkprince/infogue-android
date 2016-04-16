@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.adapters.FollowerRecyclerViewAdapter;
@@ -90,7 +91,7 @@ public class FollowerFragment extends Fragment {
         }
 
         double random = Math.random();
-        isEmptyPage = random > 0.5;
+        isEmptyPage = random > 0.8;
         Log.i("INFOGUE/random", isEmptyPage+" "+String.valueOf(random));
     }
 
@@ -194,5 +195,9 @@ public class FollowerFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(Contributor contributor);
+
+        void onListFollowControlInteraction(View view, View followControl, Contributor contributor);
+
+        void onListLongClickInteraction(View view, View followControl, Contributor contributor);
     }
 }

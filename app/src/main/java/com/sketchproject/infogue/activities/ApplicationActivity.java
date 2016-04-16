@@ -547,13 +547,13 @@ public class ApplicationActivity extends AppCompatActivity
                         postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
                         startActivity(postIntent);
                     } else if (id == R.id.action_browse) {
-                        String articleUrl = UrlHelper.getBrowseArticleUrl(article.getSlug());
+                        String articleUrl = UrlHelper.getArticleUrl(article.getSlug());
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
                         startActivity(browserIntent);
                     } else if (id == R.id.action_share) {
                         Intent sendIntent = new Intent();
                         sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareText(article.getSlug()));
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(article.getSlug()));
                         sendIntent.setType("text/plain");
                         startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
                     } else if (id == R.id.action_rate) {
@@ -592,14 +592,14 @@ public class ApplicationActivity extends AppCompatActivity
                         startActivity(postIntent);
                     }
                     if (items[item].toString().equals(getString(R.string.action_long_browse))) {
-                        String articleUrl = UrlHelper.getBrowseArticleUrl(article.getSlug());
+                        String articleUrl = UrlHelper.getArticleUrl(article.getSlug());
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
                         startActivity(browserIntent);
                     }
                     if (items[item].toString().equals(getString(R.string.action_long_share))) {
                         Intent sendIntent = new Intent();
                         sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareText(article.getSlug()));
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(article.getSlug()));
                         sendIntent.setType("text/plain");
                         startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
                     }
@@ -625,6 +625,7 @@ public class ApplicationActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         Fragment fragment;
         String title;
+        String subtitle = null;
         boolean logo;
 
         int id = item.getItemId();
@@ -643,18 +644,22 @@ public class ApplicationActivity extends AppCompatActivity
             if (id == R.id.nav_home) {
                 fragment = new HomeFragment();
                 title = "";
+                subtitle = "";
                 logo = true;
             } else if (id == R.id.nav_random) {
                 fragment = ArticleFragment.newInstance(1, "random");
-                title = "Random";
+                title = "Featured Article";
+                subtitle = "Random";
                 logo = false;
             } else if (id == R.id.nav_headline) {
                 fragment = ArticleFragment.newInstance(1, "headline");
-                title = "Headline";
+                title = "Featured Article";
+                subtitle = "Headline";
                 logo = false;
             } else {
                 fragment = ArticleFragment.newInstance(1, id, category);
                 title = category;
+                subtitle = "";
                 logo = false;
             }
 
@@ -667,6 +672,9 @@ public class ApplicationActivity extends AppCompatActivity
                 ActionBar actionBar = getSupportActionBar();
                 if (actionBar != null) {
                     actionBar.setTitle(title);
+                    if(subtitle != null && !subtitle.isEmpty()){
+                        actionBar.setSubtitle(subtitle);
+                    }
                     actionBar.setDisplayUseLogoEnabled(logo);
                 }
             }

@@ -1,26 +1,30 @@
 package com.sketchproject.infogue.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.FollowerFragment;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.UrlHelper;
 
 public class FollowerActivity extends AppCompatActivity implements
         FollowerFragment.OnListFragmentInteractionListener,
@@ -94,27 +98,94 @@ public class FollowerActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    private void showProfile(Contributor contributor) {
+        Log.i("INFOGUE/Contributor", contributor.getId() + " " + contributor.getUsername());
+
+        Intent profileIntent = new Intent(getBaseContext(), ProfileActivity.class);
+        profileIntent.putExtra(SessionManager.KEY_ID, contributor.getId());
+        profileIntent.putExtra(SessionManager.KEY_USERNAME, contributor.getUsername());
+        profileIntent.putExtra(SessionManager.KEY_NAME, contributor.getName());
+        profileIntent.putExtra(SessionManager.KEY_LOCATION, contributor.getLocation());
+        profileIntent.putExtra(SessionManager.KEY_ABOUT, contributor.getAbout());
+        profileIntent.putExtra(SessionManager.KEY_AVATAR, contributor.getAvatar());
+        profileIntent.putExtra(SessionManager.KEY_COVER, contributor.getCover());
+        profileIntent.putExtra(SessionManager.KEY_ARTICLE, contributor.getArticle());
+        profileIntent.putExtra(SessionManager.KEY_FOLLOWER, contributor.getFollowers());
+        profileIntent.putExtra(SessionManager.KEY_FOLLOWING, contributor.getFollowing());
+        profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, contributor.isFollowing());
+        startActivity(profileIntent);
+    }
+
     @Override
     public void onListFragmentInteraction(Contributor contributor) {
         if (connectionDetector.isNetworkAvailable()) {
-            Log.i("INFOGUE/Contributor", contributor.getId() + " " + contributor.getUsername());
-
-            Intent profileIntent = new Intent(getBaseContext(), ProfileActivity.class);
-            profileIntent.putExtra(SessionManager.KEY_ID, contributor.getId());
-            profileIntent.putExtra(SessionManager.KEY_USERNAME, contributor.getUsername());
-            profileIntent.putExtra(SessionManager.KEY_NAME, contributor.getName());
-            profileIntent.putExtra(SessionManager.KEY_LOCATION, contributor.getLocation());
-            profileIntent.putExtra(SessionManager.KEY_ABOUT, contributor.getAbout());
-            profileIntent.putExtra(SessionManager.KEY_AVATAR, contributor.getAvatar());
-            profileIntent.putExtra(SessionManager.KEY_COVER, contributor.getCover());
-            profileIntent.putExtra(SessionManager.KEY_ARTICLE, contributor.getArticle());
-            profileIntent.putExtra(SessionManager.KEY_FOLLOWER, contributor.getFollowers());
-            profileIntent.putExtra(SessionManager.KEY_FOLLOWING, contributor.getFollowing());
-            profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, contributor.isFollowing());
-            startActivity(profileIntent);
+            showProfile(contributor);
         } else {
             onLostConnectionNotified(getBaseContext());
         }
+    }
+
+    @Override
+    public void onListFollowControlInteraction(View view, View followControl, Contributor contributor) {
+        SessionManager session = new SessionManager(getBaseContext());
+        if (session.isLoggedIn()) {
+            ImageButton control = (ImageButton) followControl;
+            if(contributor.isFollowing()){
+                control.setImageResource(R.drawable.btn_follow);
+                contributor.setIsFollowing(false);
+            }
+            else{
+                control.setImageResource(R.drawable.btn_unfollow);
+                contributor.setIsFollowing(true);
+            }
+        } else {
+            Intent authIntent = new Intent(getBaseContext(), AuthenticationActivity.class);
+            startActivity(authIntent);
+        }
+    }
+
+    @Override
+    public void onListLongClickInteraction(final View view, final View followControl, final Contributor contributor) {
+        final CharSequence[] items = {
+                getString(R.string.action_long_open),
+                getString(R.string.action_long_browse),
+                getString(R.string.action_long_share),
+                contributor.isFollowing() ? getString(R.string.action_long_unfollow) : getString(R.string.action_long_follow)
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                if (connectionDetector.isNetworkAvailable()) {
+                    String selectedItem = items[item].toString();
+                    if (selectedItem.equals(getString(R.string.action_long_open))) {
+                        showProfile(contributor);
+                    } else if (selectedItem.equals(getString(R.string.action_long_browse))) {
+                        String articleUrl = UrlHelper.getContributorUrl(contributor.getUsername());
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
+                        startActivity(browserIntent);
+                    } else if (selectedItem.equals(getString(R.string.action_long_share))) {
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareContributorText(contributor.getUsername()));
+                        sendIntent.setType("text/plain");
+                        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
+                    } else if (selectedItem.equals(getString(R.string.action_long_follow))) {
+                        ((ImageButton) followControl).setImageResource(R.drawable.btn_unfollow);
+                        contributor.setIsFollowing(true);
+                        AppHelper.toastColored(view.getContext(), "Awesome!, you now is following \"" + contributor.getName() + "\"");
+                    } else if (selectedItem.equals(getString(R.string.action_long_unfollow))) {
+                        ((ImageButton) followControl).setImageResource(R.drawable.btn_follow);
+                        contributor.setIsFollowing(false);
+                        AppHelper.toastColored(view.getContext(), "Too bad!, you stop following \"" + contributor.getName() + "\"");
+                    }
+                } else {
+                    onLostConnectionNotified(getBaseContext());
+                }
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     @Override

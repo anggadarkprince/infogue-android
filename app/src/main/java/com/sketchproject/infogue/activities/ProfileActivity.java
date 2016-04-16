@@ -149,7 +149,7 @@ public class ProfileActivity extends AppCompatActivity implements
             mDetailButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlHelper.getContributorUrl(usernameContributor)));
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlHelper.getContributorDetailUrl(usernameContributor)));
                     startActivity(browserIntent);
                 }
             });
@@ -168,7 +168,7 @@ public class ProfileActivity extends AppCompatActivity implements
             mMessageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlHelper.getContributorUrl(usernameContributor)));
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlHelper.getContributorDetailUrl(usernameContributor)));
                     startActivity(browserIntent);
                 }
             });
@@ -176,7 +176,7 @@ public class ProfileActivity extends AppCompatActivity implements
             mMessageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlHelper.getContributorUrl(usernameContributor)));
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlHelper.getContributorDetailUrl(usernameContributor)));
                     startActivity(browserIntent);
                 }
             });

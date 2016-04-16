@@ -111,6 +111,26 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                         }
                     }
                 });
+
+                followerHolder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        if (null != mListener) {
+                            mListener.onListLongClickInteraction(view, followerHolder.mFollowButton, followerHolder.mItem);
+                        }
+                        return false;
+                    }
+                });
+
+                followerHolder.mFollowButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (null != mListener) {
+                            mListener.onListFollowControlInteraction(view, followerHolder.mFollowButton, followerHolder.mItem);
+                        }
+                    }
+                });
+
                 break;
             case VIEW_TYPE_LOADING:
                 final LoadingViewHolder progressbarHolder = (LoadingViewHolder) holder;

@@ -5,7 +5,7 @@ package com.sketchproject.infogue.utils;
  * Created by Angga on 12/04/2016 10.17.
  */
 public interface Constant {
-    String BASE_URL = "http://www.infogue.com/";
+    String BASE_URL = "http://www.infogue.id/";
     String SHORT_NAME = "info-gue";
     String URL_FEEDBACK = BASE_URL + "contact";
     String URL_FORGOT = BASE_URL + "auth/forgot";

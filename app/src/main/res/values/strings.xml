@@ -91,6 +91,8 @@
     <string name="action_long_draft">Set as Draft</string>
     <string name="action_long_edit">Edit Article</string>
     <string name="action_long_delete">Delete Article</string>
+    <string name="action_long_follow">Follow Contributor</string>
+    <string name="action_long_unfollow">Unfollow Contributor</string>
 
     <string name="about_thanks">Thanks for using our app</string>
     <string name="about_credit">Infogue.id was originally develop by Infogue Developer Team and Angga Ari Wijaya.</string>

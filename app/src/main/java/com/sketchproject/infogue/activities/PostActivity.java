@@ -165,7 +165,7 @@ public class PostActivity extends AppCompatActivity {
         } else if (id == R.id.action_share) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareText(slug));
+            sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(slug));
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
         } else if (id == R.id.action_refresh) {
@@ -174,7 +174,7 @@ public class PostActivity extends AppCompatActivity {
             snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primary));
             snackbar.show();
         } else if (id == R.id.action_browse) {
-            String articleUrl = UrlHelper.getBrowseArticleUrl(slug);
+            String articleUrl = UrlHelper.getArticleUrl(slug);
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
             startActivity(browserIntent);
         } else if (id == R.id.action_comment) {
