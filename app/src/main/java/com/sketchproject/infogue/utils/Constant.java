@@ -8,6 +8,7 @@ public interface Constant {
     String BASE_URL = "http://www.infogue.com/";
     String SHORT_NAME = "info-gue";
     String URL_FEEDBACK = BASE_URL + "contact";
+    String URL_FORGOT = BASE_URL + "auth/forgot";
     String URL_HELP = BASE_URL + "faq";
     String URL_APP = "http://play.google.com/store/apps/details?id=com.sketchproject.infogue";
 

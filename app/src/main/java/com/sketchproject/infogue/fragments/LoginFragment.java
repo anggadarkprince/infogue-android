@@ -9,7 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +23,7 @@ import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.activities.AuthenticationActivity;
 import com.sketchproject.infogue.activities.ProfileActivity;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.modules.Validator;
 import com.sketchproject.infogue.utils.Constant;
 
 import java.util.ArrayList;
@@ -32,14 +33,20 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LoginFragment extends Fragment {
+public class LoginFragment extends Fragment implements Validator.ViewValidation {
 
     private UserLoginTask mAuthTask = null;
+    private Validator validator;
+    private AlertFragment alert;
 
     private EditText mUsernameView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    private String username;
+    private String password;
+    private List<String> validationMessage;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -47,7 +54,7 @@ public class LoginFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        validator = new Validator();
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
@@ -56,6 +63,7 @@ public class LoginFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         mUsernameView = (EditText) getActivity().findViewById(R.id.input_username);
+        mUsernameView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         mPasswordView = (EditText) getActivity().findViewById(R.id.input_password);
 
         Button mEmailSignInButton = (Button) getActivity().findViewById(R.id.btn_sign_in);
@@ -71,25 +79,41 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Activity mActivity = getActivity();
-                if(mActivity instanceof AuthenticationActivity){
+                if (mActivity instanceof AuthenticationActivity) {
                     ((AuthenticationActivity) getActivity()).setTabRegisterActive();
                 }
             }
         });
 
         ImageButton mFacebookButton = (ImageButton) getActivity().findViewById(R.id.btn_facebook);
+        mFacebookButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
         ImageButton mTwitterButton = (ImageButton) getActivity().findViewById(R.id.btn_twitter);
+        mTwitterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
         TextView mForgotPassword = (TextView) getActivity().findViewById(R.id.btn_forgot);
         mForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_FEEDBACK));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_FORGOT));
                 startActivity(browserIntent);
             }
         });
 
         mLoginFormView = getActivity().findViewById(R.id.login_form);
         mProgressView = getActivity().findViewById(R.id.login_progress);
+
+        alert = (AlertFragment) getChildFragmentManager().findFragmentById(R.id.alert_fragment);
     }
 
     private void attemptLogin() {
@@ -98,38 +122,8 @@ public class LoginFragment extends Fragment {
             return;
         }
 
-        List<String> validationMessage = new ArrayList<>();
-
-        // Store values at the time of the login attempt.
-        String username = mUsernameView.getText().toString();
-        String password = mPasswordView.getText().toString();
-
-        boolean cancel = false;
-        View focusView = null;
-
-        if (TextUtils.isEmpty(password)) {
-            validationMessage.add(getString(R.string.error_password_required));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-        if (TextUtils.isEmpty(username)) {
-            validationMessage.add(getString(R.string.error_username_required));
-            focusView = mUsernameView;
-            cancel = true;
-        }
-
-        if (cancel) {
-            focusView.requestFocus();
-            AlertFragment fragment = (AlertFragment) getChildFragmentManager().findFragmentById(R.id.alert_fragment);
-            fragment.setAlertType(AlertFragment.ALERT_WARNING);
-            fragment.setAlertMessage(validationMessage);
-            fragment.show();
-        } else {
-            showProgress(true);
-            mAuthTask = new UserLoginTask(username, password);
-            mAuthTask.execute((Void) null);
-        }
+        preValidation();
+        postValidation(onValidateView());
     }
 
     /**
@@ -179,6 +173,52 @@ public class LoginFragment extends Fragment {
         return sessionManager.createLoginSession(user);
     }
 
+    @Override
+    public void preValidation() {
+        // Store values at the time of the login attempt.
+        username = mUsernameView.getText().toString();
+        password = mPasswordView.getText().toString();
+        validationMessage = new ArrayList<>();
+    }
+
+    @Override
+    public boolean onValidateView() {
+        boolean isInvalid = false;
+        View focusView = null;
+
+        if (validator.isEmpty(password, true)) {
+            validationMessage.add(getString(R.string.error_password_required));
+            focusView = mPasswordView;
+            isInvalid = true;
+        }
+
+        if (validator.isEmpty(username, true)) {
+            validationMessage.add(getString(R.string.error_username_required));
+            focusView = mUsernameView;
+            isInvalid = true;
+        }
+
+        if (isInvalid) {
+            focusView.requestFocus();
+        }
+
+        return !isInvalid;
+    }
+
+    @Override
+    public void postValidation(boolean isValid) {
+        if (isValid) {
+            alert.dismiss();
+            showProgress(true);
+            mAuthTask = new UserLoginTask(username, password);
+            mAuthTask.execute((Void) null);
+        } else {
+            alert.setAlertType(AlertFragment.ALERT_WARNING);
+            alert.setAlertMessage(validationMessage);
+            alert.show();
+        }
+    }
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -210,7 +250,7 @@ public class LoginFragment extends Fragment {
             mAuthTask = null;
 
             if (success) {
-                if(demoOnly()){
+                if (demoOnly()) {
                     getActivity().finish();
                     Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
                     SessionManager session = new SessionManager(getContext());
@@ -229,7 +269,7 @@ public class LoginFragment extends Fragment {
                     profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     profileIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(profileIntent);
-                } else{
+                } else {
                     Toast.makeText(getContext(), "Something is getting wrong", Toast.LENGTH_LONG).show();
                 }
 

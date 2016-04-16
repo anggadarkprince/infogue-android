@@ -13,6 +13,7 @@
     <string name="title_activity_profile">Profile</string>
     <string name="title_activity_article">Article</string>
     <string name="title_activity_article_create">Create Article</string>
+    <string name="title_activity_comment">Leave a Comment</string>
 
     <string name="prompt_name">Full Name</string>
     <string name="prompt_email">Email Address</string>
@@ -27,12 +28,19 @@
     <string name="prompt_content">Write Content Here</string>
     <string name="prompt_excerpt">Optional Excerpt</string>
 
-    <string name="error_invalid_username">Username only contains alpha dash underscore</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="error_agreement">You must be agree with terms and conditions</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_password_range">Password must be 6 to 20 length</string>
+    <string name="error_username_required">Username is required</string>
+    <string name="error_username_invalid">Username only contains alpha dash underscore</string>
+    <string name="error_username_length">Username may not be greater than 20 characters</string>
+    <string name="error_email_required">Email is required</string>
+    <string name="error_email_invalid">Email address is invalid</string>
+    <string name="error_email_length">Email may not be greater than 30 characters</string>
+    <string name="error_name_required">Name is required</string>
+    <string name="error_name_person">Invalid person name character</string>
+    <string name="error_name_length">Name may not be greater than 50 characters</string>
+    <string name="error_agreement_checked">You must be agree with terms and conditions</string>
+    <string name="error_auth_credential">The credential is invalid</string>
 
     <string name="label_sign_in">SIGN IN</string>
     <string name="label_get_started">GET STARTED</string>
@@ -64,6 +72,25 @@
     <string name="action_create_article">Post Article</string>
     <string name="action_follow">FOLLOW</string>
     <string name="action_unfollow">UNFOLLOW</string>
+    <string name="action_comment">Comment</string>
+    <string name="action_leave_comment">LEAVE A COMMENT</string>
+    <string name="action_view">View Article</string>
+    <string name="action_browse">Open in Web</string>
+    <string name="action_share">Share</string>
+    <string name="action_rate">Give 5 Stars</string>
+    <string name="action_draft">Set as Draft</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_publish">Publish Now</string>
+
+    <string name="action_long_rate">Give 5 Stars</string>
+    <string name="action_long_share">Share Article</string>
+    <string name="action_long_browse">Browse in Web</string>
+    <string name="action_long_open">View / Open</string>
+    <string name="action_long_publish">Publish Now</string>
+    <string name="action_long_draft">Set as Draft</string>
+    <string name="action_long_edit">Edit Article</string>
+    <string name="action_long_delete">Delete Article</string>
 
     <string name="about_thanks">Thanks for using our app</string>
     <string name="about_credit">Infogue.id was originally develop by Infogue Developer Team and Angga Ari Wijaya.</string>
@@ -85,24 +112,6 @@
     <string name="menu_about">About</string>
     <string name="menu_website">Infogue.id</string>
     <string name="menu_rate">Rate App</string>
-
-    <string name="action_view">View Article</string>
-    <string name="action_browse">Open in Web</string>
-    <string name="action_share">Share</string>
-    <string name="action_rate">Give 5 Stars</string>
-    <string name="action_draft">Set as Draft</string>
-    <string name="action_delete">Delete</string>
-    <string name="action_edit">Edit</string>
-    <string name="action_publish">Publish Now</string>
-
-    <string name="action_long_rate">Give 5 Stars</string>
-    <string name="action_long_share">Share Article</string>
-    <string name="action_long_browse">Browse in Web</string>
-    <string name="action_long_open">View / Open</string>
-    <string name="action_long_publish">Publish Now</string>
-    <string name="action_long_draft">Set as Draft</string>
-    <string name="action_long_edit">Edit Article</string>
-    <string name="action_long_delete">Delete Article</string>
 
     <string name="follow_content_description">Button Follow</string>
     <string name="avatar_content_description">Avatar Image</string>
@@ -226,14 +235,5 @@
 
         ]]>
     </string>
-    <string name="action_comment">Comment</string>
-    <string name="action_leave_comment">LEAVE A COMMENT</string>
-    <string name="title_activity_comment">Leave a Comment</string>
-
-    <string name="error_password_required">Password is required</string>
-    <string name="error_username_required">Username is required</string>
-    <string name="error_auth_credential">The credential is invalid</string>
-    <string name="error_email_required">Email is required</string>
-    <string name="error_name_required">Name is required</string>
 
 </resources>
