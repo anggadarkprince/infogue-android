@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,6 +39,12 @@ public class ArticleFragment extends Fragment {
     private static final String ARG_AUTHOR_ID = "author-id";
     private static final String ARG_AUTHOR_IS_ME = "author-is-me";
 
+    public static final String FEATURED_LATEST = "latest";
+    public static final String FEATURED_POPULAR = "popular";
+    public static final String FEATURED_TRENDING = "trending";
+    public static final String FEATURED_RANDOM = "random";
+    public static final String FEATURED_HEADLINE = "headline";
+
     private int mColumnCount = 1;
     private int mCategoryId = 0;
     private int mSubcategoryId = 0;
@@ -55,6 +62,7 @@ public class ArticleFragment extends Fragment {
     private ArticleRecyclerViewAdapter articleAdapter;
     private OnArticleFragmentInteractionListener mArticleListListener;
     private OnArticleEditableFragmentInteractionListener mArticleEditableListener;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -206,14 +214,26 @@ public class ArticleFragment extends Fragment {
      */
     private void loadArticles(final int page) {
         if (!isEndOfPage) {
-            allArticles.add(null);
-            articleAdapter.notifyItemInserted(allArticles.size() - 1);
+            if(swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()){
+                allArticles.add(null);
+                articleAdapter.notifyItemInserted(allArticles.size() - 1);
+            }
 
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    allArticles.remove(allArticles.size() - 1);
-                    articleAdapter.notifyItemRemoved(allArticles.size());
+                    if(swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()) {
+                        allArticles.remove(allArticles.size() - 1);
+                        articleAdapter.notifyItemRemoved(allArticles.size());
+                    }
+                    else{
+                        swipeRefreshLayout.setRefreshing(false);
+                        int total = allArticles.size();
+                        for (int i = 0; i<total; i++) {
+                            allArticles.remove(0);
+                        }
+                        articleAdapter.notifyItemRangeRemoved(0, total);
+                    }
 
                     List<Article> moreArticles = !isEmptyPage ? DummyArticleContent.generateDummy(page) : new ArrayList<Article>();
                     int curSize = articleAdapter.getItemCount();
@@ -246,6 +266,14 @@ public class ArticleFragment extends Fragment {
                 articleAdapter.notifyItemRemoved(i);
             }
         }
+    }
+
+    public void refreshArticleList(SwipeRefreshLayout swipeRefresh){
+        swipeRefreshLayout = swipeRefresh;
+        isEndOfPage = false;
+        isEmptyPage = false;
+
+        loadArticles(0);
     }
 
     @Override

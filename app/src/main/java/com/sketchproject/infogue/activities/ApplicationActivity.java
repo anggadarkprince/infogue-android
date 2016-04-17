@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -96,6 +97,22 @@ public class ApplicationActivity extends AppCompatActivity implements
             drawer.openDrawer(GravityCompat.START);
             session.setSessionData(SessionManager.KEY_USER_LEARNED, true);
         }
+
+        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Fragment appFragment = getSupportFragmentManager().findFragmentById(R.id.container_body);
+                if(appFragment instanceof HomeFragment){
+                    HomeFragment homeFragment = (HomeFragment) appFragment;
+                    homeFragment.homeRefresh(swipeRefreshLayout);
+                }
+                else{
+                    ArticleFragment articleFragment = (ArticleFragment) appFragment;
+                    articleFragment.refreshArticleList(swipeRefreshLayout);
+                }
+            }
+        });
     }
 
     /**
@@ -641,12 +658,12 @@ public class ApplicationActivity extends AppCompatActivity implements
                 subtitle = "";
                 logo = true;
             } else if (id == R.id.nav_random) {
-                fragment = ArticleFragment.newInstanceFeatured(1, "random");
+                fragment = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_RANDOM);
                 title = "Featured Article";
                 subtitle = "Random";
                 logo = false;
             } else if (id == R.id.nav_headline) {
-                fragment = ArticleFragment.newInstanceFeatured(1, "headline");
+                fragment = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_HEADLINE);
                 title = "Featured Article";
                 subtitle = "Headline";
                 logo = false;

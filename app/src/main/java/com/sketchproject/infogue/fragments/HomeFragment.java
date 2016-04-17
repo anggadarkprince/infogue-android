@@ -6,13 +6,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.sketchproject.infogue.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HomeFragment extends Fragment {
+
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -32,15 +39,16 @@ public class HomeFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getActivity().getSupportFragmentManager());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
+        adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_LATEST), ArticleFragment.FEATURED_LATEST.toUpperCase());
+        adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_POPULAR), ArticleFragment.FEATURED_POPULAR.toUpperCase());
+        adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_TRENDING), ArticleFragment.FEATURED_TRENDING.toUpperCase());
 
         // Set up the ViewPager with the sections adapter.
-        ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.viewpager);
-        viewPager.setAdapter(mSectionsPagerAdapter);
+        viewPager = (ViewPager) getActivity().findViewById(R.id.viewpager);
+        viewPager.setAdapter(adapter);
 
-        TabLayout tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
+        tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
         TabLayout.Tab tab;
@@ -58,48 +66,42 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    public void homeRefresh(SwipeRefreshLayout swipeRefresh){
+        ViewPagerAdapter section = (ViewPagerAdapter) viewPager.getAdapter();
+        ArticleFragment articleFragment = (ArticleFragment) section.getItem(tabLayout.getSelectedTabPosition());
+        articleFragment.refreshArticleList(swipeRefresh);
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
 
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
         }
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            if (position == 0) {
-                return ArticleFragment.newInstanceFeatured(1, "latest");
-            } else if (position == 1) {
-                return ArticleFragment.newInstanceFeatured(1, "popular");
-            } else if (position == 2) {
-                return ArticleFragment.newInstanceFeatured(1, "trending");
-            }
-
-            return ArticleFragment.newInstance(1);
+            return mFragmentList.get(position);
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 3;
+            return mFragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            if (position == 0) {
-                return "LATEST";
-            } else if (position == 1) {
-                return "POPULAR";
-            } else if (position == 2) {
-                return "TRENDING";
-            }
-
-            return null;
+            return mFragmentTitleList.get(position);
         }
     }
 }
