@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -246,7 +247,7 @@ public class ApplicationActivity extends AppCompatActivity implements
     private void confirmSignOut() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
         builder.setTitle(R.string.action_sign_out);
-        builder.setMessage(R.string.message_signout_confirm);
+        builder.setMessage(R.string.message_logout_confirm);
         builder.setPositiveButton(R.string.action_sign_out, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -285,7 +286,7 @@ public class ApplicationActivity extends AppCompatActivity implements
             finish();
         } else {
             // Notify remove persistent session data is failed
-            final Snackbar snackbar = Snackbar.make(findViewById(R.id.article_form), R.string.message_signout_failed, Snackbar.LENGTH_LONG);
+            final Snackbar snackbar = Snackbar.make(findViewById(R.id.article_form), R.string.message_logout_failed, Snackbar.LENGTH_LONG);
 
             // noinspection deprecation
             snackbar.setActionTextColor(getResources().getColor(R.color.light));
@@ -550,7 +551,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                         sendIntent.setType("text/plain");
                         startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
                     } else if (id == R.id.action_rate) {
-                        AppHelper.toastColored(view.getContext(), "Awesome!, you give 5 Stars on \"" + article.getTitle() + "\"");
+                        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
                     }
                     connectionDetector.dismissNotification();
                 } else {
@@ -584,20 +585,20 @@ public class ApplicationActivity extends AppCompatActivity implements
                         postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
                         startActivity(postIntent);
                     }
-                    if (items[item].toString().equals(getString(R.string.action_long_browse))) {
+                    else if (items[item].toString().equals(getString(R.string.action_long_browse))) {
                         String articleUrl = UrlHelper.getArticleUrl(article.getSlug());
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
                         startActivity(browserIntent);
                     }
-                    if (items[item].toString().equals(getString(R.string.action_long_share))) {
+                    else if (items[item].toString().equals(getString(R.string.action_long_share))) {
                         Intent sendIntent = new Intent();
                         sendIntent.setAction(Intent.ACTION_SEND);
                         sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(article.getSlug()));
                         sendIntent.setType("text/plain");
                         startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
                     }
-                    if (items[item].toString().equals(getString(R.string.action_long_rate))) {
-                        AppHelper.toastColored(view.getContext(), "Awesome!, you give 5 Stars on \"" + article.getTitle() + "\"");
+                    else if (items[item].toString().equals(getString(R.string.action_long_rate))) {
+                        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
                     }
                 } else {
                     onLostConnectionNotified(getBaseContext());
@@ -640,17 +641,17 @@ public class ApplicationActivity extends AppCompatActivity implements
                 subtitle = "";
                 logo = true;
             } else if (id == R.id.nav_random) {
-                fragment = ArticleFragment.newInstance(1, "random");
+                fragment = ArticleFragment.newInstanceFeatured(1, "random");
                 title = "Featured Article";
                 subtitle = "Random";
                 logo = false;
             } else if (id == R.id.nav_headline) {
-                fragment = ArticleFragment.newInstance(1, "headline");
+                fragment = ArticleFragment.newInstanceFeatured(1, "headline");
                 title = "Featured Article";
                 subtitle = "Headline";
                 logo = false;
             } else {
-                fragment = ArticleFragment.newInstance(1, id, category);
+                fragment = ArticleFragment.newInstanceCategory(1, id, category);
                 title = category;
                 subtitle = "";
                 logo = false;

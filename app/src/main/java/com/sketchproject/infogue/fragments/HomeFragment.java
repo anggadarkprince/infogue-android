@@ -6,19 +6,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.PopupMenu;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.activities.ApplicationActivity;
-import com.sketchproject.infogue.models.Article;
 
 public class HomeFragment extends Fragment {
 
@@ -81,11 +73,11 @@ public class HomeFragment extends Fragment {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             if (position == 0) {
-                return ArticleFragment.newInstance(1, "latest");
+                return ArticleFragment.newInstanceFeatured(1, "latest");
             } else if (position == 1) {
-                return ArticleFragment.newInstance(1, "popular");
+                return ArticleFragment.newInstanceFeatured(1, "popular");
             } else if (position == 2) {
-                return ArticleFragment.newInstance(1, "trending");
+                return ArticleFragment.newInstanceFeatured(1, "trending");
             }
 
             return ArticleFragment.newInstance(1);

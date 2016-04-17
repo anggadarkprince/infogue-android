@@ -3,6 +3,7 @@ package com.sketchproject.infogue.activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -26,16 +27,19 @@ import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.IconizedMenu;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.UrlHelper;
 
 public class ArticleActivity extends AppCompatActivity implements
         ArticleFragment.OnArticleFragmentInteractionListener,
+        ArticleFragment.OnArticleEditableFragmentInteractionListener,
         ConnectionDetector.OnLostConnectionListener,
         ConnectionDetector.OnConnectionEstablished {
 
     private SessionManager session;
     private ConnectionDetector connectionDetector;
-    private int id;
+    private int authorId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,14 +68,16 @@ public class ArticleActivity extends AppCompatActivity implements
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            id = extras.getInt(SessionManager.KEY_ID);
+            authorId = extras.getInt(SessionManager.KEY_ID);
+            Boolean isMyArticle = false;
             if (session.isLoggedIn()) {
-                if (session.getSessionData(SessionManager.KEY_ID, 0) == id) {
+                if (session.getSessionData(SessionManager.KEY_ID, 0) == authorId) {
                     fab.setVisibility(View.VISIBLE);
+                    isMyArticle = true;
                 }
             }
 
-            Fragment fragment = ArticleFragment.newInstance(1, id);
+            Fragment fragment = ArticleFragment.newInstanceAuthor(1, authorId, isMyArticle);
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.fragment, fragment);
@@ -110,15 +116,87 @@ public class ArticleActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    private void viewArticle(Article article){
+        if (connectionDetector.isNetworkAvailable()) {
+            Log.i("INFOGUE/Article", article.getId() + " " + article.getSlug() + " " + article.getTitle());
+            Intent postIntent = new Intent(getBaseContext(), PostActivity.class);
+            postIntent.putExtra(Article.ARTICLE_ID, article.getId());
+            postIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
+            postIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
+            postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
+            startActivity(postIntent);
+            connectionDetector.dismissNotification();
+        } else {
+            onLostConnectionNotified(getBaseContext());
+        }
+    }
+
+    private void browseArticle(Article article){
+        String articleUrl = UrlHelper.getArticleUrl(article.getSlug());
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
+        startActivity(browserIntent);
+    }
+
+    private void shareArticle(Article article){
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(article.getSlug()));
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
+    }
+
+    private void rateArticle(Article article){
+        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
+    }
+
+    private void publishArticle(Article article){
+        AppHelper.toastColored(getBaseContext(), "You published article \"" + article.getTitle() + "\"", Color.parseColor("#dd5cb85c"));
+    }
+
+    private void draftedArticle(Article article){
+        AppHelper.toastColored(getBaseContext(), "You drafted article \"" + article.getTitle() + "\"", Color.parseColor("#ddf1ae50"));
+    }
+
+    private void editArticle(Article article){
+        Intent editIntent = new Intent(getBaseContext(), ArticleEditActivity.class);
+        editIntent.putExtra(Article.ARTICLE_ID, article.getId());
+        editIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
+        startActivity(editIntent);
+    }
+
+    private void deleteArticle(View view, final Article article){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(view.getContext(), R.style.AppTheme_NoActionBar));
+        builder.setTitle(R.string.action_long_delete);
+        builder.setMessage(R.string.message_delete_confirm+" \""+article.getTitle()+"\"?");
+        builder.setPositiveButton(R.string.action_delete, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                AppHelper.toastColored(getBaseContext(), "You have deleted article \"" + article.getTitle() + "\"", Color.parseColor("#ddd9534f"));
+                ArticleFragment fragment = (ArticleFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+                fragment.deleteArticleRow(article.getId());
+            }
+        });
+        builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialogDelete = builder.create();
+        dialogDelete.show();
+        AppHelper.dialogButtonTheme(getBaseContext(), dialogDelete);
+    }
+
     @Override
     public void onArticleFragmentInteraction(View view, Article article) {
-        Log.i("INFOGUE/Article", article.getId() + " " + article.getSlug() + " " + article.getTitle());
+        viewArticle(article);
     }
 
     @Override
     public void onArticlePopupInteraction(final View view, final Article article) {
         IconizedMenu popup = new IconizedMenu(new ContextThemeWrapper(view.getContext(), R.style.AppTheme_PopupOverlay), view);
-        if (session.getSessionData(SessionManager.KEY_ID, 0) == id) {
+        if (session.getSessionData(SessionManager.KEY_ID, 0) == authorId) {
             popup.inflate(R.menu.post);
         }
         else{
@@ -130,16 +208,29 @@ public class ArticleActivity extends AppCompatActivity implements
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 int id = item.getItemId();
-                if (id == R.id.action_view) {
-                    Toast.makeText(view.getContext(), "view " + article.getTitle(), Toast.LENGTH_LONG).show();
-                } else if (id == R.id.action_publish) {
-                    Toast.makeText(view.getContext(), "publish " + article.getTitle(), Toast.LENGTH_LONG).show();
-                } else if (id == R.id.action_draft) {
-                    Toast.makeText(view.getContext(), "draft " + article.getTitle(), Toast.LENGTH_LONG).show();
-                } else if (id == R.id.action_edit) {
-                    Toast.makeText(view.getContext(), "edit " + article.getTitle(), Toast.LENGTH_LONG).show();
-                } else if (id == R.id.action_delete) {
-                    Toast.makeText(view.getContext(), "delete " + article.getTitle(), Toast.LENGTH_LONG).show();
+
+                if (connectionDetector.isNetworkAvailable()) {
+                    if (id == R.id.action_view) {
+                        viewArticle(article);
+                    } else if (id == R.id.action_browse) {
+                        browseArticle(article);
+                    } else if (id == R.id.action_share) {
+                        shareArticle(article);
+                    } else if (id == R.id.action_rate) {
+                        rateArticle(article);
+                    } else if (id == R.id.action_publish) {
+                        publishArticle(article);
+                    } else if (id == R.id.action_draft) {
+                        draftedArticle(article);
+                    } else if (id == R.id.action_edit) {
+                        editArticle(article);
+                    } else if (id == R.id.action_delete) {
+                        deleteArticle(view, article);
+                    }
+
+                    connectionDetector.dismissNotification();
+                } else {
+                    onLostConnectionNotified(getBaseContext());
                 }
 
                 return false;
@@ -152,7 +243,8 @@ public class ArticleActivity extends AppCompatActivity implements
     public void onArticleLongClickInteraction(final View view, final Article article) {
         final CharSequence[] postItems = {
                 getString(R.string.action_long_open),
-                getString(R.string.action_long_browse), getString(R.string.action_long_share),
+                getString(R.string.action_long_browse),
+                getString(R.string.action_long_share),
                 getString(R.string.action_long_publish),
                 getString(R.string.action_long_draft),
                 getString(R.string.action_long_edit),
@@ -167,17 +259,49 @@ public class ArticleActivity extends AppCompatActivity implements
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        if (session.getSessionData(SessionManager.KEY_ID, 0) == id) {
+        if (session.getSessionData(SessionManager.KEY_ID, 0) == authorId) {
             builder.setItems(postItems, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
-                    Toast.makeText(view.getContext(), postItems[item] + article.getTitle(), Toast.LENGTH_LONG).show();
+                    Log.i("INFOGUE/context", String.valueOf(item));
+                    if (postItems[item].toString().equals(getString(R.string.action_long_open))) {
+                        viewArticle(article);
+                    }
+                    else if (postItems[item].toString().equals(getString(R.string.action_long_browse))) {
+                        browseArticle(article);
+                    }
+                    else if (postItems[item].toString().equals(getString(R.string.action_long_share))) {
+                        shareArticle(article);
+                    }
+                    else if (postItems[item].toString().equals(getString(R.string.action_long_publish))) {
+                        publishArticle(article);
+                    }
+                    else if (postItems[item].toString().equals(getString(R.string.action_long_draft))) {
+                        draftedArticle(article);
+                    }
+                    else if (postItems[item].toString().equals(getString(R.string.action_long_edit))) {
+                        editArticle(article);
+                    }
+                    else if (postItems[item].toString().equals(getString(R.string.action_long_delete))) {
+                        deleteArticle(view, article);
+                    }
                 }
             });
         }
         else{
             builder.setItems(articleItems, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
-                    Toast.makeText(view.getContext(), articleItems[item] + article.getTitle(), Toast.LENGTH_LONG).show();
+                    if (articleItems[item].toString().equals(getString(R.string.action_long_open))) {
+                        viewArticle(article);
+                    }
+                    else if (articleItems[item].toString().equals(getString(R.string.action_long_browse))) {
+                        browseArticle(article);
+                    }
+                    else if (articleItems[item].toString().equals(getString(R.string.action_long_share))) {
+                        shareArticle(article);
+                    }
+                    else if (articleItems[item].toString().equals(getString(R.string.action_long_rate))) {
+                        rateArticle(article);
+                    }
                 }
             });
         }
@@ -187,7 +311,27 @@ public class ArticleActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onConnectionEstablished(Context context) {
+    public void onBrowseClicked(View view, Article article) {
+        browseArticle(article);
+    }
+
+    @Override
+    public void onShareClicked(View view, Article article) {
+        shareArticle(article);
+    }
+
+    @Override
+    public void onEditClicked(View view, Article article) {
+        editArticle(article);
+    }
+
+    @Override
+    public void onDeleteClicked(View view, Article article) {
+        deleteArticle(view, article);
+    }
+
+    @Override
+    public void onLostConnectionNotified(Context context) {
         connectionDetector.snackbarDisconnectNotification(findViewById(android.R.id.content), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -213,7 +357,7 @@ public class ArticleActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLostConnectionNotified(Context context) {
+    public void onConnectionEstablished(Context context) {
         connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
             @Override
             public void onClick(View v) {

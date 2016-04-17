@@ -71,6 +71,7 @@ public class DummyArticleContent {
         tags.add("Vacation");
         tags.add("New President");
         tags.add("Anime Spring");
+        String[] statuses = {Article.STATUS_PENDING, Article.STATUS_PUBLISHED, Article.STATUS_DRAFT, Article.STATUS_UPDATED, Article.STATUS_REJECTED};
 
         Article article = new Article(position + 1, slug[(int) Math.floor(Math.random() * slug.length)], titles[(int) Math.floor(Math.random() * titles.length)]);
         article.setFeatured("http://infogue.id/images/featured/featured_" + (int) Math.ceil(Math.random() * 25) + ".jpg");
@@ -81,6 +82,7 @@ public class DummyArticleContent {
         article.setTags(tags);
         article.setView((int) Math.round(Math.random() * 1000));
         article.setRating((int) Math.ceil(Math.random() * 5));
+        article.setStatus(statuses[(int) Math.floor(Math.random() * statuses.length)]);
         return article;
     }
 }

@@ -61,7 +61,7 @@
                         android:layout_marginRight="5dp"
                         android:layout_weight="1"
                         android:background="@color/transparent"
-                        android:contentDescription="@string/dummy_content"
+                        android:contentDescription="@string/facebook_content_description"
                         android:scaleType="fitEnd"
                         android:src="@drawable/btn_facebook" />
 
@@ -74,7 +74,7 @@
                         android:layout_marginStart="5dp"
                         android:layout_weight="1"
                         android:background="@color/transparent"
-                        android:contentDescription="@string/dummy_content"
+                        android:contentDescription="@string/twitter_content_description"
                         android:scaleType="fitStart"
                         android:src="@drawable/btn_twitter" />
                 </LinearLayout>

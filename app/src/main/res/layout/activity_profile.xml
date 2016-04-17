@@ -128,8 +128,7 @@
                         android:layout_width="1dp"
                         android:layout_height="50dp"
                         android:layout_marginTop="5dp"
-                        android:background="@color/gray"
-                        android:contentDescription="@string/dummy_content" />
+                        android:background="@color/gray" />
 
                     <RelativeLayout
                         android:id="@+id/btn_followers"
@@ -165,8 +164,7 @@
                         android:layout_width="1dp"
                         android:layout_height="50dp"
                         android:layout_marginTop="5dp"
-                        android:background="@color/gray"
-                        android:contentDescription="@string/dummy_content" />
+                        android:background="@color/gray" />
 
                     <RelativeLayout
                         android:id="@+id/btn_following"

@@ -1,9 +1,5 @@
 <resources>
     <string name="app_name">Infogue</string>
-
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">Dummy Content</string>
-
     <string name="title_activity_featured">Featured</string>
     <string name="title_activity_login">Sign in</string>
     <string name="title_activity_application">Infogue.id</string>
@@ -13,6 +9,8 @@
     <string name="title_activity_profile">Profile</string>
     <string name="title_activity_article">Article</string>
     <string name="title_activity_article_create">Create Article</string>
+    <string name="title_activity_article_edit">Edit Article</string>
+    <string name="title_activity_post">Article Post</string>
     <string name="title_activity_comment">Leave a Comment</string>
 
     <string name="prompt_name">Full Name</string>
@@ -83,6 +81,11 @@
     <string name="action_delete">Delete</string>
     <string name="action_edit">Edit</string>
     <string name="action_publish">Publish Now</string>
+    <string name="action_open_infogue">Open Infogue.id</string>
+    <string name="action_yes">Yes</string>
+    <string name="action_no">No</string>
+    <string name="action_retry">RETRY</string>
+    <string name="action_ok">OK</string>
 
     <string name="action_long_rate">Give 5 Stars</string>
     <string name="action_long_share">Share Article</string>
@@ -127,12 +130,12 @@
     <string name="message_content_description">Button Message</string>
     <string name="info_content_description">Button Detail Info</string>
     <string name="more_content_description">Button More</string>
+    <string name="delete_content_description">Button Delete</string>
 
     <string name="placeholder_about">The description will be placed here, multiline and wrapped by this container</string>
     <string name="placeholder_statistic">0</string>
     <string name="placeholder_name">Anonymous</string>
     <string name="placeholder_location">No Location</string>
-    <string name="title_activity_post">Article Post</string>
     <string name="large_text">
         <![CDATA[
 
@@ -238,15 +241,12 @@
 
         ]]>
     </string>
-    <string name="message_signout_confirm">Do you want to sign out?</string>
+
+    <string name="message_logout_confirm">Do you want to sign out?</string>
     <string name="message_exit_confirm">Do you want to exit?</string>
-    <string name="action_yes">Yes</string>
-    <string name="action_no">No</string>
-    <string name="action_open_infogue">Open Infogue.id</string>
-    <string name="message_signout_failed">Signing out failed!</string>
-    <string name="action_retry">RETRY</string>
-    <string name="action_ok">OK</string>
+    <string name="message_logout_failed">Signing out failed!</string>
     <string name="message_no_internet">No Internet Connection!</string>
     <string name="message_internet_established">Connection Established.</string>
+    <string name="message_delete_confirm">Are you sure delete</string>
 
 </resources>

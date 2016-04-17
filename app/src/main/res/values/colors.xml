@@ -4,7 +4,7 @@
     <color name="primary_dark">#01a9be</color>
     <color name="primary_darker">#00798A</color>
     <color name="accent">#0cd2eb</color>
-    <color name="dark">#131313</color>
+    <color name="dark">#1a1a1a</color>
     <color name="gray">#555555</color>
     <color name="gray_light">#dcdcdc</color>
     <color name="background">#ededed</color>
@@ -17,10 +17,35 @@
     <color name="white_overlay">#33ffffff</color>
     <color name="transparent">#00ffffff</color>
 
+    <color name="color_info">#5cc1df</color>
+    <color name="color_info_light">#66ccea</color>
+    <color name="color_info_medium">#51b4d1</color>
+    <color name="color_info_hard">#44aac7</color>
+    <color name="color_info_darker">#3b99b4</color>
     <color name="color_success">#5cb85c</color>
-    <color name="color_info">#5bc0de</color>
-    <color name="color_warning">#f0ad4e</color>
+    <color name="color_success_light">#68c968</color>
+    <color name="color_success_medium">#52ae52</color>
+    <color name="color_success_hard">#4da34d</color>
+    <color name="color_success_darker">#449144</color>
+    <color name="color_warning">#f1ae50</color>
+    <color name="color_warning_light">#f5b457</color>
+    <color name="color_warning_medium">#e4a346</color>
+    <color name="color_warning_hard">#d79638</color>
+    <color name="color_warning_darker">#ce8d2f</color>
+    <color name="color_caution">#f47738</color>
+    <color name="color_caution_light">#ff7f3f</color>
+    <color name="color_caution_medium">#fd7734</color>
+    <color name="color_caution_hard">#f56d29</color>
+    <color name="color_caution_darker">#e4601f</color>
     <color name="color_danger">#d9534f</color>
-    <color name="black">#b53232</color>
+    <color name="color_danger_light">#e9635f</color>
+    <color name="color_danger_medium">#c94b47</color>
+    <color name="color_danger_hard">#be403c</color>
+    <color name="color_danger_darker">#b33b38</color>
+    <color name="color_hazard">#d12079</color>
+    <color name="color_hazard_light">#e72d8a</color>
+    <color name="color_hazard_medium">#c41a6c</color>
+    <color name="color_hazard_hard">#b71262</color>
+    <color name="color_hazard_darker">#a60f58</color>
 
 </resources>

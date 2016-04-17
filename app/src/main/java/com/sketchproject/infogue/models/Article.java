@@ -19,6 +19,12 @@ public class Article {
     public static final String ARTICLE_VIEW = "view";
     public static final String ARTICLE_RATING = "rating";
 
+    public static final String STATUS_PENDING = "PENDING";
+    public static final String STATUS_UPDATED = "UPDATED";
+    public static final String STATUS_REJECTED = "REJECTED";
+    public static final String STATUS_PUBLISHED = "PUBLISHED";
+    public static final String STATUS_DRAFT = "DRAFT";
+
     private int id;
     private String slug;
     private String title;
@@ -30,6 +36,7 @@ public class Article {
     private List<String> tags;
     private int view;
     private int rating;
+    private String status;
 
     public Article(int id, String slug, String title) {
         this.id = id;
@@ -123,5 +130,13 @@ public class Article {
 
     public void setRating(int rating) {
         this.rating = rating;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

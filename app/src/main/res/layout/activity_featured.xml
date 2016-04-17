@@ -28,7 +28,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="45dp"
             android:src="@drawable/img_logo_large"
-            android:contentDescription="@string/dummy_content" />
+            android:contentDescription="@string/logo_content_description" />
 
         <LinearLayout
             android:id="@+id/featured_footer"
@@ -83,24 +83,24 @@
                 android:layout_width="12dp"
                 android:layout_height="12dp"
                 android:layout_margin="8dp"
-                android:contentDescription="@string/dummy_content"
-                android:src="@drawable/circle_featured_active" />
+                android:src="@drawable/circle_featured_active"
+                tools:ignore="ContentDescription" />
 
             <ImageView
                 android:id="@+id/page2"
                 android:layout_width="12dp"
                 android:layout_height="12dp"
                 android:layout_margin="8dp"
-                android:contentDescription="@string/dummy_content"
-                android:src="@drawable/circle_featured_normal" />
+                android:src="@drawable/circle_featured_normal"
+                tools:ignore="ContentDescription" />
 
             <ImageView
                 android:id="@+id/page3"
                 android:layout_width="12dp"
                 android:layout_height="12dp"
                 android:layout_margin="8dp"
-                android:contentDescription="@string/dummy_content"
-                android:src="@drawable/circle_featured_normal" />
+                android:src="@drawable/circle_featured_normal"
+                tools:ignore="ContentDescription" />
 
         </LinearLayout>
 

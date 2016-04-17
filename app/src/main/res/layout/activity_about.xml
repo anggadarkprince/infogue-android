@@ -38,7 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="60dp"
-            android:contentDescription="@string/dummy_content"
+            android:contentDescription="@string/logo_content_description"
             android:src="@drawable/img_logo_medium" />
 
         <TextView

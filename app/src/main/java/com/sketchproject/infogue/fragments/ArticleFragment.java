@@ -36,6 +36,7 @@ public class ArticleFragment extends Fragment {
     private static final String ARG_SUBCATEGORY = "subcategory";
     private static final String ARG_FEATURED = "featured";
     private static final String ARG_AUTHOR_ID = "author-id";
+    private static final String ARG_AUTHOR_IS_ME = "author-is-me";
 
     private int mColumnCount = 1;
     private int mCategoryId = 0;
@@ -43,7 +44,8 @@ public class ArticleFragment extends Fragment {
     private String mCategory;
     private String mSubcategory;
     private String mFeatured;
-    private int mAuthor;
+    private int mAuthorId;
+    private boolean mMyArticle = false;
     private boolean hasHeader = false;
     private boolean isFirstCall = true;
     private boolean isEndOfPage = false;
@@ -51,7 +53,8 @@ public class ArticleFragment extends Fragment {
 
     private List<Article> allArticles;
     private ArticleRecyclerViewAdapter articleAdapter;
-    private OnArticleFragmentInteractionListener mListener;
+    private OnArticleFragmentInteractionListener mArticleListListener;
+    private OnArticleEditableFragmentInteractionListener mArticleEditableListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -69,12 +72,13 @@ public class ArticleFragment extends Fragment {
     }
 
     @SuppressWarnings("unused")
-    public static ArticleFragment newInstance(int columnCount, int id) {
+    public static ArticleFragment newInstanceAuthor(int columnCount, int id, boolean isMyArticle) {
         ArticleFragment fragment = new ArticleFragment();
 
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putInt(ARG_AUTHOR_ID, id);
+        args.putBoolean(ARG_AUTHOR_IS_ME, isMyArticle);
 
         fragment.setArguments(args);
 
@@ -82,7 +86,7 @@ public class ArticleFragment extends Fragment {
     }
 
     @SuppressWarnings("unused")
-    public static ArticleFragment newInstance(int columnCount, String featured) {
+    public static ArticleFragment newInstanceFeatured(int columnCount, String featured) {
         ArticleFragment fragment = new ArticleFragment();
 
         Bundle args = new Bundle();
@@ -95,7 +99,7 @@ public class ArticleFragment extends Fragment {
     }
 
     @SuppressWarnings("unused")
-    public static ArticleFragment newInstance(int columnCount, int categoryId, String category) {
+    public static ArticleFragment newInstanceCategory(int columnCount, int categoryId, String category) {
         ArticleFragment fragment = new ArticleFragment();
 
         Bundle args = new Bundle();
@@ -109,7 +113,7 @@ public class ArticleFragment extends Fragment {
     }
 
     @SuppressWarnings("unused")
-    public static ArticleFragment newInstance(int columnCount, int categoryId, String category, int subcategoryId, String subcategory) {
+    public static ArticleFragment newInstanceSubCategory(int columnCount, int categoryId, String category, int subcategoryId, String subcategory) {
         ArticleFragment fragment = new ArticleFragment();
 
         Bundle args = new Bundle();
@@ -135,29 +139,25 @@ public class ArticleFragment extends Fragment {
             mCategory = getArguments().getString(ARG_CATEGORY);
             mSubcategory = getArguments().getString(ARG_SUBCATEGORY);
             mFeatured = getArguments().getString(ARG_FEATURED);
-            mAuthor = getArguments().getInt(ARG_AUTHOR_ID);
+            mAuthorId = getArguments().getInt(ARG_AUTHOR_ID);
+            mMyArticle = getArguments().getBoolean(ARG_AUTHOR_IS_ME);
         }
 
-        if(mSubcategoryId > 0 && mSubcategory != null){
-            Log.i("ARTICLE SUB CAT", mSubcategory+" id : "+mSubcategoryId);
-        }
-        else  if(mCategoryId > 0 && mCategory != null){
-            Log.i("ARTICLE", mCategory+" id : "+mCategoryId);
-        }
-        else if(mFeatured != null){
+        if (mSubcategoryId > 0 && mSubcategory != null) {
+            Log.i("INFOGUE/Article", "Sub Category " + mSubcategory + " ID : " + mSubcategoryId);
+        } else if (mCategoryId > 0 && mCategory != null) {
+            Log.i("INFOGUE/Article", "Category " + mCategory + " ID : " + mCategoryId);
+        } else if (mFeatured != null) {
             hasHeader = true;
-            Log.i("ARTICLE FEATURED", mFeatured);
-        }
-        else if(mAuthor != 0){
-            Log.i("ARTICLE CONTRIBUTOR", String.valueOf(mAuthor));
-        }
-        else{
-            Log.i("ARTICLE", "DEFAULT");
+            Log.i("INFOGUE/Article", "Featured : " + mFeatured);
+        } else if (mAuthorId != 0) {
+            Log.i("INFOGUE/ARTICLE", "Contributor ID : " + String.valueOf(mAuthorId));
+        } else {
+            Log.i("INFOGUE/Article", "Default");
         }
 
         double random = Math.random();
         isEmptyPage = random > 0.9;
-        Log.i("INFOGUE/random", isEmptyPage+" "+String.valueOf(random));
     }
 
     @Override
@@ -177,19 +177,23 @@ public class ArticleFragment extends Fragment {
             }
 
             allArticles = new ArrayList<>();
-            articleAdapter = new ArticleRecyclerViewAdapter(allArticles, mListener, hasHeader);
+            if (mMyArticle) {
+                articleAdapter = new ArticleRecyclerViewAdapter(allArticles, mArticleListListener, mArticleEditableListener);
+            } else {
+                articleAdapter = new ArticleRecyclerViewAdapter(allArticles, mArticleListListener, hasHeader);
+            }
             recyclerView.setAdapter(articleAdapter);
             recyclerView.setLayoutManager(linearLayoutManager);
             recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
                 @Override
                 public void onLoadMore(final int page, int totalItemsCount) {
-                    if(!isFirstCall){
+                    if (!isFirstCall) {
                         loadArticles(page);
                     }
                 }
             });
 
-            if(isFirstCall){
+            if (isFirstCall) {
                 isFirstCall = false;
                 loadArticles(0);
             }
@@ -200,8 +204,8 @@ public class ArticleFragment extends Fragment {
     /**
      * @param page starts at 0
      */
-    private void loadArticles(final int page){
-        if(!isEndOfPage){
+    private void loadArticles(final int page) {
+        if (!isEndOfPage) {
             allArticles.add(null);
             articleAdapter.notifyItemInserted(allArticles.size() - 1);
 
@@ -217,12 +221,12 @@ public class ArticleFragment extends Fragment {
 
                     if (allArticles.size() <= 0) {
                         isEndOfPage = true;
-                        Log.i("INFOGUE/Article", "EMPTY on page " + page);
+                        Log.i("INFOGUE/Article", "Empty on page " + page);
                         Article emptyArticle = new Article(0, null, "Empty page");
                         allArticles.add(emptyArticle);
                     } else if (allArticles.size() >= 100) {
                         isEndOfPage = true;
-                        Log.i("INFOGUE/Article", "END on page " + page);
+                        Log.i("INFOGUE/Article", "End on page " + page);
                         Article endArticle = new Article(-1, null, "End of page");
                         allArticles.add(endArticle);
                     }
@@ -234,11 +238,33 @@ public class ArticleFragment extends Fragment {
         }
     }
 
+    public void deleteArticleRow(int id){
+        Log.i("INFOGUE/Article", "Delete id : " + id);
+        for (int i = 0; i<allArticles.size(); i++) {
+            if(allArticles.get(i) != null && allArticles.get(i).getId() == id){
+                allArticles.remove(i);
+                articleAdapter.notifyItemRemoved(i);
+            }
+        }
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        if (getArguments() != null) {
+            mMyArticle = getArguments().getBoolean(ARG_AUTHOR_IS_ME);
+        }
+
         if (context instanceof OnArticleFragmentInteractionListener) {
-            mListener = (OnArticleFragmentInteractionListener) context;
+            mArticleListListener = (OnArticleFragmentInteractionListener) context;
+
+            if (mMyArticle) {
+                if (context instanceof OnArticleEditableFragmentInteractionListener) {
+                    mArticleEditableListener = (OnArticleEditableFragmentInteractionListener) context;
+                } else {
+                    throw new RuntimeException(context.toString() + " must implement OnArticleEditableFragmentInteractionListener");
+                }
+            }
         } else {
             throw new RuntimeException(context.toString() + " must implement OnArticleFragmentInteractionListener");
         }
@@ -247,7 +273,10 @@ public class ArticleFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        mArticleListListener = null;
+        if (mArticleEditableListener != null) {
+            mArticleEditableListener = null;
+        }
     }
 
     /**
@@ -262,5 +291,15 @@ public class ArticleFragment extends Fragment {
         void onArticlePopupInteraction(View view, Article article);
 
         void onArticleLongClickInteraction(View view, Article article);
+    }
+
+    public interface OnArticleEditableFragmentInteractionListener {
+        void onBrowseClicked(View view, Article article);
+
+        void onShareClicked(View view, Article article);
+
+        void onEditClicked(View view, Article article);
+
+        void onDeleteClicked(View view, Article article);
     }
 }
