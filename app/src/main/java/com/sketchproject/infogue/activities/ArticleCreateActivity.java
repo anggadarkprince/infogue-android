@@ -3,8 +3,13 @@ package com.sketchproject.infogue.activities;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
@@ -32,11 +37,13 @@ import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.AlertFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.ConnectionDetector;
+import com.sketchproject.infogue.modules.RealPathResolver;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.Validator;
 import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,31 +54,39 @@ import me.gujun.android.taggroup.TagGroup;
 
 public class ArticleCreateActivity extends AppCompatActivity implements Validator.ViewValidation {
 
-    private Validator validator;
-    private SessionManager session;
-    private ConnectionDetector connectionDetector;
-    private AlertFragment alert;
-    private Article article;
-    private List<String> validationMessage;
-    private ProgressDialog progress;
-    private ScrollView mScrollView;
+    public static final String CALLED_FROM_MAIN = "fromMainActivity";
+    public static final String RESULT_CODE = "resultCode";
+    public static final int CALL_ARTICLE_FORM_CODE = 100;
 
-    private AlertDialog dialogDiscard;
-    private EditText mTitleInput;
-    private MaterialSpinner mCategorySpinner;
-    private MaterialSpinner mSubcategorySpinner;
-    private ImageView mFeaturedImage;
-    private Button mSelectButton;
-    private TagGroup mTagsInput;
-    private EditText mSlugInput;
-    private RichEditor mContentEditor;
-    private EditText mExcerptInput;
-    private RadioButton mPublishedRadio;
-    private RadioButton mDraftRadio;
-    private Button mCreateButton;
+    protected final int PICK_IMAGE_REQUEST = 1;
 
-    String[] ITEMS = {"News", "Economic", "Entertainment", "Sport", "Science", "Technology", "Education", "Photo", "Video", "Others"};
-    String[] SUBITEMS = {"SubItem 1", "SubItem 2", "SubItem 3", "SubItem 4", "SubItem 5", "SubItem 6"};
+    protected Validator validator;
+    protected SessionManager session;
+    protected ConnectionDetector connectionDetector;
+    protected AlertFragment alert;
+    protected Article article;
+    protected List<String> validationMessage;
+    protected ProgressDialog progress;
+    protected ScrollView mScrollView;
+
+    protected AlertDialog dialogDiscard;
+    protected EditText mTitleInput;
+    protected MaterialSpinner mCategorySpinner;
+    protected MaterialSpinner mSubcategorySpinner;
+    protected ImageView mFeaturedImage;
+    protected Button mSelectButton;
+    protected TagGroup mTagsInput;
+    protected EditText mSlugInput;
+    protected RichEditor mContentEditor;
+    protected EditText mExcerptInput;
+    protected RadioButton mPublishedRadio;
+    protected RadioButton mDraftRadio;
+    protected Button mCreateButton;
+
+    protected String[] ITEMS = {"News", "Economic", "Entertainment", "Sport", "Science", "Technology", "Education", "Photo", "Video", "Others"};
+    protected String[] SUBITEMS = {"SubItem 1", "SubItem 2", "SubItem 3", "SubItem 4", "SubItem 5", "SubItem 6"};
+    protected String realPathFeatured;
+    protected boolean isCalledFromMainActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +98,9 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        Bundle extras = getIntent().getExtras();
+        isCalledFromMainActivity = extras != null && extras.getBoolean(CALLED_FROM_MAIN, false);
 
         validator = new Validator();
         session = new SessionManager(getBaseContext());
@@ -134,8 +152,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         mTagsInput.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(event.getAction() == KeyEvent.ACTION_DOWN){
-                    switch (keyCode){
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (keyCode) {
                         case KeyEvent.KEYCODE_DPAD_CENTER:
                         case KeyEvent.KEYCODE_ENTER:
                             Log.i("INFOGUE/Article", "Submit Tag");
@@ -321,7 +339,11 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         mSelectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                // Always show the chooser (if there are multiple options available)
+                startActivityForResult(Intent.createChooser(intent, "Select Featured"), PICK_IMAGE_REQUEST);
             }
         });
 
@@ -337,6 +359,30 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         progress = new ProgressDialog(this);
         progress.setMessage("Saving Article Data");
         progress.setIndeterminate(true);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            Uri uri = data.getData();
+
+            if (Build.VERSION.SDK_INT < 19) {
+                realPathFeatured = RealPathResolver.getRealPathFromURI_API11to18(this, data.getData());
+            } else {
+                realPathFeatured = RealPathResolver.getRealPathFromURI_API19(this, data.getData());
+            }
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                mFeaturedImage.setImageBitmap(bitmap);
+                mFeaturedImage.setVisibility(View.VISIBLE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -370,18 +416,27 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         }
     }
 
-    protected void saveConfirmation(){
+    protected void saveConfirmation() {
+        int action;
+        if (mPublishedRadio.isChecked()) {
+            action = R.string.action_save_publish;
+        } else if (mDraftRadio.isChecked()) {
+            action = R.string.action_save_draft;
+        } else {
+            action = 0;
+        }
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
-        builder.setTitle("Save Article");
-        builder.setMessage("Publish and waiting for editor confirmation?");
-        builder.setPositiveButton("Publish", new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.label_save_article);
+        builder.setMessage(R.string.message_save_article);
+        builder.setPositiveButton(action, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 saveData();
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -393,14 +448,30 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         AppHelper.dialogButtonTheme(this, dialogSave);
     }
 
-    private void discardConfirmation() {
-
+    protected void discardConfirmation() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.label_discard_article));
         builder.setMessage(getString(R.string.message_discard_article));
         builder.setPositiveButton(R.string.action_yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                if(isCalledFromMainActivity){
+                    Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
+                    articleIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
+                    articleIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
+                    // add some information for notification
+                    articleIntent.putExtra(ArticleActivity.DISCARD_ARTICLE, true);
+                    articleIntent.putExtra(CALLED_FROM_MAIN, isCalledFromMainActivity);
+                    articleIntent.putExtra(RESULT_CODE, AppCompatActivity.RESULT_CANCELED);
+
+                    startActivity(articleIntent);
+                }
+                else{
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra(ArticleActivity.DISCARD_ARTICLE, true);
+                    setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
+                }
+
                 finish();
             }
         });
@@ -424,12 +495,12 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         article.setCategory(mCategorySpinner.getSelectedItem().toString());
         article.setSubcategoryId(mSubcategorySpinner.getSelectedItemPosition());
         article.setSubcategory(mSubcategorySpinner.getSelectedItem().toString());
-        article.setFeatured("featured");
+        article.setFeatured(realPathFeatured);
         article.setTags(new ArrayList<>(Arrays.asList(mTagsInput.getTags())));
         article.setSlug(mSlugInput.getText().toString().trim());
         article.setContent(mContentEditor.getHtml());
         article.setExcerpt(mExcerptInput.getText().toString());
-        article.setStatus(mPublishedRadio.isChecked() ? Article.STATUS_PUBLISHED.toLowerCase() : Article.STATUS_DRAFT.toLowerCase());
+        article.setStatus(mPublishedRadio.isChecked() ? Article.STATUS_PUBLISHED.toLowerCase() : mDraftRadio.isChecked() ? Article.STATUS_DRAFT.toLowerCase() : "Invalid Selected");
         article.setAuthorId(session.getSessionData(SessionManager.KEY_ID, 0));
         validationMessage = new ArrayList<>();
     }
@@ -492,8 +563,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         if (isSlugEmpty || !isSlugValid) {
             if (isSlugEmpty) {
                 validationMessage.add(getString(R.string.error_slug_required));
-            }
-            else{
+            } else {
                 validationMessage.add(getString(R.string.error_slug_invalid));
             }
             focusView = mSlugInput;
@@ -555,17 +625,36 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         }
     }
 
-    protected void saveData(){
-        if(connectionDetector.isNetworkAvailable()){
+    protected void saveData() {
+        if (connectionDetector.isNetworkAvailable()) {
             progress.show();
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     progress.dismiss();
+
+                    if(isCalledFromMainActivity){
+                        Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
+                        articleIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
+                        articleIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
+                        // add some information for notification
+                        articleIntent.putExtra(ArticleActivity.SAVE_ARTICLE, Math.random() < 0.5);
+                        articleIntent.putExtra(CALLED_FROM_MAIN, isCalledFromMainActivity);
+                        articleIntent.putExtra(RESULT_CODE, AppCompatActivity.RESULT_OK);
+
+                        startActivity(articleIntent);
+                    }
+                    else{
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra(ArticleActivity.SAVE_ARTICLE, Math.random() < 0.5);
+                        returnIntent.putExtra(CALLED_FROM_MAIN, isCalledFromMainActivity);
+                        setResult(AppCompatActivity.RESULT_OK, returnIntent);
+                    }
+
+                    finish();
                 }
             }, 2000);
-        }
-        else{
+        } else {
             connectionDetector.snackbarDisconnectNotification(mSelectButton, null);
         }
     }

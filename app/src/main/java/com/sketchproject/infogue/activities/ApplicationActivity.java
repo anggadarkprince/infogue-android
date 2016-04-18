@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
@@ -170,6 +171,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                 public void onClick(View v) {
                     if (session.isLoggedIn()) {
                         Intent createArticleIntent = new Intent(ApplicationActivity.this, ArticleCreateActivity.class);
+                        createArticleIntent.putExtra(ArticleCreateActivity.CALLED_FROM_MAIN, true);
                         startActivity(createArticleIntent);
                     } else {
                         signOutUser();
@@ -698,8 +700,10 @@ public class ApplicationActivity extends AppCompatActivity implements
                     actionBar.setDisplayUseLogoEnabled(logo);
                 }
 
-                AppBarLayout appBarLayout = ((AppBarLayout)findViewById(R.id.appBar));
-                appBarLayout.setElevation(elevation);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    AppBarLayout appBarLayout = ((AppBarLayout)findViewById(R.id.appBar));
+                    appBarLayout.setElevation(elevation);
+                }
             }
         }
 

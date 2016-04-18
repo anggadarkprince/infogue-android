@@ -275,5 +275,9 @@
     <string name="message_delete_confirm">Are you sure delete</string>
     <string name="message_discard_article">Do you want to discard this article?</string>
     <string name="label_discard_article">Discard Article</string>
+    <string name="action_save_publish"><![CDATA[Save & Publish]]></string>
+    <string name="action_save_draft"><![CDATA[Save & Set as Draft]]></string>
+    <string name="label_save_article">Save Article</string>
+    <string name="message_save_article">Save and waiting for editor confirmation?</string>
 
 </resources>
