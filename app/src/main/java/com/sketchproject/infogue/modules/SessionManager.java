@@ -3,11 +3,14 @@ package com.sketchproject.infogue.modules;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Sketch Project Studio
+ * Created by Angga on 10/04/2016 18.16 18.17.
+ */
 public class SessionManager {
 
     public int PRIVATE_MODE = 0;

@@ -11,6 +11,10 @@ import android.widget.Toast;
 
 import com.sketchproject.infogue.R;
 
+/**
+ * Sketch Project Studio
+ * Created by Angga on 10/04/2016 18.17.
+ */
 public class ConnectionDetector extends BroadcastReceiver {
     private Context mContext;
     private OnLostConnectionListener mLostListener;

@@ -9,7 +9,8 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 /**
- * Created by Angga on 10/04/2016.
+ * Sketch Project Studio
+ * Created by Angga on 10/04/2016 18.16.
  */
 public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
     public ScrollAwareFABBehavior(Context context, AttributeSet attrs) {
