@@ -77,6 +77,14 @@ public class ConnectionDetector extends BroadcastReceiver {
         if (callbackRetry != null) {
             snackbar.setAction(action, callbackRetry);
         }
+        else{
+            snackbar.setAction(action, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    snackbar.dismiss();
+                }
+            });
+        }
         snackbar.show();
 
         View snackbarView = snackbar.getView();

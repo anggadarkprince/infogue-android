@@ -27,7 +27,7 @@
     <string name="prompt_excerpt">Optional Excerpt</string>
 
     <string name="error_password_required">Password is required</string>
-    <string name="error_password_range">Password must be 6 to 20 length</string>
+    <string name="error_password_range">Password must be 6 to 20 characters</string>
     <string name="error_username_required">Username is required</string>
     <string name="error_username_invalid">Username only contains alpha dash underscore</string>
     <string name="error_username_length">Username may not be greater than 20 characters</string>
@@ -39,6 +39,18 @@
     <string name="error_name_length">Name may not be greater than 50 characters</string>
     <string name="error_agreement_checked">You must be agree with terms and conditions</string>
     <string name="error_auth_credential">The credential is invalid</string>
+    <string name="error_title_required">Title is required</string>
+    <string name="error_title_range">Title must be 5 to 75 characters</string>
+    <string name="error_category_required">Category is required</string>
+    <string name="error_subcategory_required">Sub Category is required</string>
+    <string name="error_featured_required">Featured image is required</string>
+    <string name="error_tags_required">Tags is required</string>
+    <string name="error_slug_required">Slug is required</string>
+    <string name="error_slug_invalid">Slug only contains alpha dash underscore</string>
+    <string name="error_content_required">Content is required</string>
+    <string name="error_excerpt_length">Excerpt may not be greater than 300 characters</string>
+    <string name="error_status_invalid">Status only has value Published or Draft</string>
+    <string name="error_author_required">Session author is empty, please Login again!</string>
 
     <string name="label_sign_in">SIGN IN</string>
     <string name="label_get_started">GET STARTED</string>
@@ -261,5 +273,7 @@
     <string name="message_no_internet">No Internet Connection!</string>
     <string name="message_internet_established">Connection Established.</string>
     <string name="message_delete_confirm">Are you sure delete</string>
+    <string name="message_discard_article">Do you want to discard this article?</string>
+    <string name="label_discard_article">Discard Article</string>
 
 </resources>

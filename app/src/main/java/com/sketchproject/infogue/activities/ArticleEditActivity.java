@@ -52,7 +52,7 @@ public class ArticleEditActivity extends AppCompatActivity {
         MaterialSpinner spinnerSubcategory = (MaterialSpinner) findViewById(R.id.spinner_subcategory);
         spinnerSubcategory.setAdapter(adapterSubItem);
 
-        TagGroup mTagGroup = (TagGroup) findViewById(R.id.tag_group);
+        TagGroup mTagGroup = (TagGroup) findViewById(R.id.input_tags);
         //mTagGroup.setTags("Tag1", "Tag2", "Tag3");
 
         EditText mTitleView = (EditText) findViewById(R.id.input_title);

@@ -29,14 +29,18 @@ public class Article {
     private String slug;
     private String title;
     private String featured;
+    private int categoryId;
     private String category;
+    private int subcategoryId;
     private String subcategory;
     private String content;
+    private String excerpt;
     private String publishedAt;
     private List<String> tags;
     private int view;
     private int rating;
     private String status;
+    private int authorId;
 
     public Article(int id, String slug, String title) {
         this.id = id;
@@ -76,12 +80,28 @@ public class Article {
         this.featured = featured;
     }
 
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
+
     public String getCategory() {
         return category;
     }
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public int getSubcategoryId() {
+        return subcategoryId;
+    }
+
+    public void setSubcategoryId(int subcategoryId) {
+        this.subcategoryId = subcategoryId;
     }
 
     public String getSubcategory() {
@@ -98,6 +118,14 @@ public class Article {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getExcerpt() {
+        return excerpt;
+    }
+
+    public void setExcerpt(String excerpt) {
+        this.excerpt = excerpt;
     }
 
     public String getPublishedAt() {
@@ -138,5 +166,13 @@ public class Article {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public int getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(int authorId) {
+        this.authorId = authorId;
     }
 }
