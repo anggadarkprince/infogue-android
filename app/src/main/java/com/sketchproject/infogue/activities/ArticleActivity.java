@@ -228,7 +228,7 @@ public class ArticleActivity extends AppCompatActivity implements
         Intent editIntent = new Intent(getBaseContext(), ArticleEditActivity.class);
         editIntent.putExtra(Article.ARTICLE_ID, article.getId());
         editIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
-        startActivity(editIntent);
+        startActivityForResult(editIntent, ArticleCreateActivity.CALL_ARTICLE_FORM_CODE);
     }
 
     private void deleteArticle(View view, final Article article) {

@@ -42,6 +42,15 @@ public class Article {
     private String status;
     private int authorId;
 
+    public Article(){
+
+    }
+
+    public Article(int id, String slug) {
+        this.id = id;
+        this.slug = slug;
+    }
+
     public Article(int id, String slug, String title) {
         this.id = id;
         this.slug = slug;

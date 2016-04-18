@@ -165,7 +165,7 @@ public class ApplicationActivity extends AppCompatActivity implements
             mLocationView.setText(session.getSessionData(SessionManager.KEY_LOCATION, "No Location"));
 
             // Delegating create article event
-            Button mCreateArticleButton = (Button) navigationHeader.findViewById(R.id.btn_create_article);
+            Button mCreateArticleButton = (Button) navigationHeader.findViewById(R.id.btn_save_article);
             mCreateArticleButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

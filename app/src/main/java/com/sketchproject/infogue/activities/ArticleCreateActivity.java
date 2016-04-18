@@ -81,7 +81,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
     protected EditText mExcerptInput;
     protected RadioButton mPublishedRadio;
     protected RadioButton mDraftRadio;
-    protected Button mCreateButton;
+    protected Button mSaveButton;
 
     protected String[] ITEMS = {"News", "Economic", "Entertainment", "Sport", "Science", "Technology", "Education", "Photo", "Video", "Others"};
     protected String[] SUBITEMS = {"SubItem 1", "SubItem 2", "SubItem 3", "SubItem 4", "SubItem 5", "SubItem 6"};
@@ -118,7 +118,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         mExcerptInput = (EditText) findViewById(R.id.input_excerpt);
         mPublishedRadio = (RadioButton) findViewById(R.id.radio_published);
         mDraftRadio = (RadioButton) findViewById(R.id.radio_draft);
-        mCreateButton = (Button) findViewById(R.id.btn_create_article);
+        mSaveButton = (Button) findViewById(R.id.btn_save_article);
 
         if (mTitleInput.requestFocus()) {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -347,7 +347,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
             }
         });
 
-        mCreateButton.setOnClickListener(new View.OnClickListener() {
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 preValidation();
@@ -490,7 +490,11 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
     @Override
     public void preValidation() {
-        article = new Article(0, mTitleInput.getText().toString(), mSlugInput.getText().toString());
+        if(article == null){
+            article = new Article();
+        }
+        article.setTitle(mTitleInput.getText().toString());
+        article.setSlug(mSlugInput.getText().toString());
         article.setCategoryId(mCategorySpinner.getSelectedItemPosition());
         article.setCategory(mCategorySpinner.getSelectedItem().toString());
         article.setSubcategoryId(mSubcategorySpinner.getSelectedItemPosition());

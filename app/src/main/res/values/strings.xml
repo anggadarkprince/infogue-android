@@ -100,6 +100,7 @@
     <string name="action_ok">OK</string>
     <string name="action_select_image">SELECT IMAGE</string>
     <string name="action_create_article">CREATE ARTICLE</string>
+    <string name="action_update_article">UPDATE ARTICLE</string>
 
     <string name="action_long_rate">Give 5 Stars</string>
     <string name="action_long_share">Share Article</string>
