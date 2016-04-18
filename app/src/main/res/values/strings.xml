@@ -68,7 +68,7 @@
     <string name="action_followers">Followers</string>
     <string name="action_following">Following</string>
     <string name="action_view_detail">View Detail</string>
-    <string name="action_create_article">Post Article</string>
+    <string name="action_post_article">Post Article</string>
     <string name="action_follow">FOLLOW</string>
     <string name="action_unfollow">UNFOLLOW</string>
     <string name="action_comment">Comment</string>
@@ -86,6 +86,8 @@
     <string name="action_no">No</string>
     <string name="action_retry">RETRY</string>
     <string name="action_ok">OK</string>
+    <string name="action_select_image">SELECT IMAGE</string>
+    <string name="action_create_article">CREATE ARTICLE</string>
 
     <string name="action_long_rate">Give 5 Stars</string>
     <string name="action_long_share">Share Article</string>
@@ -105,11 +107,22 @@
     <string name="about_contact_title">Developer Contact</string>
     <string name="about_contact_content">Mobile (+62) 85655479868\nEmail sketchprojectstudio@gmail.com\nJawa 6 No 5 Jember, East Java - Indonesia</string>
     <string name="about_social">Follow our social account</string>
+
     <string name="label_articles">Articles</string>
     <string name="label_followers">Followers</string>
     <string name="label_following">Following</string>
     <string name="label_send_to">Share infogue.id to</string>
     <string name="label_search_hint">Find article or contributor</string>
+    <string name="label_basic_info">BASIC INFO</string>
+    <string name="label_featured">FEATURED</string>
+    <string name="label_image_featured">Image Featured</string>
+    <string name="label_seo">SEARCH ENGINE OPTIMIZATION</string>
+    <string name="label_tags">Article Tags</string>
+    <string name="label_content">CONTENT</string>
+    <string name="label_article">Article Content</string>
+    <string name="label_status">Article Status</string>
+    <string name="label_published">Published</string>
+    <string name="label_draft">Draft</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_random">Random</string>

@@ -50,6 +50,24 @@ public class HomeFragment extends Fragment {
 
         tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition(), true);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                ViewPagerAdapter section = (ViewPagerAdapter) viewPager.getAdapter();
+                ArticleFragment articleFragment = (ArticleFragment) section.getItem(tabLayout.getSelectedTabPosition());
+                articleFragment.scrollToTop();
+            }
+        });
 
         TabLayout.Tab tab;
         tab = tabLayout.getTabAt(0);

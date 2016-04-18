@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -99,6 +100,7 @@ public class ApplicationActivity extends AppCompatActivity implements
         }
 
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout.setColorSchemeResources(R.color.color_hazard, R.color.color_info, R.color.color_warning);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -637,6 +639,7 @@ public class ApplicationActivity extends AppCompatActivity implements
         Fragment fragment;
         String title;
         String subtitle;
+        int elevation;
         boolean logo;
 
         int id = item.getItemId();
@@ -656,21 +659,25 @@ public class ApplicationActivity extends AppCompatActivity implements
                 fragment = new HomeFragment();
                 title = "";
                 subtitle = "";
+                elevation = 0;
                 logo = true;
             } else if (id == R.id.nav_random) {
                 fragment = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_RANDOM);
                 title = "Featured Article";
                 subtitle = "Random";
+                elevation = 2;
                 logo = false;
             } else if (id == R.id.nav_headline) {
                 fragment = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_HEADLINE);
                 title = "Featured Article";
                 subtitle = "Headline";
+                elevation = 2;
                 logo = false;
             } else {
                 fragment = ArticleFragment.newInstanceCategory(1, id, category);
                 title = category;
                 subtitle = "";
+                elevation = 2;
                 logo = false;
             }
 
@@ -690,6 +697,9 @@ public class ApplicationActivity extends AppCompatActivity implements
                     }
                     actionBar.setDisplayUseLogoEnabled(logo);
                 }
+
+                AppBarLayout appBarLayout = ((AppBarLayout)findViewById(R.id.appBar));
+                appBarLayout.setElevation(elevation);
             }
         }
 

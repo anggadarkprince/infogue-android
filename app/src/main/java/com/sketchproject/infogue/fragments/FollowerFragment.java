@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -48,6 +49,7 @@ public class FollowerFragment extends Fragment {
     private List<Contributor> allFollowers;
     private FollowerRecyclerViewAdapter followerAdapter;
     private OnListFragmentInteractionListener mListener;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -91,7 +93,7 @@ public class FollowerFragment extends Fragment {
 
         double random = Math.random();
         isEmptyPage = random > 0.9;
-        Log.i("INFOGUE/random", isEmptyPage+" "+String.valueOf(random));
+        Log.i("INFOGUE/random", isEmptyPage + " " + String.valueOf(random));
     }
 
     @Override
@@ -117,7 +119,7 @@ public class FollowerFragment extends Fragment {
             recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
                 @Override
                 public void onLoadMore(final int page, int totalItemsCount) {
-                    if(!isFirstCall){
+                    if (!isFirstCall) {
                         loadFollowers(page);
                     }
                 }
@@ -136,14 +138,26 @@ public class FollowerFragment extends Fragment {
      */
     private void loadFollowers(final int page) {
         if (!isEndOfPage) {
-            allFollowers.add(null);
-            followerAdapter.notifyItemInserted(allFollowers.size() - 1);
+            if(swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()){
+                allFollowers.add(null);
+                followerAdapter.notifyItemInserted(allFollowers.size() - 1);
+            }
 
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    allFollowers.remove(allFollowers.size() - 1);
-                    followerAdapter.notifyItemRemoved(allFollowers.size());
+                    if(swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()) {
+                        allFollowers.remove(allFollowers.size() - 1);
+                        followerAdapter.notifyItemRemoved(allFollowers.size());
+                    }
+                    else{
+                        swipeRefreshLayout.setRefreshing(false);
+                        int total = allFollowers.size();
+                        for (int i = 0; i<total; i++) {
+                            allFollowers.remove(0);
+                        }
+                        followerAdapter.notifyItemRangeRemoved(0, total);
+                    }
 
                     List<Contributor> moreFollowers = !isEmptyPage ? DummyFollowerContent.generateDummy(page) : new ArrayList<Contributor>();
                     int curSize = followerAdapter.getItemCount();
@@ -168,6 +182,13 @@ public class FollowerFragment extends Fragment {
         }
     }
 
+    public void refreshArticleList(SwipeRefreshLayout swipeRefresh){
+        swipeRefreshLayout = swipeRefresh;
+        isEndOfPage = false;
+        isEmptyPage = false;
+
+        loadFollowers(0);
+    }
 
     @Override
     public void onAttach(Context context) {

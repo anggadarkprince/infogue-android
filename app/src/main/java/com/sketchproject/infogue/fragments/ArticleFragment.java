@@ -63,6 +63,7 @@ public class ArticleFragment extends Fragment {
     private OnArticleFragmentInteractionListener mArticleListListener;
     private OnArticleEditableFragmentInteractionListener mArticleEditableListener;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private RecyclerView recyclerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -71,6 +72,7 @@ public class ArticleFragment extends Fragment {
     public ArticleFragment() {
     }
 
+    @SuppressWarnings("unused")
     public static ArticleFragment newInstance(int columnCount) {
         ArticleFragment fragment = new ArticleFragment();
         Bundle args = new Bundle();
@@ -175,7 +177,7 @@ public class ArticleFragment extends Fragment {
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView = (RecyclerView) view;
 
             LinearLayoutManager linearLayoutManager;
             if (mColumnCount <= 1) {
@@ -274,6 +276,10 @@ public class ArticleFragment extends Fragment {
         isEmptyPage = false;
 
         loadArticles(0);
+    }
+
+    public void scrollToTop(){
+        recyclerView.smoothScrollToPosition(0);
     }
 
     @Override
