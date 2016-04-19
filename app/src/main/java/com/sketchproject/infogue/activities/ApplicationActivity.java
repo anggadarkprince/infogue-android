@@ -80,14 +80,21 @@ public class ApplicationActivity extends AppCompatActivity implements
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        if (drawer != null) {
+            drawer.addDrawerListener(toggle);
+        }
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        navigationView.setCheckedItem(R.id.nav_home);
+        if (navigationView != null) {
+            navigationView.setNavigationItemSelectedListener(this);
+            navigationView.setCheckedItem(R.id.nav_home);
+        }
 
-        MenuItem home = navigationView.getMenu().getItem(0).getSubMenu().getItem(0);
+        MenuItem home = null;
+        if (navigationView != null) {
+            home = navigationView.getMenu().getItem(0).getSubMenu().getItem(0);
+        }
         onNavigationItemSelected(home);
         populateMenu();
 
@@ -96,26 +103,30 @@ public class ApplicationActivity extends AppCompatActivity implements
         handleNavigationLayout(navigationHeader);
 
         if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
-            drawer.openDrawer(GravityCompat.START);
+            if (drawer != null) {
+                drawer.openDrawer(GravityCompat.START);
+            }
             session.setSessionData(SessionManager.KEY_USER_LEARNED, true);
         }
 
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
-        swipeRefreshLayout.setColorSchemeResources(R.color.color_hazard, R.color.color_info, R.color.color_warning);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                Fragment appFragment = getSupportFragmentManager().findFragmentById(R.id.container_body);
-                if(appFragment instanceof HomeFragment){
-                    HomeFragment homeFragment = (HomeFragment) appFragment;
-                    homeFragment.homeRefresh(swipeRefreshLayout);
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setColorSchemeResources(R.color.color_hazard, R.color.color_info, R.color.color_warning);
+            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    Fragment appFragment = getSupportFragmentManager().findFragmentById(R.id.container_body);
+                    if(appFragment instanceof HomeFragment){
+                        HomeFragment homeFragment = (HomeFragment) appFragment;
+                        homeFragment.homeRefresh(swipeRefreshLayout);
+                    }
+                    else{
+                        ArticleFragment articleFragment = (ArticleFragment) appFragment;
+                        articleFragment.refreshArticleList(swipeRefreshLayout);
+                    }
                 }
-                else{
-                    ArticleFragment articleFragment = (ArticleFragment) appFragment;
-                    articleFragment.refreshArticleList(swipeRefreshLayout);
-                }
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -307,20 +318,22 @@ public class ApplicationActivity extends AppCompatActivity implements
             finish();
         } else {
             // Notify remove persistent session data is failed
-            final Snackbar snackbar = Snackbar.make(findViewById(R.id.article_form), R.string.message_logout_failed, Snackbar.LENGTH_LONG);
-
-            // noinspection deprecation
-            snackbar.setActionTextColor(getResources().getColor(R.color.light));
-            snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    snackbar.dismiss();
-                    signOutUser();
-                }
-            }).show();
-
-            View snackbarView = snackbar.getView();
-            snackbarView.setBackgroundResource(R.color.color_danger);
+            View view = findViewById(R.id.container_body);
+            final Snackbar snackbar;
+            if (view != null) {
+                snackbar = Snackbar.make(view, R.string.message_logout_failed, Snackbar.LENGTH_LONG);
+                // noinspection deprecation
+                snackbar.setActionTextColor(getResources().getColor(R.color.light));
+                snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        snackbar.dismiss();
+                        signOutUser();
+                    }
+                }).show();
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundResource(R.color.color_danger);
+            }
         }
     }
 
@@ -367,13 +380,15 @@ public class ApplicationActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            if (dialogExit != null && dialogExit.isShowing()) {
-                dialogExit.cancel();
+        if (drawer != null) {
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
             } else {
-                confirmExit();
+                if (dialogExit != null && dialogExit.isShowing()) {
+                    dialogExit.cancel();
+                } else {
+                    confirmExit();
+                }
             }
         }
     }
@@ -702,13 +717,17 @@ public class ApplicationActivity extends AppCompatActivity implements
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     AppBarLayout appBarLayout = ((AppBarLayout)findViewById(R.id.appBar));
-                    appBarLayout.setElevation(elevation);
+                    if (appBarLayout != null) {
+                        appBarLayout.setElevation(elevation);
+                    }
                 }
             }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        if (drawer != null) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
 
         return true;
     }

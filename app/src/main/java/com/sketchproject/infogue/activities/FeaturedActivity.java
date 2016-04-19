@@ -28,40 +28,46 @@ public class FeaturedActivity extends AppCompatActivity {
 
         // Set up the ViewPager with the sections adapter.
         ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                changePage(position);
-            }
+        if (mViewPager != null) {
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+            mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageSelected(int position) {
+                    changePage(position);
+                }
 
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {
-            }
+                @Override
+                public void onPageScrolled(int arg0, float arg1, int arg2) {
+                }
 
-            @Override
-            public void onPageScrollStateChanged(int position) {
-            }
-        });
+                @Override
+                public void onPageScrollStateChanged(int position) {
+                }
+            });
+        }
 
         Button buttonSignIn = (Button) findViewById(R.id.btn_sign_in);
-        buttonSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent loginActivity = new Intent(FeaturedActivity.this, AuthenticationActivity.class);
-                startActivity(loginActivity);
-            }
-        });
+        if (buttonSignIn != null) {
+            buttonSignIn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent loginActivity = new Intent(FeaturedActivity.this, AuthenticationActivity.class);
+                    startActivity(loginActivity);
+                }
+            });
+        }
 
         Button buttonGetStarted = (Button) findViewById(R.id.btn_get_started);
-        buttonGetStarted.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainActivity = new Intent(FeaturedActivity.this, ApplicationActivity.class);
-                startActivity(mainActivity);
-                finish();
-            }
-        });
+        if (buttonGetStarted != null) {
+            buttonGetStarted.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent mainActivity = new Intent(FeaturedActivity.this, ApplicationActivity.class);
+                    startActivity(mainActivity);
+                    finish();
+                }
+            });
+        }
 
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
     }
@@ -71,23 +77,35 @@ public class FeaturedActivity extends AppCompatActivity {
      */
     private void changePage(int position) {
         ImageView view1 = (ImageView) findViewById(R.id.page1);
-        view1.setImageResource(R.drawable.circle_featured_normal);
+        if (view1 != null) {
+            view1.setImageResource(R.drawable.circle_featured_normal);
+        }
 
         ImageView view2 = (ImageView) findViewById(R.id.page2);
-        view2.setImageResource(R.drawable.circle_featured_normal);
+        if (view2 != null) {
+            view2.setImageResource(R.drawable.circle_featured_normal);
+        }
 
         ImageView view3 = (ImageView) findViewById(R.id.page3);
-        view3.setImageResource(R.drawable.circle_featured_normal);
+        if (view3 != null) {
+            view3.setImageResource(R.drawable.circle_featured_normal);
+        }
 
         switch (position) {
             case 0:
-                view1.setImageResource(R.drawable.circle_featured_active);
+                if (view1 != null) {
+                    view1.setImageResource(R.drawable.circle_featured_active);
+                }
                 break;
             case 1:
-                view2.setImageResource(R.drawable.circle_featured_active);
+                if (view2 != null) {
+                    view2.setImageResource(R.drawable.circle_featured_active);
+                }
                 break;
             case 2:
-                view3.setImageResource(R.drawable.circle_featured_active);
+                if (view3 != null) {
+                    view3.setImageResource(R.drawable.circle_featured_active);
+                }
                 break;
         }
     }

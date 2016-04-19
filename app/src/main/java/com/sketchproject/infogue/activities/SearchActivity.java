@@ -19,8 +19,10 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setElevation(2);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setElevation(2);
+        }
 
         handleIntent(getIntent());
     }
@@ -34,8 +36,10 @@ public class SearchActivity extends AppCompatActivity {
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            Log.i("SEARCH", query);
-            getSupportActionBar().setTitle("Result for " + query);
+            Log.i("INFOGUE/Search", query);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle("Result for " + query);
+            }
         }
     }
 

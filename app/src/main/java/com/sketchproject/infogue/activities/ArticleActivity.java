@@ -64,23 +64,27 @@ public class ArticleActivity extends AppCompatActivity implements
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent createArticleIntent = new Intent(getBaseContext(), ArticleCreateActivity.class);
-                startActivityForResult(createArticleIntent, ArticleCreateActivity.CALL_ARTICLE_FORM_CODE);
-            }
-        });
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent createArticleIntent = new Intent(getBaseContext(), ArticleCreateActivity.class);
+                    startActivityForResult(createArticleIntent, ArticleCreateActivity.CALL_ARTICLE_FORM_CODE);
+                }
+            });
+        }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
-        swipeRefreshLayout.setColorSchemeResources(R.color.color_hazard, R.color.color_info, R.color.color_warning);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                ArticleFragment fragment = (ArticleFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
-                fragment.refreshArticleList(swipeRefreshLayout);
-            }
-        });
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setColorSchemeResources(R.color.color_hazard, R.color.color_info, R.color.color_warning);
+            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    ArticleFragment fragment = (ArticleFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+                    fragment.refreshArticleList(swipeRefreshLayout);
+                }
+            });
+        }
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -99,7 +103,9 @@ public class ArticleActivity extends AppCompatActivity implements
             Boolean isMyArticle = false;
             if (session.isLoggedIn()) {
                 if (session.getSessionData(SessionManager.KEY_ID, 0) == authorId) {
-                    fab.setVisibility(View.VISIBLE);
+                    if (fab != null) {
+                        fab.setVisibility(View.VISIBLE);
+                    }
                     isMyArticle = true;
                 }
             }

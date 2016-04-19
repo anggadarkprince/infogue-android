@@ -9,7 +9,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -51,53 +50,41 @@ public class CommentActivity extends AppCompatActivity {
             final String[] patterns = {"http://disqus.com/next/login-success/", "http://disqus.com/_ax/google/complete/", "http://disqus.com/_ax/twitter/complete/", "http://disqus.com/_ax/facebook/complete/"};
 
             final WebView webDisqus = (WebView) findViewById(R.id.disqus_comment);
-            WebSettings webSettings = webDisqus.getSettings();
-            webSettings.setJavaScriptEnabled(true);
-            webSettings.setBuiltInZoomControls(false);
-            webSettings.setDisplayZoomControls(false);
-            webDisqus.requestFocusFromTouch();
-            webDisqus.setWebViewClient(new WebViewClient() {
-                @Override
-                public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                    Log.i("INFOGUE/Comment web", url);
-                    for (String pattern : patterns) {
-                        if (url.matches("^" + pattern)) {
-                            webDisqus.loadUrl(urlDisqus);
-                            Log.i("INFOGUE/Comment", "Match");
-                            break;
+            WebSettings webSettings;
+            if (webDisqus != null) {
+                webSettings = webDisqus.getSettings();
+                webSettings.setJavaScriptEnabled(true);
+                webSettings.setBuiltInZoomControls(false);
+                webSettings.setDisplayZoomControls(false);
+                webDisqus.requestFocusFromTouch();
+                webDisqus.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                        Log.i("INFOGUE/Comment web", url);
+                        for (String pattern : patterns) {
+                            if (url.matches("^" + pattern)) {
+                                webDisqus.loadUrl(urlDisqus);
+                                Log.i("INFOGUE/Comment", "Match");
+                                break;
+                            }
                         }
+                        super.onPageStarted(view, url, favicon);
                     }
-                    super.onPageStarted(view, url, favicon);
-                }
 
-                @Override
-                public void onPageFinished(WebView view, String url) {
-                    super.onPageFinished(view, url);
-                    progress.dismiss();
-                }
-            });
+                    @Override
+                    public void onPageFinished(WebView view, String url) {
+                        super.onPageFinished(view, url);
+                        progress.dismiss();
+                    }
+                });
 
-            webDisqus.loadUrl(urlDisqus);
+                webDisqus.loadUrl(urlDisqus);
+            }
+
         } else {
             Toast.makeText(getBaseContext(), "Invalid comment data", Toast.LENGTH_LONG).show();
             finish();
         }
-    }
-
-    public String getHtmlComment(int idPost, int idSlug, int idTitle, String shortName) {
-
-        return "<div id='disqus_thread'></div>"
-                + "<script type='text/javascript'>"
-                + "var disqus_identifier = '"
-                + idPost
-                + "';"
-                + "var disqus_shortname = '"
-                + shortName
-                + "';"
-                + " (function() { var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;"
-                + "dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';"
-                + "(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })();"
-                + "</script>";
     }
 
     @Override

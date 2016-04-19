@@ -85,20 +85,20 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         Animation animation = AnimationUtils.loadAnimation(holder.itemView.getContext(), (position > mLastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         holder.itemView.startAnimation(animation);
-        mLastPosition = position;
+        mLastPosition = holder.getAdapterPosition();
 
-        switch (getItemViewType(position)) {
+        switch (getItemViewType(holder.getAdapterPosition())) {
             case VIEW_TYPE_FOLLOWER:
                 final FollowerViewHolder followerHolder = (FollowerViewHolder) holder;
-                followerHolder.mItem = mContributors.get(position);
-                followerHolder.mNameView.setText(mContributors.get(position).getName());
-                followerHolder.mLocationView.setText(mContributors.get(position).getLocation());
+                followerHolder.mItem = mContributors.get(holder.getAdapterPosition());
+                followerHolder.mNameView.setText(mContributors.get(holder.getAdapterPosition()).getName());
+                followerHolder.mLocationView.setText(mContributors.get(holder.getAdapterPosition()).getLocation());
                 Glide.with(followerHolder.mView.getContext())
-                        .load(mContributors.get(position).getAvatar())
+                        .load(mContributors.get(holder.getAdapterPosition()).getAvatar())
                         .placeholder(R.drawable.placeholder_square)
                         .crossFade()
                         .into(followerHolder.mAvatarImage);
-                if (mContributors.get(position).isFollowing()) {
+                if (mContributors.get(holder.getAdapterPosition()).isFollowing()) {
                     followerHolder.mFollowButton.setImageResource(R.drawable.btn_unfollow);
                 }
 

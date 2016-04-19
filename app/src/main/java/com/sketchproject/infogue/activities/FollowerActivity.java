@@ -19,7 +19,6 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.FollowerFragment;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.ConnectionDetector;
@@ -71,14 +70,16 @@ public class FollowerActivity extends AppCompatActivity implements
         }
 
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
-        swipeRefreshLayout.setColorSchemeResources(R.color.color_hazard, R.color.color_info, R.color.color_warning);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                FollowerFragment fragment = (FollowerFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
-                fragment.refreshArticleList(swipeRefreshLayout);
-            }
-        });
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setColorSchemeResources(R.color.color_hazard, R.color.color_info, R.color.color_warning);
+            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    FollowerFragment fragment = (FollowerFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+                    fragment.refreshArticleList(swipeRefreshLayout);
+                }
+            });
+        }
     }
 
     @Override
@@ -134,15 +135,14 @@ public class FollowerActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 200){
-            if(resultCode == AppCompatActivity.RESULT_OK){
+        if (requestCode == 200) {
+            if (resultCode == AppCompatActivity.RESULT_OK) {
                 boolean isFollowing = data.getBooleanExtra(SessionManager.KEY_IS_FOLLOWING, false);
-                Log.i("INFOGUE/Follower", "Result "+isFollowing);
+                Log.i("INFOGUE/Follower", "Result " + isFollowing);
                 mContributor.setIsFollowing(isFollowing);
-                if(isFollowing){
+                if (isFollowing) {
                     ((ImageButton) mControlButton).setImageResource(R.drawable.btn_unfollow);
-                }
-                else{
+                } else {
                     ((ImageButton) mControlButton).setImageResource(R.drawable.btn_follow);
                 }
             }
@@ -164,11 +164,10 @@ public class FollowerActivity extends AppCompatActivity implements
         SessionManager session = new SessionManager(getBaseContext());
         if (session.isLoggedIn()) {
             ImageButton control = (ImageButton) followControl;
-            if(contributor.isFollowing()){
+            if (contributor.isFollowing()) {
                 control.setImageResource(R.drawable.btn_follow);
                 contributor.setIsFollowing(false);
-            }
-            else{
+            } else {
                 control.setImageResource(R.drawable.btn_unfollow);
                 contributor.setIsFollowing(true);
             }
@@ -219,8 +218,7 @@ public class FollowerActivity extends AppCompatActivity implements
                     }
                 }
             });
-        }
-        else{
+        } else {
             builder.setItems(items, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
                     if (connectionDetector.isNetworkAvailable()) {

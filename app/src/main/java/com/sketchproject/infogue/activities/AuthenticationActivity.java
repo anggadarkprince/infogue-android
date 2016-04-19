@@ -47,30 +47,35 @@ public class AuthenticationActivity extends AppCompatActivity {
         adapter.addFragment(new RegisterFragment(), "Register");
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if (position == 0) {
-                    getSupportActionBar().setTitle("Contributor Sign In");
-                } else {
-                    getSupportActionBar().setTitle("Create an Account");
+        if (viewPager != null) {
+            viewPager.setAdapter(adapter);
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    if (position == 0) {
+                        getSupportActionBar().setTitle("Contributor Sign In");
+                    } else {
+                        getSupportActionBar().setTitle("Create an Account");
+                    }
                 }
-            }
 
-            @Override
-            public void onPageSelected(int position) {
+                @Override
+                public void onPageSelected(int position) {
 
-            }
+                }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
+                @Override
+                public void onPageScrollStateChanged(int state) {
 
-            }
-        });
+                }
+            });
+        }
+
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
+        if (tabLayout != null) {
+            tabLayout.setupWithViewPager(viewPager);
+        }
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -81,8 +86,7 @@ public class AuthenticationActivity extends AppCompatActivity {
             } else if (screen == REGISTER_SCREEN) {
                 setTabRegisterActive();
             }
-        }
-        else{
+        } else {
             isAfterLogout = false;
         }
     }
@@ -92,10 +96,9 @@ public class AuthenticationActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            if(isAfterLogout){
+            if (isAfterLogout) {
                 launchMainActivity();
-            }
-            else{
+            } else {
                 finish();
             }
         }
@@ -105,14 +108,14 @@ public class AuthenticationActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(isAfterLogout){
+        if (isAfterLogout) {
             launchMainActivity();
         }
 
         super.onBackPressed();
     }
 
-    private void launchMainActivity(){
+    private void launchMainActivity() {
         Intent applicationIntent = new Intent(getBaseContext(), ApplicationActivity.class);
         applicationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         applicationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

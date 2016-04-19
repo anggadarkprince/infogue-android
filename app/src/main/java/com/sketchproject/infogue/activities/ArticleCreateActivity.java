@@ -88,6 +88,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
     protected String realPathFeatured;
     protected boolean isCalledFromMainActivity;
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -455,7 +456,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         builder.setPositiveButton(R.string.action_yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(isCalledFromMainActivity){
+                if (isCalledFromMainActivity) {
                     Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
                     articleIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
                     articleIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
@@ -465,8 +466,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                     articleIntent.putExtra(RESULT_CODE, AppCompatActivity.RESULT_CANCELED);
 
                     startActivity(articleIntent);
-                }
-                else{
+                } else {
                     Intent returnIntent = new Intent();
                     returnIntent.putExtra(ArticleActivity.DISCARD_ARTICLE, true);
                     setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
@@ -490,7 +490,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
     @Override
     public void preValidation() {
-        if(article == null){
+        if (article == null) {
             article = new Article();
         }
         article.setTitle(mTitleInput.getText().toString());
@@ -637,7 +637,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 public void run() {
                     progress.dismiss();
 
-                    if(isCalledFromMainActivity){
+                    if (isCalledFromMainActivity) {
                         Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
                         articleIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
                         articleIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
@@ -647,8 +647,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                         articleIntent.putExtra(RESULT_CODE, AppCompatActivity.RESULT_OK);
 
                         startActivity(articleIntent);
-                    }
-                    else{
+                    } else {
                         Intent returnIntent = new Intent();
                         returnIntent.putExtra(ArticleActivity.SAVE_ARTICLE, Math.random() < 0.5);
                         returnIntent.putExtra(CALLED_FROM_MAIN, isCalledFromMainActivity);

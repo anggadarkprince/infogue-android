@@ -20,7 +20,6 @@ import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;
-import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
 import com.sketchproject.infogue.utils.UrlHelper;
 
@@ -64,25 +63,41 @@ public class ProfileActivity extends AppCompatActivity implements
             username = extras.getString(SessionManager.KEY_USERNAME);
             isFollowing = extras.getBoolean(SessionManager.KEY_IS_FOLLOWING);
 
-            mNameView.setText(extras.getString(SessionManager.KEY_NAME));
-            mLocationView.setText(extras.getString(SessionManager.KEY_LOCATION));
-            mAboutView.setText(extras.getString(SessionManager.KEY_ABOUT));
-            mArticleView.setText(String.valueOf(extras.getInt(SessionManager.KEY_ARTICLE)));
-            mFollowerView.setText(String.valueOf(extras.getInt(SessionManager.KEY_FOLLOWER)));
-            mFollowingView.setText(String.valueOf(extras.getInt(SessionManager.KEY_FOLLOWING)));
+            if (mNameView != null) {
+                mNameView.setText(extras.getString(SessionManager.KEY_NAME));
+            }
+            if (mLocationView != null) {
+                mLocationView.setText(extras.getString(SessionManager.KEY_LOCATION));
+            }
+            if (mAboutView != null) {
+                mAboutView.setText(extras.getString(SessionManager.KEY_ABOUT));
+            }
+            if (mArticleView != null) {
+                mArticleView.setText(String.valueOf(extras.getInt(SessionManager.KEY_ARTICLE)));
+            }
+            if (mFollowerView != null) {
+                mFollowerView.setText(String.valueOf(extras.getInt(SessionManager.KEY_FOLLOWER)));
+            }
+            if (mFollowingView != null) {
+                mFollowingView.setText(String.valueOf(extras.getInt(SessionManager.KEY_FOLLOWING)));
+            }
 
-            Glide.with(this)
-                    .load(extras.getString(SessionManager.KEY_AVATAR))
-                    .placeholder(R.drawable.placeholder_square)
-                    .dontAnimate()
-                    .into(mAvatarImage);
+            if (mAvatarImage != null) {
+                Glide.with(this)
+                        .load(extras.getString(SessionManager.KEY_AVATAR))
+                        .placeholder(R.drawable.placeholder_square)
+                        .dontAnimate()
+                        .into(mAvatarImage);
+            }
 
-            Glide.with(this)
-                    .load(extras.getString(SessionManager.KEY_COVER))
-                    .placeholder(R.drawable.placeholder_rectangle)
-                    .centerCrop()
-                    .crossFade()
-                    .into(mCoverImage);
+            if (mCoverImage != null) {
+                Glide.with(this)
+                        .load(extras.getString(SessionManager.KEY_COVER))
+                        .placeholder(R.drawable.placeholder_rectangle)
+                        .centerCrop()
+                        .crossFade()
+                        .into(mCoverImage);
+            }
 
             isAfterLogin = extras.getBoolean(AuthenticationActivity.AFTER_LOGIN);
 
@@ -102,39 +117,45 @@ public class ProfileActivity extends AppCompatActivity implements
         }
 
         View mArticleButton = findViewById(R.id.btn_article);
-        mArticleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
-                articleIntent.putExtra(SessionManager.KEY_ID, idContributor);
-                articleIntent.putExtra(SessionManager.KEY_USERNAME, usernameContributor);
-                startActivity(articleIntent);
-            }
-        });
+        if (mArticleButton != null) {
+            mArticleButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
+                    articleIntent.putExtra(SessionManager.KEY_ID, idContributor);
+                    articleIntent.putExtra(SessionManager.KEY_USERNAME, usernameContributor);
+                    startActivity(articleIntent);
+                }
+            });
+        }
 
         View mFollowerButton = findViewById(R.id.btn_followers);
-        mFollowerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent followerIntent = new Intent(getBaseContext(), FollowerActivity.class);
-                followerIntent.putExtra(FollowerActivity.SCREEN_REQUEST, FollowerActivity.FOLLOWER_SCREEN);
-                followerIntent.putExtra(SessionManager.KEY_ID, idContributor);
-                followerIntent.putExtra(SessionManager.KEY_USERNAME, usernameContributor);
-                startActivity(followerIntent);
-            }
-        });
+        if (mFollowerButton != null) {
+            mFollowerButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent followerIntent = new Intent(getBaseContext(), FollowerActivity.class);
+                    followerIntent.putExtra(FollowerActivity.SCREEN_REQUEST, FollowerActivity.FOLLOWER_SCREEN);
+                    followerIntent.putExtra(SessionManager.KEY_ID, idContributor);
+                    followerIntent.putExtra(SessionManager.KEY_USERNAME, usernameContributor);
+                    startActivity(followerIntent);
+                }
+            });
+        }
 
         View mFollowingButton = findViewById(R.id.btn_following);
-        mFollowingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent followingIntent = new Intent(getBaseContext(), FollowerActivity.class);
-                followingIntent.putExtra(FollowerActivity.SCREEN_REQUEST, FollowerActivity.FOLLOWING_SCREEN);
-                followingIntent.putExtra(SessionManager.KEY_ID, idContributor);
-                followingIntent.putExtra(SessionManager.KEY_USERNAME, usernameContributor);
-                startActivity(followingIntent);
-            }
-        });
+        if (mFollowingButton != null) {
+            mFollowingButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent followingIntent = new Intent(getBaseContext(), FollowerActivity.class);
+                    followingIntent.putExtra(FollowerActivity.SCREEN_REQUEST, FollowerActivity.FOLLOWING_SCREEN);
+                    followingIntent.putExtra(SessionManager.KEY_ID, idContributor);
+                    followingIntent.putExtra(SessionManager.KEY_USERNAME, usernameContributor);
+                    startActivity(followingIntent);
+                }
+            });
+        }
 
         final Button mDetailButton = (Button) findViewById(R.id.btn_detail);
         final ImageButton mMessageButton = (ImageButton) findViewById(R.id.btn_message);
@@ -144,23 +165,41 @@ public class ProfileActivity extends AppCompatActivity implements
         // Open my profile
         int loggedUserId = session.getSessionData(SessionManager.KEY_ID, 0);
         if (session.isLoggedIn() && loggedUserId == idContributor) {
-            mDetailButton.setVisibility(View.VISIBLE);
-            mFollowButton.setVisibility(View.GONE);
-            mMessageButton.setVisibility(View.GONE);
-            mInfoButton.setVisibility(View.GONE);
+            if (mDetailButton != null) {
+                mDetailButton.setVisibility(View.VISIBLE);
+            }
+            if (mFollowButton != null) {
+                mFollowButton.setVisibility(View.GONE);
+            }
+            if (mMessageButton != null) {
+                mMessageButton.setVisibility(View.GONE);
+            }
+            if (mInfoButton != null) {
+                mInfoButton.setVisibility(View.GONE);
+            }
 
-            mDetailButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlHelper.getContributorDetailUrl(usernameContributor)));
-                    startActivity(browserIntent);
-                }
-            });
+            if (mDetailButton != null) {
+                mDetailButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlHelper.getContributorDetailUrl(usernameContributor)));
+                        startActivity(browserIntent);
+                    }
+                });
+            }
         } else { // Open another contributor
-            mDetailButton.setVisibility(View.GONE);
-            mFollowButton.setVisibility(View.VISIBLE);
-            mMessageButton.setVisibility(View.VISIBLE);
-            mInfoButton.setVisibility(View.VISIBLE);
+            if (mDetailButton != null) {
+                mDetailButton.setVisibility(View.GONE);
+            }
+            if (mFollowButton != null) {
+                mFollowButton.setVisibility(View.VISIBLE);
+            }
+            if (mMessageButton != null) {
+                mMessageButton.setVisibility(View.VISIBLE);
+            }
+            if (mInfoButton != null) {
+                mInfoButton.setVisibility(View.VISIBLE);
+            }
 
             if (isFollowing) {
                 stateFollow(mFollowButton);
@@ -168,28 +207,34 @@ public class ProfileActivity extends AppCompatActivity implements
                 stateUnfollow(mFollowButton);
             }
 
-            mMessageButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlHelper.getContributorDetailUrl(usernameContributor)));
-                    startActivity(browserIntent);
-                }
-            });
+            if (mMessageButton != null) {
+                mMessageButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlHelper.getContributorDetailUrl(usernameContributor)));
+                        startActivity(browserIntent);
+                    }
+                });
+            }
 
-            mMessageButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlHelper.getContributorDetailUrl(usernameContributor)));
-                    startActivity(browserIntent);
-                }
-            });
+            if (mMessageButton != null) {
+                mMessageButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlHelper.getContributorDetailUrl(usernameContributor)));
+                        startActivity(browserIntent);
+                    }
+                });
+            }
 
-            mFollowButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    toggleFollowHandler(mFollowButton);
-                }
-            });
+            if (mFollowButton != null) {
+                mFollowButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        toggleFollowHandler(mFollowButton);
+                    }
+                });
+            }
         }
     }
 

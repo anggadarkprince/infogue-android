@@ -67,10 +67,12 @@ public class PostActivity extends AppCompatActivity {
         mArticleContributor = (TextView) findViewById(R.id.article_contributor);
         mArticlePublished = (TextView) findViewById(R.id.article_published);
         mArticleContent = (WebView) findViewById(R.id.article_content);
-        mArticleContent.getSettings().setBuiltInZoomControls(false);
-        mArticleContent.getSettings().setDisplayZoomControls(false);
-        mArticleContent.setScrollContainer(false);
-        mArticleContent.setVerticalScrollBarEnabled(false);
+        if (mArticleContent != null) {
+            mArticleContent.getSettings().setBuiltInZoomControls(false);
+            mArticleContent.getSettings().setDisplayZoomControls(false);
+            mArticleContent.setScrollContainer(false);
+            mArticleContent.setVerticalScrollBarEnabled(false);
+        }
         mArticleRating = (RatingBar) findViewById(R.id.article_rating);
         mArticleTags = (TagGroup) findViewById(R.id.article_tags);
         mArticleExcerpt = (TextView) findViewById(R.id.article_excerpt);
@@ -81,16 +83,18 @@ public class PostActivity extends AppCompatActivity {
         mContributorLocation = (TextView) findViewById(R.id.contributor_location);
 
         Button mCommentButton = (Button) findViewById(R.id.btn_comment);
-        mCommentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent commentIntent = new Intent(getBaseContext(), CommentActivity.class);
-                commentIntent.putExtra(Article.ARTICLE_ID, id);
-                commentIntent.putExtra(Article.ARTICLE_SLUG, slug);
-                commentIntent.putExtra(Article.ARTICLE_TITLE, title);
-                startActivity(commentIntent);
-            }
-        });
+        if (mCommentButton != null) {
+            mCommentButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent commentIntent = new Intent(getBaseContext(), CommentActivity.class);
+                    commentIntent.putExtra(Article.ARTICLE_ID, id);
+                    commentIntent.putExtra(Article.ARTICLE_SLUG, slug);
+                    commentIntent.putExtra(Article.ARTICLE_TITLE, title);
+                    startActivity(commentIntent);
+                }
+            });
+        }
 
         progress = new ProgressDialog(this);
         progress.setMessage("Loading Article Data");

@@ -108,20 +108,20 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
-        Animation animation = AnimationUtils.loadAnimation(holder.itemView.getContext(), (position > mLastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
+        Animation animation = AnimationUtils.loadAnimation(holder.itemView.getContext(), (holder.getAdapterPosition() > mLastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         holder.itemView.startAnimation(animation);
-        mLastPosition = position;
+        mLastPosition = holder.getAdapterPosition();
 
-        switch (getItemViewType(position)) {
+        switch (getItemViewType(holder.getAdapterPosition())) {
             case VIEW_TYPE_HEADER:
                 final ArticleHeaderViewHolder headerHolder = (ArticleHeaderViewHolder) holder;
-                headerHolder.mItem = mArticles.get(position);
-                headerHolder.mTitleView.setText(mArticles.get(position).getTitle());
-                headerHolder.mDateView.setText(mArticles.get(position).getPublishedAt());
-                headerHolder.mContentView.setText(mArticles.get(position).getContent());
-                headerHolder.mCategoryView.setText(mArticles.get(position).getCategory());
+                headerHolder.mItem = mArticles.get(holder.getAdapterPosition());
+                headerHolder.mTitleView.setText(mArticles.get(holder.getAdapterPosition()).getTitle());
+                headerHolder.mDateView.setText(mArticles.get(holder.getAdapterPosition()).getPublishedAt());
+                headerHolder.mContentView.setText(mArticles.get(holder.getAdapterPosition()).getContent());
+                headerHolder.mCategoryView.setText(mArticles.get(holder.getAdapterPosition()).getCategory());
                 Glide.with(headerHolder.mView.getContext())
-                        .load(mArticles.get(position).getFeatured())
+                        .load(mArticles.get(holder.getAdapterPosition()).getFeatured())
                         .placeholder(R.drawable.placeholder_logo_wide)
                         .crossFade()
                         .into(headerHolder.mFeaturedImage);
@@ -131,11 +131,11 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 break;
             case VIEW_TYPE_ROW:
                 final ArticleRowViewHolder rowHolder = (ArticleRowViewHolder) holder;
-                rowHolder.mItem = mArticles.get(position);
-                rowHolder.mTitleView.setText(mArticles.get(position).getTitle());
-                rowHolder.mDateView.setText(mArticles.get(position).getPublishedAt());
+                rowHolder.mItem = mArticles.get(holder.getAdapterPosition());
+                rowHolder.mTitleView.setText(mArticles.get(holder.getAdapterPosition()).getTitle());
+                rowHolder.mDateView.setText(mArticles.get(holder.getAdapterPosition()).getPublishedAt());
                 Glide.with(rowHolder.mView.getContext())
-                        .load(mArticles.get(position).getFeatured())
+                        .load(mArticles.get(holder.getAdapterPosition()).getFeatured())
                         .placeholder(R.drawable.placeholder_logo)
                         .crossFade()
                         .into(rowHolder.mFeaturedImage);
@@ -145,11 +145,11 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 break;
             case VIEW_TYPE_ROW_EDITABLE:
                 final ArticleEditableViewHolder rowEditableHolder = (ArticleEditableViewHolder) holder;
-                String status = mArticles.get(position).getStatus();
-                rowEditableHolder.mItem = mArticles.get(position);
-                rowEditableHolder.mTitleView.setText(mArticles.get(position).getTitle());
-                rowEditableHolder.mDateView.setText(mArticles.get(position).getPublishedAt());
-                rowEditableHolder.mCategoryView.setText(mArticles.get(position).getCategory());
+                String status = mArticles.get(holder.getAdapterPosition()).getStatus();
+                rowEditableHolder.mItem = mArticles.get(holder.getAdapterPosition());
+                rowEditableHolder.mTitleView.setText(mArticles.get(holder.getAdapterPosition()).getTitle());
+                rowEditableHolder.mDateView.setText(mArticles.get(holder.getAdapterPosition()).getPublishedAt());
+                rowEditableHolder.mCategoryView.setText(mArticles.get(holder.getAdapterPosition()).getCategory());
                 rowEditableHolder.mStatusView.setText(status.toUpperCase());
                 switch(status){
                     case Article.STATUS_PENDING:
