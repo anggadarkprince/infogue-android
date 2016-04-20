@@ -484,7 +484,8 @@ public class ApplicationActivity extends AppCompatActivity implements
                 break;
             case R.id.action_settings:
                 if (session.isLoggedIn()) {
-                    Log.i("INFOGUE/App", "Setting");
+                    Intent settingIntent = new Intent(getBaseContext(), SettingsActivity.class);
+                    startActivity(settingIntent);
                 } else {
                     signOutUser();
                 }
@@ -585,7 +586,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                         sendIntent.setAction(Intent.ACTION_SEND);
                         sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(article.getSlug()));
                         sendIntent.setType("text/plain");
-                        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
+                        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
                     } else if (id == R.id.action_rate) {
                         AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
                     }
@@ -631,7 +632,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                         sendIntent.setAction(Intent.ACTION_SEND);
                         sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(article.getSlug()));
                         sendIntent.setType("text/plain");
-                        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
+                        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
                     }
                     else if (items[item].toString().equals(getString(R.string.action_long_rate))) {
                         AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));

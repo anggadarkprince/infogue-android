@@ -12,6 +12,7 @@
     <string name="title_activity_article_edit">Edit Article</string>
     <string name="title_activity_post">Article Post</string>
     <string name="title_activity_comment">Leave a Comment</string>
+    <string name="title_activity_settings">Settings</string>
 
     <string name="prompt_name">Full Name</string>
     <string name="prompt_email">Email Address</string>
@@ -20,14 +21,25 @@
     <string name="prompt_username">Username</string>
     <string name="prompt_title">Title Article</string>
     <string name="prompt_slug">Article Unique Slug</string>
-    <string name="prompt_tag">Article Tags</string>
+    <string name="prompt_tags">Article Tags</string>
     <string name="prompt_category">Select Category</string>
     <string name="prompt_subcategory">Select Subcategory</string>
     <string name="prompt_content">Write Content Here</string>
     <string name="prompt_excerpt">Optional Excerpt</string>
+    <string name="prompt_new_password">New Password</string>
+    <string name="prompt_confirm_password">Confirm Password</string>
+    <string name="prompt_location">Location</string>
+    <string name="prompt_about">About</string>
+    <string name="prompt_birthday">Birthday</string>
+    <string name="prompt_facebook">Facebook Url</string>
+    <string name="prompt_twitter">Twitter Url</string>
+    <string name="prompt_googleplus">Google+ Url</string>
+    <string name="prompt_instagram">Instagram Url</string>
+    <string name="prompt_contact">Contact or Phone</string>
 
     <string name="error_password_required">Password is required</string>
     <string name="error_password_range">Password must be 6 to 20 characters</string>
+    <string name="error_password_confirmed">New Password must be confirmed</string>
     <string name="error_username_required">Username is required</string>
     <string name="error_username_invalid">Username only contains alpha dash underscore</string>
     <string name="error_username_length">Username may not be greater than 20 characters</string>
@@ -37,6 +49,10 @@
     <string name="error_name_required">Name is required</string>
     <string name="error_name_person">Invalid person name character</string>
     <string name="error_name_length">Name may not be greater than 50 characters</string>
+    <string name="error_location_required">Location is required</string>
+    <string name="error_location_length">Location may not be greater than 30 characters</string>
+    <string name="error_about_required">About is required</string>
+    <string name="error_about_length">About may not be greater than 160 characters</string>
     <string name="error_agreement_checked">You must be agree with terms and conditions</string>
     <string name="error_auth_credential">The credential is invalid</string>
     <string name="error_title_required">Title is required</string>
@@ -50,7 +66,29 @@
     <string name="error_content_required">Content is required</string>
     <string name="error_excerpt_length">Excerpt may not be greater than 300 characters</string>
     <string name="error_status_invalid">Status only has value Published or Draft</string>
-    <string name="error_author_required">Session author is empty, please Login again!</string>
+    <string name="error_session_required">Session is empty, please Login again!</string>
+    <string name="error_birthday_required">Birthday is required</string>
+    <string name="error_birthday_invalid">Birthday is invalid format</string>
+    <string name="error_contact_required">Contact is required</string>
+    <string name="error_contact_length">Contact may not be greater than 30 characters</string>
+    <string name="error_gender_invalid">Gender only has value Male or Female</string>
+    <string name="error_facebook_invalid_url">Facebook is invalid URL format</string>
+    <string name="error_facebook_invalid_domain">Facebook must begin with domain facebook.com</string>
+    <string name="error_facebook_invalid_length">Facebook may not be greater than 30 characters</string>
+    <string name="error_twitter_invalid_url">Twitter is invalid URL format</string>
+    <string name="error_twitter_invalid_domain">Twitter must begin with domain twitter.com</string>
+    <string name="error_twitter_invalid_length">Twitter may not be greater than 30 characters</string>
+    <string name="error_google_plus_invalid_url">Google+ is invalid URL format</string>
+    <string name="error_google_plus_invalid_domain">Google+ must begin with domain plus.google.com</string>
+    <string name="error_google_plus_invalid_length">Google+ may not be greater than 30 characters</string>
+    <string name="error_instagram_invalid_url">Instagram is invalid URL format</string>
+    <string name="error_instagram_invalid_domain">Instagram must begin with domain instagram.com</string>
+    <string name="error_instagram_invalid_length">Instagram may not be greater than 30 characters</string>
+    <string name="error_notification_subscribe_required">Notification Subscribe is required</string>
+    <string name="error_notification_message_required">Notification Message is required</string>
+    <string name="error_notification_follower_required">Notification Stream is required</string>
+    <string name="error_notification_stream_required">Notification Stream is required</string>
+    <string name="error_push_notification_required">Push Notification is required</string>
 
     <string name="label_sign_in">SIGN IN</string>
     <string name="label_get_started">GET STARTED</string>
@@ -59,6 +97,41 @@
     <string name="label_forgot_password">Forgot Password?</string>
     <string name="label_login_social">Login with Social</string>
     <string name="label_sign_navigation">Sign in to contribute article</string>
+    <string name="label_articles">Articles</string>
+    <string name="label_followers">Followers</string>
+    <string name="label_following">Following</string>
+    <string name="label_title_basic_info">BASIC INFO</string>
+    <string name="label_title_featured">FEATURED</string>
+    <string name="label_title_seo">SEARCH ENGINE OPTIMIZATION</string>
+    <string name="label_title_content">CONTENT</string>
+    <string name="label_title_social_network">SOCIAL NETWORK</string>
+    <string name="label_title_subscription">SUBSCRIPTION</string>
+    <string name="label_title_mobile">MOBILE</string>
+    <string name="label_title_account">USER ACCOUNT</string>
+    <string name="label_intent_share">Share infogue.id to</string>
+    <string name="label_intent_search">Find article or contributor</string>
+    <string name="label_intent_media_avatar">Select Avatar</string>
+    <string name="label_intent_media_cover">Select Cover</string>
+    <string name="label_input_image_featured">Image Featured</string>
+    <string name="label_input_tags">Article Tags</string>
+    <string name="label_input_article">Article Content</string>
+    <string name="label_input_status">Article Status</string>
+    <string name="label_input_gender">Gender</string>
+    <string name="label_radio_published">Published</string>
+    <string name="label_radio_draft">Draft</string>
+    <string name="label_dialog_discard_article">Discard Article</string>
+    <string name="label_dialog_save_article">Save Article</string>
+    <string name="label_dialog_discard_setting">Discard Settings</string>
+    <string name="label_dialog_save_setting">Save Settings</string>
+    <string name="label_radio_male">Male</string>
+    <string name="label_radio_female">Female</string>
+    <string name="label_checkbox_subscribe">Subscribe new articles</string>
+    <string name="label_checkbox_message">Email me when I got a message</string>
+    <string name="label_checkbox_follow">Email me when people follow me</string>
+    <string name="label_checkbox_stream">Email me when I got new stream</string>
+    <string name="label_switch_push_notification">Enable Push Notification</string>
+    <string name="label_save_setting_progress">Saving Settings</string>
+    <string name="label_save_article_progress">Saving Article</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -101,6 +174,11 @@
     <string name="action_select_image">SELECT IMAGE</string>
     <string name="action_create_article">CREATE ARTICLE</string>
     <string name="action_update_article">UPDATE ARTICLE</string>
+    <string name="action_save_publish"><![CDATA[Save & Publish]]></string>
+    <string name="action_save_draft"><![CDATA[Save & Set as Draft]]></string>
+    <string name="action_save_setting">Save Settings</string>
+    <string name="action_change">CHANGE</string>
+    <string name="action_change_cover">CHANGE COVER</string>
 
     <string name="action_long_rate">Give 5 Stars</string>
     <string name="action_long_share">Share Article</string>
@@ -120,22 +198,6 @@
     <string name="about_contact_title">Developer Contact</string>
     <string name="about_contact_content">Mobile (+62) 85655479868\nEmail sketchprojectstudio@gmail.com\nJawa 6 No 5 Jember, East Java - Indonesia</string>
     <string name="about_social">Follow our social account</string>
-
-    <string name="label_articles">Articles</string>
-    <string name="label_followers">Followers</string>
-    <string name="label_following">Following</string>
-    <string name="label_send_to">Share infogue.id to</string>
-    <string name="label_search_hint">Find article or contributor</string>
-    <string name="label_basic_info">BASIC INFO</string>
-    <string name="label_featured">FEATURED</string>
-    <string name="label_image_featured">Image Featured</string>
-    <string name="label_seo">SEARCH ENGINE OPTIMIZATION</string>
-    <string name="label_tags">Article Tags</string>
-    <string name="label_content">CONTENT</string>
-    <string name="label_article">Article Content</string>
-    <string name="label_status">Article Status</string>
-    <string name="label_published">Published</string>
-    <string name="label_draft">Draft</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_random">Random</string>
@@ -162,6 +224,13 @@
     <string name="placeholder_statistic">0</string>
     <string name="placeholder_name">Anonymous</string>
     <string name="placeholder_location">No Location</string>
+    <string name="placeholder_phone">+62 000555</string>
+    <string name="placeholder_email">user@infogue.com</string>
+    <string name="placeholder_username">infogue_user</string>
+    <string name="placeholder_instagram">instagram.com/infogue</string>
+    <string name="placeholder_googleplus">plus.google.com/+infogue</string>
+    <string name="placeholder_twitter">twitter.com/infogue</string>
+    <string name="placeholder_facebook">facebook.com/infogue</string>
     <string name="large_text">
         <![CDATA[
 
@@ -275,10 +344,18 @@
     <string name="message_internet_established">Connection Established.</string>
     <string name="message_delete_confirm">Are you sure delete</string>
     <string name="message_discard_article">Do you want to discard this article?</string>
-    <string name="label_discard_article">Discard Article</string>
-    <string name="action_save_publish"><![CDATA[Save & Publish]]></string>
-    <string name="action_save_draft"><![CDATA[Save & Set as Draft]]></string>
-    <string name="label_save_article">Save Article</string>
     <string name="message_save_article">Save and waiting for editor confirmation?</string>
+    <string name="message_discard_setting">Are you sure want to discard current settings?</string>
+    <string name="message_save_setting">Save current account info and settings?</string>
+    <string name="message_try_again">Please try again!</string>
+    <string name="message_account_updated">Account successfully updated</string>
+    <string name="message_validation_warning">Oops, check your inputs!</string>
+
+    <string name="hint_location">Eg. Jakarta, Indonesia</string>
+    <string name="hint_description">Hint. Tell people what is your interest</string>
+    <string name="hint_instagram">Eg. instagram.com/infogue</string>
+    <string name="hint_googleplus">Eg. plus.google.com/+infogue</string>
+    <string name="hint_twitter">Eg. twitter.com/infogue</string>
+    <string name="hint_facebook">Eg. facebook.com/infogue</string>
 
 </resources>

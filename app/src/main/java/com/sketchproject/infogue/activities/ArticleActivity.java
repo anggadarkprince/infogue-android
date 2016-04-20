@@ -215,7 +215,7 @@ public class ArticleActivity extends AppCompatActivity implements
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(article.getSlug()));
         sendIntent.setType("text/plain");
-        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
+        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
     }
 
     private void rateArticle(Article article) {

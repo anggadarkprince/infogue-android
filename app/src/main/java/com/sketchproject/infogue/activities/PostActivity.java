@@ -171,7 +171,7 @@ public class PostActivity extends AppCompatActivity {
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(slug));
             sendIntent.setType("text/plain");
-            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
+            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
         } else if (id == R.id.action_refresh) {
             Snackbar snackbar = Snackbar.make(mArticleContent, "Refreshing article data...", Snackbar.LENGTH_LONG);
             snackbar.setActionTextColor(getResources().getColor(R.color.light));

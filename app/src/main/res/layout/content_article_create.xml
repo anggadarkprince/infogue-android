@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:alpha="0.5"
-                    android:text="@string/label_basic_info"
+                    android:text="@string/label_title_basic_info"
                     android:textColor="@color/gray" />
 
                 <android.support.design.widget.TextInputLayout
@@ -105,7 +105,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
                     android:alpha="0.5"
-                    android:text="@string/label_featured"
+                    android:text="@string/label_title_featured"
                     android:textColor="@color/gray" />
 
                 <RelativeLayout
@@ -132,7 +132,7 @@
                         android:paddingRight="10dp"
                         android:paddingStart="10dp"
                         android:layout_below="@id/featured_image"
-                        android:text="@string/label_image_featured"
+                        android:text="@string/label_input_image_featured"
                         android:textColor="@color/primary"
                         android:textSize="13sp" />
 
@@ -168,7 +168,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:alpha="0.5"
-                    android:text="@string/label_seo"
+                    android:text="@string/label_title_seo"
                     android:textColor="@color/gray" />
 
                 <TextView
@@ -179,7 +179,7 @@
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:paddingStart="10dp"
-                    android:text="@string/label_tags"
+                    android:text="@string/label_input_tags"
                     android:textColor="@color/primary"
                     android:textSize="13sp" />
 
@@ -227,7 +227,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:alpha="0.5"
-                    android:text="@string/label_content"
+                    android:text="@string/label_title_content"
                     android:textColor="@color/gray" />
 
                 <TextView
@@ -238,7 +238,7 @@
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:paddingStart="10dp"
-                    android:text="@string/label_article"
+                    android:text="@string/label_input_article"
                     android:textColor="@color/primary"
                     android:textSize="13sp" />
 
@@ -276,7 +276,7 @@
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:paddingStart="10dp"
-                    android:text="@string/label_status"
+                    android:text="@string/label_input_status"
                     android:textColor="@color/primary"
                     android:textSize="13sp" />
 
@@ -297,14 +297,14 @@
                         android:layout_marginEnd="20dp"
                         android:layout_marginRight="20dp"
                         android:checked="true"
-                        android:text="@string/label_published" />
+                        android:text="@string/label_radio_published" />
 
                     <RadioButton
                         android:id="@+id/radio_draft"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:text="@string/label_draft" />
+                        android:text="@string/label_radio_draft" />
 
                 </RadioGroup>
 

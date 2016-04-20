@@ -211,7 +211,7 @@ public class FollowerActivity extends AppCompatActivity implements
                             sendIntent.setAction(Intent.ACTION_SEND);
                             sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareContributorText(contributor.getUsername()));
                             sendIntent.setType("text/plain");
-                            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
+                            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
                         }
                     } else {
                         onLostConnectionNotified(getBaseContext());
@@ -235,7 +235,7 @@ public class FollowerActivity extends AppCompatActivity implements
                             sendIntent.setAction(Intent.ACTION_SEND);
                             sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareContributorText(contributor.getUsername()));
                             sendIntent.setType("text/plain");
-                            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_send_to)));
+                            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
                         } else if (selectedItem.equals(getString(R.string.action_long_follow))) {
                             ((ImageButton) followControl).setImageResource(R.drawable.btn_unfollow);
                             contributor.setIsFollowing(true);

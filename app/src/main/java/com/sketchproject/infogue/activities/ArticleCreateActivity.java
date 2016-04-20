@@ -358,7 +358,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
         alert = (AlertFragment) getSupportFragmentManager().findFragmentById(R.id.alert_fragment);
         progress = new ProgressDialog(this);
-        progress.setMessage("Saving Article Data");
+        progress.setMessage(getString(R.string.label_save_article_progress));
         progress.setIndeterminate(true);
     }
 
@@ -428,7 +428,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         }
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
-        builder.setTitle(R.string.label_save_article);
+        builder.setTitle(R.string.label_dialog_save_article);
         builder.setMessage(R.string.message_save_article);
         builder.setPositiveButton(action, new DialogInterface.OnClickListener() {
             @Override
@@ -451,7 +451,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
     protected void discardConfirmation() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.label_discard_article));
+        builder.setTitle(getString(R.string.label_dialog_discard_article));
         builder.setMessage(getString(R.string.message_discard_article));
         builder.setPositiveButton(R.string.action_yes, new DialogInterface.OnClickListener() {
             @Override
@@ -506,11 +506,11 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         article.setExcerpt(mExcerptInput.getText().toString());
         article.setStatus(mPublishedRadio.isChecked() ? Article.STATUS_PUBLISHED.toLowerCase() : mDraftRadio.isChecked() ? Article.STATUS_DRAFT.toLowerCase() : "Invalid Selected");
         article.setAuthorId(session.getSessionData(SessionManager.KEY_ID, 0));
-        validationMessage = new ArrayList<>();
     }
 
     @Override
     public boolean onValidateView() {
+        validationMessage = new ArrayList<>();
         boolean isInvalid = false;
         View focusView = null;
 
@@ -605,7 +605,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         // validation of author
         boolean isAuthorEmpty = validator.isEmpty(article.getAuthorId());
         if (isAuthorEmpty) {
-            validationMessage.add(getString(R.string.error_author_required));
+            validationMessage.add(getString(R.string.error_session_required));
             isInvalid = true;
         }
 
@@ -658,7 +658,12 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 }
             }, 2000);
         } else {
-            connectionDetector.snackbarDisconnectNotification(mSelectButton, null);
+            connectionDetector.snackbarDisconnectNotification(mSelectButton, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    connectionDetector.dismissNotification();
+                }
+            });
         }
     }
 
