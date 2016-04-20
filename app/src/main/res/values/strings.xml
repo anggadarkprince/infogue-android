@@ -353,5 +353,8 @@
     <string name="hint_googleplus">Eg. https://plus.google.com/+infogue</string>
     <string name="hint_twitter">Eg. https://twitter.com/infogue</string>
     <string name="hint_facebook">Eg. https://facebook.com/infogue</string>
+    <string name="action_view_all">VIEW ALL</string>
+    <string name="label_separator_articles">ARTICLES</string>
+    <string name="label_separator_contributors">CONTRIBUTORS</string>
 
 </resources>

@@ -33,6 +33,7 @@ public class FollowerActivity extends AppCompatActivity implements
         ConnectionDetector.OnConnectionEstablished {
 
     public static final String SCREEN_REQUEST = "FollowerScreen";
+    public static final String CONTRIBUTOR_SCREEN = "Contributors";
     public static final String FOLLOWER_SCREEN = "Followers";
     public static final String FOLLOWING_SCREEN = "Following";
 
@@ -56,13 +57,19 @@ public class FollowerActivity extends AppCompatActivity implements
             String activityTitle = extras.getString(SCREEN_REQUEST);
             int id = extras.getInt(SessionManager.KEY_ID);
             String username = extras.getString(SessionManager.KEY_USERNAME);
+            String query = extras.getString(SearchActivity.QUERY_STRING);
 
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                getSupportActionBar().setTitle(activityTitle);
+                if(query != null){
+                    getSupportActionBar().setTitle("All result for "+query);
+                }
+                else{
+                    getSupportActionBar().setTitle(activityTitle);
+                }
             }
 
-            Fragment fragment = FollowerFragment.newInstance(1, id, username, activityTitle);
+            Fragment fragment = FollowerFragment.newInstance(1, id, username, activityTitle, query);
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.fragment, fragment);

@@ -33,10 +33,14 @@ public class DummyArticleContent {
     }
 
     public static List<Article> generateDummy(int offset) {
-        List<Article> items = new ArrayList<>();
-        int index = offset * COUNT;
+        return generateDummy(offset, COUNT);
+    }
 
-        for (int i = index; i < (index + COUNT); i++) {
+    public static List<Article> generateDummy(int offset, int total) {
+        List<Article> items = new ArrayList<>();
+        int index = offset * total;
+
+        for (int i = index; i < (index + total); i++) {
             items.add(createDummyItem(i));
         }
 

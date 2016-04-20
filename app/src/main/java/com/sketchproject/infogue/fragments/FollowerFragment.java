@@ -36,12 +36,14 @@ public class FollowerFragment extends Fragment {
     private static final String ARG_RELATED_ID = "contributor-id";
     private static final String ARG_RELATED_USERNAME = "contributor-username";
     private static final String ARG_TYPE = "screen-type";
+    private static final String ARG_QUERY = "search-query";
 
     private int mColumnCount = 1;
     private int mLoggedId;
     private int mId;
     private String mUsername;
     private String mType;
+    private String mQuery;
     private boolean isFirstCall = true;
     private boolean isEndOfPage = false;
     private boolean isEmptyPage = false;
@@ -67,13 +69,14 @@ public class FollowerFragment extends Fragment {
         return fragment;
     }
 
-    public static FollowerFragment newInstance(int columnCount, int id, String username, String type) {
+    public static FollowerFragment newInstance(int columnCount, int id, String username, String type, String query) {
         FollowerFragment fragment = new FollowerFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putInt(ARG_RELATED_ID, id);
         args.putString(ARG_RELATED_USERNAME, username);
         args.putString(ARG_TYPE, type);
+        args.putString(ARG_QUERY, query);
         fragment.setArguments(args);
         return fragment;
     }
@@ -89,6 +92,7 @@ public class FollowerFragment extends Fragment {
             mId =  getArguments().getInt(ARG_RELATED_ID);
             mUsername =  getArguments().getString(ARG_RELATED_USERNAME);
             mType = getArguments().getString(ARG_TYPE);
+            mQuery = getArguments().getString(ARG_QUERY);
         }
 
         double random = Math.random();

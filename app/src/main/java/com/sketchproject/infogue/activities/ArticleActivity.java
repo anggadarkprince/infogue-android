@@ -90,8 +90,15 @@ public class ArticleActivity extends AppCompatActivity implements
         if (extras != null) {
             authorId = extras.getInt(SessionManager.KEY_ID);
             authorUsername = extras.getString(SessionManager.KEY_USERNAME);
+            String query = extras.getString(SearchActivity.QUERY_STRING);
 
-            // this extras is sent from Article form activity
+            if (getSupportActionBar() != null) {
+                if(query != null){
+                    getSupportActionBar().setTitle("All result for "+query);
+                }
+            }
+
+            // this extras is sent from Article create/edit form activity
             boolean saveResult = extras.getBoolean(ArticleActivity.SAVE_ARTICLE);
             boolean isCalledFromMain = extras.getBoolean(ArticleCreateActivity.CALLED_FROM_MAIN);
             int resultCode = extras.getInt(ArticleCreateActivity.RESULT_CODE);
@@ -110,7 +117,7 @@ public class ArticleActivity extends AppCompatActivity implements
                 }
             }
 
-            Fragment fragment = ArticleFragment.newInstanceAuthor(1, authorId, isMyArticle);
+            Fragment fragment = ArticleFragment.newInstanceAuthor(1, authorId, isMyArticle, query);
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.fragment, fragment);

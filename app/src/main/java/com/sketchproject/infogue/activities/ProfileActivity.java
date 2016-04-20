@@ -231,7 +231,12 @@ public class ProfileActivity extends AppCompatActivity implements
                 mFollowButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        toggleFollowHandler(mFollowButton);
+                        if (session.isLoggedIn()) {
+                            toggleFollowHandler(mFollowButton);
+                        } else {
+                            Intent authIntent = new Intent(getBaseContext(), AuthenticationActivity.class);
+                            startActivity(authIntent);
+                        }
                     }
                 });
             }

@@ -38,6 +38,7 @@ public class ArticleFragment extends Fragment {
     private static final String ARG_FEATURED = "featured";
     private static final String ARG_AUTHOR_ID = "author-id";
     private static final String ARG_AUTHOR_IS_ME = "author-is-me";
+    private static final String ARG_QUERY = "search-query";
 
     public static final String FEATURED_LATEST = "latest";
     public static final String FEATURED_POPULAR = "popular";
@@ -81,21 +82,20 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
-    @SuppressWarnings("unused")
-    public static ArticleFragment newInstanceAuthor(int columnCount, int id, boolean isMyArticle) {
+    public static ArticleFragment newInstanceAuthor(int columnCount, int id, boolean isMyArticle, String query) {
         ArticleFragment fragment = new ArticleFragment();
 
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putInt(ARG_AUTHOR_ID, id);
         args.putBoolean(ARG_AUTHOR_IS_ME, isMyArticle);
+        args.putString(ARG_QUERY, query);
 
         fragment.setArguments(args);
 
         return fragment;
     }
 
-    @SuppressWarnings("unused")
     public static ArticleFragment newInstanceFeatured(int columnCount, String featured) {
         ArticleFragment fragment = new ArticleFragment();
 
@@ -108,7 +108,6 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
-    @SuppressWarnings("unused")
     public static ArticleFragment newInstanceCategory(int columnCount, int categoryId, String category) {
         ArticleFragment fragment = new ArticleFragment();
 

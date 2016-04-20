@@ -33,10 +33,14 @@ public class DummyFollowerContent {
     }
 
     public static List<Contributor> generateDummy(int offset) {
-        List<Contributor> items = new ArrayList<>();
-        int index = offset * COUNT;
+        return generateDummy(offset, COUNT);
+    }
 
-        for (int i = index; i < (index + COUNT); i++) {
+    public static List<Contributor> generateDummy(int offset, int total) {
+        List<Contributor> items = new ArrayList<>();
+        int index = offset * total;
+
+        for (int i = index; i < (index + total); i++) {
             items.add(createDummyItem(i));
         }
 
