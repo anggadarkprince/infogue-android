@@ -1,5 +1,7 @@
 package com.sketchproject.infogue.modules;
 
+import android.util.Log;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -58,11 +60,12 @@ public class Validator {
 
     public boolean isValidDate(String date) {
         try {
-            DateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+            DateFormat df = new SimpleDateFormat("yyyy-mm-dd", Locale.getDefault());
             df.setLenient(false);
             df.parse(date);
             return true;
         } catch (ParseException e) {
+            Log.e("Parse Date Exception", e.getMessage());
             return false;
         }
     }

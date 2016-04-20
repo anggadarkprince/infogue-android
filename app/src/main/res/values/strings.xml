@@ -40,6 +40,7 @@
     <string name="error_password_required">Password is required</string>
     <string name="error_password_range">Password must be 6 to 20 characters</string>
     <string name="error_password_confirmed">New Password must be confirmed</string>
+    <string name="error_password_current">Current Password needed to save</string>
     <string name="error_username_required">Username is required</string>
     <string name="error_username_invalid">Username only contains alpha dash underscore</string>
     <string name="error_username_length">Username may not be greater than 20 characters</string>
@@ -84,11 +85,6 @@
     <string name="error_instagram_invalid_url">Instagram is invalid URL format</string>
     <string name="error_instagram_invalid_domain">Instagram must begin with domain instagram.com</string>
     <string name="error_instagram_invalid_length">Instagram may not be greater than 30 characters</string>
-    <string name="error_notification_subscribe_required">Notification Subscribe is required</string>
-    <string name="error_notification_message_required">Notification Message is required</string>
-    <string name="error_notification_follower_required">Notification Stream is required</string>
-    <string name="error_notification_stream_required">Notification Stream is required</string>
-    <string name="error_push_notification_required">Push Notification is required</string>
 
     <string name="label_sign_in">SIGN IN</string>
     <string name="label_get_started">GET STARTED</string>
@@ -227,10 +223,10 @@
     <string name="placeholder_phone">+62 000555</string>
     <string name="placeholder_email">user@infogue.com</string>
     <string name="placeholder_username">infogue_user</string>
-    <string name="placeholder_instagram">instagram.com/infogue</string>
-    <string name="placeholder_googleplus">plus.google.com/+infogue</string>
-    <string name="placeholder_twitter">twitter.com/infogue</string>
-    <string name="placeholder_facebook">facebook.com/infogue</string>
+    <string name="placeholder_instagram">http://instagram.com/infogue</string>
+    <string name="placeholder_googleplus">http://plus.google.com/+infogue</string>
+    <string name="placeholder_twitter">http://twitter.com/infogue</string>
+    <string name="placeholder_facebook">http://facebook.com/infogue</string>
     <string name="large_text">
         <![CDATA[
 
@@ -353,9 +349,9 @@
 
     <string name="hint_location">Eg. Jakarta, Indonesia</string>
     <string name="hint_description">Hint. Tell people what is your interest</string>
-    <string name="hint_instagram">Eg. instagram.com/infogue</string>
-    <string name="hint_googleplus">Eg. plus.google.com/+infogue</string>
-    <string name="hint_twitter">Eg. twitter.com/infogue</string>
-    <string name="hint_facebook">Eg. facebook.com/infogue</string>
+    <string name="hint_instagram">Eg. https://instagram.com/infogue</string>
+    <string name="hint_googleplus">Eg. https://plus.google.com/+infogue</string>
+    <string name="hint_twitter">Eg. https://twitter.com/infogue</string>
+    <string name="hint_facebook">Eg. https://facebook.com/infogue</string>
 
 </resources>
