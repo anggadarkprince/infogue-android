@@ -38,6 +38,7 @@ public class FollowerActivity extends AppCompatActivity implements
     public static final String FOLLOWING_SCREEN = "Following";
 
     private ConnectionDetector connectionDetector;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private View mControlButton;
     private Contributor mContributor;
 
@@ -76,8 +77,9 @@ public class FollowerActivity extends AppCompatActivity implements
             fragmentTransaction.commit();
         }
 
-        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
         if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setEnabled(true);
             swipeRefreshLayout.setColorSchemeResources(R.color.color_hazard, R.color.color_info, R.color.color_warning);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
@@ -87,6 +89,10 @@ public class FollowerActivity extends AppCompatActivity implements
                 }
             });
         }
+    }
+
+    public void setSwipeEnable(boolean state){
+        swipeRefreshLayout.setEnabled(state);
     }
 
     @Override

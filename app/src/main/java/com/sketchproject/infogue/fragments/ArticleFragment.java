@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.activities.ApplicationActivity;
+import com.sketchproject.infogue.activities.ArticleActivity;
 import com.sketchproject.infogue.adapters.ArticleRecyclerViewAdapter;
 import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
 import com.sketchproject.infogue.models.Article;
@@ -198,6 +200,16 @@ public class ArticleFragment extends Fragment {
                 public void onLoadMore(final int page, int totalItemsCount) {
                     if (!isFirstCall) {
                         loadArticles(page);
+                    }
+                }
+
+                @Override
+                public void onFirstSight(boolean isFirst) {
+                    if(getActivity() instanceof  ArticleActivity){
+                        ((ArticleActivity) getActivity()).setSwipeEnable(isFirst);
+                    }
+                    else if(getActivity() instanceof ApplicationActivity){
+                        ((ApplicationActivity) getActivity()).setSwipeEnable(isFirst);
                     }
                 }
             });

@@ -76,6 +76,7 @@ public class ArticleActivity extends AppCompatActivity implements
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
         if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setEnabled(true);
             swipeRefreshLayout.setColorSchemeResources(R.color.color_hazard, R.color.color_info, R.color.color_warning);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
@@ -123,6 +124,10 @@ public class ArticleActivity extends AppCompatActivity implements
             fragmentTransaction.replace(R.id.fragment, fragment);
             fragmentTransaction.commit();
         }
+    }
+
+    public void setSwipeEnable(boolean state){
+        swipeRefreshLayout.setEnabled(state);
     }
 
     @Override

@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.activities.FollowerActivity;
 import com.sketchproject.infogue.adapters.FollowerRecyclerViewAdapter;
 import com.sketchproject.infogue.fragments.dummy.DummyFollowerContent;
 import com.sketchproject.infogue.models.Contributor;
@@ -126,6 +127,11 @@ public class FollowerFragment extends Fragment {
                     if (!isFirstCall) {
                         loadFollowers(page);
                     }
+                }
+
+                @Override
+                public void onFirstSight(boolean isFirst) {
+                    ((FollowerActivity) getActivity()).setSwipeEnable(isFirst);
                 }
             });
 

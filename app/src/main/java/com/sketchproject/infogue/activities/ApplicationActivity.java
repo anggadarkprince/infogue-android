@@ -59,6 +59,7 @@ public class ApplicationActivity extends AppCompatActivity implements
         ConnectionDetector.OnConnectionEstablished {
 
     private NavigationView navigationView;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private SessionManager session;
     private ConnectionDetector connectionDetector;
     private AlertDialog dialogExit;
@@ -109,8 +110,9 @@ public class ApplicationActivity extends AppCompatActivity implements
             session.setSessionData(SessionManager.KEY_USER_LEARNED, true);
         }
 
-        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
         if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setEnabled(true);
             swipeRefreshLayout.setColorSchemeResources(R.color.color_hazard, R.color.color_info, R.color.color_warning);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
@@ -127,6 +129,10 @@ public class ApplicationActivity extends AppCompatActivity implements
                 }
             });
         }
+    }
+
+    public void setSwipeEnable(boolean state){
+        swipeRefreshLayout.setEnabled(state);
     }
 
     /**
