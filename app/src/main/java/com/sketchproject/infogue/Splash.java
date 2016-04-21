@@ -23,7 +23,7 @@ public class Splash extends Activity {
             public void run() {
                 SessionManager sessionManager = new SessionManager(getBaseContext());
                 boolean openFirstTime = !sessionManager.getSessionData(SessionManager.KEY_USER_LEARNED, false);
-                if (!openFirstTime) {
+                if (openFirstTime) {
                     Intent featuredIntent = new Intent(getBaseContext(), FeaturedActivity.class);
                     startActivity(featuredIntent);
                 } else {

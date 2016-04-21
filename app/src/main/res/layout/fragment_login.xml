@@ -54,7 +54,7 @@
 
                     <ImageButton
                         android:id="@+id/btn_facebook"
-                        style="?android:borderlessButtonStyle"
+                        style="?borderlessButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="5dp"
@@ -62,12 +62,12 @@
                         android:layout_weight="1"
                         android:background="@color/transparent"
                         android:contentDescription="@string/facebook_content_description"
-                        android:scaleType="fitEnd"
+                        android:scaleType="fitCenter"
                         android:src="@drawable/btn_facebook" />
 
                     <ImageButton
                         android:id="@+id/btn_twitter"
-                        style="?android:borderlessButtonStyle"
+                        style="?borderlessButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
@@ -75,16 +75,16 @@
                         android:layout_weight="1"
                         android:background="@color/transparent"
                         android:contentDescription="@string/twitter_content_description"
-                        android:scaleType="fitStart"
+                        android:scaleType="fitCenter"
                         android:src="@drawable/btn_twitter" />
                 </LinearLayout>
 
                 <fragment
                     android:id="@+id/alert_fragment"
+                    android:name="com.sketchproject.infogue.fragments.AlertFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:name="com.sketchproject.infogue.fragments.AlertFragment"
                     tools:layout="@layout/fragment_alert" />
 
                 <android.support.design.widget.TextInputLayout

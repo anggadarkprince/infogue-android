@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="180dp"
+        android:layout_marginBottom="200dp"
         android:src="@drawable/img_featured_1"
         tools:ignore="ContentDescription" />
 
