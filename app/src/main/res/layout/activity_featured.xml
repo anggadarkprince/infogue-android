@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primary"
-    android:fitsSystemWindows="true"
     tools:context=".activities.FeaturedActivity">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:layout_height="match_parent" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -38,7 +33,7 @@
             android:layout_alignParentBottom="true"
             android:background="@color/white_overlay"
             android:orientation="horizontal"
-            android:paddingBottom="30dp"
+            android:paddingBottom="@dimen/padding_featured_translucent"
             android:paddingLeft="@dimen/fab_margin"
             android:paddingRight="@dimen/fab_margin"
             android:paddingTop="30dp">
@@ -74,7 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@id/featured_footer"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="25dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -106,4 +101,4 @@
 
     </RelativeLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>

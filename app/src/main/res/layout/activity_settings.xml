@@ -207,7 +207,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/prompt_contact"
-                        android:inputType="textPhonetic"
+                        android:inputType="phone"
                         android:paddingEnd="10dp"
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
@@ -272,7 +272,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:paddingStart="10dp"
-                        android:singleLine="true" />
+                        android:focusable="false"/>
 
                 </android.support.design.widget.TextInputLayout>
 

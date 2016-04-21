@@ -3,7 +3,7 @@
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
             <corners android:radius="3dip" />
-            <solid android:color="?colorControlHighlight" />
+            <solid android:color="@color/accent" />
         </shape>
     </item>
     <item>

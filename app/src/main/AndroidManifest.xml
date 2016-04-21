@@ -75,13 +75,11 @@
             android:name=".activities.ProfileActivity"
             android:label="@string/title_activity_profile"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activities.SearchActivity"
-            android:label="@string/title_activity_search">
+            android:label="@string/title_activity_search"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -94,9 +92,6 @@
             android:name=".activities.FollowerActivity"
             android:label="@string/title_activity_follower"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activities.ArticleActivity"
@@ -121,12 +116,7 @@
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".activities.ApplicationActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.sketchproject.infogue.activities.ApplicationActivity" />
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

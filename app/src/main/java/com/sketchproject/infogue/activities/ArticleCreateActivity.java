@@ -92,7 +92,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_article_create);
+        setContentView(R.layout.activity_article_form);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -624,6 +624,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         } else {
             mScrollView.smoothScrollTo(0, 0);
             alert.setAlertType(AlertFragment.ALERT_WARNING);
+            alert.setAlertTitle(getString(R.string.message_validation_warning));
             alert.setAlertMessage(validationMessage);
             alert.show();
         }

@@ -125,7 +125,7 @@ public class PostActivity extends AppCompatActivity {
         mArticleWrapper.setVisibility(View.GONE);
         Glide.with(getBaseContext())
                 .load(extras.getString(Article.ARTICLE_FEATURED))
-                .placeholder(R.drawable.placeholder_logo)
+                .placeholder(R.drawable.placeholder_rectangle)
                 .centerCrop()
                 .crossFade()
                 .into(mArticleFeatured);

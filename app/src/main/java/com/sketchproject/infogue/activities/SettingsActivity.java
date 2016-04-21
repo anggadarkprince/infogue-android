@@ -1,5 +1,6 @@
 package com.sketchproject.infogue.activities;
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -38,6 +40,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -116,7 +119,6 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         mLocationInput = (EditText) findViewById(R.id.input_location);
         mAboutInput = (EditText) findViewById(R.id.input_about);
         mContact = (EditText) findViewById(R.id.input_contact);
-        mBirthdayInput = (EditText) findViewById(R.id.input_birthday);
         mGenderMaleRadio = (RadioButton) findViewById(R.id.radio_male);
         mGenderFemaleRadio = (RadioButton) findViewById(R.id.radio_female);
         mFacebookInput = (EditText) findViewById(R.id.input_facebook);
@@ -133,6 +135,22 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         mPasswordInput = (EditText) findViewById(R.id.input_password);
         mNewPasswordInput = (EditText) findViewById(R.id.input_new_password);
         mConfirmPasswordInput = (EditText) findViewById(R.id.input_confirm_password);
+        mBirthdayInput = (EditText) findViewById(R.id.input_birthday);
+        mBirthdayInput.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectDate();
+            }
+        });
+        mBirthdayInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    selectDate();
+                }
+            }
+        });
+
         Button mChangeAvatarButton = (Button) findViewById(R.id.btn_change_avatar);
         if (mChangeAvatarButton != null) {
             mChangeAvatarButton.setOnClickListener(new View.OnClickListener() {
@@ -222,8 +240,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
 
         if (id == android.R.id.home) {
             discardConfirmation();
-        }
-        else if (id == R.id.action_save) {
+        } else if (id == R.id.action_save) {
             preValidation();
             postValidation(onValidateView());
         }
@@ -335,7 +352,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         // validation of birthday
         boolean isBirthdayEmpty = validator.isEmpty(contributor.getBirthday());
         boolean isBirthdayValid = false;
-        if(!isBirthdayEmpty){
+        if (!isBirthdayEmpty) {
             isBirthdayValid = validator.isValidDate(new SimpleDateFormat("yyyy-mm-dd", Locale.getDefault()).format(contributor.getBirthday()));
         }
         if (isBirthdayEmpty || !isBirthdayValid) {
@@ -364,7 +381,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         // validation of facebook
         if (!validator.isEmpty(contributor.getFacebook(), true)) {
             boolean isFacebookValidUrl = validator.isValidUrl(contributor.getFacebook());
-            boolean isFacebookValidDomain = true; //validator.isValid(contributor.getFacebook(), "^(facebook.com)$");
+            boolean isFacebookValidDomain = contributor.getFacebook().contains("facebook.com");
             boolean isFacebookValidLength = validator.maxLength(contributor.getFacebook(), 100);
             if (!isFacebookValidUrl || !isFacebookValidDomain || !isFacebookValidLength) {
                 if (!isFacebookValidUrl) {
@@ -382,7 +399,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         // validation of twitter
         if (!validator.isEmpty(contributor.getTwitter(), true)) {
             boolean isTwitterValidUrl = validator.isValidUrl(contributor.getTwitter());
-            boolean isTwitterValidDomain = true; //validator.isValid(contributor.getTwitter(), "[-a-zA-Z0-9+&@#/%=~_|]+(twitter.com)+[-a-zA-Z0-9+&@#/%=~_|]");
+            boolean isTwitterValidDomain = contributor.getTwitter().contains("twitter.com");
             boolean isTwitterValidLength = validator.maxLength(contributor.getTwitter(), 100);
             if (!isTwitterValidUrl || !isTwitterValidDomain || !isTwitterValidLength) {
                 if (!isTwitterValidUrl) {
@@ -400,7 +417,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         // validation of google
         if (!validator.isEmpty(contributor.getGooglePlus(), true)) {
             boolean isGooglePlusValidUrl = validator.isValidUrl(contributor.getGooglePlus());
-            boolean isGooglePlusValidDomain = true; //validator.isValid(contributor.getGooglePlus(), "[-a-zA-Z0-9+&@#/%=~_|]+(plus.google.com)+[-a-zA-Z0-9+&@#/%=~_|]");
+            boolean isGooglePlusValidDomain = contributor.getGooglePlus().contains("plus.google.com");
             boolean isGooglePlusValidLength = validator.maxLength(contributor.getGooglePlus(), 100);
             if (!isGooglePlusValidUrl || !isGooglePlusValidDomain || !isGooglePlusValidLength) {
                 if (!isGooglePlusValidUrl) {
@@ -418,7 +435,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         // validation of instagram
         if (!validator.isEmpty(contributor.getInstagram(), true)) {
             boolean isInstagramValidUrl = validator.isValidUrl(contributor.getInstagram());
-            boolean isInstagramValidDomain = true; //validator.isValid(contributor.getInstagram(), "[-a-zA-Z0-9+&@#/%=~_|]+(instagram.com)+[-a-zA-Z0-9+&@#/%=~_|]");
+            boolean isInstagramValidDomain = contributor.getInstagram().contains("instagram.com");
             boolean isInstagramValidLength = validator.maxLength(contributor.getInstagram(), 100);
             if (!isInstagramValidUrl || !isInstagramValidDomain || !isInstagramValidLength) {
                 if (!isInstagramValidUrl) {
@@ -443,7 +460,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         // validation of new password
         boolean isNewPasswordEmpty = validator.isEmpty(mNewPasswordInput.getText().toString(), true);
         boolean isConfirmPasswordEmpty = validator.isEmpty(mConfirmPasswordInput.getText().toString(), true);
-        if(!isNewPasswordEmpty || !isConfirmPasswordEmpty){
+        if (!isNewPasswordEmpty || !isConfirmPasswordEmpty) {
             boolean isNewPasswordConfirmed = mConfirmPasswordInput.getText().toString().equals(mNewPasswordInput.getText().toString());
             boolean isNewPasswordValidRange = validator.rangeLength(contributor.getNewPassword(), 6, 20);
             if (!isNewPasswordConfirmed || !isNewPasswordValidRange) {
@@ -538,6 +555,19 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                 e.printStackTrace();
             }
         }
+    }
+
+    private void selectDate() {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        new DatePickerDialog(SettingsActivity.this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                mBirthdayInput.setText(new StringBuilder().append(year).append("-").append(monthOfYear + 1).append("-").append(dayOfMonth));
+            }
+        }, year, month, day).show();
     }
 
     private void selectImage(String title, int type) {
