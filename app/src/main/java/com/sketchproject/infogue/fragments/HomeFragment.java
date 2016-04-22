@@ -7,11 +7,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.models.Article;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,23 +34,16 @@ public class HomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_home, container, false);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
+        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
         adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_LATEST), ArticleFragment.FEATURED_LATEST.toUpperCase());
         adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_POPULAR), ArticleFragment.FEATURED_POPULAR.toUpperCase());
         adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_TRENDING), ArticleFragment.FEATURED_TRENDING.toUpperCase());
 
-        // Set up the ViewPager with the sections adapter.
-        viewPager = (ViewPager) getActivity().findViewById(R.id.viewpager);
+        viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
         viewPager.setAdapter(adapter);
 
-        tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
+        tabLayout = (TabLayout) rootView.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -82,6 +77,7 @@ public class HomeFragment extends Fragment {
         if(tab != null){
             tab.setIcon(R.drawable.tab_icon_whatshot_selector);
         }
+        return rootView;
     }
 
     public void homeRefresh(SwipeRefreshLayout swipeRefresh){
@@ -95,8 +91,8 @@ public class HomeFragment extends Fragment {
      * one of the sections/tabs/pages.
      */
     class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
+        private List<Fragment> mFragmentList = new ArrayList<>();
+        private List<String> mFragmentTitleList = new ArrayList<>();
 
         public ViewPagerAdapter(FragmentManager manager) {
             super(manager);

@@ -268,9 +268,9 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 title.setLayoutParams(params);
                 layout.addView(title);
 
-                final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                final AlertDialog.Builder builder = new AlertDialog.Builder(ArticleCreateActivity.this);
                 builder.setTitle("Insert Image");
-                builder.setMessage("Put complete image link (include http://) and alternative title.");
+                builder.setMessage("Put complete image link and alternative title.");
                 builder.setView(layout);
                 builder.setPositiveButton("Insert", new DialogInterface.OnClickListener() {
                     @Override
@@ -313,7 +313,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 title.setLayoutParams(params);
                 layout.addView(title);
 
-                final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                final AlertDialog.Builder builder = new AlertDialog.Builder(ArticleCreateActivity.this);
                 builder.setTitle("Insert Link");
                 builder.setMessage("Put complete link url and link title.");
                 builder.setView(layout);
@@ -371,9 +371,9 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
             Uri uri = data.getData();
 
             if (Build.VERSION.SDK_INT < 19) {
-                realPathFeatured = RealPathResolver.getRealPathFromURI_API11to18(this, data.getData());
+                realPathFeatured = RealPathResolver.getRealPathFromURI_API11to18(getBaseContext(), data.getData());
             } else {
-                realPathFeatured = RealPathResolver.getRealPathFromURI_API19(this, data.getData());
+                realPathFeatured = RealPathResolver.getRealPathFromURI_API19(getBaseContext(), data.getData());
             }
 
             try {

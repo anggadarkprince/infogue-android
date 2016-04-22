@@ -61,7 +61,7 @@ public class ArticleFragment extends Fragment {
     private boolean isEndOfPage = false;
     private boolean isEmptyPage = false;
 
-    private List<Article> allArticles;
+    private List<Article> allArticles = new ArrayList<>();
     private ArticleRecyclerViewAdapter articleAdapter;
     private OnArticleFragmentInteractionListener mArticleListListener;
     private OnArticleEditableFragmentInteractionListener mArticleEditableListener;
@@ -187,7 +187,6 @@ public class ArticleFragment extends Fragment {
                 linearLayoutManager = new GridLayoutManager(context, mColumnCount);
             }
 
-            allArticles = new ArrayList<>();
             if (mMyArticle) {
                 articleAdapter = new ArticleRecyclerViewAdapter(allArticles, mArticleListListener, mArticleEditableListener);
             } else {
