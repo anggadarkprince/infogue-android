@@ -357,4 +357,5 @@
     <string name="label_separator_articles">ARTICLES</string>
     <string name="label_separator_contributors">CONTRIBUTORS</string>
 
+    <string name="facebook_app_id">400987613433600</string>
 </resources>

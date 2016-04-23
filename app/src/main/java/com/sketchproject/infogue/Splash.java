@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.sketchproject.infogue.activities.ApplicationActivity;
 import com.sketchproject.infogue.activities.FeaturedActivity;
 import com.sketchproject.infogue.modules.SessionManager;
@@ -16,6 +18,9 @@ public class Splash extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_splash);
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(getApplication());
 
         final int SPLASH_TIME_OUT = 3000;
         new Handler().postDelayed(new Runnable() {
