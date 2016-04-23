@@ -3,7 +3,6 @@ package com.sketchproject.infogue.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -16,18 +15,31 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.Validator;
+import com.sketchproject.infogue.modules.VolleySingleton;
+import com.sketchproject.infogue.utils.Constant;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class RegisterFragment extends Fragment implements Validator.ViewValidation {
 
-    private UserRegisterTask mRegisterTask = null;
     private Validator validator;
     private AlertFragment alert;
 
@@ -83,10 +95,6 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
     }
 
     private void attemptRegister() {
-        if (mRegisterTask != null) {
-            return;
-        }
-
         preValidation();
         postValidation(onValidateView());
     }
@@ -216,8 +224,7 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
         if (isValid) {
             alert.dismiss();
             showProgress(true);
-            mRegisterTask = new UserRegisterTask(name, email, username, password);
-            mRegisterTask.execute((Void) null);
+            registrationRequest();
         } else {
             alert.setAlertType(AlertFragment.ALERT_WARNING);
             alert.setAlertMessage(validationMessage);
@@ -225,54 +232,81 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
         }
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserRegisterTask extends AsyncTask<Void, Void, Boolean> {
+    private void registrationRequest() {
+        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_REGISTER,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject result = new JSONObject(response);
+                            String status = result.getString("status");
+                            String message = result.getString("message");
 
-        private final String mName;
-        private final String mEmail;
-        private final String mUsername;
-        private final String mPassword;
+                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                alert.setAlertType(AlertFragment.ALERT_SUCCESS);
+                                alert.setAlertTitle("Registration Complete");
+                                alert.setAlertMessage("Activation link has been sent to your email.");
+                            } else {
+                                alert.setAlertType(AlertFragment.ALERT_DANGER);
+                                alert.setAlertMessage(message);
+                            }
+                            alert.show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
-        UserRegisterTask(String name, String email, String username, String password) {
-            mName = name;
-            mEmail = email;
-            mUsername = username;
-            mPassword = password;
-        }
+                        showProgress(false);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        NetworkResponse networkResponse = error.networkResponse;
+                        if (networkResponse != null) {
+                            String result = new String(networkResponse.data);
+                            try {
+                                JSONObject response = new JSONObject(result);
+                                String status = response.getString("status");
+                                String message = response.getString("message");
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            try {
-                // Simulate network access.
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                return false;
+                                if (status.equals(Constant.REQUEST_EXIST) && networkResponse.statusCode == 400) {
+                                    alert.setAlertType(AlertFragment.ALERT_WARNING);
+                                    alert.setAlertTitle("Please review your inputs");
+                                    alert.setAlertMessage(message);
+                                } else {
+                                    alert.setAlertType(AlertFragment.ALERT_DANGER);
+                                    alert.setAlertMessage(message);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            alert.setAlertType(AlertFragment.ALERT_DANGER);
+                            alert.setAlertMessage("Request Timeout, please try again!");
+                        }
+                        alert.show();
+
+                        showProgress(false);
+                        error.printStackTrace();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("name", mNameView.getText().toString());
+                params.put("email", mEmailView.getText().toString());
+                params.put("username", mUsernameView.getText().toString());
+                params.put("password", mPasswordView.getText().toString());
+                return params;
             }
+        };
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mRegisterTask = null;
-            if (success) {
-                getActivity().finish();
-            } else {
-                showProgress(false);
-                AlertFragment fragment = (AlertFragment) getChildFragmentManager().findFragmentById(R.id.alert_fragment);
-                fragment.setAlertType(AlertFragment.ALERT_DANGER);
-                fragment.setAlertMessage("Server error occurred, Try again!");
-                fragment.show();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mRegisterTask = null;
-            showProgress(false);
-        }
+        // Access the RequestQueue through your singleton class.
+        VolleySingleton.getInstance(getContext()).addToRequestQueue(postRequest);
     }
 }

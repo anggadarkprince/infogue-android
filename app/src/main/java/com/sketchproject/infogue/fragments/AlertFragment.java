@@ -5,6 +5,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,6 +117,11 @@ public class AlertFragment extends Fragment {
 
     public void setAlertMessage(String message) {
         mAlertMessage.setText(message);
+    }
+
+    public void setAlertMessageHtml(String message) {
+        mAlertMessage.setText(Html.fromHtml(message));
+        mAlertMessage.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     public void setAlertMessage(List<String> messages) {

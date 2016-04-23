@@ -11,6 +11,10 @@ public class Contributor {
     public static final String GENDER_FEMALE = "female";
     public static final String GENDER_OTHER = "other";
 
+    public static final String STATUS_PENDING = "pending";
+    public static final String STATUS_ACTIVATED = "activated";
+    public static final String STATUS_SUSPENDED = "suspended";
+
     private int id;
     private String username;
     private String email;

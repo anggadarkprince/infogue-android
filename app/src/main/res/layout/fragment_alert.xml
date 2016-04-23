@@ -50,5 +50,7 @@
         android:layout_toEndOf="@id/alert_icon"
         android:textColor="@color/light_transparent"
         android:textSize="13sp"
+        android:autoLink="all"
+        android:textColorLink="@color/light_transparent"
         android:text="Alert message..."/>
 </RelativeLayout>

@@ -6,7 +6,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
@@ -17,25 +16,34 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.activities.AuthenticationActivity;
 import com.sketchproject.infogue.activities.ProfileActivity;
+import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.Validator;
+import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.Constant;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class LoginFragment extends Fragment implements Validator.ViewValidation {
 
-    private UserLoginTask mAuthTask = null;
     private Validator validator;
     private AlertFragment alert;
 
@@ -117,11 +125,6 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
     }
 
     private void attemptLogin() {
-        // Escape if mAuthTask is defined it means login still process.
-        if (mAuthTask != null) {
-            return;
-        }
-
         preValidation();
         postValidation(onValidateView());
     }
@@ -154,23 +157,6 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                         mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
                     }
                 });
-    }
-
-    private boolean demoOnly() {
-        SessionManager sessionManager = new SessionManager(getActivity().getBaseContext());
-        HashMap<String, Object> user = new HashMap<>();
-        user.put(SessionManager.KEY_ID, 1);
-        user.put(SessionManager.KEY_TOKEN, "6224573472634636534");
-        user.put(SessionManager.KEY_USERNAME, "anggadarkprince");
-        user.put(SessionManager.KEY_NAME, "Angga Ari Wijaya");
-        user.put(SessionManager.KEY_LOCATION, "Gresik, Indonesia");
-        user.put(SessionManager.KEY_ABOUT, "Freelancer UI/UX Designer, The wind at my back so it's time to fly. angga-ari.com");
-        user.put(SessionManager.KEY_AVATAR, "http://infogue.id/images/contributors/avatar_1.jpg");
-        user.put(SessionManager.KEY_COVER, "http://infogue.id/images/covers/cover_5.jpg");
-        user.put(SessionManager.KEY_ARTICLE, 234);
-        user.put(SessionManager.KEY_FOLLOWER, 362);
-        user.put(SessionManager.KEY_FOLLOWING, 345);
-        return sessionManager.createLoginSession(user);
     }
 
     @Override
@@ -210,8 +196,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         if (isValid) {
             alert.dismiss();
             showProgress(true);
-            mAuthTask = new UserLoginTask(username, password);
-            mAuthTask.execute((Void) null);
+            loginRequest();
         } else {
             alert.setAlertType(AlertFragment.ALERT_WARNING);
             alert.setAlertMessage(validationMessage);
@@ -219,74 +204,133 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         }
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    private void loginRequest() {
+        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_LOGIN,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject result = new JSONObject(response);
+                            String status = result.getString("status");
+                            String message = result.getString("message");
+                            String login = result.getString("login");
 
-        private final String mUsername;
-        private final String mPassword;
+                            if (status.equals(Contributor.STATUS_ACTIVATED) && login.equals(Constant.REQUEST_GRANTED)) {
+                                JSONObject user = result.getJSONObject("user");
+                                if (populateSessionData(user)) {
+                                    getActivity().finish();
+                                    Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
+                                    SessionManager session = new SessionManager(getContext());
+                                    profileIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
+                                    profileIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
+                                    profileIntent.putExtra(SessionManager.KEY_NAME, session.getSessionData(SessionManager.KEY_NAME, null));
+                                    profileIntent.putExtra(SessionManager.KEY_LOCATION, session.getSessionData(SessionManager.KEY_LOCATION, null));
+                                    profileIntent.putExtra(SessionManager.KEY_ABOUT, session.getSessionData(SessionManager.KEY_ABOUT, null));
+                                    profileIntent.putExtra(SessionManager.KEY_AVATAR, session.getSessionData(SessionManager.KEY_AVATAR, null));
+                                    profileIntent.putExtra(SessionManager.KEY_COVER, session.getSessionData(SessionManager.KEY_COVER, null));
+                                    profileIntent.putExtra(SessionManager.KEY_ARTICLE, session.getSessionData(SessionManager.KEY_ARTICLE, 0));
+                                    profileIntent.putExtra(SessionManager.KEY_FOLLOWER, session.getSessionData(SessionManager.KEY_FOLLOWER, 0));
+                                    profileIntent.putExtra(SessionManager.KEY_FOLLOWING, session.getSessionData(SessionManager.KEY_FOLLOWING, 0));
+                                    profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, false);
+                                    profileIntent.putExtra(AuthenticationActivity.AFTER_LOGIN, true);
+                                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    profileIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(profileIntent);
+                                } else {
+                                    alert.setAlertType(AlertFragment.ALERT_DANGER);
+                                    alert.setAlertMessage("Creating session failed");
+                                    alert.show();
+                                    showProgress(false);
+                                }
+                            } else {
+                                alert.setAlertType(AlertFragment.ALERT_DANGER);
+                                alert.setAlertMessage(message);
+                                alert.show();
+                                showProgress(false);
+                            }
 
-        UserLoginTask(String username, String password) {
-            mUsername = username;
-            mPassword = password;
-        }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        NetworkResponse networkResponse = error.networkResponse;
+                        if (networkResponse != null) {
+                            String result = new String(networkResponse.data);
+                            try {
+                                JSONObject response = new JSONObject(result);
+                                String status = response.getString("status");
+                                String message = response.getString("message");
+                                String login = response.getString("login");
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            try {
-                // Simulate network access.
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                return false;
-            }
+                                if (status.equals(Constant.REQUEST_UNREGISTERED) && networkResponse.statusCode == 403) {
+                                    alert.setAlertType(AlertFragment.ALERT_DANGER);
+                                    alert.setAlertMessage(message);
+                                } else if (status.equals(Contributor.STATUS_PENDING) && networkResponse.statusCode == 403) {
+                                    String urlResendEmail = Constant.BASE_URL + "auth/resend/" + response.getString("token");
+                                    alert.setAlertType(AlertFragment.ALERT_WARNING);
+                                    alert.setAlertTitle("Pending");
+                                    alert.setAlertMessage("Account is pending please activate via email.\nResend email activation?\n"+urlResendEmail);
+                                } else if (status.equals(Contributor.STATUS_SUSPENDED) && networkResponse.statusCode == 403) {
+                                    alert.setAlertType(AlertFragment.ALERT_DANGER);
+                                    alert.setAlertTitle("Suspended");
+                                    alert.setAlertMessage("Account is suspended");
+                                } else if (login.equals(Constant.REQUEST_MISMATCH) && networkResponse.statusCode == 401) {
+                                    alert.setAlertType(AlertFragment.ALERT_DANGER);
+                                    alert.setAlertMessage(message);
+                                } else {
+                                    alert.setAlertType(AlertFragment.ALERT_DANGER);
+                                    alert.setAlertMessage(message);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            alert.setAlertType(AlertFragment.ALERT_DANGER);
+                            alert.setAlertMessage("Request Timeout, please try again!");
+                        }
+                        alert.show();
 
-            return mUsername.equals("angga") && mPassword.equals("angga1234");
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-
-            if (success) {
-                if (demoOnly()) {
-                    getActivity().finish();
-                    Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
-                    SessionManager session = new SessionManager(getContext());
-                    profileIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
-                    profileIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
-                    profileIntent.putExtra(SessionManager.KEY_NAME, session.getSessionData(SessionManager.KEY_NAME, null));
-                    profileIntent.putExtra(SessionManager.KEY_LOCATION, session.getSessionData(SessionManager.KEY_LOCATION, null));
-                    profileIntent.putExtra(SessionManager.KEY_ABOUT, session.getSessionData(SessionManager.KEY_ABOUT, null));
-                    profileIntent.putExtra(SessionManager.KEY_AVATAR, session.getSessionData(SessionManager.KEY_AVATAR, null));
-                    profileIntent.putExtra(SessionManager.KEY_COVER, session.getSessionData(SessionManager.KEY_COVER, null));
-                    profileIntent.putExtra(SessionManager.KEY_ARTICLE, session.getSessionData(SessionManager.KEY_ARTICLE, 0));
-                    profileIntent.putExtra(SessionManager.KEY_FOLLOWER, session.getSessionData(SessionManager.KEY_FOLLOWER, 0));
-                    profileIntent.putExtra(SessionManager.KEY_FOLLOWING, session.getSessionData(SessionManager.KEY_FOLLOWING, 0));
-                    profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, false);
-                    profileIntent.putExtra(AuthenticationActivity.AFTER_LOGIN, true);
-                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    profileIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(profileIntent);
-                } else {
-                    Toast.makeText(getContext(), "Something is getting wrong", Toast.LENGTH_LONG).show();
+                        showProgress(false);
+                        error.printStackTrace();
+                    }
                 }
-
-            } else {
-                showProgress(false);
-                mPasswordView.requestFocus();
-                AlertFragment fragment = (AlertFragment) getChildFragmentManager().findFragmentById(R.id.alert_fragment);
-                fragment.setAlertType(AlertFragment.ALERT_DANGER);
-                fragment.setAlertMessage(getString(R.string.error_auth_credential));
-                fragment.show();
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("username", mUsernameView.getText().toString());
+                params.put("password", mPasswordView.getText().toString());
+                return params;
             }
-        }
+        };
 
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
+        // Access the RequestQueue through your singleton class.
+        VolleySingleton.getInstance(getContext()).addToRequestQueue(postRequest);
+    }
+
+    private boolean populateSessionData(JSONObject result) {
+        SessionManager sessionManager = new SessionManager(getActivity().getBaseContext());
+        HashMap<String, Object> user = new HashMap<>();
+        try {
+            user.put(SessionManager.KEY_ID, result.getInt("id"));
+            user.put(SessionManager.KEY_TOKEN, result.getString("api_token"));
+            user.put(SessionManager.KEY_USERNAME, result.getString("username"));
+            user.put(SessionManager.KEY_NAME, result.getString("name"));
+            user.put(SessionManager.KEY_LOCATION, result.getString("location"));
+            user.put(SessionManager.KEY_ABOUT, result.getString("about"));
+            user.put(SessionManager.KEY_AVATAR, result.getString("avatar_ref"));
+            user.put(SessionManager.KEY_COVER, result.getString("cover_ref"));
+            user.put(SessionManager.KEY_ARTICLE, result.getInt("article_total"));
+            user.put(SessionManager.KEY_FOLLOWER, result.getInt("followers_total"));
+            user.put(SessionManager.KEY_FOLLOWING, result.getInt("following_total"));
+            return sessionManager.createLoginSession(user);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }
