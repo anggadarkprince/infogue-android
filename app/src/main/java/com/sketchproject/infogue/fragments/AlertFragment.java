@@ -153,7 +153,7 @@ public class AlertFragment extends Fragment {
             case ALERT_WARNING:
                 mAlertContainer.setBackgroundResource(R.color.color_warning);
                 mAlertIcon.setImageResource(R.drawable.ic_warning);
-                mAlertTitle.setText("Caution, look at this!");
+                mAlertTitle.setText("Warning, take a look!");
                 mAlertMessage.setText("Warning message appear here...");
                 break;
             case ALERT_DANGER:

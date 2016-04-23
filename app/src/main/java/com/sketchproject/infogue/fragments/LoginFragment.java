@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,14 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.activities.AuthenticationActivity;
 import com.sketchproject.infogue.activities.ProfileActivity;
@@ -30,6 +39,14 @@ import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.Validator;
 import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.Constant;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterLoginButton;
+import com.twitter.sdk.android.core.models.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,10 +56,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.fabric.sdk.android.Fabric;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class LoginFragment extends Fragment implements Validator.ViewValidation {
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "Rg1JqRPoxbflYe7XtQGCkcKsw";
+    private static final String TWITTER_SECRET = "tVI6dgYF89AHNTkVz3yqywoE9WvjrF4ZVdq2dmk0l2bndLdW9d";
 
     private Validator validator;
     private AlertFragment alert;
@@ -51,6 +74,9 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private LoginButton loginButtonFacebook;
+    private TwitterLoginButton loginButtonTwitter;
+    private CallbackManager callbackManager;
 
     private String username;
     private String password;
@@ -61,9 +87,128 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(getContext(), new Twitter(authConfig));
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         validator = new Validator();
-        return inflater.inflate(R.layout.fragment_login, container, false);
+        View view = inflater.inflate(R.layout.fragment_login, container, false);
+
+        // Facebook SDK setup
+        loginButtonFacebook = (LoginButton) view.findViewById(R.id.login_button_facebook);
+        loginButtonFacebook.setReadPermissions("email", "public_profile", "user_about_me", "user_website", "user_birthday");
+
+        // If using in a fragment
+        loginButtonFacebook.setFragment(this);
+
+        // Init callback manager
+        FacebookSdk.sdkInitialize(getContext());
+        callbackManager = CallbackManager.Factory.create();
+
+        // Callback registration
+        loginButtonFacebook.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.i("Infogue/facebook", loginResult.getAccessToken().getUserId());
+
+                GraphRequest request = GraphRequest.newMeRequest(
+                        loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                Log.i("Infogue/facebook", response.toString());
+
+                                try {
+                                    String name = object.getString("name");
+                                    String email = object.getString("email");
+                                    String birthday = object.getString("birthday");
+                                    String gender = object.getString("gender");
+                                    String about = object.getString("website");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,email,gender,birthday,website");
+                request.setParameters(parameters);
+                request.executeAsync();
+            }
+
+            @Override
+            public void onCancel() {
+                alert.setAlertType(AlertFragment.ALERT_WARNING);
+                alert.setAlertMessage("Facebook login attempt canceled");
+                alert.show();
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                alert.setAlertType(AlertFragment.ALERT_DANGER);
+                alert.setAlertMessage("Facebook login attempt failed");
+                alert.show();
+            }
+        });
+
+
+        // Twitter Fabric
+        loginButtonTwitter = (TwitterLoginButton) view.findViewById(R.id.login_button_twitter);
+        loginButtonTwitter.setCallback(new Callback<TwitterSession>() {
+            @Override
+            public void success(Result<TwitterSession> result) {
+                // The TwitterSession is also available through:
+                // Twitter.getInstance().core.getSessionManager().getActiveSession()
+                TwitterSession session = result.data;
+                // with your app's user model
+                String msg = "@" + session.getUserName() + " logged in! (#" + session.getUserId() + ")";
+                Log.i("Infogue/twitter", msg);
+
+                Twitter.getApiClient(session).getAccountService().verifyCredentials(true, false, new Callback<User>() {
+                    @Override
+                    public void success(Result<User> result) {
+                        User user = result.data;
+                        String name = user.name;
+                        String username = user.screenName;
+                        String location = user.location;
+                        String email = user.email;
+                        String about = user.description;
+                        String avatar = user.profileImageUrl;
+                        String cover = user.profileBannerUrl;
+
+                        Log.i("Infogue/twitter", name + " " + username + " " + location + " " + email + " " + about + " " + avatar + " " + cover);
+                    }
+
+                    @Override
+                    public void failure(TwitterException e) {
+                        alert.setAlertType(AlertFragment.ALERT_DANGER);
+                        alert.setAlertMessage("Login with Twitter failure");
+                        alert.show();
+                    }
+                });
+            }
+
+            @Override
+            public void failure(TwitterException exception) {
+                alert.setAlertType(AlertFragment.ALERT_DANGER);
+                alert.setAlertMessage("Login with Twitter failure");
+                alert.show();
+            }
+        });
+
+        return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        loginButtonTwitter.onActivityResult(requestCode, resultCode, data);
+        Log.i("Infogue/twitter", String.valueOf(resultCode));
     }
 
     @Override
@@ -97,7 +242,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         mFacebookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                loginButtonFacebook.performClick();
             }
         });
 
@@ -105,7 +250,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         mTwitterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                loginButtonTwitter.performClick();
             }
         });
 
@@ -273,7 +418,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                     String urlResendEmail = Constant.BASE_URL + "auth/resend/" + response.getString("token");
                                     alert.setAlertType(AlertFragment.ALERT_WARNING);
                                     alert.setAlertTitle("Pending");
-                                    alert.setAlertMessage("Account is pending please activate via email.\nResend email activation?\n"+urlResendEmail);
+                                    alert.setAlertMessage("Account is pending please activate via email.\nResend email activation?\n" + urlResendEmail);
                                 } else if (status.equals(Contributor.STATUS_SUSPENDED) && networkResponse.statusCode == 403) {
                                     alert.setAlertType(AlertFragment.ALERT_DANGER);
                                     alert.setAlertTitle("Suspended");
