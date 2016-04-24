@@ -9,6 +9,8 @@ import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.sketchproject.infogue.activities.ApplicationActivity;
 import com.sketchproject.infogue.activities.FeaturedActivity;
+import com.sketchproject.infogue.database.DBHelper;
+import com.sketchproject.infogue.database.DatabaseManager;
 import com.sketchproject.infogue.modules.SessionManager;
 
 public class Splash extends Activity {
@@ -21,6 +23,9 @@ public class Splash extends Activity {
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(getApplication());
+
+        DBHelper dbHelper = new DBHelper(getApplicationContext());
+        DatabaseManager.initializeInstance(dbHelper);
 
         final int SPLASH_TIME_OUT = 3000;
         new Handler().postDelayed(new Runnable() {
