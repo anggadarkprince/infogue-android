@@ -17,11 +17,16 @@ public class Article {
     public static final String ARTICLE_SUBCATEGORY = "subcategory";
     public static final String ARTICLE_SUBCATEGORY_ID = "subcategory_id";
     public static final String ARTICLE_CONTENT = "content";
+    public static final String ARTICLE_EXCERPT = "excerpt";
     public static final String ARTICLE_PUBLISHED_AT = "published_at";
+    public static final String ARTICLE_CREATED_AT = "created_at";
     public static final String ARTICLE_TAGS = "tags";
     public static final String ARTICLE_VIEW = "view";
-    public static final String ARTICLE_RATING = "total_rating";
+    public static final String ARTICLE_RATING_TOTAL = "total_rating";
+    public static final String ARTICLE_RATING = "rating";
     public static final String ARTICLE_STATUS = "status";
+    public static final String ARTICLE_FOREIGN = "article_id";
+    public static final String ARTICLE_RATE = "rate";
 
     public static final String STATUS_PENDING = "pending";
     public static final String STATUS_UPDATED = "updated";

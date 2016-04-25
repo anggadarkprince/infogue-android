@@ -1,6 +1,7 @@
 package com.sketchproject.infogue.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.sketchproject.infogue.R;
@@ -24,6 +26,7 @@ import com.sketchproject.infogue.adapters.ArticleRecyclerViewAdapter;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 import com.sketchproject.infogue.modules.VolleySingleton;
+import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
 import com.sketchproject.infogue.utils.UrlHelper;
 
@@ -296,7 +299,7 @@ public class ArticleFragment extends Fragment {
                                             article.setContent(articleData.getString(Article.ARTICLE_CONTENT));
                                             article.setPublishedAt(articleData.getString(Article.ARTICLE_PUBLISHED_AT));
                                             article.setView(articleData.getInt(Article.ARTICLE_VIEW));
-                                            article.setRating(articleData.getInt(Article.ARTICLE_RATING));
+                                            article.setRating(articleData.getInt(Article.ARTICLE_RATING_TOTAL));
                                             article.setStatus(articleData.getString(Article.ARTICLE_STATUS));
                                             moreArticles.add(article);
                                         }
@@ -320,6 +323,8 @@ public class ArticleFragment extends Fragment {
                                     articleAdapter.notifyItemRangeInserted(curSize, allArticles.size() - 1);
                                     Log.i("INFOGUE/Article", "Load More page " + page);
                                 } else {
+                                    AppHelper.toastColored(getContext(), getString(R.string.error_server), Color.parseColor("#ddd1205e"));
+
                                     isEndOfPage = true;
                                     Log.i("INFOGUE/Article", "Empty on page " + page);
                                     Article emptyArticle = new Article(0, null, "Empty page");
@@ -333,9 +338,23 @@ public class ArticleFragment extends Fragment {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            // remove loading
+                            if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+
+                            // remove last loading
                             allArticles.remove(allArticles.size() - 1);
                             articleAdapter.notifyItemRemoved(allArticles.size());
+
+                            String errorMessage = getActivity().getString(R.string.error_server);
+                            if (error.networkResponse == null) {
+                                if (error.getClass().equals(TimeoutError.class)) {
+                                    errorMessage = getActivity().getString(R.string.error_timeout);
+                                } else {
+                                    errorMessage = getActivity().getString(R.string.error_unknown);
+                                }
+                            }
+                            AppHelper.toastColored(getContext(), errorMessage, Color.parseColor("#ddd1205e"));
 
                             // indicate the error
                             isEndOfPage = true;

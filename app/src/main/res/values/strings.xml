@@ -37,6 +37,9 @@
     <string name="prompt_instagram">Instagram Url</string>
     <string name="prompt_contact">Contact or Phone</string>
 
+    <string name="error_server">Oops, Something is getting wrong</string>
+    <string name="error_unknown">Unknown error occurred</string>
+    <string name="error_timeout">Request server timeout, try again!</string>
     <string name="error_password_required">Password is required</string>
     <string name="error_password_range">Password must be 6 to 20 characters</string>
     <string name="error_password_confirmed">New Password must be confirmed</string>

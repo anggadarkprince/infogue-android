@@ -22,15 +22,28 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.IconizedMenu;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
 import com.sketchproject.infogue.utils.UrlHelper;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ArticleActivity extends AppCompatActivity implements
         ArticleFragment.OnArticleFragmentInteractionListener,
@@ -94,8 +107,8 @@ public class ArticleActivity extends AppCompatActivity implements
             String query = extras.getString(SearchActivity.QUERY_STRING);
 
             if (getSupportActionBar() != null) {
-                if(query != null){
-                    getSupportActionBar().setTitle("All result for "+query);
+                if (query != null) {
+                    getSupportActionBar().setTitle("All result for " + query);
                 }
             }
 
@@ -126,7 +139,7 @@ public class ArticleActivity extends AppCompatActivity implements
         }
     }
 
-    public void setSwipeEnable(boolean state){
+    public void setSwipeEnable(boolean state) {
         swipeRefreshLayout.setEnabled(state);
     }
 
@@ -230,8 +243,55 @@ public class ArticleActivity extends AppCompatActivity implements
         startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
     }
 
-    private void rateArticle(Article article) {
-        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
+    private void rateArticle(final Article article) {
+        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_LOGIN,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject result = new JSONObject(response);
+                            String status = result.getString("status");
+
+                            if (!status.equals(Constant.REQUEST_SUCCESS)) {
+                                String errorMessage = "Oops, request timeout, your rating was discarded";
+                                AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        String errorMessage = getString(R.string.error_server);
+                        if (error.networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                errorMessage = "Oops, request timeout, your rating was discarded";
+                            } else {
+                                errorMessage = getString(R.string.error_unknown);
+                            }
+                        }
+                        AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put(Article.ARTICLE_FOREIGN, String.valueOf(article.getId()));
+                params.put(Article.ARTICLE_RATE, String.valueOf(5));
+                return params;
+            }
+        };
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
+
+        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \n\"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
     }
 
     private void publishArticle(Article article) {

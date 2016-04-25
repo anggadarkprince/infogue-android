@@ -1,6 +1,7 @@
 package com.sketchproject.infogue.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.sketchproject.infogue.R;
@@ -24,6 +26,7 @@ import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
+import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
 import com.sketchproject.infogue.utils.UrlHelper;
 
@@ -231,9 +234,7 @@ public class FollowerFragment extends Fragment {
                                     followerAdapter.notifyItemRangeInserted(curSize, allFollowers.size() - 1);
                                     Log.i("INFOGUE/Contributor", "Load More page " + page);
                                 } else {
-                                    // remove loading
-                                    allFollowers.remove(allFollowers.size() - 1);
-                                    followerAdapter.notifyItemRemoved(allFollowers.size());
+                                    AppHelper.toastColored(getContext(), getActivity().getString(R.string.error_server), Color.parseColor("#ddd1205e"));
 
                                     // indicate the error
                                     isEndOfPage = true;
@@ -250,6 +251,20 @@ public class FollowerFragment extends Fragment {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
+                            // remove last loading
+                            allFollowers.remove(allFollowers.size() - 1);
+                            followerAdapter.notifyItemRemoved(allFollowers.size());
+
+                            String errorMessage = getActivity().getString(R.string.error_server);
+                            if (error.networkResponse == null) {
+                                if (error.getClass().equals(TimeoutError.class)) {
+                                    errorMessage = getActivity().getString(R.string.error_timeout);
+                                } else {
+                                    errorMessage = getActivity().getString(R.string.error_unknown);
+                                }
+                            }
+                            AppHelper.toastColored(getContext(), errorMessage, Color.parseColor("#ddd1205e"));
+
                             // indicate the error or timeout
                             isEndOfPage = true;
                             Log.i("INFOGUE/Contributor", "Failure or timeout on page " + page);

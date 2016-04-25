@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.facebook.CallbackManager;
@@ -437,7 +438,12 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                             }
                         } else {
                             alert.setAlertType(AlertFragment.ALERT_DANGER);
-                            alert.setAlertMessage("Request Timeout, please try again!");
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                alert.setAlertMessage(getString(R.string.error_timeout));
+                            }
+                            else{
+                                alert.setAlertMessage(getString(R.string.error_unknown));
+                            }
                         }
                         alert.show();
 

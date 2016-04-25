@@ -42,8 +42,10 @@ import android.widget.TextView;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
@@ -67,7 +69,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ApplicationActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
@@ -757,7 +761,55 @@ public class ApplicationActivity extends AppCompatActivity implements
                         startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
                     }
                     else if (items[item].toString().equals(getString(R.string.action_long_rate))) {
-                        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
+                        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_LOGIN,
+                                new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
+                                        try {
+                                            JSONObject result = new JSONObject(response);
+                                            String status = result.getString("status");
+
+                                            if(!status.equals(Constant.REQUEST_SUCCESS)){
+                                                String errorMessage = "Oops, request timeout, your rating was discarded";
+                                                AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                                            }
+                                        }
+                                        catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        String errorMessage = getString(R.string.error_server);
+                                        if (error.networkResponse == null) {
+                                            if (error.getClass().equals(TimeoutError.class)) {
+                                                errorMessage = "Oops, request timeout, your rating was discarded";
+                                            } else {
+                                                errorMessage = getString(R.string.error_unknown);
+                                            }
+                                        }
+                                        AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                                    }
+                                }
+                        ) {
+                            @Override
+                            protected Map<String, String> getParams() {
+                                Map<String, String> params = new HashMap<>();
+                                params.put(Article.ARTICLE_FOREIGN, String.valueOf(article.getId()));
+                                params.put(Article.ARTICLE_RATE, String.valueOf(5));
+                                return params;
+                            }
+                        };
+                        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                                15000,
+                                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+                        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
+
+                        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \n\"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
                     }
                 } else {
                     onLostConnectionNotified(getBaseContext());

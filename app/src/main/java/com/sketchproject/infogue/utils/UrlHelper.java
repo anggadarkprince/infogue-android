@@ -55,7 +55,7 @@ public class UrlHelper {
         String url = Constant.BASE_URL_API + "contributor/" + authorUsername + "/article";
 
         optionalQuery += author;
-        optionalQuery += "&"+myArticle;
+        optionalQuery += "&" + myArticle;
         if (query != null) {
             if (!optionalQuery.isEmpty()) {
                 optionalQuery += "&";
@@ -67,6 +67,10 @@ public class UrlHelper {
             url += "?" + optionalQuery;
         }
         return url;
+    }
+
+    public static String getApiPostUrl(String slug) {
+        return Constant.BASE_URL_API + "article/" + slug;
     }
 
     public static String getContributorDetailUrl(String username) {

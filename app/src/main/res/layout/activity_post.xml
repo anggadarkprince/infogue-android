@@ -104,7 +104,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="20dp"
                         android:layout_marginRight="20dp"
-                        android:layout_marginTop="1dp"
                         android:text="Angga Ari Wijaya"
                         android:textColor="@color/light" />
 
@@ -120,7 +119,6 @@
                         android:id="@+id/article_published"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
                         android:text="21 January 2016"
                         android:textColor="@color/light" />
                 </LinearLayout>
