@@ -7,17 +7,20 @@ import java.util.List;
  * Created by Angga on 12/04/2016 22.09.
  */
 public class Article {
-    public static final String ARTICLE_ID = "article_id";
+    public static final String ARTICLE_ID = "id";
     public static final String ARTICLE_SLUG = "slug";
     public static final String ARTICLE_TITLE = "title";
     public static final String ARTICLE_FEATURED = "featured";
+    public static final String ARTICLE_FEATURED_REF = "featured_ref";
     public static final String ARTICLE_CATEGORY = "category";
+    public static final String ARTICLE_CATEGORY_ID = "category_id";
     public static final String ARTICLE_SUBCATEGORY = "subcategory";
+    public static final String ARTICLE_SUBCATEGORY_ID = "subcategory_id";
     public static final String ARTICLE_CONTENT = "content";
     public static final String ARTICLE_PUBLISHED_AT = "published_at";
     public static final String ARTICLE_TAGS = "tags";
     public static final String ARTICLE_VIEW = "view";
-    public static final String ARTICLE_RATING = "rating";
+    public static final String ARTICLE_RATING = "total_rating";
 
     public static final String STATUS_PENDING = "PENDING";
     public static final String STATUS_UPDATED = "UPDATED";

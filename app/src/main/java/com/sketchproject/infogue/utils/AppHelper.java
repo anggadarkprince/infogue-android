@@ -68,6 +68,15 @@ public class AppHelper {
         return toast;
     }
 
+    public static String createSlug(String title) {
+        String trimmed = title.trim();
+        String slug = trimmed
+                .replaceAll("[^a-zA-Z0-9-]", "-")
+                .replaceAll("-+", "-")
+                .replaceAll("^-|-$", "");
+        return slug.toLowerCase();
+    }
+
     public static String wrapHtmlString(String html) {
         return "<html><head><style>img{display: inline; height: auto; max-width: 100%;}</style></head><body>" + html + "</body></html>";
     }

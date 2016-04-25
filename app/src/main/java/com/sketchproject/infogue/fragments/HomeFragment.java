@@ -7,13 +7,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.models.Article;
+import com.sketchproject.infogue.modules.ObjectPooling;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +21,7 @@ public class HomeFragment extends Fragment {
 
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    private ObjectPooling objectPooling = new ObjectPooling();
 
     public HomeFragment() {
         // Required empty public constructor
@@ -35,10 +35,41 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
         adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_LATEST), ArticleFragment.FEATURED_LATEST.toUpperCase());
         adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_POPULAR), ArticleFragment.FEATURED_POPULAR.toUpperCase());
         adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_TRENDING), ArticleFragment.FEATURED_TRENDING.toUpperCase());
+
+        Fragment fragmentLatest;
+        Object objectFragmentLatest = objectPooling.find(ArticleFragment.FEATURED_LATEST);
+        if (objectFragmentLatest == null) {
+            fragmentLatest = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_LATEST);
+            objectPooling.pool(fragmentLatest, ArticleFragment.FEATURED_LATEST);
+        } else {
+            fragmentLatest = (ArticleFragment) objectFragmentLatest;
+        }
+        //adapter.addFragment(fragmentLatest, ArticleFragment.FEATURED_LATEST.toUpperCase());
+
+        Fragment fragmentPopular;
+        Object objectFragmentPopular = objectPooling.find(ArticleFragment.FEATURED_POPULAR);
+        if (objectFragmentPopular == null) {
+            fragmentPopular = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_POPULAR);
+            objectPooling.pool(fragmentPopular, ArticleFragment.FEATURED_POPULAR);
+        } else {
+            fragmentPopular = (ArticleFragment) objectFragmentPopular;
+        }
+        //adapter.addFragment(fragmentPopular, ArticleFragment.FEATURED_POPULAR.toUpperCase());
+
+        Fragment fragmentTrending;
+        Object objectFragmentTrending = objectPooling.find(ArticleFragment.FEATURED_TRENDING);
+        if (objectFragmentTrending == null) {
+            fragmentTrending = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_TRENDING);
+            objectPooling.pool(fragmentPopular, ArticleFragment.FEATURED_TRENDING);
+        } else {
+            fragmentTrending = (ArticleFragment) objectFragmentTrending;
+        }
+        //adapter.addFragment(fragmentTrending, ArticleFragment.FEATURED_TRENDING.toUpperCase());
 
         viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
         viewPager.setAdapter(adapter);
@@ -66,21 +97,21 @@ public class HomeFragment extends Fragment {
 
         TabLayout.Tab tab;
         tab = tabLayout.getTabAt(0);
-        if(tab != null){
+        if (tab != null) {
             tab.setIcon(R.drawable.tab_icon_layer_selector);
         }
         tab = tabLayout.getTabAt(1);
-        if(tab != null){
+        if (tab != null) {
             tab.setIcon(R.drawable.tab_icon_star_selector);
         }
         tab = tabLayout.getTabAt(2);
-        if(tab != null){
+        if (tab != null) {
             tab.setIcon(R.drawable.tab_icon_whatshot_selector);
         }
         return rootView;
     }
 
-    public void homeRefresh(SwipeRefreshLayout swipeRefresh){
+    public void homeRefresh(SwipeRefreshLayout swipeRefresh) {
         ViewPagerAdapter section = (ViewPagerAdapter) viewPager.getAdapter();
         ArticleFragment articleFragment = (ArticleFragment) section.getItem(tabLayout.getSelectedTabPosition());
         articleFragment.refreshArticleList(swipeRefresh);

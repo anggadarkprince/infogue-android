@@ -31,5 +31,7 @@ public interface Constant {
 
     String URL_API_REGISTER = BASE_URL_API + "account/register";
     String URL_API_LOGIN = BASE_URL_API + "account/login";
+    String URL_API_CATEGORY = BASE_URL_API + "category";
+    String URL_API_FEATURED = BASE_URL_API + "featured";
 
 }

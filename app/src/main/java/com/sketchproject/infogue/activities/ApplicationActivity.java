@@ -45,6 +45,7 @@ import com.sketchproject.infogue.fragments.HomeFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.IconizedMenu;
+import com.sketchproject.infogue.modules.ObjectPooling;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
@@ -63,6 +64,7 @@ public class ApplicationActivity extends AppCompatActivity implements
     private SessionManager session;
     private ConnectionDetector connectionDetector;
     private AlertDialog dialogExit;
+    private ObjectPooling objectPooling;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,7 @@ public class ApplicationActivity extends AppCompatActivity implements
         connectionDetector = new ConnectionDetector(getBaseContext());
         connectionDetector.setLostConnectionListener(this);
         session = new SessionManager(getBaseContext());
+        objectPooling = new ObjectPooling();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -680,25 +683,53 @@ public class ApplicationActivity extends AppCompatActivity implements
             startActivity(aboutActivity);
         } else {
             if (id == R.id.nav_home) {
-                fragment = new HomeFragment();
+                Object objectFragment = objectPooling.find("home");
+                if(objectFragment == null){
+                    fragment = new HomeFragment();
+                    objectPooling.pool(fragment, "home");
+                }
+                else{
+                    fragment = (HomeFragment) objectFragment;
+                }
                 title = "";
                 subtitle = "";
                 elevation = 0;
                 logo = true;
             } else if (id == R.id.nav_random) {
-                fragment = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_RANDOM);
+                Object objectFragment = objectPooling.find(ArticleFragment.FEATURED_RANDOM);
+                if(objectFragment == null){
+                    fragment = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_RANDOM);
+                    objectPooling.pool(fragment, ArticleFragment.FEATURED_RANDOM);
+                }
+                else{
+                    fragment = (ArticleFragment) objectFragment;
+                }
                 title = "Featured Article";
                 subtitle = "Random";
                 elevation = 2;
                 logo = false;
             } else if (id == R.id.nav_headline) {
-                fragment = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_HEADLINE);
+                Object objectFragment = objectPooling.find(ArticleFragment.FEATURED_HEADLINE);
+                if(objectFragment == null){
+                    fragment = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_HEADLINE);
+                    objectPooling.pool(fragment, ArticleFragment.FEATURED_HEADLINE);
+                }
+                else{
+                    fragment = (ArticleFragment) objectFragment;
+                }
                 title = "Featured Article";
                 subtitle = "Headline";
                 elevation = 2;
                 logo = false;
             } else {
-                fragment = ArticleFragment.newInstanceCategory(1, id, category);
+                Object objectFragment = objectPooling.find(category);
+                if(objectFragment == null){
+                    fragment = ArticleFragment.newInstanceCategory(1, id, AppHelper.createSlug(category));
+                    objectPooling.pool(fragment, category);
+                }
+                else{
+                    fragment = (ArticleFragment) objectFragment;
+                }
                 title = category;
                 subtitle = "";
                 elevation = 2;

@@ -2,7 +2,6 @@ package com.sketchproject.infogue.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,13 +12,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.activities.ApplicationActivity;
 import com.sketchproject.infogue.activities.ArticleActivity;
 import com.sketchproject.infogue.adapters.ArticleRecyclerViewAdapter;
-import com.sketchproject.infogue.fragments.dummy.DummyArticleContent;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
+import com.sketchproject.infogue.modules.VolleySingleton;
+import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.UrlHelper;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +69,6 @@ public class ArticleFragment extends Fragment {
     private boolean hasHeader = false;
     private boolean isFirstCall = true;
     private boolean isEndOfPage = false;
-    private boolean isEmptyPage = false;
 
     private List<Article> allArticles = new ArrayList<>();
     private ArticleRecyclerViewAdapter articleAdapter;
@@ -67,6 +76,9 @@ public class ArticleFragment extends Fragment {
     private OnArticleEditableFragmentInteractionListener mArticleEditableListener;
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
+
+    private String apiArticleUrl = "";
+    private String apiArticleUrlFirstPage = "";
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -156,19 +168,21 @@ public class ArticleFragment extends Fragment {
 
         if (mSubcategoryId > 0 && mSubcategory != null) {
             Log.i("INFOGUE/Article", "Sub Category " + mSubcategory + " ID : " + mSubcategoryId);
+            apiArticleUrl = UrlHelper.getApiCategoryUrl(mCategory, mSubcategory, 0);
         } else if (mCategoryId > 0 && mCategory != null) {
             Log.i("INFOGUE/Article", "Category " + mCategory + " ID : " + mCategoryId);
+            apiArticleUrl = UrlHelper.getApiCategoryUrl(mCategory, null, 0);
         } else if (mFeatured != null) {
             hasHeader = true;
             Log.i("INFOGUE/Article", "Featured : " + mFeatured);
+            apiArticleUrl = UrlHelper.getApiFeaturedUrl(mFeatured, 0);
         } else if (mAuthorId != 0) {
             Log.i("INFOGUE/ARTICLE", "Contributor ID : " + String.valueOf(mAuthorId));
         } else {
             Log.i("INFOGUE/Article", "Default");
         }
 
-        double random = Math.random();
-        isEmptyPage = random > 0.9;
+        apiArticleUrlFirstPage = apiArticleUrl;
     }
 
     @Override
@@ -204,10 +218,9 @@ public class ArticleFragment extends Fragment {
 
                 @Override
                 public void onFirstSight(boolean isFirst) {
-                    if(getActivity() instanceof  ArticleActivity){
+                    if (getActivity() instanceof ArticleActivity) {
                         ((ArticleActivity) getActivity()).setSwipeEnable(isFirst);
-                    }
-                    else if(getActivity() instanceof ApplicationActivity){
+                    } else if (getActivity() instanceof ApplicationActivity) {
                         ((ApplicationActivity) getActivity()).setSwipeEnable(isFirst);
                     }
                 }
@@ -225,70 +238,135 @@ public class ArticleFragment extends Fragment {
      * @param page starts at 0
      */
     private void loadArticles(final int page) {
-        if (!isEndOfPage) {
-            if(swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()){
+        if (!isEndOfPage && apiArticleUrl != null) {
+            if (swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()) {
                 allArticles.add(null);
                 articleAdapter.notifyItemInserted(allArticles.size() - 1);
             }
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if(swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()) {
-                        allArticles.remove(allArticles.size() - 1);
-                        articleAdapter.notifyItemRemoved(allArticles.size());
-                    }
-                    else{
-                        swipeRefreshLayout.setRefreshing(false);
-                        int total = allArticles.size();
-                        for (int i = 0; i<total; i++) {
-                            allArticles.remove(0);
+            Log.i("INFOGUE/Article", "URL " + apiArticleUrl);
+            JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.GET, apiArticleUrl, null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                String status = response.getString("status");
+                                JSONObject articles = response.getJSONObject("articles");
+                                String nextUrl = articles.getString("next_page_url");
+                                int currentPage = articles.getInt("current_page");
+                                int lastPage = articles.getInt("last_page");
+                                JSONArray data = articles.optJSONArray("data");
+
+                                apiArticleUrl = nextUrl;
+
+                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                    if (swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()) {
+                                        allArticles.remove(allArticles.size() - 1);
+                                        articleAdapter.notifyItemRemoved(allArticles.size());
+                                    } else {
+                                        swipeRefreshLayout.setRefreshing(false);
+                                        int total = allArticles.size();
+                                        for (int i = 0; i < total; i++) {
+                                            allArticles.remove(0);
+                                        }
+                                        articleAdapter.notifyItemRangeRemoved(0, total);
+                                    }
+
+                                    List<Article> moreArticles = new ArrayList<>();
+
+                                    if (data != null) {
+                                        for (int i = 0; i < data.length(); i++) {
+                                            JSONObject articleData = data.getJSONObject(i);
+                                            Article article = new Article();
+                                            article.setId(articleData.getInt(Article.ARTICLE_ID));
+                                            article.setSlug(articleData.getString(Article.ARTICLE_SLUG));
+                                            article.setTitle(articleData.getString(Article.ARTICLE_TITLE));
+                                            article.setFeatured(articleData.getString(Article.ARTICLE_FEATURED_REF));
+                                            article.setCategoryId(articleData.getInt(Article.ARTICLE_CATEGORY_ID));
+                                            article.setCategory(articleData.getString(Article.ARTICLE_CATEGORY));
+                                            article.setSubcategoryId(articleData.getInt(Article.ARTICLE_SUBCATEGORY_ID));
+                                            article.setSubcategory(articleData.getString(Article.ARTICLE_SUBCATEGORY));
+                                            article.setContent(articleData.getString(Article.ARTICLE_CONTENT));
+                                            article.setPublishedAt(articleData.getString(Article.ARTICLE_PUBLISHED_AT));
+                                            article.setView(articleData.getInt(Article.ARTICLE_VIEW));
+                                            article.setRating(articleData.getInt(Article.ARTICLE_RATING));
+                                            moreArticles.add(article);
+                                        }
+                                    }
+
+                                    int curSize = articleAdapter.getItemCount();
+                                    allArticles.addAll(moreArticles);
+
+                                    if (allArticles.size() <= 0) {
+                                        isEndOfPage = true;
+                                        Log.i("INFOGUE/Article", "Empty on page " + page);
+                                        Article emptyArticle = new Article(0, null, "Empty page");
+                                        allArticles.add(emptyArticle);
+                                    } else if (currentPage >= lastPage) {
+                                        isEndOfPage = true;
+                                        Log.i("INFOGUE/Article", "End on page " + page);
+                                        Article endArticle = new Article(-1, null, "End of page");
+                                        allArticles.add(endArticle);
+                                    }
+
+                                    articleAdapter.notifyItemRangeInserted(curSize, allArticles.size() - 1);
+                                    Log.i("INFOGUE/Article", "Load More page " + page);
+                                } else {
+                                    isEndOfPage = true;
+                                    Log.i("INFOGUE/Article", "Empty on page " + page);
+                                    Article emptyArticle = new Article(0, null, "Empty page");
+                                    allArticles.add(emptyArticle);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-                        articleAdapter.notifyItemRangeRemoved(0, total);
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // remove loading
+                            allArticles.remove(allArticles.size() - 1);
+                            articleAdapter.notifyItemRemoved(allArticles.size());
+
+                            // indicate the error
+                            isEndOfPage = true;
+                            Log.i("INFOGUE/Article", "Empty on page " + page);
+                            Article emptyArticle = new Article(0, null, "Empty page");
+                            allArticles.add(emptyArticle);
+                            error.printStackTrace();
+                        }
                     }
+            );
+            postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    15000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-                    List<Article> moreArticles = !isEmptyPage ? DummyArticleContent.generateDummy(page) : new ArrayList<Article>();
-                    int curSize = articleAdapter.getItemCount();
-                    allArticles.addAll(moreArticles);
-
-                    if (allArticles.size() <= 0) {
-                        isEndOfPage = true;
-                        Log.i("INFOGUE/Article", "Empty on page " + page);
-                        Article emptyArticle = new Article(0, null, "Empty page");
-                        allArticles.add(emptyArticle);
-                    } else if (allArticles.size() >= 100) {
-                        isEndOfPage = true;
-                        Log.i("INFOGUE/Article", "End on page " + page);
-                        Article endArticle = new Article(-1, null, "End of page");
-                        allArticles.add(endArticle);
-                    }
-
-                    articleAdapter.notifyItemRangeInserted(curSize, allArticles.size() - 1);
-                    Log.i("INFOGUE/Article", "Load More page " + page);
-                }
-            }, 3000);
+            // Access the RequestQueue through your singleton class.
+            VolleySingleton.getInstance(getContext()).addToRequestQueue(postRequest);
         }
     }
 
-    public void deleteArticleRow(int id){
+    public void deleteArticleRow(int id) {
         Log.i("INFOGUE/Article", "Delete id : " + id);
-        for (int i = 0; i<allArticles.size(); i++) {
-            if(allArticles.get(i) != null && allArticles.get(i).getId() == id){
+        for (int i = 0; i < allArticles.size(); i++) {
+            if (allArticles.get(i) != null && allArticles.get(i).getId() == id) {
                 allArticles.remove(i);
                 articleAdapter.notifyItemRemoved(i);
             }
         }
     }
 
-    public void refreshArticleList(SwipeRefreshLayout swipeRefresh){
+    public void refreshArticleList(SwipeRefreshLayout swipeRefresh) {
         swipeRefreshLayout = swipeRefresh;
         isEndOfPage = false;
-        isEmptyPage = false;
+        apiArticleUrl = apiArticleUrlFirstPage;
 
         loadArticles(0);
     }
 
-    public void scrollToTop(){
+    public void scrollToTop() {
         recyclerView.smoothScrollToPosition(0);
     }
 

@@ -47,7 +47,7 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
         // If it’s still loading, we check to see if the dataset count has
         // changed, if so we conclude it has finished loading and update the current page
         // number and total item count. (-1 for excluding 'loading' data with null value)
-        if (loading && (totalItemCount - 1 > previousTotalItemCount)) {
+        if ((loading && (totalItemCount - 1 > previousTotalItemCount)) || currentPage == 0) {
             loading = false;
             previousTotalItemCount = totalItemCount;
         }
@@ -55,11 +55,12 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
         // If it isn’t currently loading, we check to see if we have breached
         // the visibleThreshold and need to reload more data.
         // If we do need to reload some more data, we execute onLoadMore to fetch the data.
-        Log.i("INFOGUE/Load", String.valueOf(!loading) + "  total item " + totalItemCount + "  last visible item " + lastVisibleItem + "  threshold " + visibleThreshold);
+        //Log.i("INFOGUE/Load", String.valueOf(!loading) + "  total item " + totalItemCount + "  last visible item " + lastVisibleItem + "  threshold " + visibleThreshold);
         if (!loading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
             currentPage++;
             onLoadMore(currentPage, totalItemCount);
             loading = true;
+            Log.i("INFOGUE/Load", "Load more");
         }
 
         if (mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0) {

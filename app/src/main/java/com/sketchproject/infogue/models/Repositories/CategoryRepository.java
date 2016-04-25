@@ -1,4 +1,4 @@
-package com.sketchproject.infogue.models.Repository;
+package com.sketchproject.infogue.models.Repositories;
 
 import android.content.ContentValues;
 import android.database.Cursor;
