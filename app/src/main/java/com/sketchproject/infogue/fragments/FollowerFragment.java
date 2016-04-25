@@ -2,7 +2,6 @@ package com.sketchproject.infogue.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,22 +11,32 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.activities.FollowerActivity;
 import com.sketchproject.infogue.adapters.FollowerRecyclerViewAdapter;
-import com.sketchproject.infogue.fragments.dummy.DummyFollowerContent;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.modules.VolleySingleton;
+import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.UrlHelper;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * A fragment representing a list of Items.
- * <p/>
+ *
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
@@ -40,19 +49,17 @@ public class FollowerFragment extends Fragment {
     private static final String ARG_QUERY = "search-query";
 
     private int mColumnCount = 1;
-    private int mLoggedId;
-    private int mId;
-    private String mUsername;
     private String mType;
-    private String mQuery;
     private boolean isFirstCall = true;
     private boolean isEndOfPage = false;
-    private boolean isEmptyPage = false;
 
     private List<Contributor> allFollowers;
     private FollowerRecyclerViewAdapter followerAdapter;
     private OnListFragmentInteractionListener mListener;
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    private String apiFollowerUrl = "";
+    private String apiFollowerUrlFirstPage = "";
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -87,25 +94,25 @@ public class FollowerFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         SessionManager session = new SessionManager(getContext());
-        mLoggedId = session.getSessionData(SessionManager.KEY_ID, 0);
+        int mLoggedId = session.getSessionData(SessionManager.KEY_ID, 0);
+
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            mId =  getArguments().getInt(ARG_RELATED_ID);
-            mUsername =  getArguments().getString(ARG_RELATED_USERNAME);
             mType = getArguments().getString(ARG_TYPE);
-            mQuery = getArguments().getString(ARG_QUERY);
-        }
 
-        double random = Math.random();
-        isEmptyPage = random > 0.9;
-        Log.i("INFOGUE/random", isEmptyPage + " " + String.valueOf(random));
+            // if needed remove the comment: int mId = getArguments().getInt(ARG_RELATED_ID);
+            String mUsername = getArguments().getString(ARG_RELATED_USERNAME);
+            String mQuery = getArguments().getString(ARG_QUERY);
+
+            apiFollowerUrl = UrlHelper.getApiFollowerUrl(mType, mLoggedId, mUsername, mQuery);
+            apiFollowerUrlFirstPage = apiFollowerUrl;
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_follower_list, container, false);
 
-        // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
@@ -135,7 +142,7 @@ public class FollowerFragment extends Fragment {
                 }
             });
 
-            if(isFirstCall){
+            if (isFirstCall) {
                 isFirstCall = false;
                 loadFollowers(0);
             }
@@ -147,55 +154,123 @@ public class FollowerFragment extends Fragment {
      * @param page starts at 0
      */
     private void loadFollowers(final int page) {
-        if (!isEndOfPage) {
-            if(swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()){
+        if (!isEndOfPage && apiFollowerUrl != null) {
+            if (swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()) {
                 allFollowers.add(null);
                 followerAdapter.notifyItemInserted(allFollowers.size() - 1);
             }
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if(swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()) {
-                        allFollowers.remove(allFollowers.size() - 1);
-                        followerAdapter.notifyItemRemoved(allFollowers.size());
-                    }
-                    else{
-                        swipeRefreshLayout.setRefreshing(false);
-                        int total = allFollowers.size();
-                        for (int i = 0; i<total; i++) {
-                            allFollowers.remove(0);
+            Log.i("INFOGUE/" + mType, "URL " + apiFollowerUrl);
+            JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, apiFollowerUrl, null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                String status = response.getString("status");
+
+                                JSONObject contributors = response.getJSONObject(mType.toLowerCase());
+                                String nextUrl = contributors.getString("next_page_url");
+                                int currentPage = contributors.getInt("current_page");
+                                int lastPage = contributors.getInt("last_page");
+                                JSONArray data = contributors.optJSONArray("data");
+
+                                apiFollowerUrl = nextUrl;
+
+                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                    if (swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()) {
+                                        allFollowers.remove(allFollowers.size() - 1);
+                                        followerAdapter.notifyItemRemoved(allFollowers.size());
+                                    } else {
+                                        swipeRefreshLayout.setRefreshing(false);
+                                        int total = allFollowers.size();
+                                        for (int i = 0; i < total; i++) {
+                                            allFollowers.remove(0);
+                                        }
+                                        followerAdapter.notifyItemRangeRemoved(0, total);
+                                    }
+
+                                    List<Contributor> moreFollowers = new ArrayList<>();
+                                    if (data != null) {
+                                        for (int i = 0; i < data.length(); i++) {
+                                            JSONObject contributorData = data.getJSONObject(i);
+
+                                            Contributor contributor = new Contributor();
+                                            contributor.setId(contributorData.getInt(Contributor.CONTRIBUTOR_ID));
+                                            contributor.setToken(contributorData.getString(Contributor.CONTRIBUTOR_TOKEN));
+                                            contributor.setUsername(contributorData.getString(Contributor.CONTRIBUTOR_USERNAME));
+                                            contributor.setName(contributorData.getString(Contributor.CONTRIBUTOR_NAME));
+                                            contributor.setEmail(contributorData.getString(Contributor.CONTRIBUTOR_EMAIL));
+                                            contributor.setLocation(contributorData.getString(Contributor.CONTRIBUTOR_LOCATION));
+                                            contributor.setAbout(contributorData.getString(Contributor.CONTRIBUTOR_ABOUT));
+                                            contributor.setAvatar(contributorData.getString(Contributor.CONTRIBUTOR_AVATAR_REF));
+                                            contributor.setCover(contributorData.getString(Contributor.CONTRIBUTOR_COVER_REF));
+                                            contributor.setStatus(contributorData.getString(Contributor.CONTRIBUTOR_STATUS));
+                                            contributor.setArticle(contributorData.getInt(Contributor.CONTRIBUTOR_ARTICLE));
+                                            contributor.setFollowers(contributorData.getInt(Contributor.CONTRIBUTOR_FOLLOWERS));
+                                            contributor.setFollowing(contributorData.getInt(Contributor.CONTRIBUTOR_FOLLOWING));
+                                            contributor.setIsFollowing(contributorData.getInt(Contributor.CONTRIBUTOR_IS_FOLLOWING) == 1);
+                                            moreFollowers.add(contributor);
+                                        }
+                                    }
+
+                                    int curSize = followerAdapter.getItemCount();
+                                    allFollowers.addAll(moreFollowers);
+
+                                    if (allFollowers.size() <= 0) {
+                                        isEndOfPage = true;
+                                        Log.i("INFOGUE/Contributor", "EMPTY on page " + page);
+                                        Contributor emptyContributor = new Contributor(0, null);
+                                        allFollowers.add(emptyContributor);
+                                    } else if (currentPage >= lastPage) {
+                                        isEndOfPage = true;
+                                        Log.i("INFOGUE/Contributor", "END on page " + page);
+                                        Contributor endContributor = new Contributor(-1, null);
+                                        allFollowers.add(endContributor);
+                                    }
+
+                                    followerAdapter.notifyItemRangeInserted(curSize, allFollowers.size() - 1);
+                                    Log.i("INFOGUE/Contributor", "Load More page " + page);
+                                } else {
+                                    // remove loading
+                                    allFollowers.remove(allFollowers.size() - 1);
+                                    followerAdapter.notifyItemRemoved(allFollowers.size());
+
+                                    // indicate the error
+                                    isEndOfPage = true;
+                                    Log.i("INFOGUE/Contributor", "Failure on page " + page);
+                                    Contributor failureContributor = new Contributor(-1, null);
+                                    allFollowers.add(failureContributor);
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-                        followerAdapter.notifyItemRangeRemoved(0, total);
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // indicate the error or timeout
+                            isEndOfPage = true;
+                            Log.i("INFOGUE/Contributor", "Failure or timeout on page " + page);
+                            Contributor failureContributor = new Contributor(-1, null);
+                            allFollowers.add(failureContributor);
+                        }
                     }
+            );
+            contributorRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    15000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-                    List<Contributor> moreFollowers = !isEmptyPage ? DummyFollowerContent.generateDummy(page) : new ArrayList<Contributor>();
-                    int curSize = followerAdapter.getItemCount();
-                    allFollowers.addAll(moreFollowers);
-
-                    if (allFollowers.size() <= 0) {
-                        isEndOfPage = true;
-                        Log.i("INFOGUE/Contributor", "EMPTY on page " + page);
-                        Contributor emptyContributor = new Contributor(0, null);
-                        allFollowers.add(emptyContributor);
-                    } else if (allFollowers.size() >= 100) {
-                        isEndOfPage = true;
-                        Log.i("INFOGUE/Contributor", "END on page " + page);
-                        Contributor endContributor = new Contributor(-1, null);
-                        allFollowers.add(endContributor);
-                    }
-
-                    followerAdapter.notifyItemRangeInserted(curSize, allFollowers.size() - 1);
-                    Log.i("INFOGUE/Contributor", "Load More page " + page);
-                }
-            }, 3000);
+            VolleySingleton.getInstance(getContext()).addToRequestQueue(contributorRequest);
         }
     }
 
-    public void refreshArticleList(SwipeRefreshLayout swipeRefresh){
+    public void refreshArticleList(SwipeRefreshLayout swipeRefresh) {
         swipeRefreshLayout = swipeRefresh;
         isEndOfPage = false;
-        isEmptyPage = false;
+        apiFollowerUrl = apiFollowerUrlFirstPage;
 
         loadFollowers(0);
     }

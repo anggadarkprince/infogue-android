@@ -2,6 +2,7 @@ package com.sketchproject.infogue.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,12 +15,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
 import com.sketchproject.infogue.utils.UrlHelper;
 
@@ -63,6 +65,14 @@ public class ProfileActivity extends AppCompatActivity implements
             username = extras.getString(SessionManager.KEY_USERNAME);
             isFollowing = extras.getBoolean(SessionManager.KEY_IS_FOLLOWING);
 
+            String status = extras.getString(SessionManager.KEY_STATUS, "");
+            if (!status.equals(Contributor.STATUS_ACTIVATED)) {
+                AppHelper.toastColored(getBaseContext(), "Contributor is " + status, Color.parseColor("#ddd1205e"));
+                Intent returnIntent = new Intent();
+                setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
+                finish();
+            }
+
             if (mNameView != null) {
                 mNameView.setText(extras.getString(SessionManager.KEY_NAME));
             }
@@ -103,7 +113,7 @@ public class ProfileActivity extends AppCompatActivity implements
 
             buildProfileEventHandler(contributorId, username);
         } else {
-            Toast.makeText(getBaseContext(), "Invalid user profile", Toast.LENGTH_LONG).show();
+            AppHelper.toastColored(getBaseContext(), "Invalid user profile", Color.parseColor("#ddd1205e"));
             Intent returnIntent = new Intent();
             setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
             finish();

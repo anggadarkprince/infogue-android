@@ -37,6 +37,7 @@ public class SessionManager {
     public static final String KEY_USERNAME = "username";
     public static final String KEY_TOKEN = "token";
     public static final String KEY_IS_FOLLOWING = "followed";
+    public static final String KEY_STATUS = "status";
     public static final String KEY_USER_LEARNED = "learned";
 
     public SessionManager(Context context) {
@@ -60,6 +61,7 @@ public class SessionManager {
         editor.putString(KEY_ABOUT, String.valueOf(session.get(KEY_ABOUT)));
         editor.putString(KEY_AVATAR, String.valueOf(session.get(KEY_AVATAR)));
         editor.putString(KEY_COVER, String.valueOf(session.get(KEY_COVER)));
+        editor.putString(KEY_STATUS, String.valueOf(session.get(KEY_STATUS)));
         editor.putInt(KEY_ARTICLE, Integer.parseInt(String.valueOf(session.get(KEY_ARTICLE))));
         editor.putInt(KEY_FOLLOWER, Integer.parseInt(String.valueOf(session.get(KEY_FOLLOWER))));
         editor.putInt(KEY_FOLLOWING, Integer.parseInt(String.valueOf(session.get(KEY_FOLLOWING))));

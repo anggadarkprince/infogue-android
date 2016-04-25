@@ -118,7 +118,7 @@ public class ArticleActivity extends AppCompatActivity implements
                 }
             }
 
-            Fragment fragment = ArticleFragment.newInstanceAuthor(1, authorId, isMyArticle, query);
+            Fragment fragment = ArticleFragment.newInstanceAuthor(1, authorId, authorUsername, isMyArticle, query);
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.fragment, fragment);

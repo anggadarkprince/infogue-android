@@ -7,6 +7,23 @@ import java.util.Date;
  * Created by Angga on 10/04/2016 21.32.
  */
 public class Contributor {
+    public static final String CONTRIBUTOR_ID = "id";
+    public static final String CONTRIBUTOR_TOKEN = "api_token";
+    public static final String CONTRIBUTOR_USERNAME = "username";
+    public static final String CONTRIBUTOR_EMAIL = "email";
+    public static final String CONTRIBUTOR_NAME = "name";
+    public static final String CONTRIBUTOR_LOCATION = "location";
+    public static final String CONTRIBUTOR_ABOUT = "about";
+    public static final String CONTRIBUTOR_AVATAR = "avatar";
+    public static final String CONTRIBUTOR_AVATAR_REF = "avatar_ref";
+    public static final String CONTRIBUTOR_COVER = "cover";
+    public static final String CONTRIBUTOR_COVER_REF = "cover_ref";
+    public static final String CONTRIBUTOR_STATUS = "status";
+    public static final String CONTRIBUTOR_ARTICLE = "article_total";
+    public static final String CONTRIBUTOR_FOLLOWERS = "followers_total";
+    public static final String CONTRIBUTOR_FOLLOWING = "following_total";
+    public static final String CONTRIBUTOR_IS_FOLLOWING = "is_following";
+
     public static final String GENDER_MALE = "male";
     public static final String GENDER_FEMALE = "female";
     public static final String GENDER_OTHER = "other";
@@ -16,6 +33,7 @@ public class Contributor {
     public static final String STATUS_SUSPENDED = "suspended";
 
     private int id;
+    private String token;
     private String username;
     private String email;
     private String password;
@@ -37,6 +55,7 @@ public class Contributor {
     private boolean pushNotification;
     private String avatar;
     private String cover;
+    private String status;
     private int article;
     private int followers;
     private int following;
@@ -259,4 +278,19 @@ public class Contributor {
         this.isFollowing = isFollowing;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

@@ -49,6 +49,7 @@ public class ArticleFragment extends Fragment {
     private static final String ARG_SUBCATEGORY = "subcategory";
     private static final String ARG_FEATURED = "featured";
     private static final String ARG_AUTHOR_ID = "author-id";
+    private static final String ARG_AUTHOR_USERNAME = "author-username";
     private static final String ARG_AUTHOR_IS_ME = "author-is-me";
     private static final String ARG_QUERY = "search-query";
 
@@ -65,6 +66,8 @@ public class ArticleFragment extends Fragment {
     private String mSubcategory;
     private String mFeatured;
     private int mAuthorId;
+    private String mAuthorUsername;
+    private String mQuery;
     private boolean mMyArticle = false;
     private boolean hasHeader = false;
     private boolean isFirstCall = true;
@@ -96,12 +99,13 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
-    public static ArticleFragment newInstanceAuthor(int columnCount, int id, boolean isMyArticle, String query) {
+    public static ArticleFragment newInstanceAuthor(int columnCount, int id, String username, boolean isMyArticle, String query) {
         ArticleFragment fragment = new ArticleFragment();
 
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putInt(ARG_AUTHOR_ID, id);
+        args.putString(ARG_AUTHOR_USERNAME, username);
         args.putBoolean(ARG_AUTHOR_IS_ME, isMyArticle);
         args.putString(ARG_QUERY, query);
 
@@ -163,7 +167,9 @@ public class ArticleFragment extends Fragment {
             mSubcategory = getArguments().getString(ARG_SUBCATEGORY);
             mFeatured = getArguments().getString(ARG_FEATURED);
             mAuthorId = getArguments().getInt(ARG_AUTHOR_ID);
+            mAuthorUsername = getArguments().getString(ARG_AUTHOR_USERNAME);
             mMyArticle = getArguments().getBoolean(ARG_AUTHOR_IS_ME);
+            mQuery = getArguments().getString(ARG_QUERY);
         }
 
         if (mSubcategoryId > 0 && mSubcategory != null) {
@@ -177,7 +183,8 @@ public class ArticleFragment extends Fragment {
             Log.i("INFOGUE/Article", "Featured : " + mFeatured);
             apiArticleUrl = UrlHelper.getApiFeaturedUrl(mFeatured, 0);
         } else if (mAuthorId != 0) {
-            Log.i("INFOGUE/ARTICLE", "Contributor ID : " + String.valueOf(mAuthorId));
+            Log.i("INFOGUE/ARTICLE", "Contributor ID : " + String.valueOf(mAuthorId)+" Username : "+mAuthorUsername);
+            apiArticleUrl = UrlHelper.getApiArticleUrl(mAuthorId, mAuthorUsername, mMyArticle, mQuery);
         } else {
             Log.i("INFOGUE/Article", "Default");
         }
@@ -290,6 +297,7 @@ public class ArticleFragment extends Fragment {
                                             article.setPublishedAt(articleData.getString(Article.ARTICLE_PUBLISHED_AT));
                                             article.setView(articleData.getInt(Article.ARTICLE_VIEW));
                                             article.setRating(articleData.getInt(Article.ARTICLE_RATING));
+                                            article.setStatus(articleData.getString(Article.ARTICLE_STATUS));
                                             moreArticles.add(article);
                                         }
                                     }

@@ -27,6 +27,48 @@ public class UrlHelper {
         return url;
     }
 
+    public static String getApiFollowerUrl(String type, int relatedId, String username, String query) {
+        String related = "contributor_id=" + relatedId;
+        String search = "query=" + query;
+        String optionalQuery = "";
+        String url = Constant.BASE_URL_API + "contributor/" + username + "/" + type.toLowerCase();
+
+        optionalQuery += related;
+        if (query != null) {
+            if (!optionalQuery.isEmpty()) {
+                optionalQuery += "&";
+            }
+            optionalQuery += search;
+        }
+
+        if (!optionalQuery.isEmpty()) {
+            url += "?" + optionalQuery;
+        }
+        return url;
+    }
+
+    public static String getApiArticleUrl(int authorId, String authorUsername, boolean isMyArticle, String query) {
+        String author = "contributor_id=" + authorId;
+        String myArticle = "my_article=" + isMyArticle;
+        String search = "query=" + query;
+        String optionalQuery = "";
+        String url = Constant.BASE_URL_API + "contributor/" + authorUsername + "/article";
+
+        optionalQuery += author;
+        optionalQuery += "&"+myArticle;
+        if (query != null) {
+            if (!optionalQuery.isEmpty()) {
+                optionalQuery += "&";
+            }
+            optionalQuery += search;
+        }
+
+        if (!optionalQuery.isEmpty()) {
+            url += "?" + optionalQuery;
+        }
+        return url;
+    }
+
     public static String getContributorDetailUrl(String username) {
         return Constant.BASE_URL + "contributor/" + username + "/detail";
     }

@@ -21,12 +21,13 @@ public class Article {
     public static final String ARTICLE_TAGS = "tags";
     public static final String ARTICLE_VIEW = "view";
     public static final String ARTICLE_RATING = "total_rating";
+    public static final String ARTICLE_STATUS = "status";
 
-    public static final String STATUS_PENDING = "PENDING";
-    public static final String STATUS_UPDATED = "UPDATED";
-    public static final String STATUS_REJECTED = "REJECTED";
-    public static final String STATUS_PUBLISHED = "PUBLISHED";
-    public static final String STATUS_DRAFT = "DRAFT";
+    public static final String STATUS_PENDING = "pending";
+    public static final String STATUS_UPDATED = "updated";
+    public static final String STATUS_REJECTED = "reject";
+    public static final String STATUS_PUBLISHED = "published";
+    public static final String STATUS_DRAFT = "draft";
 
     private int id;
     private String slug;

@@ -366,6 +366,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                     getActivity().finish();
                                     Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
                                     SessionManager session = new SessionManager(getContext());
+
                                     profileIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
                                     profileIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
                                     profileIntent.putExtra(SessionManager.KEY_NAME, session.getSessionData(SessionManager.KEY_NAME, null));
@@ -373,6 +374,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                     profileIntent.putExtra(SessionManager.KEY_ABOUT, session.getSessionData(SessionManager.KEY_ABOUT, null));
                                     profileIntent.putExtra(SessionManager.KEY_AVATAR, session.getSessionData(SessionManager.KEY_AVATAR, null));
                                     profileIntent.putExtra(SessionManager.KEY_COVER, session.getSessionData(SessionManager.KEY_COVER, null));
+                                    profileIntent.putExtra(SessionManager.KEY_STATUS, session.getSessionData(SessionManager.KEY_STATUS, null));
                                     profileIntent.putExtra(SessionManager.KEY_ARTICLE, session.getSessionData(SessionManager.KEY_ARTICLE, 0));
                                     profileIntent.putExtra(SessionManager.KEY_FOLLOWER, session.getSessionData(SessionManager.KEY_FOLLOWER, 0));
                                     profileIntent.putExtra(SessionManager.KEY_FOLLOWING, session.getSessionData(SessionManager.KEY_FOLLOWING, 0));
@@ -469,6 +471,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
             user.put(SessionManager.KEY_ABOUT, result.getString("about"));
             user.put(SessionManager.KEY_AVATAR, result.getString("avatar_ref"));
             user.put(SessionManager.KEY_COVER, result.getString("cover_ref"));
+            user.put(SessionManager.KEY_STATUS, result.getString("status"));
             user.put(SessionManager.KEY_ARTICLE, result.getInt("article_total"));
             user.put(SessionManager.KEY_FOLLOWER, result.getInt("followers_total"));
             user.put(SessionManager.KEY_FOLLOWING, result.getInt("following_total"));

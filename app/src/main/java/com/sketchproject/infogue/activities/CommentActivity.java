@@ -2,7 +2,9 @@ package com.sketchproject.infogue.activities;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -94,14 +96,26 @@ public class CommentActivity extends AppCompatActivity {
         return true;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
             finish();
+        } else if (id == R.id.action_feedback) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_FEEDBACK));
+            startActivity(browserIntent);
+        } else if (id == R.id.action_help) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_HELP));
+            startActivity(browserIntent);
+        } else if (id == R.id.action_rating) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_APP));
+            startActivity(browserIntent);
+        } else if (id == R.id.action_about) {
+            Intent aboutActivity = new Intent(getBaseContext(), AboutActivity.class);
+            startActivity(aboutActivity);
         }
+
         return super.onOptionsItemSelected(item);
     }
 }
