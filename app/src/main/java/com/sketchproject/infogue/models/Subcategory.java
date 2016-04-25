@@ -6,13 +6,15 @@ package com.sketchproject.infogue.models;
  */
 public class Subcategory {
     public static final String TABLE = "subcategory";
-    public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_CATEGORY_ID = "categoryId";
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_CATEGORY_ID = "category_id";
     public static final String COLUMN_SUBCATEGORY = "subcategory";
+    public static final String COLUMN_LABEL = "label";
 
     private int id;
     private int category_id;
     private String subcategory;
+    private String label;
 
     public int getId() {
         return id;
@@ -36,5 +38,13 @@ public class Subcategory {
 
     public void setSubcategory(String subcategory) {
         this.subcategory = subcategory;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 }

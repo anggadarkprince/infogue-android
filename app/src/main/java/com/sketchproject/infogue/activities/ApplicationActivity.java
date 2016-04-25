@@ -1,5 +1,6 @@
 package com.sketchproject.infogue.activities;
 
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,20 +39,35 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.HomeFragment;
 import com.sketchproject.infogue.models.Article;
+import com.sketchproject.infogue.models.Category;
+import com.sketchproject.infogue.models.Repositories.CategoryRepository;
+import com.sketchproject.infogue.models.Repositories.SubcategoryRepository;
+import com.sketchproject.infogue.models.Subcategory;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.IconizedMenu;
 import com.sketchproject.infogue.modules.ObjectPooling;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
 import com.sketchproject.infogue.utils.UrlHelper;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class ApplicationActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
@@ -63,8 +79,9 @@ public class ApplicationActivity extends AppCompatActivity implements
     private SwipeRefreshLayout swipeRefreshLayout;
     private SessionManager session;
     private ConnectionDetector connectionDetector;
-    private AlertDialog dialogExit;
+    private AlertDialog dialogConfirmation;
     private ObjectPooling objectPooling;
+    private ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +92,10 @@ public class ApplicationActivity extends AppCompatActivity implements
         connectionDetector.setLostConnectionListener(this);
         session = new SessionManager(getBaseContext());
         objectPooling = new ObjectPooling();
+
+        progress = new ProgressDialog(this);
+        progress.setMessage("Downloading Category Menu");
+        progress.setIndeterminate(true);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -100,7 +121,6 @@ public class ApplicationActivity extends AppCompatActivity implements
             home = navigationView.getMenu().getItem(0).getSubMenu().getItem(0);
         }
         onNavigationItemSelected(home);
-        populateMenu();
 
         View navigationHeader = navigationView.getHeaderView(0);
 
@@ -110,7 +130,11 @@ public class ApplicationActivity extends AppCompatActivity implements
             if (drawer != null) {
                 drawer.openDrawer(GravityCompat.START);
             }
-            session.setSessionData(SessionManager.KEY_USER_LEARNED, true);
+            downloadCategoryMenu();
+        }
+        else{
+            CategoryRepository categoryRepository = new CategoryRepository();
+            populateMenu(categoryRepository.retrieveData());
         }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
@@ -138,6 +162,74 @@ public class ApplicationActivity extends AppCompatActivity implements
         swipeRefreshLayout.setEnabled(state);
     }
 
+    private void downloadCategoryMenu(){
+        progress.show();
+        JsonObjectRequest menuRequest = new JsonObjectRequest(Request.Method.GET, Constant.URL_API_CATEGORY, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String status = response.getString("status");
+                            JSONArray categories = response.getJSONArray("menus");
+
+                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                CategoryRepository categoryRepository = new CategoryRepository();
+                                categoryRepository.clearData();
+                                SubcategoryRepository subcategoryRepository = new SubcategoryRepository();
+                                subcategoryRepository.clearData();
+
+                                for (int i =0; i< categories.length();i++){
+                                    JSONObject categoryObject = categories.getJSONObject(i);
+
+                                    Category category = new Category();
+                                    category.setId(categoryObject.getInt(Category.COLUMN_ID));
+                                    category.setCategory(categoryObject.getString(Category.COLUMN_CATEGORY));
+
+                                    categoryRepository.createData(category);
+
+                                    JSONArray subcategories = categoryObject.getJSONArray("subcategories");
+                                    for(int j = 0; j<subcategories.length(); j++){
+                                        JSONObject subcategoryObject = subcategories.getJSONObject(j);
+
+                                        Subcategory subcategory = new Subcategory();
+                                        subcategory.setId(subcategoryObject.getInt(Subcategory.COLUMN_ID));
+                                        subcategory.setCategoryId(subcategoryObject.getInt(Subcategory.COLUMN_CATEGORY_ID));
+                                        subcategory.setSubcategory(subcategoryObject.getString(Subcategory.COLUMN_SUBCATEGORY));
+                                        subcategory.setLabel(subcategoryObject.getString(Subcategory.COLUMN_LABEL));
+
+                                        subcategoryRepository.createData(subcategory);
+                                    }
+
+                                    populateMenu(categoryRepository.retrieveData());
+                                }
+                                session.setSessionData(SessionManager.KEY_USER_LEARNED, true);
+                            } else {
+                                progress.cancel();
+                                confirmRetry();
+                            }
+                        } catch (JSONException e) {
+                            progress.cancel();
+                            e.printStackTrace();
+                        }
+                        progress.dismiss();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progress.cancel();
+                        confirmRetry();
+                    }
+                }
+        );
+        menuRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        // Access the RequestQueue through your singleton class.
+        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(menuRequest);
+    }
     /**
      * Decide to show which header and set according login status.
      *
@@ -250,6 +342,28 @@ public class ApplicationActivity extends AppCompatActivity implements
         return false;
     }
 
+    private void confirmRetry(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
+        builder.setTitle(R.string.action_retry);
+        builder.setMessage(R.string.message_request_timeout);
+        builder.setPositiveButton(R.string.action_retry, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                downloadCategoryMenu();
+            }
+        });
+        builder.setNegativeButton(R.string.action_exit, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+
+        dialogConfirmation = builder.create();
+        dialogConfirmation.show();
+        AppHelper.dialogButtonTheme(this, dialogConfirmation);
+    }
+
     /**
      * Show confirm dialog before exit.
      */
@@ -277,9 +391,9 @@ public class ApplicationActivity extends AppCompatActivity implements
             }
         });
 
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        AppHelper.dialogButtonTheme(this, dialog);
+        dialogConfirmation = builder.create();
+        dialogConfirmation.show();
+        AppHelper.dialogButtonTheme(this, dialogConfirmation);
     }
 
     /**
@@ -302,9 +416,9 @@ public class ApplicationActivity extends AppCompatActivity implements
             }
         });
 
-        dialogExit = builder.create();
-        dialogExit.show();
-        AppHelper.dialogButtonTheme(this, dialogExit);
+        dialogConfirmation = builder.create();
+        dialogConfirmation.show();
+        AppHelper.dialogButtonTheme(this, dialogConfirmation);
     }
 
     /**
@@ -369,14 +483,12 @@ public class ApplicationActivity extends AppCompatActivity implements
     /**
      * Create category menu on navigation drawer.
      */
-    private void populateMenu() {
+    private void populateMenu(List<Category> menu) {
         SubMenu navMenu = navigationView.getMenu().getItem(1).getSubMenu();
-
-        String[] dataNav = {"News", "Economic", "Entertainment", "Sport", "Science", "Technology", "Education", "Photo", "Video", "Others"};
-        int[] dataNavId = {11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
-
-        for (int i = 0; i < dataNav.length; i++) {
-            navMenu.add(1, dataNavId[i], Menu.CATEGORY_ALTERNATIVE, dataNav[i])
+        navMenu.clear();
+        for (int i = 0; i < menu.size(); i++) {
+            Category category = menu.get(i);
+            navMenu.add(1, category.getId(), Menu.CATEGORY_ALTERNATIVE, category.getCategory())
                     .setCheckable(true)
                     .setIcon(R.drawable.ic_circle);
         }
@@ -393,8 +505,8 @@ public class ApplicationActivity extends AppCompatActivity implements
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
             } else {
-                if (dialogExit != null && dialogExit.isShowing()) {
-                    dialogExit.cancel();
+                if (dialogConfirmation != null && dialogConfirmation.isShowing()) {
+                    dialogConfirmation.cancel();
                 } else {
                     confirmExit();
                 }

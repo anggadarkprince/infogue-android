@@ -6,7 +6,7 @@ package com.sketchproject.infogue.models;
  */
 public class Category {
     public static final String TABLE = "category";
-    public static final String COLUMN_ID = "_id";
+    public static final String COLUMN_ID = "id";
     public static final String COLUMN_CATEGORY = "category";
 
     private int id;

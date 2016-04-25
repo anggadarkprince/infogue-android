@@ -38,7 +38,7 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
         String[] projection = {Category.COLUMN_ID, Category.COLUMN_CATEGORY};
 
         // How we want the results sorted in the resulting Cursor
-        String sortOrder = Category.COLUMN_ID + " DESC";
+        String sortOrder = Category.COLUMN_ID + " ASC";
 
         Cursor cursor = db.query(
                 Category.TABLE,     // The table to query
@@ -117,6 +117,15 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
         String selection = Category.COLUMN_ID + " = ?";
         String[] selectionArgs = {String.valueOf(data.getId())};
         int affectedRows = db.delete(Category.TABLE, selection, selectionArgs);
+
+        db.close();
+        return affectedRows > 0;
+    }
+
+    public boolean clearData(){
+        SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
+
+        int affectedRows = db.delete(Category.TABLE, null, null);
 
         db.close();
         return affectedRows > 0;

@@ -24,6 +24,7 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
         values.put(Subcategory.COLUMN_ID, data.getId());
         values.put(Subcategory.COLUMN_CATEGORY_ID, data.getCategoryId());
         values.put(Subcategory.COLUMN_SUBCATEGORY, data.getSubcategory());
+        values.put(Subcategory.COLUMN_LABEL, data.getLabel());
 
         long newSubCategoryId = db.insert(Subcategory.TABLE, null, values);
         db.close();
@@ -36,10 +37,10 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
         SQLiteDatabase db = DatabaseManager.getInstance().getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
-        String[] projection = {Subcategory.COLUMN_ID, Subcategory.COLUMN_CATEGORY_ID, Subcategory.COLUMN_SUBCATEGORY};
+        String[] projection = {Subcategory.COLUMN_ID, Subcategory.COLUMN_CATEGORY_ID, Subcategory.COLUMN_SUBCATEGORY, Subcategory.COLUMN_LABEL};
 
         // How we want the results sorted in the resulting Cursor
-        String sortOrder = Subcategory.COLUMN_ID + " DESC";
+        String sortOrder = Subcategory.COLUMN_ID + " ASC";
 
         Cursor cursor = db.query(Subcategory.TABLE, projection, null, null, null, null, sortOrder);
 
@@ -52,6 +53,7 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
                 subcategory.setId(cursor.getInt(cursor.getColumnIndexOrThrow(Subcategory.COLUMN_ID)));
                 subcategory.setCategoryId(cursor.getInt(cursor.getColumnIndexOrThrow(Subcategory.COLUMN_CATEGORY_ID)));
                 subcategory.setSubcategory(cursor.getString(cursor.getColumnIndex(Subcategory.COLUMN_SUBCATEGORY)));
+                subcategory.setLabel(cursor.getString(cursor.getColumnIndex(Subcategory.COLUMN_LABEL)));
                 subcategoryList.add(subcategory);
             } while (cursor.moveToNext());
         }
@@ -67,7 +69,7 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
         SQLiteDatabase db = DatabaseManager.getInstance().getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
-        String[] projection = {Subcategory.COLUMN_ID, Subcategory.COLUMN_CATEGORY_ID, Subcategory.COLUMN_SUBCATEGORY};
+        String[] projection = {Subcategory.COLUMN_ID, Subcategory.COLUMN_CATEGORY_ID, Subcategory.COLUMN_SUBCATEGORY, Subcategory.COLUMN_LABEL};
 
         String selection = Subcategory.COLUMN_ID + " = ?";
         String[] selectionArgs = {String.valueOf(data.getId())};
@@ -78,6 +80,7 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
             subcategory.setId(cursor.getInt(cursor.getColumnIndexOrThrow(Subcategory.COLUMN_ID)));
             subcategory.setCategoryId(cursor.getInt(cursor.getColumnIndexOrThrow(Subcategory.COLUMN_CATEGORY_ID)));
             subcategory.setSubcategory(cursor.getString(cursor.getColumnIndex(Subcategory.COLUMN_SUBCATEGORY)));
+            subcategory.setLabel(cursor.getString(cursor.getColumnIndex(Subcategory.COLUMN_LABEL)));
         }
 
         cursor.close();
@@ -95,6 +98,7 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
         values.put(Subcategory.COLUMN_ID, data.getId());
         values.put(Subcategory.COLUMN_CATEGORY_ID, data.getCategoryId());
         values.put(Subcategory.COLUMN_SUBCATEGORY, data.getSubcategory());
+        values.put(Subcategory.COLUMN_LABEL, data.getLabel());
 
         // Which row to update, based on the ID
         String selection = Subcategory.COLUMN_ID + " = ?";
@@ -118,4 +122,12 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
         return affectedRows > 0;
     }
 
+    public boolean clearData(){
+        SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
+
+        int affectedRows = db.delete(Subcategory.TABLE, null, null);
+
+        db.close();
+        return affectedRows > 0;
+    }
 }

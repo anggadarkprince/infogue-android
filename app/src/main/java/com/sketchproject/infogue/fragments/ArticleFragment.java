@@ -245,7 +245,7 @@ public class ArticleFragment extends Fragment {
             }
 
             Log.i("INFOGUE/Article", "URL " + apiArticleUrl);
-            JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.GET, apiArticleUrl, null,
+            JsonObjectRequest articleRequest = new JsonObjectRequest(Request.Method.GET, apiArticleUrl, null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
@@ -338,13 +338,12 @@ public class ArticleFragment extends Fragment {
                         }
                     }
             );
-            postRequest.setRetryPolicy(new DefaultRetryPolicy(
+            articleRequest.setRetryPolicy(new DefaultRetryPolicy(
                     15000,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-            // Access the RequestQueue through your singleton class.
-            VolleySingleton.getInstance(getContext()).addToRequestQueue(postRequest);
+            VolleySingleton.getInstance(getContext()).addToRequestQueue(articleRequest);
         }
     }
 
