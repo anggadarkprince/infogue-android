@@ -70,7 +70,11 @@ public class UrlHelper {
     }
 
     public static String getApiPostUrl(String slug, int loggedId) {
-        return Constant.BASE_URL_API + "article/" + slug+"?contributor_id="+loggedId;
+        return Constant.BASE_URL_API + "article/" + slug + "?contributor_id=" + loggedId;
+    }
+
+    public static String getApiContributorUrl(String username) {
+        return Constant.BASE_URL_API + "contributor/" + username;
     }
 
     public static String getContributorDetailUrl(String username) {

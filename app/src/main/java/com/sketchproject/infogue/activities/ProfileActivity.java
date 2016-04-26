@@ -16,14 +16,29 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
 import com.sketchproject.infogue.utils.UrlHelper;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity implements
         ConnectionDetector.OnLostConnectionListener,
@@ -33,6 +48,10 @@ public class ProfileActivity extends AppCompatActivity implements
 
     private SessionManager session;
     private ConnectionDetector connectionDetector;
+
+    private TextView mArticleView;
+    private TextView mFollowerView;
+    private TextView mFollowingView;
 
     private int contributorId;
     private String username;
@@ -55,11 +74,12 @@ public class ProfileActivity extends AppCompatActivity implements
         TextView mNameView = (TextView) findViewById(R.id.name);
         TextView mLocationView = (TextView) findViewById(R.id.location);
         TextView mAboutView = (TextView) findViewById(R.id.about);
-        TextView mArticleView = (TextView) findViewById(R.id.valueArticle);
-        TextView mFollowerView = (TextView) findViewById(R.id.valueFollower);
-        TextView mFollowingView = (TextView) findViewById(R.id.valueFollowing);
         ImageView mAvatarImage = (ImageView) findViewById(R.id.avatar);
         ImageView mCoverImage = (ImageView) findViewById(R.id.cover);
+
+        mArticleView = (TextView) findViewById(R.id.valueArticle);
+        mFollowerView = (TextView) findViewById(R.id.valueFollower);
+        mFollowingView = (TextView) findViewById(R.id.valueFollowing);
 
         final Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -177,6 +197,8 @@ public class ProfileActivity extends AppCompatActivity implements
         // Open my profile
         int loggedUserId = session.getSessionData(SessionManager.KEY_ID, 0);
         if (session.isLoggedIn() && loggedUserId == idContributor) {
+            updateProfileInBackground();
+
             if (mDetailButton != null) {
                 mDetailButton.setVisibility(View.VISIBLE);
             }
@@ -259,12 +281,198 @@ public class ProfileActivity extends AppCompatActivity implements
         if (isFollowing) {
             stateUnfollow(mFollowButton);
             Log.i("INFOGUE/PROFILE", "Unfollow " + contributorId + " " + username);
+
+            StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_UNFOLLOW,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject result = new JSONObject(response);
+                                String status = result.getString("status");
+                                String message = result.getString("message");
+
+                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                    Log.i("Infogue/Unfollow", message);
+                                } else {
+                                    Log.w("Infogue/Unfollow", getString(R.string.error_unknown));
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            NetworkResponse networkResponse = error.networkResponse;
+                            String errorMessage = getString(R.string.error_unknown);
+                            if (networkResponse == null) {
+                                if (error.getClass().equals(TimeoutError.class)) {
+                                    errorMessage = getString(R.string.error_timeout);
+                                }
+                            } else {
+                                String result = new String(networkResponse.data);
+                                try {
+                                    JSONObject response = new JSONObject(result);
+                                    String status = response.getString("status");
+                                    String message = response.getString("message");
+
+                                    if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                        errorMessage = message + ", please login again!";
+                                    } else if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                        errorMessage = message;
+                                    } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                        errorMessage = message;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+
+                            stateFollow(mFollowButton);
+                        }
+                    }
+            ) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("api_token", session.getSessionData(SessionManager.KEY_TOKEN, null));
+                    params.put("contributor_id", String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
+                    params.put("following_id", String.valueOf(contributorId));
+                    params.put("_method", "delete");
+                    return params;
+                }
+            };
+            postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    15000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
         } else {
             stateFollow(mFollowButton);
             Log.i("INFOGUE/PROFILE", "Follow " + contributorId + " " + username);
+
+            StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_FOLLOW,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject result = new JSONObject(response);
+                                String status = result.getString("status");
+                                String message = result.getString("message");
+
+                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                    Log.i("Infogue/Follow", message);
+                                } else {
+                                    Log.w("Infogue/Follow", getString(R.string.error_unknown));
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            NetworkResponse networkResponse = error.networkResponse;
+                            String errorMessage = getString(R.string.error_unknown);
+                            if (networkResponse == null) {
+                                if (error.getClass().equals(TimeoutError.class)) {
+                                    errorMessage = getString(R.string.error_timeout);
+                                }
+                            } else {
+                                String result = new String(networkResponse.data);
+                                try {
+                                    JSONObject response = new JSONObject(result);
+                                    String status = response.getString("status");
+                                    String message = response.getString("message");
+
+                                    if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                        errorMessage = message + ", please login again!";
+                                    } else if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                        errorMessage = message;
+                                    } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                        errorMessage = message;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+
+                            stateUnfollow(mFollowButton);
+                        }
+                    }
+            ) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("api_token", session.getSessionData(SessionManager.KEY_TOKEN, null));
+                    params.put("contributor_id", String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
+                    params.put("following_id", String.valueOf(contributorId));
+                    return params;
+                }
+            };
+            postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    15000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
         }
 
         isFollowing = !isFollowing;
+    }
+
+    private void updateProfileInBackground() {
+        JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, UrlHelper.getApiContributorUrl(username), null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String status = response.getString("status");
+                            JSONObject contributor = response.getJSONObject("contributor");
+
+                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                session.setSessionData(SessionManager.KEY_ARTICLE, contributor.getInt("article_total"));
+                                session.setSessionData(SessionManager.KEY_FOLLOWER, contributor.getInt("followers_total"));
+                                session.setSessionData(SessionManager.KEY_FOLLOWING, contributor.getInt("following_total"));
+
+                                mArticleView.setText(String.valueOf(session.getSessionData(SessionManager.KEY_ARTICLE, 0)));
+                                mFollowerView.setText(String.valueOf(session.getSessionData(SessionManager.KEY_FOLLOWER, 0)));
+                                mFollowingView.setText(String.valueOf(session.getSessionData(SessionManager.KEY_FOLLOWING, 0)));
+                            } else {
+                                Log.w("Infogue/Profile", getString(R.string.error_unknown));
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if (error.networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                Log.e("Infogue/Profile", getString(R.string.error_timeout));
+                            } else {
+                                Log.e("Infogue/Profile", getString(R.string.error_unknown));
+                            }
+                        } else {
+                            Log.e("Infogue/Profile", getString(R.string.error_server));
+                        }
+                    }
+                }
+        );
+        contributorRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(contributorRequest);
     }
 
     @SuppressWarnings("deprecation")

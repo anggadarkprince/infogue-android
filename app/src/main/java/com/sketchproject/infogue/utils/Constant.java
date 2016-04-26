@@ -35,5 +35,7 @@ public interface Constant {
     String URL_API_FEATURED = BASE_URL_API + "featured";
     String URL_API_RATE = BASE_URL_API + "article/rate";
     String URL_API_HIT = BASE_URL_API + "article/hit";
+    String URL_API_FOLLOW = BASE_URL_API + "follow";
+    String URL_API_UNFOLLOW = BASE_URL_API + "unfollow";
 
 }

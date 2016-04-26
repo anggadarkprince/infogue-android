@@ -55,6 +55,11 @@ import java.util.Map;
 import me.gujun.android.taggroup.TagGroup;
 
 public class PostActivity extends AppCompatActivity {
+    private SessionManager session;
+    private int mLoggedId;
+    private int mAuthorId;
+    private String mApiToken;
+
     private int id;
     private String slug;
     private String title;
@@ -89,6 +94,10 @@ public class PostActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        session = new SessionManager(getBaseContext());
+        mLoggedId = session.getSessionData(SessionManager.KEY_ID, 0);
+        mApiToken = session.getSessionData(SessionManager.KEY_TOKEN, "");
 
         mArticleWrapper = (LinearLayout) findViewById(R.id.article);
         mArticleFeatured = (ImageView) findViewById(R.id.featured);
@@ -170,9 +179,6 @@ public class PostActivity extends AppCompatActivity {
                     .into(mArticleFeatured);
             mArticleTitle.setText(extras.getString(Article.ARTICLE_TITLE));
 
-            final SessionManager session = new SessionManager(getBaseContext());
-            int mLoggedId = session.getSessionData(SessionManager.KEY_ID, 0);
-
             JsonObjectRequest articleRequest = new JsonObjectRequest(Request.Method.GET, UrlHelper.getApiPostUrl(slug, mLoggedId), null,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -237,6 +243,7 @@ public class PostActivity extends AppCompatActivity {
                                     }
                                     mArticleTags.setTags(tagList);
 
+                                    mAuthorId = author.getInt(Contributor.CONTRIBUTOR_ID);
                                     Glide.with(getBaseContext())
                                             .load(author.getString(Contributor.CONTRIBUTOR_AVATAR_REF))
                                             .placeholder(R.drawable.placeholder_square)
@@ -336,8 +343,147 @@ public class PostActivity extends AppCompatActivity {
     private void toggleFollowHandler() {
         if (isFollowingAuthor) {
             mContributorFollowButton.setImageResource(R.drawable.btn_follow);
+
+            StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_UNFOLLOW,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject result = new JSONObject(response);
+                                String status = result.getString("status");
+                                String message = result.getString("message");
+
+                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                    Log.i("Infogue/Unfollow", message);
+                                } else {
+                                    Log.w("Infogue/Unfollow", getString(R.string.error_unknown));
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            NetworkResponse networkResponse = error.networkResponse;
+                            String errorMessage = getString(R.string.error_unknown);
+                            if (networkResponse == null) {
+                                if (error.getClass().equals(TimeoutError.class)) {
+                                    errorMessage = getString(R.string.error_timeout);
+                                }
+                            } else {
+                                String result = new String(networkResponse.data);
+                                try {
+                                    JSONObject response = new JSONObject(result);
+                                    String status = response.getString("status");
+                                    String message = response.getString("message");
+
+                                    if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                        errorMessage = message+", please login again!";
+                                    } else if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                        errorMessage = message;
+                                    } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                        errorMessage = message;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+
+                            mContributorFollowButton.setImageResource(R.drawable.btn_unfollow);
+                            isFollowingAuthor = true;
+                        }
+                    }
+            ) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("api_token", mApiToken);
+                    params.put("contributor_id", String.valueOf(mLoggedId));
+                    params.put("following_id", String.valueOf(mAuthorId));
+                    params.put("_method", "delete");
+                    return params;
+                }
+            };
+            postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    15000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
         } else {
             mContributorFollowButton.setImageResource(R.drawable.btn_unfollow);
+
+            StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_FOLLOW,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject result = new JSONObject(response);
+                                String status = result.getString("status");
+                                String message = result.getString("message");
+
+                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                    Log.i("Infogue/Follow", message);
+                                } else {
+                                    Log.w("Infogue/Follow", getString(R.string.error_unknown));
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            NetworkResponse networkResponse = error.networkResponse;
+                            String errorMessage = getString(R.string.error_unknown);
+                            if (networkResponse == null) {
+                                if (error.getClass().equals(TimeoutError.class)) {
+                                    errorMessage = getString(R.string.error_timeout);
+                                }
+                            } else {
+                                String result = new String(networkResponse.data);
+                                try {
+                                    JSONObject response = new JSONObject(result);
+                                    String status = response.getString("status");
+                                    String message = response.getString("message");
+
+                                    if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                        errorMessage = message+", please login again!";
+                                    } else if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                        errorMessage = message;
+                                    } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                        errorMessage = message;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+
+                            mContributorFollowButton.setImageResource(R.drawable.btn_follow);
+                            isFollowingAuthor = false;
+                        }
+                    }
+            ) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("api_token", mApiToken);
+                    params.put("contributor_id", String.valueOf(mLoggedId));
+                    params.put("following_id", String.valueOf(mAuthorId));
+                    return params;
+                }
+            };
+            postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    15000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
         }
 
         isFollowingAuthor = !isFollowingAuthor;
