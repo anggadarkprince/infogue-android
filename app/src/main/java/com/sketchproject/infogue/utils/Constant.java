@@ -37,5 +37,6 @@ public interface Constant {
     String URL_API_HIT = BASE_URL_API + "article/hit";
     String URL_API_FOLLOW = BASE_URL_API + "follow";
     String URL_API_UNFOLLOW = BASE_URL_API + "unfollow";
+    String URL_API_COMMENT = BASE_URL_API + "comment";
 
 }

@@ -77,6 +77,10 @@ public class UrlHelper {
         return Constant.BASE_URL_API + "contributor/" + username;
     }
 
+    public static String getApiCommentUrl(String slug) {
+        return Constant.BASE_URL_API + "article/" + slug + "/comment";
+    }
+
     public static String getContributorDetailUrl(String username) {
         return Constant.BASE_URL + "contributor/" + username + "/detail";
     }

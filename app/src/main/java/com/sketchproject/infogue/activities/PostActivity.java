@@ -60,9 +60,9 @@ public class PostActivity extends AppCompatActivity {
     private int mAuthorId;
     private String mApiToken;
 
-    private int id;
-    private String slug;
-    private String title;
+    private int articleId;
+    private String articleSlug;
+    private String articleTitle;
     private boolean isFollowingAuthor;
 
     private LinearLayout mArticleWrapper;
@@ -129,9 +129,9 @@ public class PostActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent commentIntent = new Intent(getBaseContext(), CommentActivity.class);
-                    commentIntent.putExtra(Article.ARTICLE_ID, id);
-                    commentIntent.putExtra(Article.ARTICLE_SLUG, slug);
-                    commentIntent.putExtra(Article.ARTICLE_TITLE, title);
+                    commentIntent.putExtra(Article.ARTICLE_ID, articleId);
+                    commentIntent.putExtra(Article.ARTICLE_SLUG, articleSlug);
+                    commentIntent.putExtra(Article.ARTICLE_TITLE, articleTitle);
                     startActivity(commentIntent);
                 }
             });
@@ -166,9 +166,9 @@ public class PostActivity extends AppCompatActivity {
     private void buildArticle() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            id = extras.getInt(Article.ARTICLE_ID);
-            slug = extras.getString(Article.ARTICLE_SLUG);
-            title = extras.getString(Article.ARTICLE_TITLE);
+            articleId = extras.getInt(Article.ARTICLE_ID);
+            articleSlug = extras.getString(Article.ARTICLE_SLUG);
+            articleTitle = extras.getString(Article.ARTICLE_TITLE);
 
             mArticleWrapper.setVisibility(View.GONE);
             Glide.with(getBaseContext())
@@ -179,7 +179,7 @@ public class PostActivity extends AppCompatActivity {
                     .into(mArticleFeatured);
             mArticleTitle.setText(extras.getString(Article.ARTICLE_TITLE));
 
-            JsonObjectRequest articleRequest = new JsonObjectRequest(Request.Method.GET, UrlHelper.getApiPostUrl(slug, mLoggedId), null,
+            JsonObjectRequest articleRequest = new JsonObjectRequest(Request.Method.GET, UrlHelper.getApiPostUrl(articleSlug, mLoggedId), null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
@@ -332,8 +332,8 @@ public class PostActivity extends AppCompatActivity {
             VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(articleRequest);
 
         } else {
-            id = 0;
-            slug = "";
+            articleId = 0;
+            articleSlug = "";
             progress.dismiss();
             AppHelper.toastColored(getBaseContext(), "Invalid article data", Color.parseColor("#ddd1205e"));
             finish();
@@ -503,7 +503,7 @@ public class PostActivity extends AppCompatActivity {
                                     String message = result.getString("message");
 
                                     if (status.equals(Constant.REQUEST_SUCCESS)) {
-                                        Log.i("Infogue/Hit", "Current hit article id : " + id + " is " + message);
+                                        Log.i("Infogue/Hit", "Current hit article id : " + articleId + " is " + message);
                                     } else {
                                         Log.w("Infogue/Hit", getString(R.string.error_unknown));
                                     }
@@ -530,7 +530,7 @@ public class PostActivity extends AppCompatActivity {
                     @Override
                     protected Map<String, String> getParams() {
                         Map<String, String> params = new HashMap<>();
-                        params.put(Article.ARTICLE_FOREIGN, String.valueOf(id));
+                        params.put(Article.ARTICLE_FOREIGN, String.valueOf(articleId));
                         return params;
                     }
                 };
@@ -556,7 +556,7 @@ public class PostActivity extends AppCompatActivity {
                                 String message = result.getString("message");
 
                                 if (status.equals(Constant.REQUEST_SUCCESS)) {
-                                    Log.i("Infogue/Rate", "Average rating for article id : " + id + " is " + message);
+                                    Log.i("Infogue/Rate", "Average rating for article id : " + articleId + " is " + message);
                                 } else {
                                     String errorMessage = getString(R.string.error_unknown) + "\r\nYour rating was discarded";
                                     AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
@@ -600,7 +600,7 @@ public class PostActivity extends AppCompatActivity {
                 @Override
                 protected Map<String, String> getParams() {
                     Map<String, String> params = new HashMap<>();
-                    params.put(Article.ARTICLE_FOREIGN, String.valueOf(id));
+                    params.put(Article.ARTICLE_FOREIGN, String.valueOf(articleId));
                     params.put(Article.ARTICLE_RATE, String.valueOf((int) rating));
                     return params;
                 }
@@ -613,9 +613,9 @@ public class PostActivity extends AppCompatActivity {
             VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
 
             if (rating >= 3) {
-                AppHelper.toastColored(getBaseContext(), "Awesome!, you give " + rating + " Stars on \n\r\"" + title + "\"", Color.parseColor("#ddd1205e"));
+                AppHelper.toastColored(getBaseContext(), "Awesome!, you give " + rating + " Stars on \n\r\"" + articleTitle + "\"", Color.parseColor("#ddd1205e"));
             } else {
-                AppHelper.toastColored(getBaseContext(), "Too bad!, you give under 3 Stars on \n\r\"" + title + "\"", Color.parseColor("#ddf1ae50"));
+                AppHelper.toastColored(getBaseContext(), "Too bad!, you give under 3 Stars on \n\r\"" + articleTitle + "\"", Color.parseColor("#ddf1ae50"));
             }
         }
     }
@@ -637,21 +637,21 @@ public class PostActivity extends AppCompatActivity {
         } else if (id == R.id.action_share) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(slug));
+            sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(articleSlug));
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
         } else if (id == R.id.action_refresh) {
             progress.show();
             buildArticle();
         } else if (id == R.id.action_browse) {
-            String articleUrl = UrlHelper.getArticleUrl(slug);
+            String articleUrl = UrlHelper.getArticleUrl(articleSlug);
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
             startActivity(browserIntent);
         } else if (id == R.id.action_comment) {
             Intent commentIntent = new Intent(getBaseContext(), CommentActivity.class);
-            commentIntent.putExtra(Article.ARTICLE_ID, id);
-            commentIntent.putExtra(Article.ARTICLE_SLUG, slug);
-            commentIntent.putExtra(Article.ARTICLE_TITLE, title);
+            commentIntent.putExtra(Article.ARTICLE_ID, articleId);
+            commentIntent.putExtra(Article.ARTICLE_SLUG, articleSlug);
+            commentIntent.putExtra(Article.ARTICLE_TITLE, articleTitle);
             startActivity(commentIntent);
         }
 

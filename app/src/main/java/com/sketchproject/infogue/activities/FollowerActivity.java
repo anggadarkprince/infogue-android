@@ -28,7 +28,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.FollowerFragment;
-import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;

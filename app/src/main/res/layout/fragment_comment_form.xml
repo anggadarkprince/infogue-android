@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_vertical_margin">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/light"
+        android:padding="10dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/avatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:contentDescription="@string/avatar_content_description"
+            android:scaleType="centerCrop"
+            android:src="@drawable/dummy_avatar" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@id/avatar"
+            android:layout_toRightOf="@id/avatar"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/placeholder_name"
+            android:textColor="@color/primary"
+            android:textSize="15sp"
+            tools:ignore="RelativeOverlap" />
+
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/name"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_toEndOf="@id/avatar"
+            android:layout_toRightOf="@id/avatar"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/placeholder_location"
+            android:textColor="@color/gray"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/avatar_content_description"
+            android:src="@drawable/ic_mail"
+            android:tint="@color/primary" />
+
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/input_comment"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/btn_toggle"
+        android:gravity="start"
+        android:hint="@string/prompt_leave_a_comment"
+        android:padding="10dp"
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/btn_comment"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:background="@drawable/btn_primary"
+        android:text="@string/action_submit_comment"
+        android:textColor="@color/light" />
+
+    <Button
+        android:id="@+id/btn_dismiss"
+        style="?buttonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/background"
+        android:textColor="@color/gray"
+        android:text="@string/action_cancel" />
+
+</LinearLayout>

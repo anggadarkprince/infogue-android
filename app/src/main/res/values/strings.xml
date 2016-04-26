@@ -159,6 +159,7 @@
     <string name="action_unfollow">UNFOLLOW</string>
     <string name="action_comment">Comment</string>
     <string name="action_leave_comment">LEAVE A COMMENT</string>
+    <string name="action_submit_comment">SUBMIT COMMENT</string>
     <string name="action_view">View Article</string>
     <string name="action_browse">Open in Web</string>
     <string name="action_share">Share</string>
@@ -337,5 +338,9 @@
 
     <string name="facebook_app_id">577855965712128</string>
     <string name="fb_login_protocol_scheme">fb577855965712128</string>
+    <string name="placeholder_date">13 January 2016</string>
+    <string name="prompt_leave_a_comment">Leave a comment</string>
+    <string name="label_comments">Comments :</string>
+    <string name="comment_content_description">Leave a comment</string>
 
 </resources>
