@@ -99,6 +99,8 @@
     <string name="label_articles">Articles</string>
     <string name="label_followers">Followers</string>
     <string name="label_following">Following</string>
+    <string name="label_rating">RATING</string>
+    <string name="label_tags">TAGS</string>
     <string name="label_title_basic_info">BASIC INFO</string>
     <string name="label_title_featured">FEATURED</string>
     <string name="label_title_seo">SEARCH ENGINE OPTIMIZATION</string>
@@ -230,6 +232,12 @@
     <string name="placeholder_googleplus">http://plus.google.com/+infogue</string>
     <string name="placeholder_twitter">http://twitter.com/infogue</string>
     <string name="placeholder_facebook">http://facebook.com/infogue</string>
+    <string name="placeholder_article_detail">Subcategory | 0X Views | 5 Stars</string>
+    <string name="placeholder_article_excerpt">This is example of excerpt content</string>
+    <string name="placeholder_article_published_at">21 January 2016</string>
+    <string name="placeholder_article_title">This is a long text title for article post then here we go diving in the sky</string>
+    <string name="placeholder_article_category">CATEGORY</string>
+    <string name="placeholder_article_rating_desc">GOOD ARTICLE</string>
     <string name="large_text">
         <![CDATA[
 
@@ -275,15 +283,6 @@
                 Motion is meaningful and appropriate, serving to focus attention and maintain continuity.
                 Feedback is subtle yet clear. Transitions are efﬁcient yet coherent.<br>
 
-                <h4>3D world.</h4>
-
-                The material environment is a 3D space, which means all objects have x, y, and z
-                dimensions. The z-axis is perpendicularly aligned to the plane of the display, with the
-                positive z-axis extending towards the viewer. Every sheet of material occupies a single
-                position along the z-axis and has a standard 1dp thickness.
-                On the web, the z-axis is used for layering and not for perspective. The 3D world is
-                emulated by manipulating the y-axis.<br>
-
                 <h4>Light and shadow.</h4>
 
                 Within the material environment, virtual lights illuminate the scene. Key lights create
@@ -305,31 +304,6 @@
                 does not vary from 6dp in one app to 16dp in another app).
                 Components may have different resting elevations across platforms, depending on the depth
                 of the environment (e.g., TV has a greater depth than mobile or desktop).<br>
-
-                <h4>Responsive elevation and dynamic elevation offsets.</h4>
-
-                Some component types have responsive elevation, meaning they change elevation in response
-                to user input (e.g., normal, focused, and pressed) or system events. These elevation
-                changes are consistently implemented using dynamic elevation offsets.
-                Dynamic elevation offsets are the goal elevation that a component moves towards, relative
-                to the component’s resting state. They ensure that elevation changes are consistent
-                across actions and component types. For example, all components that lift on press have
-                the same elevation change relative to their resting elevation.
-                Once the input event is completed or cancelled, the component will return to its resting
-                elevation.<br>
-
-                <h4>Avoiding elevation interference.</h4>
-
-                Components with responsive elevations may encounter other components as they move between
-                their resting elevations and dynamic elevation offsets. Because material cannot pass
-                through other material, components avoid interfering with one another any number of ways,
-                whether on a per component basis or using the entire app layout.
-                On a component level, components can move or be removed before they cause interference.
-                For example, a floating action button (FAB) can disappear or move off screen before a
-                user picks up a card, or it can move if a snackbar appears.
-                On the layout level, design your app layout to minimize opportunities for interference.
-                For example, position the FAB to one side of stream of a cards so the FAB won’t interfere
-                when a user tries to pick up one of cards.
             </body>
         </html>
 
@@ -359,8 +333,9 @@
     <string name="action_view_all">VIEW ALL</string>
     <string name="label_separator_articles">ARTICLES</string>
     <string name="label_separator_contributors">CONTRIBUTORS</string>
+    <string name="message_request_timeout">Request server time out</string>
 
     <string name="facebook_app_id">577855965712128</string>
     <string name="fb_login_protocol_scheme">fb577855965712128</string>
-    <string name="message_request_timeout">Request server time out</string>
+
 </resources>

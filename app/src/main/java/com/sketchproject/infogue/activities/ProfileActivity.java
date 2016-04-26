@@ -29,6 +29,8 @@ public class ProfileActivity extends AppCompatActivity implements
         ConnectionDetector.OnLostConnectionListener,
         ConnectionDetector.OnConnectionEstablished {
 
+    public static final int PROFILE_RESULT_CODE = 200;
+
     private SessionManager session;
     private ConnectionDetector connectionDetector;
 

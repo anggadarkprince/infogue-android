@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
@@ -244,16 +245,19 @@ public class ArticleActivity extends AppCompatActivity implements
     }
 
     private void rateArticle(final Article article) {
-        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_LOGIN,
+        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_RATE,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
                             JSONObject result = new JSONObject(response);
                             String status = result.getString("status");
+                            String message = result.getString("message");
 
-                            if (!status.equals(Constant.REQUEST_SUCCESS)) {
-                                String errorMessage = "Oops, request timeout, your rating was discarded";
+                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                Log.i("Infogue/Rate", "Average rating for article id : " + article.getId() + " is " + message);
+                            } else {
+                                String errorMessage = getString(R.string.error_unknown) + "\r\nYour rating was discarded";
                                 AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
                             }
                         } catch (JSONException e) {
@@ -264,12 +268,28 @@ public class ArticleActivity extends AppCompatActivity implements
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        NetworkResponse networkResponse = error.networkResponse;
                         String errorMessage = getString(R.string.error_server);
-                        if (error.networkResponse == null) {
+                        if (networkResponse == null) {
                             if (error.getClass().equals(TimeoutError.class)) {
-                                errorMessage = "Oops, request timeout, your rating was discarded";
+                                errorMessage = getString(R.string.error_timeout) + "\r\nYour rating was discarded";
                             } else {
                                 errorMessage = getString(R.string.error_unknown);
+                            }
+                        } else {
+                            try {
+                                String result = new String(networkResponse.data);
+                                JSONObject response = new JSONObject(result);
+                                String status = response.getString("status");
+                                String message = response.getString("message");
+
+                                if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    errorMessage = message;
+                                } else {
+                                    errorMessage = getString(R.string.error_unknown);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
                         }
                         AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
@@ -291,7 +311,7 @@ public class ArticleActivity extends AppCompatActivity implements
 
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
 
-        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \n\"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
+        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \n\r\"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
     }
 
     private void publishArticle(Article article) {

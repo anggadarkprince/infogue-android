@@ -40,6 +40,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
@@ -135,8 +136,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                 drawer.openDrawer(GravityCompat.START);
             }
             downloadCategoryMenu();
-        }
-        else{
+        } else {
             CategoryRepository categoryRepository = new CategoryRepository();
             populateMenu(categoryRepository.retrieveData());
         }
@@ -149,11 +149,10 @@ public class ApplicationActivity extends AppCompatActivity implements
                 @Override
                 public void onRefresh() {
                     Fragment appFragment = getSupportFragmentManager().findFragmentById(R.id.container_body);
-                    if(appFragment instanceof HomeFragment){
+                    if (appFragment instanceof HomeFragment) {
                         HomeFragment homeFragment = (HomeFragment) appFragment;
                         homeFragment.homeRefresh(swipeRefreshLayout);
-                    }
-                    else{
+                    } else {
                         ArticleFragment articleFragment = (ArticleFragment) appFragment;
                         articleFragment.refreshArticleList(swipeRefreshLayout);
                     }
@@ -162,11 +161,11 @@ public class ApplicationActivity extends AppCompatActivity implements
         }
     }
 
-    public void setSwipeEnable(boolean state){
+    public void setSwipeEnable(boolean state) {
         swipeRefreshLayout.setEnabled(state);
     }
 
-    private void downloadCategoryMenu(){
+    private void downloadCategoryMenu() {
         progress.show();
         JsonObjectRequest menuRequest = new JsonObjectRequest(Request.Method.GET, Constant.URL_API_CATEGORY, null,
                 new Response.Listener<JSONObject>() {
@@ -182,7 +181,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                                 SubcategoryRepository subcategoryRepository = new SubcategoryRepository();
                                 subcategoryRepository.clearData();
 
-                                for (int i =0; i< categories.length();i++){
+                                for (int i = 0; i < categories.length(); i++) {
                                     JSONObject categoryObject = categories.getJSONObject(i);
 
                                     Category category = new Category();
@@ -192,7 +191,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                                     categoryRepository.createData(category);
 
                                     JSONArray subcategories = categoryObject.getJSONArray("subcategories");
-                                    for(int j = 0; j<subcategories.length(); j++){
+                                    for (int j = 0; j < subcategories.length(); j++) {
                                         JSONObject subcategoryObject = subcategories.getJSONObject(j);
 
                                         Subcategory subcategory = new Subcategory();
@@ -234,6 +233,7 @@ public class ApplicationActivity extends AppCompatActivity implements
         // Access the RequestQueue through your singleton class.
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(menuRequest);
     }
+
     /**
      * Decide to show which header and set according login status.
      *
@@ -346,7 +346,7 @@ public class ApplicationActivity extends AppCompatActivity implements
         return false;
     }
 
-    private void confirmRetry(){
+    private void confirmRetry() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
         builder.setTitle(R.string.action_retry);
         builder.setMessage(R.string.message_request_timeout);
@@ -714,7 +714,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                         sendIntent.setType("text/plain");
                         startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
                     } else if (id == R.id.action_rate) {
-                        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
+                        givePerfectRating(article);
                     }
                     connectionDetector.dismissNotification();
                 } else {
@@ -747,69 +747,18 @@ public class ApplicationActivity extends AppCompatActivity implements
                         postIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
                         postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
                         startActivity(postIntent);
-                    }
-                    else if (items[item].toString().equals(getString(R.string.action_long_browse))) {
+                    } else if (items[item].toString().equals(getString(R.string.action_long_browse))) {
                         String articleUrl = UrlHelper.getArticleUrl(article.getSlug());
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
                         startActivity(browserIntent);
-                    }
-                    else if (items[item].toString().equals(getString(R.string.action_long_share))) {
+                    } else if (items[item].toString().equals(getString(R.string.action_long_share))) {
                         Intent sendIntent = new Intent();
                         sendIntent.setAction(Intent.ACTION_SEND);
                         sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(article.getSlug()));
                         sendIntent.setType("text/plain");
                         startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
-                    }
-                    else if (items[item].toString().equals(getString(R.string.action_long_rate))) {
-                        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_LOGIN,
-                                new Response.Listener<String>() {
-                                    @Override
-                                    public void onResponse(String response) {
-                                        try {
-                                            JSONObject result = new JSONObject(response);
-                                            String status = result.getString("status");
-
-                                            if(!status.equals(Constant.REQUEST_SUCCESS)){
-                                                String errorMessage = "Oops, request timeout, your rating was discarded";
-                                                AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
-                                            }
-                                        }
-                                        catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                },
-                                new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        String errorMessage = getString(R.string.error_server);
-                                        if (error.networkResponse == null) {
-                                            if (error.getClass().equals(TimeoutError.class)) {
-                                                errorMessage = "Oops, request timeout, your rating was discarded";
-                                            } else {
-                                                errorMessage = getString(R.string.error_unknown);
-                                            }
-                                        }
-                                        AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
-                                    }
-                                }
-                        ) {
-                            @Override
-                            protected Map<String, String> getParams() {
-                                Map<String, String> params = new HashMap<>();
-                                params.put(Article.ARTICLE_FOREIGN, String.valueOf(article.getId()));
-                                params.put(Article.ARTICLE_RATE, String.valueOf(5));
-                                return params;
-                            }
-                        };
-                        postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                                15000,
-                                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-                        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
-
-                        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \n\"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
+                    } else if (items[item].toString().equals(getString(R.string.action_long_rate))) {
+                        givePerfectRating(article);
                     }
                 } else {
                     onLostConnectionNotified(getBaseContext());
@@ -818,6 +767,76 @@ public class ApplicationActivity extends AppCompatActivity implements
         });
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private void givePerfectRating(final Article article){
+        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_RATE,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject result = new JSONObject(response);
+                            String status = result.getString("status");
+                            String message = result.getString("message");
+
+                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                Log.i("Infogue/Rate", "Average rating for article id : " + article.getId() + " is " + message);
+                            } else {
+                                String errorMessage = getString(R.string.error_unknown) + "\r\nYour rating was discarded";
+                                AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = getString(R.string.error_server);
+                        if (networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                errorMessage = getString(R.string.error_timeout) + "\r\nYour rating was discarded";
+                            } else {
+                                errorMessage = getString(R.string.error_unknown);
+                            }
+                        } else {
+                            try {
+                                String result = new String(networkResponse.data);
+                                JSONObject response = new JSONObject(result);
+                                String status = response.getString("status");
+                                String message = response.getString("message");
+
+                                if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    errorMessage = message;
+                                } else {
+                                    errorMessage = getString(R.string.error_unknown);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put(Article.ARTICLE_FOREIGN, String.valueOf(article.getId()));
+                params.put(Article.ARTICLE_RATE, String.valueOf(5));
+                return params;
+            }
+        };
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
+
+        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \n\r\"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
     }
 
     /**
@@ -849,11 +868,10 @@ public class ApplicationActivity extends AppCompatActivity implements
         } else {
             if (id == R.id.nav_home) {
                 Object objectFragment = objectPooling.find("home");
-                if(objectFragment == null){
+                if (objectFragment == null) {
                     fragment = new HomeFragment();
                     objectPooling.pool(fragment, "home");
-                }
-                else{
+                } else {
                     fragment = (HomeFragment) objectFragment;
                 }
                 title = "";
@@ -862,11 +880,10 @@ public class ApplicationActivity extends AppCompatActivity implements
                 logo = true;
             } else if (id == R.id.nav_random) {
                 Object objectFragment = objectPooling.find(ArticleFragment.FEATURED_RANDOM);
-                if(objectFragment == null){
+                if (objectFragment == null) {
                     fragment = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_RANDOM);
                     objectPooling.pool(fragment, ArticleFragment.FEATURED_RANDOM);
-                }
-                else{
+                } else {
                     fragment = (ArticleFragment) objectFragment;
                 }
                 title = "Featured Article";
@@ -875,11 +892,10 @@ public class ApplicationActivity extends AppCompatActivity implements
                 logo = false;
             } else if (id == R.id.nav_headline) {
                 Object objectFragment = objectPooling.find(ArticleFragment.FEATURED_HEADLINE);
-                if(objectFragment == null){
+                if (objectFragment == null) {
                     fragment = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_HEADLINE);
                     objectPooling.pool(fragment, ArticleFragment.FEATURED_HEADLINE);
-                }
-                else{
+                } else {
                     fragment = (ArticleFragment) objectFragment;
                 }
                 title = "Featured Article";
@@ -888,11 +904,10 @@ public class ApplicationActivity extends AppCompatActivity implements
                 logo = false;
             } else {
                 Object objectFragment = objectPooling.find(category);
-                if(objectFragment == null){
+                if (objectFragment == null) {
                     fragment = ArticleFragment.newInstanceCategory(1, id, AppHelper.createSlug(category));
                     objectPooling.pool(fragment, category);
-                }
-                else{
+                } else {
                     fragment = (ArticleFragment) objectFragment;
                 }
                 title = category;
@@ -919,7 +934,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    AppBarLayout appBarLayout = ((AppBarLayout)findViewById(R.id.appBar));
+                    AppBarLayout appBarLayout = ((AppBarLayout) findViewById(R.id.appBar));
                     if (appBarLayout != null) {
                         appBarLayout.setElevation(elevation);
                     }

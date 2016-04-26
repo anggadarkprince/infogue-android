@@ -69,8 +69,8 @@ public class UrlHelper {
         return url;
     }
 
-    public static String getApiPostUrl(String slug) {
-        return Constant.BASE_URL_API + "article/" + slug;
+    public static String getApiPostUrl(String slug, int loggedId) {
+        return Constant.BASE_URL_API + "article/" + slug+"?contributor_id="+loggedId;
     }
 
     public static String getContributorDetailUrl(String username) {
@@ -94,6 +94,10 @@ public class UrlHelper {
     }
 
     public static String getDisqusUrl(int idPost, String slug, String title, String shortName) {
-        return Constant.URL_DISQUS_TEMPLATE + "?shortname=" + shortName + "&identifier=" + idPost + "&url=" + Constant.BASE_URL + slug + "&title=" + title;
+        return Constant.URL_DISQUS_TEMPLATE +
+                "?shortname=" + shortName +
+                "&identifier=" + idPost +
+                "&url=" + Constant.BASE_URL + slug +
+                "&title=" + title;
     }
 }

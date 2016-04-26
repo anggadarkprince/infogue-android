@@ -21,6 +21,7 @@ public class Article {
     public static final String ARTICLE_PUBLISHED_AT = "published_at";
     public static final String ARTICLE_CREATED_AT = "created_at";
     public static final String ARTICLE_TAGS = "tags";
+    public static final String ARTICLE_TAG = "tag";
     public static final String ARTICLE_VIEW = "view";
     public static final String ARTICLE_RATING_TOTAL = "total_rating";
     public static final String ARTICLE_RATING = "rating";

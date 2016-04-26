@@ -36,7 +36,6 @@ public class FollowerActivity extends AppCompatActivity implements
     public static final String CONTRIBUTOR_SCREEN = "Contributors";
     public static final String FOLLOWER_SCREEN = "Followers";
     public static final String FOLLOWING_SCREEN = "Following";
-    public static final int PROFILE_RESULT_CODE = 200;
 
     private ConnectionDetector connectionDetector;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -144,13 +143,13 @@ public class FollowerActivity extends AppCompatActivity implements
         profileIntent.putExtra(SessionManager.KEY_FOLLOWER, contributor.getFollowers());
         profileIntent.putExtra(SessionManager.KEY_FOLLOWING, contributor.getFollowing());
         profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, contributor.isFollowing());
-        startActivityForResult(profileIntent, PROFILE_RESULT_CODE);
+        startActivityForResult(profileIntent, ProfileActivity.PROFILE_RESULT_CODE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PROFILE_RESULT_CODE) {
+        if (requestCode == ProfileActivity.PROFILE_RESULT_CODE) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 boolean isFollowing = data.getBooleanExtra(SessionManager.KEY_IS_FOLLOWING, false);
                 Log.i("INFOGUE/Follower", "Result " + isFollowing);
