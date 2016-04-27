@@ -115,6 +115,7 @@ public class ProfileActivity extends AppCompatActivity implements
             }
 
             if (mAvatarImage != null) {
+                Glide.clear(mAvatarImage);
                 Glide.with(this)
                         .load(extras.getString(SessionManager.KEY_AVATAR))
                         .placeholder(R.drawable.placeholder_square)
@@ -123,6 +124,7 @@ public class ProfileActivity extends AppCompatActivity implements
             }
 
             if (mCoverImage != null) {
+                Glide.clear(mCoverImage);
                 Glide.with(this)
                         .load(extras.getString(SessionManager.KEY_COVER))
                         .placeholder(R.drawable.placeholder_rectangle)

@@ -81,6 +81,7 @@ public class ApplicationActivity extends AppCompatActivity implements
         ConnectionDetector.OnConnectionEstablished {
 
     private NavigationView navigationView;
+    private View navigationHeader;
     private SwipeRefreshLayout swipeRefreshLayout;
     private SessionManager session;
     private ConnectionDetector connectionDetector;
@@ -127,9 +128,9 @@ public class ApplicationActivity extends AppCompatActivity implements
         }
         onNavigationItemSelected(home);
 
-        View navigationHeader = navigationView.getHeaderView(0);
+        navigationHeader = navigationView.getHeaderView(0);
 
-        handleNavigationLayout(navigationHeader);
+        handleNavigationLayout();
 
         if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
             if (drawer != null) {
@@ -236,10 +237,8 @@ public class ApplicationActivity extends AppCompatActivity implements
 
     /**
      * Decide to show which header and set according login status.
-     *
-     * @param navigationHeader handle header view
      */
-    private void handleNavigationLayout(View navigationHeader) {
+    private void handleNavigationLayout() {
         ViewGroup headerSigned = (RelativeLayout) navigationHeader.findViewById(R.id.signed_header);
         ViewGroup headerUnsigned = (LinearLayout) navigationHeader.findViewById(R.id.unsigned_header);
 
@@ -248,37 +247,7 @@ public class ApplicationActivity extends AppCompatActivity implements
             headerSigned.setVisibility(View.VISIBLE);
             headerUnsigned.setVisibility(View.GONE);
 
-            // Avatar image view delegating event and download image async
-            ImageView mAvatarImage = (ImageView) navigationHeader.findViewById(R.id.avatar);
-            mAvatarImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showProfile();
-                }
-            });
-            Glide.with(this).load(session.getSessionData(SessionManager.KEY_AVATAR, Constant.URL_AVATAR_DEFAULT))
-                    .dontAnimate()
-                    .into(mAvatarImage);
-
-            // Cover image view delegating event and download image async with cross fade effect
-            ImageView mCoverImage = (ImageView) navigationHeader.findViewById(R.id.cover);
-            Glide.with(this).load(session.getSessionData(SessionManager.KEY_COVER, Constant.URL_COVER_DEFAULT))
-                    .crossFade()
-                    .into(mCoverImage);
-
-            // Name view delegating event
-            TextView mNameView = (TextView) navigationHeader.findViewById(R.id.name);
-            mNameView.setText(session.getSessionData(SessionManager.KEY_NAME, "Anonymous"));
-            mNameView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showProfile();
-                }
-            });
-
-            // Set location text view
-            TextView mLocationView = (TextView) navigationHeader.findViewById(R.id.location);
-            mLocationView.setText(session.getSessionData(SessionManager.KEY_LOCATION, "No Location"));
+            updateSideProfile(false);
 
             // Delegating create article event
             Button mCreateArticleButton = (Button) navigationHeader.findViewById(R.id.btn_save_article);
@@ -334,6 +303,49 @@ public class ApplicationActivity extends AppCompatActivity implements
                 }
             });
         }
+    }
+
+    private void updateSideProfile(boolean skipCache){
+        // Avatar image view delegating event and download image async
+        ImageView mAvatarImage = (ImageView) navigationHeader.findViewById(R.id.avatar);
+        mAvatarImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showProfile();
+            }
+        });
+        if(skipCache){
+            Glide.clear(mAvatarImage);
+        }
+        Glide.with(this).load(session.getSessionData(SessionManager.KEY_AVATAR, Constant.URL_AVATAR_DEFAULT))
+                .placeholder(R.drawable.placeholder_square)
+                .centerCrop()
+                .dontAnimate()
+                .into(mAvatarImage);
+
+        // Cover image view delegating event and download image async with cross fade effect
+        ImageView mCoverImage = (ImageView) navigationHeader.findViewById(R.id.cover);
+        if(skipCache){
+            Glide.clear(mCoverImage);
+        }
+        Glide.with(this).load(session.getSessionData(SessionManager.KEY_COVER, Constant.URL_COVER_DEFAULT))
+                .centerCrop()
+                .crossFade()
+                .into(mCoverImage);
+
+        // Name view delegating event
+        TextView mNameView = (TextView) navigationHeader.findViewById(R.id.name);
+        mNameView.setText(session.getSessionData(SessionManager.KEY_NAME, "Anonymous"));
+        mNameView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showProfile();
+            }
+        });
+
+        // Set location text view
+        TextView mLocationView = (TextView) navigationHeader.findViewById(R.id.location);
+        mLocationView.setText(session.getSessionData(SessionManager.KEY_LOCATION, "No Location"));
     }
 
     private boolean isSessionActive() {
@@ -566,6 +578,16 @@ public class ApplicationActivity extends AppCompatActivity implements
         return super.onPrepareOptionsPanel(view, menu);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SettingsActivity.SETTING_RESULT_CODE) {
+            if (resultCode == AppCompatActivity.RESULT_OK) {
+                updateSideProfile(true);
+            }
+        }
+    }
+
     /**
      * Select option menu.
      *
@@ -611,7 +633,7 @@ public class ApplicationActivity extends AppCompatActivity implements
             case R.id.action_settings:
                 if (session.isLoggedIn()) {
                     Intent settingIntent = new Intent(getBaseContext(), SettingsActivity.class);
-                    startActivity(settingIntent);
+                    startActivityForResult(settingIntent, SettingsActivity.SETTING_RESULT_CODE);
                 } else {
                     signOutUser();
                 }

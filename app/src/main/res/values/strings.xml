@@ -133,6 +133,8 @@
     <string name="label_switch_push_notification">Enable Push Notification</string>
     <string name="label_save_setting_progress">Saving Settings</string>
     <string name="label_save_article_progress">Saving Article</string>
+    <string name="label_retrieve_setting_progress">Retrieving account data</string>
+    <string name="label_comments">Comments :</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -340,7 +342,8 @@
     <string name="fb_login_protocol_scheme">fb577855965712128</string>
     <string name="placeholder_date">13 January 2016</string>
     <string name="prompt_leave_a_comment">Leave a comment</string>
-    <string name="label_comments">Comments :</string>
     <string name="comment_content_description">Leave a comment</string>
+    <string name="error_not_found">Data not found</string>
+    <string name="error_parse_data">Error parse data</string>
 
 </resources>

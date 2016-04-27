@@ -5,16 +5,17 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,14 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.ScrollView;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.AlertFragment;
 import com.sketchproject.infogue.models.Contributor;
@@ -33,7 +42,14 @@ import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.RealPathResolver;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.Validator;
+import com.sketchproject.infogue.modules.VolleyMultipartRequest;
+import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.AppHelper;
+import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.UrlHelper;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -42,14 +58,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Setting activity handle user configuration and password
  * Created by Angga 20/04/2016 19:32
  */
 public class SettingsActivity extends AppCompatActivity implements Validator.ViewValidation {
+
+    public static final int SETTING_RESULT_CODE = 100;
 
     protected final int PICK_IMAGE_AVATAR = 1;
     protected final int PICK_IMAGE_COVER = 2;
@@ -91,6 +111,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
 
     private String mRealPathAvatar;
     private String mRealPathCover;
+    private boolean mIsSaved;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,8 +129,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         connectionDetector = new ConnectionDetector(getBaseContext());
         alert = (AlertFragment) getSupportFragmentManager().findFragmentById(R.id.alert_fragment);
 
-        progress = new ProgressDialog(this);
-        progress.setMessage(getString(R.string.label_save_setting_progress));
+        progress = new ProgressDialog(SettingsActivity.this);
         progress.setIndeterminate(true);
 
         mScrollView = (ScrollView) findViewById(R.id.scroll_container);
@@ -188,6 +208,8 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         builderDiscard.setPositiveButton(R.string.action_yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                Intent returnIntent = new Intent();
+                setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
                 finish();
             }
         });
@@ -217,6 +239,9 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
             }
         });
         dialogSave = builderSave.create();
+
+        mIsSaved = false;
+        retrieveProfile();
     }
 
     @Override
@@ -557,6 +582,106 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         }
     }
 
+    private void retrieveProfile() {
+        progress.setMessage(getString(R.string.label_retrieve_setting_progress));
+        progress.show();
+        String username = session.getSessionData(SessionManager.KEY_USERNAME, null);
+
+        JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, UrlHelper.getApiContributorUrl(username), null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String status = response.getString("status");
+                            JSONObject contributor = response.getJSONObject("contributor");
+
+                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                Glide.clear(mAvatarImage);
+                                Glide.with(getBaseContext()).load(contributor.getString(Contributor.CONTRIBUTOR_AVATAR_REF))
+                                        .placeholder(R.drawable.placeholder_square)
+                                        .centerCrop()
+                                        .crossFade()
+                                        .into(mAvatarImage);
+                                Glide.clear(mCoverImage);
+                                Glide.with(getBaseContext()).load(contributor.getString(Contributor.CONTRIBUTOR_COVER_REF))
+                                        .placeholder(R.drawable.placeholder_rectangle)
+                                        .centerCrop()
+                                        .crossFade()
+                                        .into(mCoverImage);
+                                mNameInput.setText(contributor.getString(Contributor.CONTRIBUTOR_NAME));
+                                mLocationInput.setText(contributor.getString(Contributor.CONTRIBUTOR_LOCATION));
+                                mAboutInput.setText(contributor.getString(Contributor.CONTRIBUTOR_ABOUT));
+                                mContact.setText(contributor.getString(Contributor.CONTRIBUTOR_CONTACT));
+                                mGenderMaleRadio.setChecked(contributor.getString(Contributor.CONTRIBUTOR_GENDER).equals(Contributor.GENDER_MALE));
+                                mGenderFemaleRadio.setChecked(contributor.getString(Contributor.CONTRIBUTOR_GENDER).equals(Contributor.GENDER_FEMALE));
+                                mBirthdayInput.setText(contributor.getString(Contributor.CONTRIBUTOR_BIRTHDAY));
+                                mFacebookInput.setText(contributor.getString(Contributor.CONTRIBUTOR_FACEBOOK));
+                                mTwitterInput.setText(contributor.getString(Contributor.CONTRIBUTOR_TWITTER));
+                                mGooglePlusInput.setText(contributor.getString(Contributor.CONTRIBUTOR_GOOGLE_PLUS));
+                                mInstagramInput.setText(contributor.getString(Contributor.CONTRIBUTOR_INSTAGRAM));
+                                mNotificationSubscribeCheck.setChecked(contributor.getInt(Contributor.CONTRIBUTOR_SUBSCRIPTION) == 1);
+                                mNotificationMessageCheck.setChecked(contributor.getInt(Contributor.CONTRIBUTOR_MESSAGE) == 1);
+                                mNotificationFollowerCheck.setChecked(contributor.getInt(Contributor.CONTRIBUTOR_FOLLOWER) == 1);
+                                mNotificationStreamCheck.setChecked(contributor.getInt(Contributor.CONTRIBUTOR_FEED) == 1);
+                                mPushNotificationSwitch.setChecked(contributor.getInt(Contributor.CONTRIBUTOR_MOBILE) == 1);
+                                mUsernameInput.setText(contributor.getString(Contributor.CONTRIBUTOR_USERNAME));
+                                mEmailInput.setText(contributor.getString(Contributor.CONTRIBUTOR_EMAIL));
+                            } else {
+                                Log.w("Infogue/Profile", getString(R.string.error_unknown));
+                                AppHelper.toastColored(getBaseContext(), getString(R.string.error_unknown), Color.parseColor("#ddd1205e"));
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            AppHelper.toastColored(getBaseContext(), getString(R.string.error_parse_data), Color.parseColor("#ddd1205e"));
+                        }
+
+                        progress.dismiss();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = getString(R.string.error_unknown);
+                        if (networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                errorMessage = getString(R.string.error_timeout);
+                            }
+                        } else {
+                            String result = new String(networkResponse.data);
+                            try {
+                                JSONObject response = new JSONObject(result);
+                                String status = response.getString("status");
+                                String message = response.getString("message");
+
+                                if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                    errorMessage = getString(R.string.error_not_found);
+                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    errorMessage = message;
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                errorMessage = getString(R.string.error_parse_data);
+                            }
+                        }
+                        AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                        progress.dismiss();
+
+                        Intent returnIntent = new Intent();
+                        setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
+                        finish();
+                    }
+                }
+        );
+        contributorRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(contributorRequest);
+    }
+
     private void selectDate() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -578,8 +703,14 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
     }
 
     private void discardConfirmation() {
-        dialogDiscard.show();
-        AppHelper.dialogButtonTheme(this, dialogDiscard);
+        if (mIsSaved) {
+            Intent returnIntent = new Intent();
+            setResult(AppCompatActivity.RESULT_OK, returnIntent);
+            finish();
+        } else {
+            dialogDiscard.show();
+            AppHelper.dialogButtonTheme(this, dialogDiscard);
+        }
     }
 
     private void saveConfirmation() {
@@ -589,22 +720,132 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
 
     private void saveSettings() {
         if (connectionDetector.isNetworkAvailable()) {
+            progress.setMessage(getString(R.string.label_save_setting_progress));
             progress.show();
-            new Handler().postDelayed(new Runnable() {
+
+            VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, Constant.URL_API_SETTING, new Response.Listener<NetworkResponse>() {
                 @Override
-                public void run() {
-                    progress.dismiss();
-                    if (Math.random() < 0.5) {
-                        alert.setAlertType(AlertFragment.ALERT_DANGER);
-                        alert.setAlertMessage(getString(R.string.message_try_again));
-                    } else {
-                        alert.setAlertType(AlertFragment.ALERT_SUCCESS);
-                        alert.setAlertMessage(getString(R.string.message_account_updated));
+                public void onResponse(NetworkResponse response) {
+                    String resultResponse = new String(response.data);
+                    try {
+                        JSONObject result = new JSONObject(resultResponse);
+                        String status = result.getString("status");
+                        String message = result.getString("message");
+                        JSONObject contributorUpdated = result.getJSONObject("contributor");
+
+                        if (status.equals(Constant.REQUEST_SUCCESS)) {
+                            alert.setAlertType(AlertFragment.ALERT_SUCCESS);
+                            alert.setAlertMessage(message);
+                            mIsSaved = true;
+
+                            session.setSessionData(SessionManager.KEY_NAME, contributorUpdated.getString(Contributor.CONTRIBUTOR_NAME));
+                            session.setSessionData(SessionManager.KEY_USERNAME, contributorUpdated.getString(Contributor.CONTRIBUTOR_USERNAME));
+                            session.setSessionData(SessionManager.KEY_LOCATION, contributorUpdated.getString(Contributor.CONTRIBUTOR_LOCATION));
+                            session.setSessionData(SessionManager.KEY_ABOUT, contributorUpdated.getString(Contributor.CONTRIBUTOR_ABOUT));
+                            session.setSessionData(SessionManager.KEY_AVATAR, contributorUpdated.getString(Contributor.CONTRIBUTOR_AVATAR_REF));
+                            session.setSessionData(SessionManager.KEY_COVER, contributorUpdated.getString(Contributor.CONTRIBUTOR_COVER_REF));
+                        } else {
+                            alert.setAlertType(AlertFragment.ALERT_INFO);
+                            alert.setAlertMessage(getString(R.string.error_unknown));
+                        }
+
+                        mRealPathAvatar = null;
+                        mRealPathCover = null;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
+
                     alert.show();
                     mScrollView.smoothScrollTo(0, 0);
+                    progress.dismiss();
+
+                    Log.i("Infogue/setting", resultResponse);
                 }
-            }, 3000);
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    NetworkResponse networkResponse = error.networkResponse;
+                    String errorMessage = getString(R.string.error_unknown);
+                    if (networkResponse == null) {
+                        if (error.getClass().equals(TimeoutError.class)) {
+                            errorMessage = getString(R.string.error_timeout);
+                        }
+                    } else {
+                        String result = new String(networkResponse.data);
+                        try {
+                            JSONObject response = new JSONObject(result);
+                            String status = response.getString("status");
+                            String message = response.getString("message");
+
+                            if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                errorMessage = getString(R.string.error_not_found);
+                            } else if (status.equals(Constant.REQUEST_MISMATCH) && networkResponse.statusCode == 401) {
+                                errorMessage = message;
+                            } else if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                errorMessage = message;
+                            } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                errorMessage = message;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            errorMessage = getString(R.string.error_parse_data);
+                        }
+                    }
+
+                    alert.setAlertType(AlertFragment.ALERT_DANGER);
+                    alert.setAlertMessage(errorMessage);
+                    alert.show();
+
+                    mScrollView.smoothScrollTo(0, 0);
+                    progress.dismiss();
+
+                    error.printStackTrace();
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("_method", "put");
+                    params.put(Contributor.CONTRIBUTOR_API, session.getSessionData(SessionManager.KEY_TOKEN, null));
+                    params.put(Contributor.CONTRIBUTOR_FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
+                    params.put(Contributor.CONTRIBUTOR_NAME, contributor.getName());
+                    params.put(Contributor.CONTRIBUTOR_LOCATION, contributor.getLocation());
+                    params.put(Contributor.CONTRIBUTOR_ABOUT, contributor.getAbout());
+                    params.put(Contributor.CONTRIBUTOR_CONTACT, contributor.getContact());
+                    params.put(Contributor.CONTRIBUTOR_GENDER, contributor.getGender());
+                    params.put(Contributor.CONTRIBUTOR_BIRTHDAY, new SimpleDateFormat("yyyy-mm-dd", Locale.getDefault()).format(contributor.getBirthday()));
+                    params.put(Contributor.CONTRIBUTOR_FACEBOOK, contributor.getFacebook());
+                    params.put(Contributor.CONTRIBUTOR_TWITTER, contributor.getTwitter());
+                    params.put(Contributor.CONTRIBUTOR_GOOGLE_PLUS, contributor.getGooglePlus());
+                    params.put(Contributor.CONTRIBUTOR_INSTAGRAM, contributor.getInstagram());
+                    params.put(Contributor.CONTRIBUTOR_EMAIL, contributor.getEmail());
+                    params.put(Contributor.CONTRIBUTOR_USERNAME, contributor.getUsername());
+                    params.put(Contributor.CONTRIBUTOR_SUBSCRIPTION, String.valueOf(contributor.isNotificationSubscribe() ? 1 : 0));
+                    params.put(Contributor.CONTRIBUTOR_MESSAGE, String.valueOf(contributor.isNotificationMessage() ? 1 : 0));
+                    params.put(Contributor.CONTRIBUTOR_FOLLOWER, String.valueOf(contributor.isNotificationFollower() ? 1 : 0));
+                    params.put(Contributor.CONTRIBUTOR_FEED, String.valueOf(contributor.isNotificationStream() ? 1 : 0));
+                    params.put(Contributor.CONTRIBUTOR_MOBILE, String.valueOf(contributor.isPushNotification() ? 1 : 0));
+                    params.put(Contributor.CONTRIBUTOR_PASSWORD, String.valueOf(contributor.getPassword()));
+                    params.put(Contributor.CONTRIBUTOR_NEW_PASSWORD, String.valueOf(contributor.getNewPassword()));
+                    return params;
+                }
+
+                @Override
+                protected Map<String, DataPart> getByteData() {
+                    Map<String, DataPart> params = new HashMap<>();
+                    if (mRealPathAvatar != null && !mRealPathAvatar.trim().isEmpty()) {
+                        params.put(Contributor.CONTRIBUTOR_AVATAR, new DataPart("file_avatar.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), mAvatarImage.getDrawable()), "image/jpeg"));
+                    }
+                    if (mRealPathCover != null && !mRealPathCover.trim().isEmpty()) {
+                        params.put(Contributor.CONTRIBUTOR_COVER, new DataPart("file_cover.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), mCoverImage.getDrawable()), "image/jpeg"));
+                    }
+
+                    return params;
+                }
+            };
+
+            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
+
         } else {
             connectionDetector.snackbarDisconnectNotification(mScrollView, new View.OnClickListener() {
                 @Override

@@ -8,12 +8,26 @@ import java.util.Date;
  */
 public class Contributor {
     public static final String CONTRIBUTOR_ID = "id";
+    public static final String CONTRIBUTOR_FOREIGN = "contributor_id";
+    public static final String CONTRIBUTOR_API = "api_token";
     public static final String CONTRIBUTOR_TOKEN = "api_token";
     public static final String CONTRIBUTOR_USERNAME = "username";
     public static final String CONTRIBUTOR_EMAIL = "email";
     public static final String CONTRIBUTOR_NAME = "name";
     public static final String CONTRIBUTOR_LOCATION = "location";
     public static final String CONTRIBUTOR_ABOUT = "about";
+    public static final String CONTRIBUTOR_CONTACT = "contact";
+    public static final String CONTRIBUTOR_GENDER = "gender";
+    public static final String CONTRIBUTOR_BIRTHDAY = "birthday";
+    public static final String CONTRIBUTOR_FACEBOOK = "facebook";
+    public static final String CONTRIBUTOR_TWITTER = "twitter";
+    public static final String CONTRIBUTOR_GOOGLE_PLUS = "googleplus";
+    public static final String CONTRIBUTOR_INSTAGRAM = "instagram";
+    public static final String CONTRIBUTOR_SUBSCRIPTION = "email_subscription";
+    public static final String CONTRIBUTOR_MESSAGE = "email_message";
+    public static final String CONTRIBUTOR_FOLLOWER = "email_follow";
+    public static final String CONTRIBUTOR_FEED = "email_feed";
+    public static final String CONTRIBUTOR_MOBILE = "mobile_notification";
     public static final String CONTRIBUTOR_AVATAR = "avatar";
     public static final String CONTRIBUTOR_AVATAR_REF = "avatar_ref";
     public static final String CONTRIBUTOR_COVER = "cover";
@@ -23,6 +37,8 @@ public class Contributor {
     public static final String CONTRIBUTOR_FOLLOWERS = "followers_total";
     public static final String CONTRIBUTOR_FOLLOWING = "following_total";
     public static final String CONTRIBUTOR_IS_FOLLOWING = "is_following";
+    public static final String CONTRIBUTOR_PASSWORD = "password";
+    public static final String CONTRIBUTOR_NEW_PASSWORD = "new_password";
 
     public static final String GENDER_MALE = "male";
     public static final String GENDER_FEMALE = "female";

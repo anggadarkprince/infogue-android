@@ -52,7 +52,7 @@
                     android:layout_height="140dp"
                     android:contentDescription="@string/cover_content_description"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/dummy_featured_1" />
+                    android:src="@drawable/placeholder_rectangle" />
 
                 <View
                     android:layout_width="match_parent"
@@ -81,7 +81,7 @@
                     android:layout_height="100dp"
                     android:layout_margin="20dp"
                     android:contentDescription="@string/avatar_content_description"
-                    android:src="@drawable/dummy_avatar" />
+                    android:src="@drawable/placeholder_square" />
 
                 <Button
                     android:id="@+id/btn_change_avatar"
@@ -132,8 +132,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:paddingStart="10dp"
-                        android:singleLine="true"
-                        android:text="@string/placeholder_name" />
+                        android:singleLine="true" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -152,8 +151,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:paddingStart="10dp"
-                        android:singleLine="true"
-                        android:text="@string/placeholder_location" />
+                        android:singleLine="true" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -182,8 +180,7 @@
                         android:paddingEnd="10dp"
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
-                        android:paddingStart="10dp"
-                        android:text="@string/placeholder_about" />
+                        android:paddingStart="10dp" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -212,8 +209,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:paddingStart="10dp"
-                        android:singleLine="true"
-                        android:text="@string/placeholder_phone" />
+                        android:singleLine="true" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -312,8 +308,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:paddingStart="10dp"
-                        android:singleLine="true"
-                        android:text="@string/placeholder_facebook" />
+                        android:singleLine="true" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -342,8 +337,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:paddingStart="10dp"
-                        android:singleLine="true"
-                        android:text="@string/placeholder_twitter" />
+                        android:singleLine="true" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -372,8 +366,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:paddingStart="10dp"
-                        android:singleLine="true"
-                        android:text="@string/placeholder_googleplus" />
+                        android:singleLine="true" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -402,8 +395,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:paddingStart="10dp"
-                        android:singleLine="true"
-                        android:text="@string/placeholder_instagram" />
+                        android:singleLine="true" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -522,8 +514,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:paddingStart="10dp"
-                        android:singleLine="true"
-                        android:text="@string/placeholder_email" />
+                        android:singleLine="true" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -542,8 +533,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:paddingStart="10dp"
-                        android:singleLine="true"
-                        android:text="@string/placeholder_username" />
+                        android:singleLine="true" />
 
                 </android.support.design.widget.TextInputLayout>
 

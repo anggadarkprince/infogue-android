@@ -414,7 +414,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                 String message = response.getString("message");
                                 String login = response.getString("login");
 
-                                if (status.equals(Constant.REQUEST_UNREGISTERED) && networkResponse.statusCode == 403) {
+                                if ((status.equals(Constant.REQUEST_UNREGISTERED) || login.equals(Constant.REQUEST_RESTRICT)) && networkResponse.statusCode == 403) {
                                     alert.setAlertType(AlertFragment.ALERT_DANGER);
                                     alert.setAlertMessage(message);
                                 } else if (status.equals(Contributor.STATUS_PENDING) && networkResponse.statusCode == 403) {

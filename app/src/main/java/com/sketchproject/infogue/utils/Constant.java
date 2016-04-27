@@ -28,9 +28,11 @@ public interface Constant {
     String REQUEST_MISMATCH = "mismatch"; // code 401 unauthorized
     String REQUEST_FAILURE = "failure"; // code 500 internal error
     String REQUEST_DENIED = "denied"; // code 400 bad request
+    String REQUEST_NOT_FOUND = "not found"; // code 400 bad request
 
     String URL_API_REGISTER = BASE_URL_API + "account/register";
     String URL_API_LOGIN = BASE_URL_API + "account/login";
+    String URL_API_SETTING = BASE_URL_API + "account";
     String URL_API_CATEGORY = BASE_URL_API + "category";
     String URL_API_FEATURED = BASE_URL_API + "featured";
     String URL_API_RATE = BASE_URL_API + "article/rate";
