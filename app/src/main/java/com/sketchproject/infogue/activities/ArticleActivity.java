@@ -1,9 +1,9 @@
 package com.sketchproject.infogue.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +33,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.models.Article;
+import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.IconizedMenu;
 import com.sketchproject.infogue.modules.SessionManager;
@@ -58,8 +60,8 @@ public class ArticleActivity extends AppCompatActivity implements
     private SessionManager session;
     private ConnectionDetector connectionDetector;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ProgressDialog progress;
     private int authorId;
-    private String authorUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,9 @@ public class ArticleActivity extends AppCompatActivity implements
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        progress = new ProgressDialog(ArticleActivity.this);
+        progress.setIndeterminate(true);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         if (fab != null) {
@@ -104,7 +109,7 @@ public class ArticleActivity extends AppCompatActivity implements
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             authorId = extras.getInt(SessionManager.KEY_ID);
-            authorUsername = extras.getString(SessionManager.KEY_USERNAME);
+            String authorUsername = extras.getString(SessionManager.KEY_USERNAME);
             String query = extras.getString(SearchActivity.QUERY_STRING);
 
             if (getSupportActionBar() != null) {
@@ -169,8 +174,11 @@ public class ArticleActivity extends AppCompatActivity implements
         if (resultCode == AppCompatActivity.RESULT_OK) {
             if (saveResult) {
                 snackbarView.setBackgroundResource(R.color.color_success);
+                swipeRefreshLayout.setRefreshing(true);
+                ArticleFragment fragment = (ArticleFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+                fragment.refreshArticleList(swipeRefreshLayout);
             } else {
-                snackbar.setText("Something is getting wrong!");
+                snackbar.setText(R.string.error_server);
                 snackbarView.setBackgroundResource(R.color.color_danger);
             }
         } else if (resultCode == AppCompatActivity.RESULT_CANCELED) {
@@ -186,9 +194,7 @@ public class ArticleActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.info, menu);
-
         return true;
     }
 
@@ -251,14 +257,11 @@ public class ArticleActivity extends AppCompatActivity implements
                     public void onResponse(String response) {
                         try {
                             JSONObject result = new JSONObject(response);
-                            String status = result.getString("status");
-                            String message = result.getString("message");
+                            String status = result.getString(Constant.RESPONSE_STATUS);
+                            String message = result.getString(Constant.RESPONSE_MESSAGE);
 
                             if (status.equals(Constant.REQUEST_SUCCESS)) {
-                                Log.i("Infogue/Rate", "Average rating for article id : " + article.getId() + " is " + message);
-                            } else {
-                                String errorMessage = getString(R.string.error_unknown) + "\r\nYour rating was discarded";
-                                AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                                Log.i("Infogue/Rate", "Success::Average rating for article id " + article.getId() + " is " + message);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -268,31 +271,35 @@ public class ArticleActivity extends AppCompatActivity implements
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+
                         NetworkResponse networkResponse = error.networkResponse;
-                        String errorMessage = getString(R.string.error_server);
+                        String errorMessage = getString(R.string.error_unknown);
                         if (networkResponse == null) {
                             if (error.getClass().equals(TimeoutError.class)) {
-                                errorMessage = getString(R.string.error_timeout) + "\r\nYour rating was discarded";
-                            } else {
-                                errorMessage = getString(R.string.error_unknown);
+                                errorMessage = getString(R.string.error_timeout);
                             }
                         } else {
                             try {
                                 String result = new String(networkResponse.data);
                                 JSONObject response = new JSONObject(result);
-                                String status = response.getString("status");
-                                String message = response.getString("message");
+                                String status = response.getString(Constant.RESPONSE_STATUS);
+                                String message = response.getString(Constant.RESPONSE_MESSAGE);
 
-                                if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
-                                    errorMessage = message;
-                                } else {
-                                    errorMessage = getString(R.string.error_unknown);
+                                Log.i("Infogue/Article", "Error::" + message);
+
+                                if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                    errorMessage = getString(R.string.error_not_found);
+                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    errorMessage = getString(R.string.error_server);
+                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                    errorMessage = getString(R.string.error_maintenance);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
-                        AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                        AppHelper.toastColored(getBaseContext(), errorMessage + "\r\nYour rating was discarded", ContextCompat.getColor(getBaseContext(), R.color.color_danger));
                     }
                 }
         ) {
@@ -311,15 +318,8 @@ public class ArticleActivity extends AppCompatActivity implements
 
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
 
-        AppHelper.toastColored(getBaseContext(), "Awesome!, you give 5 Stars on \n\r\"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
-    }
-
-    private void publishArticle(Article article) {
-        AppHelper.toastColored(getBaseContext(), "You published article \"" + article.getTitle() + "\"", Color.parseColor("#dd5cb85c"));
-    }
-
-    private void draftedArticle(Article article) {
-        AppHelper.toastColored(getBaseContext(), "You drafted article \"" + article.getTitle() + "\"", Color.parseColor("#ddf1ae50"));
+        String successMessage = "Awesome!, you give 5 Stars on \n\r\"" + article.getTitle() + "\"";
+        AppHelper.toastColored(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.primary));
     }
 
     private void editArticle(Article article) {
@@ -332,13 +332,11 @@ public class ArticleActivity extends AppCompatActivity implements
     private void deleteArticle(View view, final Article article) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(view.getContext(), R.style.AppTheme_NoActionBar));
         builder.setTitle(R.string.action_long_delete);
-        builder.setMessage(R.string.message_delete_confirm + " \"" + article.getTitle() + "\"?");
+        builder.setMessage(getString(R.string.message_delete_confirm) + " \"" + article.getTitle() + "\"?");
         builder.setPositiveButton(R.string.action_delete, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                AppHelper.toastColored(getBaseContext(), "You have deleted article \"" + article.getTitle() + "\"", Color.parseColor("#ddd9534f"));
-                ArticleFragment fragment = (ArticleFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
-                fragment.deleteArticleRow(article.getId());
+                deleteArticleRequest(article);
             }
         });
         builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
@@ -351,6 +349,91 @@ public class ArticleActivity extends AppCompatActivity implements
         AlertDialog dialogDelete = builder.create();
         dialogDelete.show();
         AppHelper.dialogButtonTheme(getBaseContext(), dialogDelete);
+    }
+
+    private void deleteArticleRequest(final Article article) {
+        progress.setMessage(getString(R.string.label_delete_article_progress));
+        progress.show();
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_ARTICLE + "/" + article.getSlug(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject result = new JSONObject(response);
+                            String status = result.getString(Constant.RESPONSE_STATUS);
+                            String message = result.getString(Constant.RESPONSE_MESSAGE);
+
+                            Log.i("Infogue/Article", "Success::" + message);
+
+                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                ArticleFragment fragment = (ArticleFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+                                fragment.deleteArticleRow(article.getId());
+
+                                String successMessage = "You have deleted article \r\n\"" + article.getTitle() + "\"";
+                                AppHelper.toastColored(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.color_warning));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        progress.dismiss();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+
+                        NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = getString(R.string.error_unknown);
+                        if (networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                errorMessage = getString(R.string.error_timeout);
+                            }
+                        } else {
+                            try {
+                                String result = new String(networkResponse.data);
+                                JSONObject response = new JSONObject(result);
+                                String status = response.getString(Constant.RESPONSE_STATUS);
+                                String message = response.getString(Constant.RESPONSE_MESSAGE);
+
+                                Log.i("Infogue/Article", "Error::" + message);
+
+                                if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                    errorMessage = message + ", please login again!";
+                                } else if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                    errorMessage = getString(R.string.error_not_found);
+                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    errorMessage = getString(R.string.error_server);
+                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                    errorMessage = getString(R.string.error_maintenance);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                errorMessage = getString(R.string.error_parse_data);
+                            }
+                        }
+                        AppHelper.toastColored(getBaseContext(), errorMessage, ContextCompat.getColor(getBaseContext(), R.color.color_danger));
+
+                        progress.dismiss();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("_method", "delete");
+                params.put(Contributor.CONTRIBUTOR_API, session.getSessionData(SessionManager.KEY_TOKEN, null));
+                return params;
+            }
+        };
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
     }
 
     @Override
@@ -382,10 +465,6 @@ public class ArticleActivity extends AppCompatActivity implements
                         shareArticle(article);
                     } else if (id == R.id.action_rate) {
                         rateArticle(article);
-                    } else if (id == R.id.action_publish) {
-                        publishArticle(article);
-                    } else if (id == R.id.action_draft) {
-                        draftedArticle(article);
                     } else if (id == R.id.action_edit) {
                         editArticle(article);
                     } else if (id == R.id.action_delete) {
@@ -409,8 +488,6 @@ public class ArticleActivity extends AppCompatActivity implements
                 getString(R.string.action_long_open),
                 getString(R.string.action_long_browse),
                 getString(R.string.action_long_share),
-                getString(R.string.action_long_publish),
-                getString(R.string.action_long_draft),
                 getString(R.string.action_long_edit),
                 getString(R.string.action_long_delete)
         };
@@ -426,17 +503,12 @@ public class ArticleActivity extends AppCompatActivity implements
         if (session.getSessionData(SessionManager.KEY_ID, 0) == authorId) {
             builder.setItems(postItems, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
-                    Log.i("INFOGUE/context", String.valueOf(item));
                     if (postItems[item].toString().equals(getString(R.string.action_long_open))) {
                         viewArticle(article);
                     } else if (postItems[item].toString().equals(getString(R.string.action_long_browse))) {
                         browseArticle(article);
                     } else if (postItems[item].toString().equals(getString(R.string.action_long_share))) {
                         shareArticle(article);
-                    } else if (postItems[item].toString().equals(getString(R.string.action_long_publish))) {
-                        publishArticle(article);
-                    } else if (postItems[item].toString().equals(getString(R.string.action_long_draft))) {
-                        draftedArticle(article);
                     } else if (postItems[item].toString().equals(getString(R.string.action_long_edit))) {
                         editArticle(article);
                     } else if (postItems[item].toString().equals(getString(R.string.action_long_delete))) {

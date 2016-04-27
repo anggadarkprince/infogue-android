@@ -100,7 +100,7 @@ public class ApplicationActivity extends AppCompatActivity implements
         objectPooling = new ObjectPooling();
 
         progress = new ProgressDialog(this);
-        progress.setMessage("Downloading Category Menu");
+        progress.setMessage(getString(R.string.label_retrieve_category_progress));
         progress.setIndeterminate(true);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

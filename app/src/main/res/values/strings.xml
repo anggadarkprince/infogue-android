@@ -40,6 +40,9 @@
     <string name="error_server">Oops, Something is getting wrong</string>
     <string name="error_unknown">Unknown error occurred</string>
     <string name="error_timeout">Request server timeout, try again!</string>
+    <string name="error_not_found">Data not found</string>
+    <string name="error_parse_data">Error parse data</string>
+    <string name="error_maintenance">Server currently still maintenance</string>
     <string name="error_password_required">Password is required</string>
     <string name="error_password_range">Password must be 6 to 20 characters</string>
     <string name="error_password_confirmed">New Password must be confirmed</string>
@@ -133,6 +136,7 @@
     <string name="label_switch_push_notification">Enable Push Notification</string>
     <string name="label_save_setting_progress">Saving Settings</string>
     <string name="label_save_article_progress">Saving Article</string>
+    <string name="label_delete_article_progress">Deleting article</string>
     <string name="label_retrieve_setting_progress">Retrieving account data</string>
     <string name="label_comments">Comments :</string>
 
@@ -188,8 +192,6 @@
     <string name="action_long_share">Share Article</string>
     <string name="action_long_browse">Browse in Web</string>
     <string name="action_long_open">View / Open</string>
-    <string name="action_long_publish">Publish Now</string>
-    <string name="action_long_draft">Set as Draft</string>
     <string name="action_long_edit">Edit Article</string>
     <string name="action_long_delete">Delete Article</string>
     <string name="action_long_follow">Follow Contributor</string>
@@ -343,7 +345,6 @@
     <string name="placeholder_date">13 January 2016</string>
     <string name="prompt_leave_a_comment">Leave a comment</string>
     <string name="comment_content_description">Leave a comment</string>
-    <string name="error_not_found">Data not found</string>
-    <string name="error_parse_data">Error parse data</string>
+    <string name="label_retrieve_category_progress">Downloading Category Menu</string>
 
 </resources>

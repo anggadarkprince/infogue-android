@@ -34,6 +34,10 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
 
     @Override
     public List<Subcategory> retrieveData() {
+        return retrieveData(0);
+    }
+
+    public List<Subcategory> retrieveData(int categoryId) {
         SQLiteDatabase db = DatabaseManager.getInstance().getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
@@ -42,7 +46,17 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
         // How we want the results sorted in the resulting Cursor
         String sortOrder = Subcategory.COLUMN_ID + " ASC";
 
-        Cursor cursor = db.query(Subcategory.TABLE, projection, null, null, null, null, sortOrder);
+        Cursor cursor;
+
+        if(categoryId <= 0){
+            cursor = db.query(Subcategory.TABLE, projection, null, null, null, null, sortOrder);
+        }
+        else{
+            String selection = Subcategory.COLUMN_CATEGORY_ID + " = ?";
+            String[] selectionArgs = {String.valueOf(categoryId)};
+
+            cursor = db.query(Subcategory.TABLE, projection, selection, selectionArgs, null, null, sortOrder);
+        }
 
         List<Subcategory> subcategoryList = new ArrayList<>();
         Subcategory subcategory;

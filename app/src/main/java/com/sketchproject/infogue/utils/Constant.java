@@ -30,6 +30,9 @@ public interface Constant {
     String REQUEST_DENIED = "denied"; // code 400 bad request
     String REQUEST_NOT_FOUND = "not found"; // code 400 bad request
 
+    String RESPONSE_STATUS = "status";
+    String RESPONSE_MESSAGE = "message";
+
     String URL_API_REGISTER = BASE_URL_API + "account/register";
     String URL_API_LOGIN = BASE_URL_API + "account/login";
     String URL_API_SETTING = BASE_URL_API + "account";
@@ -37,6 +40,7 @@ public interface Constant {
     String URL_API_FEATURED = BASE_URL_API + "featured";
     String URL_API_RATE = BASE_URL_API + "article/rate";
     String URL_API_HIT = BASE_URL_API + "article/hit";
+    String URL_API_ARTICLE = BASE_URL_API + "article";
     String URL_API_FOLLOW = BASE_URL_API + "follow";
     String URL_API_UNFOLLOW = BASE_URL_API + "unfollow";
     String URL_API_COMMENT = BASE_URL_API + "comment";

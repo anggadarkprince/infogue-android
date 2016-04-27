@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,20 +33,38 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.ScrollView;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.AlertFragment;
 import com.sketchproject.infogue.models.Article;
+import com.sketchproject.infogue.models.Category;
+import com.sketchproject.infogue.models.Contributor;
+import com.sketchproject.infogue.models.Repositories.CategoryRepository;
+import com.sketchproject.infogue.models.Repositories.SubcategoryRepository;
+import com.sketchproject.infogue.models.Subcategory;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.RealPathResolver;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.Validator;
+import com.sketchproject.infogue.modules.VolleyMultipartRequest;
+import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.AppHelper;
 import com.sketchproject.infogue.utils.Constant;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 import jp.wasabeef.richeditor.RichEditor;
@@ -83,8 +101,13 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
     protected RadioButton mDraftRadio;
     protected Button mSaveButton;
 
-    protected String[] ITEMS = {"News", "Economic", "Entertainment", "Sport", "Science", "Technology", "Education", "Photo", "Video", "Others"};
-    protected String[] SUBITEMS = {"SubItem 1", "SubItem 2", "SubItem 3", "SubItem 4", "SubItem 5", "SubItem 6"};
+    protected String[] mCategoryList = {};
+    protected String[] mSubcategoryList = {};
+    protected ArrayAdapter<String> adapterCategory;
+    protected ArrayAdapter adapterSubcategory;
+    protected List<Category> categoriesList;
+    protected List<Subcategory> subcategoriesList;
+
     protected String realPathFeatured;
     protected boolean isCalledFromMainActivity;
 
@@ -142,13 +165,45 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
             }
         });
 
-        ArrayAdapter<String> adapterCategory = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, ITEMS);
+        // populate category spinner
+        categoriesList = new CategoryRepository().retrieveData();
+        mCategoryList = new String[categoriesList.size()];
+        for (int k = 0; k < categoriesList.size(); k++) {
+            mCategoryList[k] = categoriesList.get(k).getCategory();
+        }
+        adapterCategory = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mCategoryList);
         adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mCategorySpinner.setAdapter(adapterCategory);
+        mCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("infogue/Article", "Category " + position + " id " + id);
+                if (position >= 0) {
+                    subcategoriesList = new SubcategoryRepository().retrieveData(categoriesList.get(position).getId());
+                    mSubcategoryList = new String[subcategoriesList.size()];
+                    Log.i("infogue/Article", "Category id " + categoriesList.get(position).getId() + " SubCategory " + subcategoriesList.size());
+                    for (int k = 0; k < subcategoriesList.size(); k++) {
+                        mSubcategoryList[k] = subcategoriesList.get(k).getSubcategory();
+                        Log.i("infogue/Article", "SubCategory " + subcategoriesList.get(k).getSubcategory());
+                    }
 
-        ArrayAdapter<String> adapterSubItem = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, SUBITEMS);
-        adapterSubItem.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSubcategorySpinner.setAdapter(adapterSubItem);
+                    // populate subcategory spinner
+                    adapterSubcategory = new ArrayAdapter<>(getBaseContext(), android.R.layout.simple_spinner_item, mSubcategoryList);
+                    adapterSubcategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    mSubcategorySpinner.setAdapter(adapterSubcategory);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        // populate subcategory spinner
+        adapterSubcategory = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mSubcategoryList);
+        adapterSubcategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSubcategorySpinner.setAdapter(adapterSubcategory);
 
         mTagsInput.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -357,8 +412,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         });
 
         alert = (AlertFragment) getSupportFragmentManager().findFragmentById(R.id.alert_fragment);
-        progress = new ProgressDialog(this);
-        progress.setMessage(getString(R.string.label_save_article_progress));
+        progress = new ProgressDialog(ArticleCreateActivity.this);
         progress.setIndeterminate(true);
     }
 
@@ -388,9 +442,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.save, menu);
-
         return true;
     }
 
@@ -495,16 +547,16 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         }
         article.setTitle(mTitleInput.getText().toString());
         article.setSlug(mSlugInput.getText().toString());
-        article.setCategoryId(mCategorySpinner.getSelectedItemPosition());
-        article.setCategory(mCategorySpinner.getSelectedItem().toString());
-        article.setSubcategoryId(mSubcategorySpinner.getSelectedItemPosition());
-        article.setSubcategory(mSubcategorySpinner.getSelectedItem().toString());
+        article.setCategoryId(categoriesList.get(mCategorySpinner.getSelectedItemPosition()).getId());
+        article.setCategory(categoriesList.get(mCategorySpinner.getSelectedItemPosition()).getCategory());
+        article.setSubcategoryId(subcategoriesList.get(mSubcategorySpinner.getSelectedItemPosition()).getId());
+        article.setSubcategory(subcategoriesList.get(mSubcategorySpinner.getSelectedItemPosition()).getSubcategory());
         article.setFeatured(realPathFeatured);
         article.setTags(new ArrayList<>(Arrays.asList(mTagsInput.getTags())));
         article.setSlug(mSlugInput.getText().toString().trim());
         article.setContent(mContentEditor.getHtml());
         article.setExcerpt(mExcerptInput.getText().toString());
-        article.setStatus(mPublishedRadio.isChecked() ? Article.STATUS_PUBLISHED.toLowerCase() : mDraftRadio.isChecked() ? Article.STATUS_DRAFT.toLowerCase() : "Invalid Selected");
+        article.setStatus(mPublishedRadio.isChecked() ? Article.STATUS_PENDING.toLowerCase() : mDraftRadio.isChecked() ? Article.STATUS_DRAFT.toLowerCase() : "Invalid Selected");
         article.setAuthorId(session.getSessionData(SessionManager.KEY_ID, 0));
     }
 
@@ -594,7 +646,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         boolean isStatusValid = validator.isMemberOf(article.getStatus(),
                 new String[]{
                         Article.STATUS_PUBLISHED.toLowerCase(),
-                        Article.STATUS_DRAFT.toLowerCase()
+                        Article.STATUS_DRAFT.toLowerCase(),
+                        Article.STATUS_PENDING.toLowerCase()
                 });
         if (!isStatusValid) {
             validationMessage.add(getString(R.string.error_status_invalid));
@@ -632,32 +685,131 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
     protected void saveData() {
         if (connectionDetector.isNetworkAvailable()) {
+            progress.setMessage(getString(R.string.label_save_article_progress));
             progress.show();
-            new Handler().postDelayed(new Runnable() {
+
+            VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, Constant.URL_API_ARTICLE, new Response.Listener<NetworkResponse>() {
                 @Override
-                public void run() {
-                    progress.dismiss();
+                public void onResponse(NetworkResponse response) {
+                    String resultResponse = new String(response.data);
+                    try {
+                        JSONObject result = new JSONObject(resultResponse);
+                        String status = result.getString(Constant.RESPONSE_STATUS);
+                        String message = result.getString(Constant.RESPONSE_MESSAGE);
+                        Log.i("Infogue/Article", message);
 
-                    if (isCalledFromMainActivity) {
-                        Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
-                        articleIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
-                        articleIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
-                        // add some information for notification
-                        articleIntent.putExtra(ArticleActivity.SAVE_ARTICLE, Math.random() < 0.5);
-                        articleIntent.putExtra(CALLED_FROM_MAIN, isCalledFromMainActivity);
-                        articleIntent.putExtra(RESULT_CODE, AppCompatActivity.RESULT_OK);
+                        if (status.equals(Constant.REQUEST_SUCCESS)) {
+                            if (isCalledFromMainActivity) {
+                                Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
+                                articleIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
+                                articleIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
+                                // add some information for notification
+                                articleIntent.putExtra(ArticleActivity.SAVE_ARTICLE, true);
+                                articleIntent.putExtra(CALLED_FROM_MAIN, isCalledFromMainActivity);
+                                articleIntent.putExtra(RESULT_CODE, AppCompatActivity.RESULT_OK);
+                                startActivity(articleIntent);
+                            } else {
+                                Intent returnIntent = new Intent();
+                                returnIntent.putExtra(ArticleActivity.SAVE_ARTICLE, true);
+                                returnIntent.putExtra(CALLED_FROM_MAIN, isCalledFromMainActivity);
+                                setResult(AppCompatActivity.RESULT_OK, returnIntent);
+                            }
+                            finish();
 
-                        startActivity(articleIntent);
+                        } else {
+                            alert.setAlertType(AlertFragment.ALERT_INFO);
+                            alert.setAlertMessage(getString(R.string.error_unknown));
+                            alert.show();
+                            mScrollView.smoothScrollTo(0, 0);
+                        }
+                        realPathFeatured = null;
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        alert.setAlertType(AlertFragment.ALERT_WARNING);
+                        alert.setAlertMessage(getString(R.string.error_parse_data));
+                        alert.show();
+                        mScrollView.smoothScrollTo(0, 0);
+                    }
+                    progress.cancel();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    error.printStackTrace();
+
+                    NetworkResponse networkResponse = error.networkResponse;
+                    String errorMessage = getString(R.string.error_unknown);
+                    if (networkResponse == null) {
+                        if (error.getClass().equals(TimeoutError.class)) {
+                            errorMessage = getString(R.string.error_timeout);
+                        }
                     } else {
-                        Intent returnIntent = new Intent();
-                        returnIntent.putExtra(ArticleActivity.SAVE_ARTICLE, Math.random() < 0.5);
-                        returnIntent.putExtra(CALLED_FROM_MAIN, isCalledFromMainActivity);
-                        setResult(AppCompatActivity.RESULT_OK, returnIntent);
+                        try {
+                            String result = new String(networkResponse.data);
+                            JSONObject response = new JSONObject(result);
+                            String status = response.getString(Constant.RESPONSE_STATUS);
+                            String message = response.getString(Constant.RESPONSE_MESSAGE);
+
+                            Log.i("Infogue/Article", "Error::" + message);
+
+                            if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                errorMessage = message;
+                            } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                errorMessage = message + ", please login again!";
+                            } else if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                errorMessage = getString(R.string.error_not_found);
+                            } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                errorMessage = getString(R.string.error_server);
+                            } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                errorMessage = getString(R.string.error_maintenance);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            errorMessage = getString(R.string.error_parse_data);
+                        }
                     }
 
-                    finish();
+                    alert.setAlertType(AlertFragment.ALERT_DANGER);
+                    alert.setAlertMessage(errorMessage);
+                    alert.show();
+
+                    mScrollView.smoothScrollTo(0, 0);
+                    progress.dismiss();
                 }
-            }, 2000);
+            }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put(Contributor.CONTRIBUTOR_API, session.getSessionData(SessionManager.KEY_TOKEN, null));
+                    params.put(Contributor.CONTRIBUTOR_FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
+                    params.put(Article.ARTICLE_TITLE, article.getTitle());
+                    params.put(Article.ARTICLE_SLUG, article.getSlug());
+                    params.put(Article.ARTICLE_TAGS, TextUtils.join(",", article.getTags()));
+                    params.put(Article.ARTICLE_SUBCATEGORY_ID, String.valueOf(article.getSubcategoryId()));
+                    params.put(Article.ARTICLE_CONTENT, article.getContent());
+                    params.put(Article.ARTICLE_EXCERPT, article.getExcerpt());
+                    params.put(Article.ARTICLE_STATUS, article.getStatus());
+                    return params;
+                }
+
+                @Override
+                protected Map<String, DataPart> getByteData() {
+                    Map<String, DataPart> params = new HashMap<>();
+                    if (realPathFeatured != null && !realPathFeatured.trim().isEmpty()) {
+                        byte[] featuredData = AppHelper.getFileDataFromDrawable(getBaseContext(), mFeaturedImage.getDrawable());
+                        params.put(Article.ARTICLE_FEATURED, new DataPart("file_featured.jpg", featuredData, "image/jpeg"));
+                    }
+
+                    return params;
+                }
+            };
+            multipartRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    30000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
         } else {
             connectionDetector.snackbarDisconnectNotification(mSelectButton, new View.OnClickListener() {
                 @Override

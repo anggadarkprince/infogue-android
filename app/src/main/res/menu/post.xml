@@ -10,20 +10,6 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_publish"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_upload"
-        android:title="@string/action_publish"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_draft"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_file"
-        android:title="@string/action_draft"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/action_edit"
         android:orderInCategory="100"
         android:icon="@drawable/ic_pencil"
