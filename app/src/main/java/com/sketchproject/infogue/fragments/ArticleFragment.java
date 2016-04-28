@@ -55,6 +55,7 @@ public class ArticleFragment extends Fragment {
     private static final String ARG_AUTHOR_USERNAME = "author-username";
     private static final String ARG_AUTHOR_IS_ME = "author-is-me";
     private static final String ARG_QUERY = "search-query";
+    private static final String ARG_TAG = "tag";
 
     public static final String FEATURED_LATEST = "latest";
     public static final String FEATURED_POPULAR = "popular";
@@ -71,6 +72,7 @@ public class ArticleFragment extends Fragment {
     private int mAuthorId;
     private String mAuthorUsername;
     private String mQuery;
+    private String mTag;
     private boolean mMyArticle = false;
     private boolean hasHeader = false;
     private boolean isFirstCall = true;
@@ -102,7 +104,7 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
-    public static ArticleFragment newInstanceAuthor(int columnCount, int id, String username, boolean isMyArticle, String query) {
+    public static ArticleFragment newInstanceAuthor(int columnCount, int id, String username, boolean isMyArticle) {
         ArticleFragment fragment = new ArticleFragment();
 
         Bundle args = new Bundle();
@@ -110,10 +112,28 @@ public class ArticleFragment extends Fragment {
         args.putInt(ARG_AUTHOR_ID, id);
         args.putString(ARG_AUTHOR_USERNAME, username);
         args.putBoolean(ARG_AUTHOR_IS_ME, isMyArticle);
+
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static ArticleFragment newInstanceQuery(int columnCount, String query){
+        ArticleFragment fragment = new ArticleFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putString(ARG_QUERY, query);
 
         fragment.setArguments(args);
+        return fragment;
+    }
 
+    public static ArticleFragment newInstanceTag(int columnCount, String tag){
+        ArticleFragment fragment = new ArticleFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putString(ARG_TAG, tag);
+
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -125,7 +145,6 @@ public class ArticleFragment extends Fragment {
         args.putString(ARG_FEATURED, featured);
 
         fragment.setArguments(args);
-
         return fragment;
     }
 
@@ -138,7 +157,6 @@ public class ArticleFragment extends Fragment {
         args.putString(ARG_CATEGORY, category);
 
         fragment.setArguments(args);
-
         return fragment;
     }
 
@@ -154,7 +172,6 @@ public class ArticleFragment extends Fragment {
         args.putString(ARG_SUBCATEGORY, subcategory);
 
         fragment.setArguments(args);
-
         return fragment;
     }
 
@@ -173,6 +190,7 @@ public class ArticleFragment extends Fragment {
             mAuthorUsername = getArguments().getString(ARG_AUTHOR_USERNAME);
             mMyArticle = getArguments().getBoolean(ARG_AUTHOR_IS_ME);
             mQuery = getArguments().getString(ARG_QUERY);
+            mTag = getArguments().getString(ARG_TAG);
         }
 
         if (mSubcategoryId > 0 && mSubcategory != null) {
@@ -186,8 +204,13 @@ public class ArticleFragment extends Fragment {
             Log.i("INFOGUE/Article", "Featured : " + mFeatured);
             apiArticleUrl = UrlHelper.getApiFeaturedUrl(mFeatured, 0);
         } else if (mAuthorId != 0) {
+            if(mAuthorUsername == null){
+                mAuthorUsername = "";
+            }
             Log.i("INFOGUE/ARTICLE", "Contributor ID : " + String.valueOf(mAuthorId)+" Username : "+mAuthorUsername);
             apiArticleUrl = UrlHelper.getApiArticleUrl(mAuthorId, mAuthorUsername, mMyArticle, mQuery);
+        } else if(mTag != null && !mTag.isEmpty()){
+            apiArticleUrl = UrlHelper.getApiTagUrl(mTag);
         } else {
             Log.i("INFOGUE/Article", "Default");
         }

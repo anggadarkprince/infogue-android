@@ -348,5 +348,8 @@
 
     <string name="facebook_app_id">577855965712128</string>
     <string name="fb_login_protocol_scheme">fb577855965712128</string>
+    <string name="message_article_discarded">Article is discarded!</string>
+    <string name="message_article_invalid">Invalid Article Result!</string>
+    <string name="message_article_saved">Article successfully saved!</string>
 
 </resources>

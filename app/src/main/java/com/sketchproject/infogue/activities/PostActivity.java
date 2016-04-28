@@ -141,6 +141,9 @@ public class PostActivity extends AppCompatActivity {
             @Override
             public void onTagClick(String tag) {
                 Log.i("Infogue/Tag", tag);
+                Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
+                articleIntent.putExtra(Article.ARTICLE_TAG, tag);
+                startActivity(articleIntent);
             }
         });
 

@@ -27,6 +27,10 @@ public class UrlHelper {
         return url;
     }
 
+    public static String getApiTagUrl(String tag) {
+        return Constant.BASE_URL_API + "tag/" + tag;
+    }
+
     public static String getApiFollowerUrl(String type, int relatedId, String username, String query) {
         String related = "contributor_id=" + relatedId;
         String search = "query=" + query;
@@ -74,7 +78,7 @@ public class UrlHelper {
     }
 
     public static String getApiPostUrl(String slug, int loggedId) {
-        return Constant.BASE_URL_API + "article/" + slug+"?contributor_id=" + loggedId;
+        return Constant.BASE_URL_API + "article/" + slug + "?contributor_id=" + loggedId;
     }
 
     public static String getApiContributorUrl(String username) {

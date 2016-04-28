@@ -111,10 +111,14 @@ public class ArticleActivity extends AppCompatActivity implements
             authorId = extras.getInt(SessionManager.KEY_ID);
             String authorUsername = extras.getString(SessionManager.KEY_USERNAME);
             String query = extras.getString(SearchActivity.QUERY_STRING);
+            String tag = extras.getString(Article.ARTICLE_TAG);
 
             if (getSupportActionBar() != null) {
                 if (query != null) {
                     getSupportActionBar().setTitle("All result for " + query);
+                } else if(tag != null){
+                    getSupportActionBar().setTitle(tag);
+                    getSupportActionBar().setSubtitle("TAG");
                 }
             }
 
@@ -137,7 +141,15 @@ public class ArticleActivity extends AppCompatActivity implements
                 }
             }
 
-            Fragment fragment = ArticleFragment.newInstanceAuthor(1, authorId, authorUsername, isMyArticle, query);
+            Fragment fragment;
+            if (tag != null && !tag.isEmpty()) {
+                fragment = ArticleFragment.newInstanceTag(1, tag);
+            } else if (query != null && !query.isEmpty()) {
+                fragment = ArticleFragment.newInstanceQuery(1, query);
+            } else {
+                fragment = ArticleFragment.newInstanceAuthor(1, authorId, authorUsername, isMyArticle);
+            }
+
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.fragment, fragment);
@@ -161,7 +173,7 @@ public class ArticleActivity extends AppCompatActivity implements
 
     @SuppressWarnings("deprecation")
     private void handleResult(int resultCode, boolean saveResult) {
-        final Snackbar snackbar = Snackbar.make(swipeRefreshLayout, "Article successfully saved!", Snackbar.LENGTH_LONG);
+        final Snackbar snackbar = Snackbar.make(swipeRefreshLayout, R.string.message_article_saved, Snackbar.LENGTH_LONG);
         snackbar.setActionTextColor(getResources().getColor(R.color.light));
         snackbar.setAction(R.string.action_ok, new View.OnClickListener() {
             @Override
@@ -183,10 +195,10 @@ public class ArticleActivity extends AppCompatActivity implements
             }
         } else if (resultCode == AppCompatActivity.RESULT_CANCELED) {
             snackbarView.setBackgroundResource(R.color.color_warning);
-            snackbar.setText("Article is discarded!");
+            snackbar.setText(R.string.message_article_discarded);
         } else {
             snackbarView.setBackgroundResource(R.color.color_danger);
-            snackbar.setText("Invalid Article Result!");
+            snackbar.setText(R.string.message_article_invalid);
         }
 
         snackbar.show();
