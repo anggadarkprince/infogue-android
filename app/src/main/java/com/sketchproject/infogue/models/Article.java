@@ -17,6 +17,7 @@ public class Article {
     public static final String ARTICLE_SUBCATEGORY = "subcategory";
     public static final String ARTICLE_SUBCATEGORY_ID = "subcategory_id";
     public static final String ARTICLE_CONTENT = "content";
+    public static final String ARTICLE_CONTENT_UPDATE = "content_update";
     public static final String ARTICLE_EXCERPT = "excerpt";
     public static final String ARTICLE_PUBLISHED_AT = "published_at";
     public static final String ARTICLE_CREATED_AT = "created_at";
@@ -44,6 +45,7 @@ public class Article {
     private int subcategoryId;
     private String subcategory;
     private String content;
+    private String contentUpdate;
     private String excerpt;
     private String publishedAt;
     private List<String> tags;
@@ -193,5 +195,13 @@ public class Article {
 
     public void setAuthorId(int authorId) {
         this.authorId = authorId;
+    }
+
+    public String getContentUpdate() {
+        return contentUpdate;
+    }
+
+    public void setContentUpdate(String contentUpdate) {
+        this.contentUpdate = contentUpdate;
     }
 }

@@ -49,6 +49,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.database.DBHelper;
+import com.sketchproject.infogue.database.DatabaseManager;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.HomeFragment;
 import com.sketchproject.infogue.models.Article;
@@ -93,6 +95,9 @@ public class ApplicationActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_application);
+
+        DBHelper dbHelper = new DBHelper(getApplicationContext());
+        DatabaseManager.initializeInstance(dbHelper);
 
         connectionDetector = new ConnectionDetector(getBaseContext());
         connectionDetector.setLostConnectionListener(this);

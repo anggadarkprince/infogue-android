@@ -69,8 +69,12 @@ public class UrlHelper {
         return url;
     }
 
+    public static String getApiPostUrl(String slug) {
+        return Constant.BASE_URL_API + "article/" + slug;
+    }
+
     public static String getApiPostUrl(String slug, int loggedId) {
-        return Constant.BASE_URL_API + "article/" + slug + "?contributor_id=" + loggedId;
+        return Constant.BASE_URL_API + "article/" + slug+"?contributor_id=" + loggedId;
     }
 
     public static String getApiContributorUrl(String username) {

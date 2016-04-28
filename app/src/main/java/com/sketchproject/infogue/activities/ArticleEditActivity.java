@@ -1,17 +1,33 @@
 package com.sketchproject.infogue.activities;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.fragments.AlertFragment;
 import com.sketchproject.infogue.models.Article;
+import com.sketchproject.infogue.models.Category;
+import com.sketchproject.infogue.models.Subcategory;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.AppHelper;
+import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.UrlHelper;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +35,7 @@ import java.util.List;
 public class ArticleEditActivity extends ArticleCreateActivity {
     private int articleId;
     private String articleSlug;
+    private String articleFeatured;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,84 +49,157 @@ public class ArticleEditActivity extends ArticleCreateActivity {
         if (extras != null) {
             articleId = extras.getInt(Article.ARTICLE_ID);
             articleSlug = extras.getString(Article.ARTICLE_SLUG);
+            articleFeatured = extras.getString(Article.ARTICLE_FEATURED);
+            apiUrl = Constant.URL_API_ARTICLE + "/" + articleSlug;
+            isUpdate = true;
+
+            mFeaturedImage.setVisibility(View.VISIBLE);
+            Glide.with(getBaseContext()).load(articleFeatured)
+                    .placeholder(R.drawable.placeholder_rectangle)
+                    .centerCrop()
+                    .crossFade()
+                    .into(mFeaturedImage);
+            realPathFeatured = articleFeatured;
         } else {
             AppHelper.toastColored(getBaseContext(), "Invalid article!", Color.parseColor("#ddd9534f"));
             finish();
         }
 
-        demoOnly();
-
         mSaveButton.setText(R.string.action_update_article);
+
+        retrieveArticleData();
     }
 
-    protected void saveData() {
-        if (connectionDetector.isNetworkAvailable()) {
-            progress.show();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    progress.dismiss();
+    private void retrieveArticleData() {
+        progress.setMessage(getString(R.string.label_retrieve_article_progress));
+        progress.show();
 
-                    if (isCalledFromMainActivity) {
-                        Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
-                        articleIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
-                        articleIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
-                        // add some information for notification
-                        articleIntent.putExtra(ArticleActivity.SAVE_ARTICLE, Math.random() < 0.5);
-                        articleIntent.putExtra(CALLED_FROM_MAIN, isCalledFromMainActivity);
-                        articleIntent.putExtra(RESULT_CODE, AppCompatActivity.RESULT_OK);
+        JsonObjectRequest articleRequest = new JsonObjectRequest(Request.Method.GET, UrlHelper.getApiPostUrl(articleSlug), null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String status = response.getString(Constant.RESPONSE_STATUS);
 
-                        startActivity(articleIntent);
-                    } else {
-                        Intent returnIntent = new Intent();
-                        returnIntent.putExtra(ArticleActivity.SAVE_ARTICLE, Math.random() < 0.5);
-                        returnIntent.putExtra(CALLED_FROM_MAIN, isCalledFromMainActivity);
-                        setResult(AppCompatActivity.RESULT_OK, returnIntent);
+                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                JSONObject articleObject = response.getJSONObject("article");
+                                JSONObject subcategory = articleObject.getJSONObject(Article.ARTICLE_SUBCATEGORY);
+                                JSONObject category = subcategory.getJSONObject(Article.ARTICLE_CATEGORY);
+                                JSONArray tags = articleObject.getJSONArray(Article.ARTICLE_TAGS);
+
+                                mTitleInput.setText(articleObject.getString(Article.ARTICLE_TITLE));
+                                mSlugInput.setText(articleObject.getString(Article.ARTICLE_SLUG));
+                                String contentUpdate = articleObject.getString(Article.ARTICLE_CONTENT_UPDATE);
+                                if (contentUpdate != null && !contentUpdate.equals("null") && !contentUpdate.trim().isEmpty()) {
+                                    mContentEditor.setHtml(contentUpdate);
+                                } else {
+                                    mContentEditor.setHtml(articleObject.getString(Article.ARTICLE_CONTENT));
+                                }
+
+                                mExcerptInput.setText(articleObject.getString(Article.ARTICLE_EXCERPT));
+
+                                for (int i = 0; i < categoriesList.size(); i++) {
+                                    if (categoriesList.get(i).getId() == category.getInt(Category.COLUMN_ID)) {
+                                        mCategorySpinner.setSelection(i +1);
+                                        populateSubcategory(i);
+                                        break;
+                                    }
+                                }
+
+                                for (int j = 0; j < subcategoriesList.size(); j++) {
+                                    if (subcategoriesList.get(j).getId() == subcategory.getInt(Subcategory.COLUMN_ID)) {
+                                        final int position = j;
+                                        mSubcategorySpinner.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                mSubcategorySpinner.setSelection(position+1);
+                                                Log.i("Infogue/Subcategory","Set selection 2 - "+position);
+                                            }
+                                        }, 200);
+
+                                        break;
+                                    }
+                                }
+
+                                List<String> tagsList = new ArrayList<>();
+                                for (int i = 0; i < tags.length(); i++) {
+                                    tagsList.add(tags.getJSONObject(i).getString(Article.ARTICLE_TAG));
+                                }
+                                mTagsInput.setTags(tagsList);
+
+                                boolean isPending = articleObject.getString(Article.ARTICLE_STATUS).equals(Article.STATUS_PENDING);
+                                boolean isPublished = articleObject.getString(Article.ARTICLE_STATUS).equals(Article.STATUS_PUBLISHED);
+                                boolean isDraft = articleObject.getString(Article.ARTICLE_STATUS).equals(Article.STATUS_DRAFT);
+                                if (isPending || isPublished) {
+                                    mPublishedRadio.setChecked(true);
+                                } else if (isDraft) {
+                                    mDraftRadio.setChecked(true);
+                                } else {
+                                    mPublishedRadio.setChecked(false);
+                                    mDraftRadio.setChecked(false);
+                                }
+                                mScrollView.smoothScrollTo(0, 0);
+
+                            } else {
+                                alert.setAlertType(AlertFragment.ALERT_INFO);
+                                alert.setAlertMessage(getString(R.string.error_unknown));
+                                alert.show();
+                                mScrollView.smoothScrollTo(0, 0);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            finish();
+                            AppHelper.toastColored(getBaseContext(), getString(R.string.error_parse_data),
+                                    ContextCompat.getColor(getBaseContext(), R.color.primary));
+                        }
+                        progress.dismiss();
                     }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
 
-                    finish();
+                        NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = getString(R.string.error_unknown);
+                        if (networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                errorMessage = getString(R.string.error_timeout);
+                            }
+                        } else {
+                            try {
+                                String result = new String(networkResponse.data);
+                                JSONObject response = new JSONObject(result);
+                                String status = response.optString(Constant.RESPONSE_STATUS);
+                                String message = response.optString(Constant.RESPONSE_MESSAGE);
+
+                                Log.e("Infogue/Article", "Error::" + message);
+
+                                if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                    errorMessage = getString(R.string.error_unauthorized);
+                                } else if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                    errorMessage = getString(R.string.error_not_found);
+                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    errorMessage = getString(R.string.error_server);
+                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                    errorMessage = getString(R.string.error_maintenance);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                errorMessage = getString(R.string.error_parse_data);
+                            }
+                        }
+                        AppHelper.toastColored(getBaseContext(), errorMessage,
+                                ContextCompat.getColor(getBaseContext(), R.color.color_danger));
+                        progress.dismiss();
+                    }
                 }
-            }, 2000);
-        } else {
-            connectionDetector.snackbarDisconnectNotification(mSelectButton, null);
-        }
-    }
+        );
+        articleRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-    private void demoOnly() {
-        List<String> tags = new ArrayList<>();
-        tags.add("sunday");
-        tags.add("holiday");
-        tags.add("spirit");
-        tags.add("smile");
-        tags.add("welcome home");
-        tags.add("new album");
-        tags.add("music2016");
-
-        article = new Article(articleId, articleSlug);
-        article.setTitle("Hari ini indah sekali");
-        article.setSlug("hari-ini-indah-sekali");
-        article.setCategory("Entertainment");
-        article.setCategoryId(1);
-        article.setSubcategory("Music");
-        article.setSubcategoryId(2);
-        article.setAuthorId(session.getSessionData(SessionManager.KEY_ID, 0));
-        article.setContent(getString(R.string.large_text));
-        article.setTags(tags);
-        article.setFeatured("http://infogue.id/images/featured/featured_1.jpg");
-        article.setExcerpt("This is simple excerpt");
-
-        mTitleInput.setText(article.getTitle());
-        mSlugInput.setText(article.getSlug());
-        mCategorySpinner.setSelection(article.getCategoryId());
-        mSubcategorySpinner.setSelection(article.getSubcategoryId());
-        mContentEditor.setHtml(article.getContent());
-        mTagsInput.setTags(article.getTags());
-        mExcerptInput.setText(article.getExcerpt());
-        mFeaturedImage.setVisibility(View.VISIBLE);
-        Glide.with(getBaseContext())
-                .load(article.getFeatured())
-                .placeholder(R.drawable.placeholder_logo_wide)
-                .crossFade()
-                .into(mFeaturedImage);
+        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(articleRequest);
     }
 }

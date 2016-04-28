@@ -153,7 +153,7 @@ public class ArticleActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == ArticleCreateActivity.CALL_ARTICLE_FORM_CODE) {
+        if (requestCode == ArticleCreateActivity.CALL_ARTICLE_FORM_CODE && data != null) {
             boolean saveResult = data.getBooleanExtra(SAVE_ARTICLE, false);
             handleResult(resultCode, saveResult);
         }
@@ -326,6 +326,7 @@ public class ArticleActivity extends AppCompatActivity implements
         Intent editIntent = new Intent(getBaseContext(), ArticleEditActivity.class);
         editIntent.putExtra(Article.ARTICLE_ID, article.getId());
         editIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
+        editIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
         startActivityForResult(editIntent, ArticleCreateActivity.CALL_ARTICLE_FORM_CODE);
     }
 
@@ -375,6 +376,8 @@ public class ArticleActivity extends AppCompatActivity implements
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            AppHelper.toastColored(getBaseContext(), getString(R.string.error_parse_data),
+                                    ContextCompat.getColor(getBaseContext(), R.color.primary));
                         }
 
                         progress.dismiss();
@@ -395,13 +398,13 @@ public class ArticleActivity extends AppCompatActivity implements
                             try {
                                 String result = new String(networkResponse.data);
                                 JSONObject response = new JSONObject(result);
-                                String status = response.getString(Constant.RESPONSE_STATUS);
-                                String message = response.getString(Constant.RESPONSE_MESSAGE);
+                                String status = response.optString(Constant.RESPONSE_STATUS);
+                                String message = response.optString(Constant.RESPONSE_MESSAGE);
 
-                                Log.i("Infogue/Article", "Error::" + message);
+                                Log.e("Infogue/Article", "Error::" + message);
 
                                 if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
-                                    errorMessage = message + ", please login again!";
+                                    errorMessage = getString(R.string.error_unauthorized);
                                 } else if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                     errorMessage = getString(R.string.error_not_found);
                                 } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
@@ -414,8 +417,8 @@ public class ArticleActivity extends AppCompatActivity implements
                                 errorMessage = getString(R.string.error_parse_data);
                             }
                         }
-                        AppHelper.toastColored(getBaseContext(), errorMessage, ContextCompat.getColor(getBaseContext(), R.color.color_danger));
-
+                        AppHelper.toastColored(getBaseContext(), errorMessage,
+                                ContextCompat.getColor(getBaseContext(), R.color.color_danger));
                         progress.dismiss();
                     }
                 }

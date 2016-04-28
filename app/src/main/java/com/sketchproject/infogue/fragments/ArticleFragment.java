@@ -297,6 +297,7 @@ public class ArticleFragment extends Fragment {
                                             article.setSubcategoryId(articleData.getInt(Article.ARTICLE_SUBCATEGORY_ID));
                                             article.setSubcategory(articleData.getString(Article.ARTICLE_SUBCATEGORY));
                                             article.setContent(articleData.getString(Article.ARTICLE_CONTENT));
+                                            article.setContentUpdate(articleData.getString(Article.ARTICLE_CONTENT_UPDATE));
                                             article.setPublishedAt(articleData.getString(Article.ARTICLE_PUBLISHED_AT));
                                             article.setView(articleData.getInt(Article.ARTICLE_VIEW));
                                             article.setRating(articleData.getInt(Article.ARTICLE_RATING_TOTAL));

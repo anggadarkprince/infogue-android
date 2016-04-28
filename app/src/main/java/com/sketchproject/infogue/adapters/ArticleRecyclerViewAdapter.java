@@ -73,7 +73,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 return VIEW_TYPE_HEADER;
             }
 
-            if(mIsEditable){
+            if (mIsEditable) {
                 return VIEW_TYPE_ROW_EDITABLE;
             }
             return VIEW_TYPE_ROW;
@@ -146,48 +146,54 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             case VIEW_TYPE_ROW_EDITABLE:
                 final ArticleEditableViewHolder rowEditableHolder = (ArticleEditableViewHolder) holder;
                 String status = mArticles.get(holder.getAdapterPosition()).getStatus();
+                String contentUpdate = mArticles.get(holder.getAdapterPosition()).getContentUpdate();
                 rowEditableHolder.mItem = mArticles.get(holder.getAdapterPosition());
                 rowEditableHolder.mTitleView.setText(mArticles.get(holder.getAdapterPosition()).getTitle());
                 rowEditableHolder.mDateView.setText(mArticles.get(holder.getAdapterPosition()).getPublishedAt());
                 rowEditableHolder.mCategoryView.setText(mArticles.get(holder.getAdapterPosition()).getCategory());
-                rowEditableHolder.mStatusView.setText(status.toUpperCase());
-                switch(status){
-                    case Article.STATUS_PENDING:
-                        rowEditableHolder.mControlBar.setBackgroundResource(R.color.color_warning_light);
-                        //rowEditableHolder.mBrowse.setBackgroundResource(R.color.color_warning);
-                        //rowEditableHolder.mShare.setBackgroundResource(R.color.color_warning_medium);
-                        //rowEditableHolder.mEdit.setBackgroundResource(R.color.color_warning_hard);
-                        //rowEditableHolder.mDelete.setBackgroundResource(R.color.color_warning_darker);
-                        break;
-                    case Article.STATUS_PUBLISHED:
-                        rowEditableHolder.mControlBar.setBackgroundResource(R.color.color_success_light);
-                        //rowEditableHolder.mBrowse.setBackgroundResource(R.color.color_success);
-                        //rowEditableHolder.mShare.setBackgroundResource(R.color.color_success_medium);
-                        //rowEditableHolder.mEdit.setBackgroundResource(R.color.color_success_hard);
-                        //rowEditableHolder.mDelete.setBackgroundResource(R.color.color_success_darker);
-                        break;
-                    case Article.STATUS_UPDATED:
-                        rowEditableHolder.mControlBar.setBackgroundResource(R.color.color_hazard_light);
-                        //rowEditableHolder.mBrowse.setBackgroundResource(R.color.color_hazard);
-                        //rowEditableHolder.mShare.setBackgroundResource(R.color.color_hazard_medium);
-                        //rowEditableHolder.mEdit.setBackgroundResource(R.color.color_hazard_hard);
-                        //rowEditableHolder.mDelete.setBackgroundResource(R.color.color_hazard_darker);
-                        break;
-                    case Article.STATUS_REJECTED:
-                        rowEditableHolder.mControlBar.setBackgroundResource(R.color.color_danger_light);
-                        //rowEditableHolder.mBrowse.setBackgroundResource(R.color.color_danger);
-                        //rowEditableHolder.mShare.setBackgroundResource(R.color.color_danger_medium);
-                        //rowEditableHolder.mEdit.setBackgroundResource(R.color.color_danger_hard);
-                        //rowEditableHolder.mDelete.setBackgroundResource(R.color.color_danger_darker);
-                        break;
-                    case Article.STATUS_DRAFT:
-                        rowEditableHolder.mControlBar.setBackgroundResource(R.color.color_caution_light);
-                        //rowEditableHolder.mBrowse.setBackgroundResource(R.color.color_caution);
-                        //rowEditableHolder.mShare.setBackgroundResource(R.color.color_caution_medium);
-                        //rowEditableHolder.mEdit.setBackgroundResource(R.color.color_caution_hard);
-                        //rowEditableHolder.mDelete.setBackgroundResource(R.color.color_caution_darker);
-                        break;
+
+                if (contentUpdate != null && !contentUpdate.equals("null") && !contentUpdate.trim().isEmpty()) {
+                    Log.i("Infogue/Article", contentUpdate);
+                    rowEditableHolder.mStatusView.setText(Article.STATUS_UPDATED.toUpperCase());
+                    rowEditableHolder.mControlBar.setBackgroundResource(R.color.color_hazard_light);
+                    //rowEditableHolder.mBrowse.setBackgroundResource(R.color.color_hazard);
+                    //rowEditableHolder.mShare.setBackgroundResource(R.color.color_hazard_medium);
+                    //rowEditableHolder.mEdit.setBackgroundResource(R.color.color_hazard_hard);
+                    //rowEditableHolder.mDelete.setBackgroundResource(R.color.color_hazard_darker);
+                } else {
+                    rowEditableHolder.mStatusView.setText(status.toUpperCase());
+                    switch (status) {
+                        case Article.STATUS_PENDING:
+                            rowEditableHolder.mControlBar.setBackgroundResource(R.color.color_warning_light);
+                            //rowEditableHolder.mBrowse.setBackgroundResource(R.color.color_warning);
+                            //rowEditableHolder.mShare.setBackgroundResource(R.color.color_warning_medium);
+                            //rowEditableHolder.mEdit.setBackgroundResource(R.color.color_warning_hard);
+                            //rowEditableHolder.mDelete.setBackgroundResource(R.color.color_warning_darker);
+                            break;
+                        case Article.STATUS_PUBLISHED:
+                            rowEditableHolder.mControlBar.setBackgroundResource(R.color.color_success_light);
+                            //rowEditableHolder.mBrowse.setBackgroundResource(R.color.color_success);
+                            //rowEditableHolder.mShare.setBackgroundResource(R.color.color_success_medium);
+                            //rowEditableHolder.mEdit.setBackgroundResource(R.color.color_success_hard);
+                            //rowEditableHolder.mDelete.setBackgroundResource(R.color.color_success_darker);
+                            break;
+                        case Article.STATUS_REJECTED:
+                            rowEditableHolder.mControlBar.setBackgroundResource(R.color.color_danger_light);
+                            //rowEditableHolder.mBrowse.setBackgroundResource(R.color.color_danger);
+                            //rowEditableHolder.mShare.setBackgroundResource(R.color.color_danger_medium);
+                            //rowEditableHolder.mEdit.setBackgroundResource(R.color.color_danger_hard);
+                            //rowEditableHolder.mDelete.setBackgroundResource(R.color.color_danger_darker);
+                            break;
+                        case Article.STATUS_DRAFT:
+                            rowEditableHolder.mControlBar.setBackgroundResource(R.color.color_caution_light);
+                            //rowEditableHolder.mBrowse.setBackgroundResource(R.color.color_caution);
+                            //rowEditableHolder.mShare.setBackgroundResource(R.color.color_caution_medium);
+                            //rowEditableHolder.mEdit.setBackgroundResource(R.color.color_caution_hard);
+                            //rowEditableHolder.mDelete.setBackgroundResource(R.color.color_caution_darker);
+                            break;
+                    }
                 }
+
                 Glide.with(rowEditableHolder.mView.getContext())
                         .load(mArticles.get(position).getFeatured())
                         .placeholder(R.drawable.placeholder_logo)
@@ -199,7 +205,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 rowEditableHolder.mBrowse.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(null != mEditableListener){
+                        if (null != mEditableListener) {
                             mEditableListener.onBrowseClicked(rowEditableHolder.mView, rowEditableHolder.mItem);
                         }
                     }
@@ -208,7 +214,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 rowEditableHolder.mShare.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(null != mEditableListener){
+                        if (null != mEditableListener) {
                             mEditableListener.onShareClicked(rowEditableHolder.mView, rowEditableHolder.mItem);
                         }
                     }
@@ -217,7 +223,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 rowEditableHolder.mEdit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(null != mEditableListener) {
+                        if (null != mEditableListener) {
                             mEditableListener.onEditClicked(rowEditableHolder.mView, rowEditableHolder.mItem);
                         }
                     }
@@ -226,7 +232,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 rowEditableHolder.mDelete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(null != mEditableListener){
+                        if (null != mEditableListener) {
                             mEditableListener.onDeleteClicked(rowEditableHolder.mView, rowEditableHolder.mItem);
                         }
                     }
@@ -250,7 +256,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         }
     }
 
-    private void setDefaultRowEventListener(View view, View more, final Article article){
+    private void setDefaultRowEventListener(View view, View more, final Article article) {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -270,7 +276,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             }
         });
 
-        if(more != null){
+        if (more != null) {
             more.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

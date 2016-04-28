@@ -36,10 +36,12 @@
     <string name="prompt_googleplus">Google+ Url</string>
     <string name="prompt_instagram">Instagram Url</string>
     <string name="prompt_contact">Contact or Phone</string>
+    <string name="prompt_leave_a_comment">Leave a comment</string>
 
     <string name="error_server">Oops, Something is getting wrong</string>
     <string name="error_unknown">Unknown error occurred</string>
     <string name="error_timeout">Request server timeout, try again!</string>
+    <string name="error_unauthorized">Unauthorized, please login again!</string>
     <string name="error_not_found">Data not found</string>
     <string name="error_parse_data">Error parse data</string>
     <string name="error_maintenance">Server currently still maintenance</string>
@@ -102,6 +104,7 @@
     <string name="label_articles">Articles</string>
     <string name="label_followers">Followers</string>
     <string name="label_following">Following</string>
+    <string name="label_comments">Comments :</string>
     <string name="label_rating">RATING</string>
     <string name="label_tags">TAGS</string>
     <string name="label_title_basic_info">BASIC INFO</string>
@@ -138,7 +141,8 @@
     <string name="label_save_article_progress">Saving Article</string>
     <string name="label_delete_article_progress">Deleting article</string>
     <string name="label_retrieve_setting_progress">Retrieving account data</string>
-    <string name="label_comments">Comments :</string>
+    <string name="label_retrieve_category_progress">Downloading Category Menu</string>
+    <string name="label_retrieve_article_progress">Loading Article Data</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -225,22 +229,24 @@
     <string name="info_content_description">Button Detail Info</string>
     <string name="more_content_description">Button More</string>
     <string name="delete_content_description">Button Delete</string>
+    <string name="comment_content_description">Leave a comment</string>
 
-    <string name="placeholder_about">The description will be placed here, multiline and wrapped by this container</string>
+    <string name="placeholder_about">No Description</string>
     <string name="placeholder_statistic">0</string>
     <string name="placeholder_name">Anonymous</string>
     <string name="placeholder_location">No Location</string>
-    <string name="placeholder_phone">+62 000555</string>
+    <string name="placeholder_phone">No Contact</string>
     <string name="placeholder_email">user@infogue.com</string>
+    <string name="placeholder_date">DATE</string>
     <string name="placeholder_username">infogue_user</string>
-    <string name="placeholder_instagram">http://instagram.com/infogue</string>
-    <string name="placeholder_googleplus">http://plus.google.com/+infogue</string>
-    <string name="placeholder_twitter">http://twitter.com/infogue</string>
-    <string name="placeholder_facebook">http://facebook.com/infogue</string>
-    <string name="placeholder_article_detail">Subcategory | 0X Views | 5 Stars</string>
-    <string name="placeholder_article_excerpt">This is example of excerpt content</string>
-    <string name="placeholder_article_published_at">21 January 2016</string>
-    <string name="placeholder_article_title">This is a long text title for article post then here we go diving in the sky</string>
+    <string name="placeholder_instagram">https://instagram.com/infogue</string>
+    <string name="placeholder_googleplus">https://plus.google.com/+infogue</string>
+    <string name="placeholder_twitter">https://twitter.com/infogue</string>
+    <string name="placeholder_facebook">https://facebook.com/infogue</string>
+    <string name="placeholder_article_detail">Subcategory | 0X Views | 0 Stars</string>
+    <string name="placeholder_article_excerpt">Excerpt</string>
+    <string name="placeholder_article_published_at">Timestamp</string>
+    <string name="placeholder_article_title">TITLE</string>
     <string name="placeholder_article_category">CATEGORY</string>
     <string name="placeholder_article_rating_desc">GOOD ARTICLE</string>
     <string name="large_text">
@@ -342,9 +348,5 @@
 
     <string name="facebook_app_id">577855965712128</string>
     <string name="fb_login_protocol_scheme">fb577855965712128</string>
-    <string name="placeholder_date">13 January 2016</string>
-    <string name="prompt_leave_a_comment">Leave a comment</string>
-    <string name="comment_content_description">Leave a comment</string>
-    <string name="label_retrieve_category_progress">Downloading Category Menu</string>
 
 </resources>

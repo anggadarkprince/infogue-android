@@ -110,6 +110,9 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
     protected String realPathFeatured;
     protected boolean isCalledFromMainActivity;
+    protected boolean isNewFeatured;
+    protected boolean isUpdate;
+    protected String apiUrl;
 
     @SuppressWarnings("ConstantConditions")
     @Override
@@ -177,16 +180,11 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         mCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("infogue/Article", "Category " + position + " id " + id);
+                Log.i("Infogue/Category", "position " + position + " id " + id);
                 if (position >= 0) {
-                    subcategoriesList = new SubcategoryRepository().retrieveData(categoriesList.get(position).getId());
-                    mSubcategoryList = new String[subcategoriesList.size()];
-                    Log.i("infogue/Article", "Category id " + categoriesList.get(position).getId() + " SubCategory " + subcategoriesList.size());
-                    for (int k = 0; k < subcategoriesList.size(); k++) {
-                        mSubcategoryList[k] = subcategoriesList.get(k).getSubcategory();
-                        Log.i("infogue/Article", "SubCategory " + subcategoriesList.get(k).getSubcategory());
-                    }
-
+                    populateSubcategory(position);
+                } else {
+                    mSubcategoryList = new String[0];
                     // populate subcategory spinner
                     adapterSubcategory = new ArrayAdapter<>(getBaseContext(), android.R.layout.simple_spinner_item, mSubcategoryList);
                     adapterSubcategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -204,6 +202,17 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         adapterSubcategory = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mSubcategoryList);
         adapterSubcategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSubcategorySpinner.setAdapter(adapterSubcategory);
+        mSubcategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("Infogue/SubCategory", "position " + position + " id " + id);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         mTagsInput.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -414,6 +423,26 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         alert = (AlertFragment) getSupportFragmentManager().findFragmentById(R.id.alert_fragment);
         progress = new ProgressDialog(ArticleCreateActivity.this);
         progress.setIndeterminate(true);
+
+        isNewFeatured = false;
+        apiUrl = Constant.URL_API_ARTICLE;
+        isUpdate = false;
+    }
+
+    protected void populateSubcategory(int position) {
+        subcategoriesList = new SubcategoryRepository().retrieveData(categoriesList.get(position).getId());
+        mSubcategoryList = new String[subcategoriesList.size()];
+        for (int k = 0; k < subcategoriesList.size(); k++) {
+            mSubcategoryList[k] = subcategoriesList.get(k).getSubcategory();
+        }
+
+        // populate subcategory spinner
+        adapterSubcategory = new ArrayAdapter<>(getBaseContext(), android.R.layout.simple_spinner_item, mSubcategoryList);
+        adapterSubcategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSubcategorySpinner.setAdapter(adapterSubcategory);
+        if (mSubcategoryList.length > 0) {
+            mSubcategorySpinner.setSelection(0);
+        }
     }
 
     @Override
@@ -429,6 +458,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
             } else {
                 realPathFeatured = RealPathResolver.getRealPathFromURI_API19(getBaseContext(), data.getData());
             }
+
+            isNewFeatured = true;
 
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
@@ -470,6 +501,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
     }
 
     protected void saveConfirmation() {
+        Log.i("Infogue/Sub id", String.valueOf(article.getSubcategoryId()));
+
         int action;
         if (mPublishedRadio.isChecked()) {
             action = R.string.action_save_publish;
@@ -542,15 +575,50 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
     @Override
     public void preValidation() {
-        if (article == null) {
-            article = new Article();
-        }
+        article = new Article();
         article.setTitle(mTitleInput.getText().toString());
         article.setSlug(mSlugInput.getText().toString());
-        article.setCategoryId(categoriesList.get(mCategorySpinner.getSelectedItemPosition()).getId());
-        article.setCategory(categoriesList.get(mCategorySpinner.getSelectedItemPosition()).getCategory());
-        article.setSubcategoryId(subcategoriesList.get(mSubcategorySpinner.getSelectedItemPosition()).getId());
-        article.setSubcategory(subcategoriesList.get(mSubcategorySpinner.getSelectedItemPosition()).getSubcategory());
+
+        if (categoriesList != null) {
+            int index = mCategorySpinner.getSelectedItemPosition() - 1;
+            Log.i("Infogue/Category", "Selected index "+String.valueOf(index));
+
+            if(mCategorySpinner.getSelectedItemPosition() - 1 >= 0){
+                int categoryId = categoriesList.get(index).getId();
+                String categoryLabel = categoriesList.get(index).getCategory();
+
+                article.setCategoryId(categoryId);
+                article.setCategory(categoryLabel);
+            }
+            else{
+                article.setCategoryId(0);
+                article.setCategory(null);
+            }
+            Log.i("Infogue/Category", "Id " + article.getCategoryId() + " Label " + article.getCategory());
+        } else {
+            Log.e("Infogue/Category", "is null");
+        }
+
+        if (subcategoriesList != null) {
+            int index = mSubcategorySpinner.getSelectedItemPosition() - 1;
+            Log.i("Infogue/Subcategory", String.valueOf(index));
+            if(index >= 0){
+                int subcategoryId = subcategoriesList.get(index).getId();
+                String subcategoryLabel = subcategoriesList.get(index).getSubcategory();
+
+                article.setSubcategoryId(subcategoryId);
+                article.setSubcategory(subcategoryLabel);
+            }
+            else{
+                article.setSubcategoryId(0);
+                article.setSubcategory(null);
+            }
+
+            Log.i("Infogue/Subcategory", "Id " + article.getSubcategoryId() + " Label " + article.getSubcategory());
+        } else {
+            Log.e("Infogue/Subcategory", "is null");
+        }
+
         article.setFeatured(realPathFeatured);
         article.setTags(new ArrayList<>(Arrays.asList(mTagsInput.getTags())));
         article.setSlug(mSlugInput.getText().toString().trim());
@@ -580,8 +648,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         }
 
         // validation of category
-        boolean isCategoryIdEmpty = validator.isEmpty(article.getCategoryId());
-        boolean isCategoryEmpty = validator.isEmpty(article.getCategory());
+        boolean isCategoryIdEmpty = validator.isEmpty(article.getCategoryId(), true);
+        boolean isCategoryEmpty = validator.isEmpty(article.getCategory(), true);
         if (isCategoryIdEmpty || isCategoryEmpty) {
             validationMessage.add(getString(R.string.error_category_required));
             focusView = mCategorySpinner;
@@ -589,8 +657,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         }
 
         // validation of subcategory
-        boolean isSubCategoryIdEmpty = validator.isEmpty(article.getSubcategoryId());
-        boolean isSubCategoryEmpty = validator.isEmpty(article.getSubcategory());
+        boolean isSubCategoryIdEmpty = validator.isEmpty(article.getSubcategoryId(), true);
+        boolean isSubCategoryEmpty = validator.isEmpty(article.getSubcategory(), true);
         if (isSubCategoryIdEmpty || isSubCategoryEmpty) {
             validationMessage.add(getString(R.string.error_subcategory_required));
             focusView = mSubcategorySpinner;
@@ -688,7 +756,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
             progress.setMessage(getString(R.string.label_save_article_progress));
             progress.show();
 
-            VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, Constant.URL_API_ARTICLE, new Response.Listener<NetworkResponse>() {
+            VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, apiUrl, new Response.Listener<NetworkResponse>() {
                 @Override
                 public void onResponse(NetworkResponse response) {
                     String resultResponse = new String(response.data);
@@ -748,21 +816,21 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                         try {
                             String result = new String(networkResponse.data);
                             JSONObject response = new JSONObject(result);
-                            String status = response.getString(Constant.RESPONSE_STATUS);
-                            String message = response.getString(Constant.RESPONSE_MESSAGE);
+                            String status = response.optString(Constant.RESPONSE_STATUS);
+                            String message = response.optString(Constant.RESPONSE_MESSAGE);
 
-                            Log.i("Infogue/Article", "Error::" + message);
+                            Log.e("Infogue/Article", "Error::" + message);
 
                             if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
                                 errorMessage = message;
                             } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
-                                errorMessage = message + ", please login again!";
+                                errorMessage = getString(R.string.error_unauthorized);
                             } else if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                 errorMessage = getString(R.string.error_not_found);
-                            } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
-                                errorMessage = getString(R.string.error_server);
                             } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
                                 errorMessage = getString(R.string.error_maintenance);
+                            } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                errorMessage = message;
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -790,13 +858,16 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                     params.put(Article.ARTICLE_CONTENT, article.getContent());
                     params.put(Article.ARTICLE_EXCERPT, article.getExcerpt());
                     params.put(Article.ARTICLE_STATUS, article.getStatus());
+                    if (isUpdate) {
+                        params.put("_method", "put");
+                    }
                     return params;
                 }
 
                 @Override
                 protected Map<String, DataPart> getByteData() {
                     Map<String, DataPart> params = new HashMap<>();
-                    if (realPathFeatured != null && !realPathFeatured.trim().isEmpty()) {
+                    if (realPathFeatured != null && !realPathFeatured.isEmpty() && isNewFeatured) {
                         byte[] featuredData = AppHelper.getFileDataFromDrawable(getBaseContext(), mFeaturedImage.getDrawable());
                         params.put(Article.ARTICLE_FEATURED, new DataPart("file_featured.jpg", featuredData, "image/jpeg"));
                     }
@@ -805,8 +876,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 }
             };
             multipartRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    30000,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    50000,
+                    0,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
             VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
