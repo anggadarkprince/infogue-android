@@ -117,7 +117,7 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
-    public static ArticleFragment newInstanceQuery(int columnCount, String query){
+    public static ArticleFragment newInstanceQuery(int columnCount, String query) {
         ArticleFragment fragment = new ArticleFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
@@ -127,7 +127,7 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
-    public static ArticleFragment newInstanceTag(int columnCount, String tag){
+    public static ArticleFragment newInstanceTag(int columnCount, String tag) {
         ArticleFragment fragment = new ArticleFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
@@ -204,13 +204,14 @@ public class ArticleFragment extends Fragment {
             Log.i("INFOGUE/Article", "Featured : " + mFeatured);
             apiArticleUrl = UrlHelper.getApiFeaturedUrl(mFeatured, 0);
         } else if (mAuthorId != 0) {
-            if(mAuthorUsername == null){
-                mAuthorUsername = "";
-            }
-            Log.i("INFOGUE/ARTICLE", "Contributor ID : " + String.valueOf(mAuthorId)+" Username : "+mAuthorUsername);
+            Log.i("INFOGUE/Article", "Contributor ID : " + String.valueOf(mAuthorId) + " Username : " + mAuthorUsername);
             apiArticleUrl = UrlHelper.getApiArticleUrl(mAuthorId, mAuthorUsername, mMyArticle, mQuery);
-        } else if(mTag != null && !mTag.isEmpty()){
+        } else if (mTag != null && !mTag.isEmpty()) {
+            Log.i("INFOGUE/Article", "Tag : " + mTag);
             apiArticleUrl = UrlHelper.getApiTagUrl(mTag);
+        } else if (mQuery != null && !mQuery.isEmpty()) {
+            Log.i("INFOGUE/Article", "Query : " + mQuery);
+            apiArticleUrl = UrlHelper.getApiSearchUrl(mQuery, UrlHelper.SEARCH_ARTICLE);
         } else {
             Log.i("INFOGUE/Article", "Default");
         }

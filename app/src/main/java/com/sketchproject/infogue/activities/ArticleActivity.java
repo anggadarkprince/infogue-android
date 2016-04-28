@@ -311,7 +311,8 @@ public class ArticleActivity extends AppCompatActivity implements
                                 e.printStackTrace();
                             }
                         }
-                        AppHelper.toastColored(getBaseContext(), errorMessage + "\r\nYour rating was discarded", ContextCompat.getColor(getBaseContext(), R.color.color_danger));
+                        String rateMessage = errorMessage + "\r\nYour rating was discarded";
+                        AppHelper.toastColored(getBaseContext(), rateMessage, ContextCompat.getColor(getBaseContext(), R.color.color_danger));
                     }
                 }
         ) {

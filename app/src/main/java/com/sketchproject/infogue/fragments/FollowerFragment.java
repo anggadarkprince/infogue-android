@@ -39,7 +39,7 @@ import java.util.List;
 
 /**
  * A fragment representing a list of Items.
- *
+ * <p/>
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
@@ -107,7 +107,16 @@ public class FollowerFragment extends Fragment {
             String mUsername = getArguments().getString(ARG_RELATED_USERNAME);
             String mQuery = getArguments().getString(ARG_QUERY);
 
-            apiFollowerUrl = UrlHelper.getApiFollowerUrl(mType, mLoggedId, mUsername, mQuery);
+            if (mQuery != null && !mQuery.isEmpty()) {
+                Log.i("INFOGUE/Follower", "Query : " + mQuery);
+                apiFollowerUrl = UrlHelper.getApiSearchUrl(mQuery, UrlHelper.SEARCH_CONTRIBUTOR);
+            } else if (mUsername != null && !mUsername.isEmpty()) {
+                Log.i("INFOGUE/Follower", "Username : " + mUsername);
+                apiFollowerUrl = UrlHelper.getApiFollowerUrl(mType, mLoggedId, mUsername);
+            } else {
+                Log.i("INFOGUE/Follower", "Default");
+            }
+
             apiFollowerUrlFirstPage = apiFollowerUrl;
         }
     }

@@ -407,11 +407,9 @@ public class FollowerActivity extends AppCompatActivity implements
                         } else if (selectedItem.equals(getString(R.string.action_long_follow))) {
                             ((ImageButton) followControl).setImageResource(R.drawable.btn_unfollow);
                             contributor.setIsFollowing(true);
-                            AppHelper.toastColored(view.getContext(), "Awesome!, you now is following\n\"" + contributor.getName() + "\"");
                         } else if (selectedItem.equals(getString(R.string.action_long_unfollow))) {
                             ((ImageButton) followControl).setImageResource(R.drawable.btn_follow);
                             contributor.setIsFollowing(false);
-                            AppHelper.toastColored(view.getContext(), "Too bad!, you stop following\n\"" + contributor.getName() + "\"");
                         }
                     } else {
                         onLostConnectionNotified(getBaseContext());

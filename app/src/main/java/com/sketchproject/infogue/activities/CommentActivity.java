@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -84,6 +83,7 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
         progress.setMessage("Submitting comment");
         progress.setIndeterminate(true);
 
+        @SuppressLint("InflateParams")
         View mFormComment = getLayoutInflater().inflate(R.layout.fragment_comment_form, null);
         mCommentInput = (EditText) mFormComment.findViewById(R.id.input_comment);
 
@@ -91,15 +91,13 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
         mCommentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(connectionDetector.isNetworkAvailable()){
-                    if(mCommentInput.getText().toString().trim().isEmpty()){
+                if (connectionDetector.isNetworkAvailable()) {
+                    if (mCommentInput.getText().toString().trim().isEmpty()) {
                         AppHelper.toastColored(getBaseContext(), "Comment can't be blank", Color.parseColor("#ddd1205e"));
-                    }
-                    else{
+                    } else {
                         submitComment();
                     }
-                }
-                else{
+                } else {
                     connectionDetector.snackbarDisconnectNotification(v, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -203,7 +201,7 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
         }
     }
 
-    public void setSwipeEnable(boolean state){
+    public void setSwipeEnable(boolean state) {
         swipeRefreshLayout.setEnabled(state);
     }
 

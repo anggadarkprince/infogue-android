@@ -5,6 +5,11 @@ package com.sketchproject.infogue.utils;
  * Created by Angga on 12/04/2016 17.33.
  */
 public class UrlHelper {
+    public static final String SEARCH_BOTH = "both";
+    public static final String SEARCH_CONTRIBUTOR = "contributor";
+    public static final String SEARCH_ARTICLE = "article";
+
+
     public static String getApiFeaturedUrl(String slugFeatured, int page) {
         String url = Constant.URL_API_FEATURED + "/" + slugFeatured;
         if (page > 0) {
@@ -31,23 +36,19 @@ public class UrlHelper {
         return Constant.BASE_URL_API + "tag/" + tag;
     }
 
-    public static String getApiFollowerUrl(String type, int relatedId, String username, String query) {
-        String related = "contributor_id=" + relatedId;
-        String search = "query=" + query;
+    public static String getApiFollowerUrl(String type, int relatedId, String username) {
         String optionalQuery = "";
         String url = Constant.BASE_URL_API + "contributor/" + username + "/" + type.toLowerCase();
 
-        optionalQuery += related;
-        if (query != null) {
-            if (!optionalQuery.isEmpty()) {
-                optionalQuery += "&";
-            }
-            optionalQuery += search;
+        if(relatedId > 0){
+            String related = "contributor_id=" + relatedId;
+            optionalQuery += related;
         }
 
         if (!optionalQuery.isEmpty()) {
             url += "?" + optionalQuery;
         }
+
         return url;
     }
 
@@ -85,12 +86,26 @@ public class UrlHelper {
         return Constant.BASE_URL_API + "contributor/" + username;
     }
 
+    public static String getApiSearchUrl(String query, String type){
+        String url = Constant.BASE_URL_API+"search/";
+        if(type == null || type.equals(SEARCH_BOTH)){
+            url += "?query="+query;
+        } else {
+            url += type+"?query="+query;
+        }
+        return url;
+    }
+
     public static String getApiCommentUrl(String slug) {
         return Constant.BASE_URL_API + "article/" + slug + "/comment";
     }
 
     public static String getContributorDetailUrl(String username) {
         return Constant.BASE_URL + "contributor/" + username + "/detail";
+    }
+
+    public static String getContributorConversationUrl(String username) {
+        return Constant.BASE_URL + "account/message/conversation/" + username;
     }
 
     public static String getArticleUrl(String slug) {
