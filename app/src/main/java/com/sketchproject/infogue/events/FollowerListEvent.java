@@ -41,16 +41,32 @@ public class FollowerListEvent {
     private static Contributor contributor;
     private static ImageButton followButton;
 
+    /**
+     * Initialize Follower event list.
+     *
+     * @param context parent context
+     */
     public FollowerListEvent(Context context) {
         this.context = context;
     }
 
+    /**
+     * Initialize Follower event list.
+     *
+     * @param context         parent context
+     * @param contributorData model data of contributor
+     * @param buttonControl   toggle button follow (castable to ImageButton)
+     */
     public FollowerListEvent(Context context, Contributor contributorData, View buttonControl) {
+        Log.i("Infogue/Contributor", "ID : " + contributorData.getId() + " Username : " + contributorData.getUsername());
         this.context = context;
         contributor = contributorData;
         followButton = (ImageButton) buttonControl;
     }
 
+    /**
+     * Share contributor link to another provider.
+     */
     public void shareContributor() {
         if (contributor == null) {
             throwArgumentContributorException();
@@ -63,6 +79,9 @@ public class FollowerListEvent {
         context.startActivity(Intent.createChooser(sendIntent, context.getResources().getText(R.string.label_intent_share)));
     }
 
+    /**
+     * Open contributor link on browser.
+     */
     public void browseContributor() {
         if (contributor == null) {
             throwArgumentContributorException();
@@ -73,8 +92,11 @@ public class FollowerListEvent {
         context.startActivity(browserIntent);
     }
 
+    /**
+     * Launch Profile Activity and passing necessary value from contributor data.
+     */
     public void viewProfile() {
-        Log.i("INFOGUE/Contributor", contributor.getId() + " " + contributor.getUsername());
+        Log.i("Infogue/Contributor", contributor.getId() + " " + contributor.getUsername());
 
         if (contributor == null) {
             throwArgumentContributorException();
@@ -101,6 +123,14 @@ public class FollowerListEvent {
         }
     }
 
+    /**
+     * Handle result of ProfileActivity, find out if user follow or unfollow profile after
+     * launch ProfileActivity the sync immediately.
+     *
+     * @param requestCode unique code when call ProfileActivity
+     * @param resultCode  result state code currently always catch RESULT_OK
+     * @param data        related status of following
+     */
     public void handleProfileResult(int requestCode, int resultCode, Intent data) {
         if (contributor == null || followButton == null) {
             throwArgumentException();
@@ -119,6 +149,11 @@ public class FollowerListEvent {
         }
     }
 
+    /**
+     * Follow button event, check if user need to follow by state of 'is_following' attribute,
+     * notify the toggle state immediately, if follow or unfollow failed, rollback the state and
+     * button appearance depends on last 'is_following' value.
+     */
     public void followContributor() {
         if (contributor == null || followButton == null) {
             throwArgumentException();
@@ -284,11 +319,17 @@ public class FollowerListEvent {
         }
     }
 
+    /**
+     * @throws IllegalStateException
+     */
     private void throwInstanceException() throws IllegalStateException {
         throw new IllegalStateException(context.getClass().getSimpleName() +
                 " must extends FragmentActivity class.");
     }
 
+    /**
+     * @throws IllegalArgumentException
+     */
     private void throwArgumentContributorException() throws IllegalArgumentException {
         throw new IllegalArgumentException(context.getClass().getSimpleName() +
                 " contributor or follow button must be initialized and referenced the same object." +
@@ -296,6 +337,9 @@ public class FollowerListEvent {
                 " constructor to start the activity?");
     }
 
+    /**
+     * @throws IllegalArgumentException
+     */
     private void throwArgumentException() throws IllegalArgumentException {
         throw new IllegalArgumentException(context.getClass().getSimpleName() +
                 " contributor or follow button must be initialized and referenced the same object." +

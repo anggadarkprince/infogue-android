@@ -74,7 +74,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
     public static final String CALLED_FROM_MAIN = "fromMainActivity";
     public static final String RESULT_CODE = "resultCode";
-    public static final int CALL_ARTICLE_FORM_CODE = 100;
+    public static final int ARTICLE_FORM_CODE = 100;
 
     protected final int PICK_IMAGE_REQUEST = 1;
 

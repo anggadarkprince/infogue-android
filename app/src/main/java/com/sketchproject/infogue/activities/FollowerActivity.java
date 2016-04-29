@@ -1,83 +1,62 @@
 package com.sketchproject.infogue.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.NetworkResponse;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.TimeoutError;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.events.FollowerContextBuilder;
+import com.sketchproject.infogue.events.FollowerListEvent;
 import com.sketchproject.infogue.fragments.FollowerFragment;
 import com.sketchproject.infogue.models.Contributor;
-import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;
-import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.APIBuilder;
-import com.sketchproject.infogue.utils.Helper;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class FollowerActivity extends AppCompatActivity implements
         FollowerFragment.OnFollowerInteractionListener {
 
-    public static final String SCREEN_REQUEST = "FollowerScreen";
+    public static final String SCREEN_REQUEST = "Screen";
     public static final String CONTRIBUTOR_SCREEN = "Contributors";
     public static final String FOLLOWER_SCREEN = "Followers";
     public static final String FOLLOWING_SCREEN = "Following";
 
-    private ConnectionDetector connectionDetector;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private View mControlButton;
-    private Contributor mContributor;
 
+    /**
+     * Perform initialization of FollowerActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_follower);
-
-        connectionDetector = new ConnectionDetector(getBaseContext());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String activityTitle = extras.getString(SCREEN_REQUEST);
             int id = extras.getInt(SessionManager.KEY_ID);
             String username = extras.getString(SessionManager.KEY_USERNAME);
             String query = extras.getString(SearchActivity.QUERY_STRING);
+            String activityTitle = extras.getString(SCREEN_REQUEST);
 
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                if(query != null){
-                    getSupportActionBar().setTitle("All result for "+query);
+                if (query != null) {
+                    activityTitle = "All result for " + query;
                 }
-                else{
-                    getSupportActionBar().setTitle(activityTitle);
-                }
+                getSupportActionBar().setTitle(activityTitle);
             }
 
             Fragment fragment = FollowerFragment.newInstance(1, id, username, activityTitle, query);
@@ -101,18 +80,34 @@ public class FollowerActivity extends AppCompatActivity implements
         }
     }
 
-    public void setSwipeEnable(boolean state){
+    /**
+     * Set swipe to refresh enable or disable, user could swipe when reach top.
+     *
+     * @param state enable or not
+     */
+    public void setSwipeEnable(boolean state) {
         swipeRefreshLayout.setEnabled(state);
     }
 
+    /**
+     * Create option menu.
+     *
+     * @param menu content of option menu
+     * @return boolean
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.info, menu);
 
         return true;
     }
 
+    /**
+     * Select action for option menu.
+     *
+     * @param item of selected option menu
+     * @return boolean
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -136,283 +131,56 @@ public class FollowerActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    private void showProfile(Contributor contributor, View buttonControl) {
-        Log.i("INFOGUE/Contributor", contributor.getId() + " " + contributor.getUsername());
-        mControlButton = buttonControl;
-
-        Intent profileIntent = new Intent(getBaseContext(), ProfileActivity.class);
-        profileIntent.putExtra(SessionManager.KEY_ID, contributor.getId());
-        profileIntent.putExtra(SessionManager.KEY_USERNAME, contributor.getUsername());
-        profileIntent.putExtra(SessionManager.KEY_NAME, contributor.getName());
-        profileIntent.putExtra(SessionManager.KEY_LOCATION, contributor.getLocation());
-        profileIntent.putExtra(SessionManager.KEY_ABOUT, contributor.getAbout());
-        profileIntent.putExtra(SessionManager.KEY_AVATAR, contributor.getAvatar());
-        profileIntent.putExtra(SessionManager.KEY_COVER, contributor.getCover());
-        profileIntent.putExtra(SessionManager.KEY_STATUS, contributor.getStatus());
-        profileIntent.putExtra(SessionManager.KEY_ARTICLE, contributor.getArticle());
-        profileIntent.putExtra(SessionManager.KEY_FOLLOWER, contributor.getFollowers());
-        profileIntent.putExtra(SessionManager.KEY_FOLLOWING, contributor.getFollowing());
-        profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, contributor.isFollowing());
-        startActivityForResult(profileIntent, ProfileActivity.PROFILE_RESULT_CODE);
-    }
-
+    /**
+     * Check if there is result from profile activity, if so update button follow state.
+     *
+     * @param requestCode code request when profile activity called
+     * @param resultCode  result state for now just catch RESULT_OK
+     * @param data        data from activity called is follow or unfollow
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ProfileActivity.PROFILE_RESULT_CODE) {
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-                boolean isFollowing = data.getBooleanExtra(SessionManager.KEY_IS_FOLLOWING, false);
-                Log.i("INFOGUE/Follower", "Result " + isFollowing);
-                mContributor.setIsFollowing(isFollowing);
-                if (isFollowing) {
-                    ((ImageButton) mControlButton).setImageResource(R.drawable.btn_unfollow);
-                } else {
-                    ((ImageButton) mControlButton).setImageResource(R.drawable.btn_follow);
-                }
-            }
-        }
+        new FollowerListEvent(this)
+                .handleProfileResult(requestCode, resultCode, data);
     }
 
+    /**
+     * Triggered when user click the follower row view holder.
+     *
+     * @param contributor   contain contributor model data
+     * @param followControl button follow view (castable to ImageButton)
+     */
     @Override
     public void onFollowerInteraction(Contributor contributor, View followControl) {
-        if (connectionDetector.isNetworkAvailable()) {
-            showProfile(contributor, followControl);
-            mContributor = contributor;
-        } else {
-            connectionDetector.snackbarDisconnectNotification(swipeRefreshLayout, null);
-        }
+        new FollowerListEvent(this, contributor, followControl)
+                .viewProfile();
     }
 
+    /**
+     * Triggered when user click follow toggle button.
+     *
+     * @param view          row article list recycler view holder
+     * @param followControl button follow view (castable to ImageButton)
+     * @param contributor   contain contributor model data
+     */
     @Override
     public void onFollowerControlInteraction(View view, View followControl, final Contributor contributor) {
-        final SessionManager session = new SessionManager(getBaseContext());
-        if (session.isLoggedIn()) {
-            final ImageButton control = (ImageButton) followControl;
-            if (contributor.isFollowing()) {
-                control.setImageResource(R.drawable.btn_follow);
-                contributor.setIsFollowing(false);
-
-                StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_UNFOLLOW,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                try {
-                                    JSONObject result = new JSONObject(response);
-                                    String status = result.getString("status");
-                                    String message = result.getString("message");
-
-                                    if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                        Log.i("Infogue/Unfollow", message);
-                                    } else {
-                                        Log.w("Infogue/Unfollow", getString(R.string.error_unknown));
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                NetworkResponse networkResponse = error.networkResponse;
-                                String errorMessage = getString(R.string.error_unknown);
-                                if (networkResponse == null) {
-                                    if (error.getClass().equals(TimeoutError.class)) {
-                                        errorMessage = getString(R.string.error_timeout);
-                                    }
-                                } else {
-                                    String result = new String(networkResponse.data);
-                                    try {
-                                        JSONObject response = new JSONObject(result);
-                                        String status = response.getString("status");
-                                        String message = response.getString("message");
-
-                                        if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
-                                            errorMessage = message+", please login again!";
-                                        } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
-                                            errorMessage = message;
-                                        } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
-                                            errorMessage = message;
-                                        }
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
-
-                                control.setImageResource(R.drawable.btn_unfollow);
-                                contributor.setIsFollowing(true);
-                            }
-                        }
-                ) {
-                    @Override
-                    protected Map<String, String> getParams() {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("api_token", session.getSessionData(SessionManager.KEY_TOKEN, null));
-                        params.put("contributor_id", String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
-                        params.put("following_id", String.valueOf(contributor.getId()));
-                        params.put("_method", "delete");
-                        return params;
-                    }
-                };
-                postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                        15000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-                VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
-            } else {
-                control.setImageResource(R.drawable.btn_unfollow);
-                contributor.setIsFollowing(true);
-
-                StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_FOLLOW,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                try {
-                                    JSONObject result = new JSONObject(response);
-                                    String status = result.getString("status");
-                                    String message = result.getString("message");
-
-                                    if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                        Log.i("Infogue/Follow", message);
-                                    } else {
-                                        Log.w("Infogue/Follow", getString(R.string.error_unknown));
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                NetworkResponse networkResponse = error.networkResponse;
-                                String errorMessage = getString(R.string.error_unknown);
-                                if (networkResponse == null) {
-                                    if (error.getClass().equals(TimeoutError.class)) {
-                                        errorMessage = getString(R.string.error_timeout);
-                                    }
-                                } else {
-                                    String result = new String(networkResponse.data);
-                                    try {
-                                        JSONObject response = new JSONObject(result);
-                                        String status = response.getString("status");
-                                        String message = response.getString("message");
-
-                                        if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
-                                            errorMessage = message+", please login again!";
-                                        } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
-                                            errorMessage = message;
-                                        } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
-                                            errorMessage = message;
-                                        }
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
-
-                                control.setImageResource(R.drawable.btn_follow);
-                                contributor.setIsFollowing(false);
-                            }
-                        }
-                ) {
-                    @Override
-                    protected Map<String, String> getParams() {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("api_token", session.getSessionData(SessionManager.KEY_TOKEN, null));
-                        params.put("contributor_id", String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
-                        params.put("following_id", String.valueOf(contributor.getId()));
-                        return params;
-                    }
-                };
-                postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                        15000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-                VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
-            }
-        } else {
-            Intent authIntent = new Intent(getBaseContext(), AuthenticationActivity.class);
-            startActivity(authIntent);
-        }
+        new FollowerListEvent(this, contributor, followControl)
+                .followContributor();
     }
 
+    /**
+     * Show popup and show more action to interact with related contributor.
+     *
+     * @param view          row article list recycler view holder
+     * @param followControl button follow view (castable to ImageButton)
+     * @param contributor   contain contributor model data
+     */
     @Override
     public void onFollowerLongClickInteraction(final View view, final View followControl, final Contributor contributor) {
-        final CharSequence[] items = {
-                getString(R.string.action_long_open),
-                getString(R.string.action_long_browse),
-                getString(R.string.action_long_share),
-                contributor.isFollowing() ? getString(R.string.action_long_unfollow) : getString(R.string.action_long_follow)
-        };
-
-        final CharSequence[] itemsWithoutControl = {
-                getString(R.string.action_long_open),
-                getString(R.string.action_long_browse),
-                getString(R.string.action_long_share),
-        };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        SessionManager session = new SessionManager(getBaseContext());
-        if (session.getSessionData(SessionManager.KEY_ID, 0) == contributor.getId()) {
-            builder.setItems(itemsWithoutControl, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int item) {
-                    if (connectionDetector.isNetworkAvailable()) {
-                        String selectedItem = items[item].toString();
-                        if (selectedItem.equals(getString(R.string.action_long_open))) {
-                            showProfile(contributor, followControl);
-                            mContributor = contributor;
-                        } else if (selectedItem.equals(getString(R.string.action_long_browse))) {
-                            String articleUrl = APIBuilder.getContributorUrl(contributor.getUsername());
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
-                            startActivity(browserIntent);
-                        } else if (selectedItem.equals(getString(R.string.action_long_share))) {
-                            Intent sendIntent = new Intent();
-                            sendIntent.setAction(Intent.ACTION_SEND);
-                            sendIntent.putExtra(Intent.EXTRA_TEXT, APIBuilder.getShareContributorText(contributor.getUsername()));
-                            sendIntent.setType("text/plain");
-                            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
-                        }
-                    } else {
-                        connectionDetector.snackbarDisconnectNotification(swipeRefreshLayout, null);
-                    }
-                }
-            });
-        } else {
-            builder.setItems(items, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int item) {
-                    if (connectionDetector.isNetworkAvailable()) {
-                        String selectedItem = items[item].toString();
-                        if (selectedItem.equals(getString(R.string.action_long_open))) {
-                            showProfile(contributor, followControl);
-                            mContributor = contributor;
-                        } else if (selectedItem.equals(getString(R.string.action_long_browse))) {
-                            String articleUrl = APIBuilder.getContributorUrl(contributor.getUsername());
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
-                            startActivity(browserIntent);
-                        } else if (selectedItem.equals(getString(R.string.action_long_share))) {
-                            Intent sendIntent = new Intent();
-                            sendIntent.setAction(Intent.ACTION_SEND);
-                            sendIntent.putExtra(Intent.EXTRA_TEXT, APIBuilder.getShareContributorText(contributor.getUsername()));
-                            sendIntent.setType("text/plain");
-                            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
-                        } else if (selectedItem.equals(getString(R.string.action_long_follow))) {
-                            ((ImageButton) followControl).setImageResource(R.drawable.btn_unfollow);
-                            contributor.setIsFollowing(true);
-                        } else if (selectedItem.equals(getString(R.string.action_long_unfollow))) {
-                            ((ImageButton) followControl).setImageResource(R.drawable.btn_follow);
-                            contributor.setIsFollowing(false);
-                        }
-                    } else {
-                        connectionDetector.snackbarDisconnectNotification(swipeRefreshLayout, null);
-                    }
-                }
-            });
-        }
-        AlertDialog alert = builder.create();
-        alert.show();
+        new FollowerContextBuilder(this, contributor, followControl)
+                .buildContext()
+                .show();
     }
 }

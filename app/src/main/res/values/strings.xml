@@ -332,7 +332,7 @@
     <string name="message_logout_failed">Signing out failed!</string>
     <string name="message_no_internet">No Internet Connection!</string>
     <string name="message_internet_established">Connection Established.</string>
-    <string name="message_delete_confirm">Are you sure delete</string>
+    <string name="message_delete_article">Are you sure delete this article?</string>
     <string name="message_discard_article">Do you want to discard this article?</string>
     <string name="message_save_article">Save and waiting for editor confirmation?</string>
     <string name="message_discard_setting">Are you sure want to discard current settings?</string>

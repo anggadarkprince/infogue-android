@@ -26,4 +26,12 @@
         <item>@string/action_long_share</item>
         <item>@string/action_long_rate</item>
     </string-array>
+
+    <string-array name="items_article_editable">
+        <item>@string/action_long_open</item>
+        <item>@string/action_long_browse</item>
+        <item>@string/action_long_share</item>
+        <item>@string/action_long_edit</item>
+        <item>@string/action_long_delete</item>
+    </string-array>
 </resources>

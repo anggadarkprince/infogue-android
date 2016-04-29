@@ -20,10 +20,13 @@ public class FollowerContextBuilder {
     private AlertDialog alert;
     private String[] items;
 
-    public FollowerContextBuilder() {
-        items = context.getResources().getStringArray(R.array.items_article);
-    }
-
+    /**
+     * Initialize FollowerContextBuilder.
+     *
+     * @param dialogContext parent context
+     * @param data          model data of contributor
+     * @param followControl toggle follow button (castable to ImageButton)
+     */
     public FollowerContextBuilder(Context dialogContext, Contributor data, final View followControl) {
         context = dialogContext;
         contributor = data;
@@ -31,14 +34,27 @@ public class FollowerContextBuilder {
         items = context.getResources().getStringArray(R.array.items_article);
     }
 
-    public AlertDialog buildContext(){
+    /**
+     * Create dialog by passing field attribute that filled after constructor.
+     *
+     * @return AlertDialog
+     */
+    public AlertDialog buildContext() {
         return buildContext(context, contributor, followButton);
     }
 
+    /**
+     * Create context menu by information which passed.
+     *
+     * @param dialogContext parent context
+     * @param data          model data of contributor
+     * @param followControl toggle follow button (castable to ImageButton)
+     * @return AlertDialog
+     */
     public AlertDialog buildContext(final Context dialogContext, final Contributor data, final View followControl) {
         if (dialogContext == null || data == null || followControl == null) {
             throw new IllegalArgumentException(FollowerContextBuilder.class.getSimpleName() +
-                    " Context, data, followControl is not initialized. Make sure use"+
+                    " Context, data, followControl is not initialized. Make sure use" +
                     " FollowerContextBuilder(Context dialogContext, Contributor data, final View followControl)");
         }
 
@@ -46,12 +62,10 @@ public class FollowerContextBuilder {
         if (new SessionManager(dialogContext).isMe(data.getId()) || !data.getStatus().equals(Contributor.STATUS_ACTIVATED)) {
             menuRes = R.array.items_follow_profile;
             items = dialogContext.getResources().getStringArray(R.array.items_follow_profile);
-        }
-        else if(data.isFollowing()){
+        } else if (data.isFollowing()) {
             menuRes = R.array.items_unfollow_people;
             items = dialogContext.getResources().getStringArray(R.array.items_unfollow_people);
-        }
-        else {
+        } else {
             menuRes = R.array.items_follow_people;
             items = dialogContext.getResources().getStringArray(R.array.items_follow_people);
         }
@@ -60,6 +74,7 @@ public class FollowerContextBuilder {
         builder.setItems(menuRes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 String menu = items[which];
+
                 FollowerListEvent event = new FollowerListEvent(dialogContext, data, followControl);
                 if (menu.equals(dialogContext.getString(R.string.action_long_open))) {
                     event.viewProfile();
@@ -78,6 +93,9 @@ public class FollowerContextBuilder {
         return alert;
     }
 
+    /**
+     * Show alert if initialized.
+     */
     public void show() {
         if (alert == null) {
             throw new IllegalStateException(FollowerContextBuilder.class.getSimpleName() +
@@ -86,6 +104,9 @@ public class FollowerContextBuilder {
         alert.show();
     }
 
+    /**
+     * Dismiss alert if initialized.
+     */
     public void dismiss() {
         if (alert == null) {
             throw new IllegalStateException(FollowerContextBuilder.class.getSimpleName() +

@@ -5,9 +5,6 @@ package com.sketchproject.infogue.utils;
  * Created by Angga on 12/04/2016 17.33.
  */
 public class APIBuilder {
-    public static final String SEARCH_BOTH = "both";
-    public static final String SEARCH_CONTRIBUTOR = "contributor";
-    public static final String SEARCH_ARTICLE = "article";
     public static final String BASE_URL = "http://www.infogue.id/";
     public static final String URL_HELP = BASE_URL + "faq";
     public static final String URL_FORGOT = BASE_URL + "auth/forgot";
@@ -39,6 +36,14 @@ public class APIBuilder {
     public static final String REQUEST_NOT_FOUND = "not found"; // code 400 bad request
     public static final String RESPONSE_STATUS = "status";
     public static final String RESPONSE_MESSAGE = "message";
+
+    public static final String METHOD = "_method";
+    public static final String METHOD_PUT = "put";
+    public static final String METHOD_DELETE = "delete";
+
+    public static final String SEARCH_BOTH = "both";
+    public static final String SEARCH_CONTRIBUTOR = "contributor";
+    public static final String SEARCH_ARTICLE = "article";
 
     public static String getApiFeaturedUrl(String slugFeatured, int page) {
         String url = URL_API_FEATURED + "/" + slugFeatured;

@@ -60,8 +60,8 @@ import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.ObjectPooling;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.Helper;
 import com.sketchproject.infogue.utils.APIBuilder;
+import com.sketchproject.infogue.utils.Helper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -85,6 +85,11 @@ public class ApplicationActivity extends AppCompatActivity implements
     private ObjectPooling objectPooling;
     private ProgressDialog progress;
 
+    /**
+     * Perform initialization of ApplicationActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -304,6 +309,24 @@ public class ApplicationActivity extends AppCompatActivity implements
                     startActivity(authIntent);
                 }
             });
+        }
+    }
+
+    /**
+     * Check if there is result from setting activity, if so update information on sidebar
+     * like avatar, cover name and location.
+     *
+     * @param requestCode code request when setting activity called
+     * @param resultCode  result if user save or discard (RESULT_OK = save | RESULT_CANCELED = discard)
+     * @param data        data from activity called if necessary
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SettingsActivity.SETTING_RESULT_CODE) {
+            if (resultCode == AppCompatActivity.RESULT_OK) {
+                buildSideNavigationProfile(true);
+            }
         }
     }
 
@@ -546,7 +569,7 @@ public class ApplicationActivity extends AppCompatActivity implements
         if (session.isLoggedIn()) {
             getMenuInflater().inflate(R.menu.account, menu);
         } else {
-            getMenuInflater().inflate(R.menu.menu, menu);
+            getMenuInflater().inflate(R.menu.option, menu);
         }
 
         // Associate searchable configuration with the SearchView
@@ -579,24 +602,6 @@ public class ApplicationActivity extends AppCompatActivity implements
         }
 
         return super.onPrepareOptionsPanel(view, menu);
-    }
-
-    /**
-     * Check if there is result from setting activity, if so update information on sidebar
-     * like avatar, cover name and location.
-     *
-     * @param requestCode code request when setting activity called
-     * @param resultCode  result if user save or discard (RESULT_OK = save | RESULT_CANCELED = discard)
-     * @param data        data from activity called if necessary
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SettingsActivity.SETTING_RESULT_CODE) {
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-                buildSideNavigationProfile(true);
-            }
-        }
     }
 
     /**

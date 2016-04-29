@@ -6,6 +6,7 @@ import android.support.v7.app.AlertDialog;
 
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.models.Article;
+import com.sketchproject.infogue.modules.SessionManager;
 
 /**
  * Sketch Project Studio
@@ -15,31 +16,46 @@ public class ArticleContextBuilder {
     private Context context;
     private Article article;
     private AlertDialog alert;
-    private String[] items;
 
-    public ArticleContextBuilder() {
-        items = context.getResources().getStringArray(R.array.items_article);
-    }
-
+    /**
+     * Initialize ArticleContextBuilder.
+     *
+     * @param dialogContext parent context
+     * @param data          model data of article
+     */
     public ArticleContextBuilder(Context dialogContext, Article data) {
         context = dialogContext;
         article = data;
-        items = context.getResources().getStringArray(R.array.items_article);
     }
 
-    public AlertDialog buildContext(){
+    /**
+     * Build new context menu dialog for article by passing field attribute.
+     *
+     * @return AlertDialog
+     */
+    public AlertDialog buildContext() {
         return buildContext(context, article);
     }
 
+    /**
+     * Build context menu dialog by information which passed.
+     *
+     * @param dialogContext parent context
+     * @param data          model data of article
+     * @return AlertDialog
+     */
     public AlertDialog buildContext(final Context dialogContext, final Article data) {
         if (dialogContext == null || data == null) {
             throw new IllegalArgumentException(ArticlePopupBuilder.class.getSimpleName() +
-                    " Context, Article is not initialized. Make sure use"+
+                    " Context, Article is not initialized. Make sure use" +
                     " ArticleContextBuilder(Context dialogContext, Article data) instead");
         }
 
+        final int menu = new SessionManager(dialogContext).isMe(data.getAuthorId()) ? R.array.items_article_editable : R.array.items_article;
+        final String[] items = context.getResources().getStringArray(R.array.items_article);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(dialogContext);
-        builder.setItems(R.array.items_article, new DialogInterface.OnClickListener() {
+        builder.setItems(menu, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 String menu = items[which];
                 ArticleListEvent event = new ArticleListEvent(dialogContext, data);
@@ -51,6 +67,10 @@ public class ArticleContextBuilder {
                     event.shareArticle();
                 } else if (menu.equals(dialogContext.getString(R.string.action_long_rate))) {
                     event.rateArticle();
+                } else if (menu.equals(dialogContext.getString(R.string.action_long_edit))) {
+                    event.editArticle();
+                } else if (menu.equals(dialogContext.getString(R.string.action_long_delete))) {
+                    event.deleteArticle();
                 }
             }
         });
@@ -58,6 +78,9 @@ public class ArticleContextBuilder {
         return alert;
     }
 
+    /**
+     * Show alert if initialized.
+     */
     public void show() {
         if (alert == null) {
             throw new IllegalStateException(ArticleContextBuilder.class.getSimpleName() +
@@ -66,6 +89,9 @@ public class ArticleContextBuilder {
         alert.show();
     }
 
+    /**
+     * Dismiss alert if initialized.
+     */
     public void dismiss() {
         if (alert == null) {
             throw new IllegalStateException(ArticleContextBuilder.class.getSimpleName() +
