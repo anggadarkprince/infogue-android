@@ -1,7 +1,6 @@
 package com.sketchproject.infogue.activities;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -38,9 +37,8 @@ import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.IconizedMenu;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.AppHelper;
-import com.sketchproject.infogue.utils.Constant;
-import com.sketchproject.infogue.utils.UrlHelper;
+import com.sketchproject.infogue.utils.APIBuilder;
+import com.sketchproject.infogue.utils.Helper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,10 +47,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ArticleActivity extends AppCompatActivity implements
-        ArticleFragment.OnArticleFragmentInteractionListener,
-        ArticleFragment.OnArticleEditableFragmentInteractionListener,
-        ConnectionDetector.OnLostConnectionListener,
-        ConnectionDetector.OnConnectionEstablished {
+        ArticleFragment.OnArticleInteractionListener,
+        ArticleFragment.OnArticleEditableFragmentInteractionListener {
 
     public static final String DISCARD_ARTICLE = "discard";
     public static final String SAVE_ARTICLE = "save";
@@ -70,8 +66,6 @@ public class ArticleActivity extends AppCompatActivity implements
 
         session = new SessionManager(getBaseContext());
         connectionDetector = new ConnectionDetector(getBaseContext());
-        connectionDetector.setLostConnectionListener(this);
-        connectionDetector.setEstablishedConnectionListener(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -217,13 +211,13 @@ public class ArticleActivity extends AppCompatActivity implements
         if (id == android.R.id.home) {
             finish();
         } else if (id == R.id.action_feedback) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_FEEDBACK));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_FEEDBACK));
             startActivity(browserIntent);
         } else if (id == R.id.action_help) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_HELP));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_HELP));
             startActivity(browserIntent);
         } else if (id == R.id.action_rating) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_APP));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_APP));
             startActivity(browserIntent);
         } else if (id == R.id.action_about) {
             Intent aboutActivity = new Intent(getBaseContext(), AboutActivity.class);
@@ -244,12 +238,12 @@ public class ArticleActivity extends AppCompatActivity implements
             startActivity(postIntent);
             connectionDetector.dismissNotification();
         } else {
-            onLostConnectionNotified(getBaseContext());
+            connectionDetector.snackbarDisconnectNotification(swipeRefreshLayout, null);
         }
     }
 
     private void browseArticle(Article article) {
-        String articleUrl = UrlHelper.getArticleUrl(article.getSlug());
+        String articleUrl = APIBuilder.getArticleUrl(article.getSlug());
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
         startActivity(browserIntent);
     }
@@ -257,22 +251,22 @@ public class ArticleActivity extends AppCompatActivity implements
     private void shareArticle(Article article) {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(article.getSlug()));
+        sendIntent.putExtra(Intent.EXTRA_TEXT, APIBuilder.getShareArticleText(article.getSlug()));
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
     }
 
     private void rateArticle(final Article article) {
-        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_RATE,
+        StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_RATE,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
                             JSONObject result = new JSONObject(response);
-                            String status = result.getString(Constant.RESPONSE_STATUS);
-                            String message = result.getString(Constant.RESPONSE_MESSAGE);
+                            String status = result.getString(APIBuilder.RESPONSE_STATUS);
+                            String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
 
-                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                            if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 Log.i("Infogue/Rate", "Success::Average rating for article id " + article.getId() + " is " + message);
                             }
                         } catch (JSONException e) {
@@ -295,16 +289,16 @@ public class ArticleActivity extends AppCompatActivity implements
                             try {
                                 String result = new String(networkResponse.data);
                                 JSONObject response = new JSONObject(result);
-                                String status = response.getString(Constant.RESPONSE_STATUS);
-                                String message = response.getString(Constant.RESPONSE_MESSAGE);
+                                String status = response.getString(APIBuilder.RESPONSE_STATUS);
+                                String message = response.getString(APIBuilder.RESPONSE_MESSAGE);
 
                                 Log.i("Infogue/Article", "Error::" + message);
 
-                                if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                     errorMessage = getString(R.string.error_not_found);
-                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                     errorMessage = getString(R.string.error_server);
-                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
                                     errorMessage = getString(R.string.error_maintenance);
                                 }
                             } catch (JSONException e) {
@@ -312,7 +306,7 @@ public class ArticleActivity extends AppCompatActivity implements
                             }
                         }
                         String rateMessage = errorMessage + "\r\nYour rating was discarded";
-                        AppHelper.toastColored(getBaseContext(), rateMessage, ContextCompat.getColor(getBaseContext(), R.color.color_danger));
+                        Helper.toastColor(getBaseContext(), rateMessage, ContextCompat.getColor(getBaseContext(), R.color.color_danger));
                     }
                 }
         ) {
@@ -332,7 +326,7 @@ public class ArticleActivity extends AppCompatActivity implements
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
 
         String successMessage = "Awesome!, you give 5 Stars on \n\r\"" + article.getTitle() + "\"";
-        AppHelper.toastColored(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.primary));
+        Helper.toastColor(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.primary));
     }
 
     private void editArticle(Article article) {
@@ -362,34 +356,34 @@ public class ArticleActivity extends AppCompatActivity implements
 
         AlertDialog dialogDelete = builder.create();
         dialogDelete.show();
-        AppHelper.dialogButtonTheme(getBaseContext(), dialogDelete);
+        Helper.setDialogButtonTheme(getBaseContext(), dialogDelete);
     }
 
     private void deleteArticleRequest(final Article article) {
         progress.setMessage(getString(R.string.label_delete_article_progress));
         progress.show();
 
-        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_ARTICLE + "/" + article.getSlug(),
+        StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_ARTICLE + "/" + article.getSlug(),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
                             JSONObject result = new JSONObject(response);
-                            String status = result.getString(Constant.RESPONSE_STATUS);
-                            String message = result.getString(Constant.RESPONSE_MESSAGE);
+                            String status = result.getString(APIBuilder.RESPONSE_STATUS);
+                            String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
 
                             Log.i("Infogue/Article", "Success::" + message);
 
-                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                            if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 ArticleFragment fragment = (ArticleFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
                                 fragment.deleteArticleRow(article.getId());
 
                                 String successMessage = "You have deleted article \r\n\"" + article.getTitle() + "\"";
-                                AppHelper.toastColored(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.color_warning));
+                                Helper.toastColor(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.color_warning));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            AppHelper.toastColored(getBaseContext(), getString(R.string.error_parse_data),
+                            Helper.toastColor(getBaseContext(), getString(R.string.error_parse_data),
                                     ContextCompat.getColor(getBaseContext(), R.color.primary));
                         }
 
@@ -411,18 +405,18 @@ public class ArticleActivity extends AppCompatActivity implements
                             try {
                                 String result = new String(networkResponse.data);
                                 JSONObject response = new JSONObject(result);
-                                String status = response.optString(Constant.RESPONSE_STATUS);
-                                String message = response.optString(Constant.RESPONSE_MESSAGE);
+                                String status = response.optString(APIBuilder.RESPONSE_STATUS);
+                                String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
                                 Log.e("Infogue/Article", "Error::" + message);
 
-                                if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                     errorMessage = getString(R.string.error_unauthorized);
-                                } else if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                } else if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                     errorMessage = getString(R.string.error_not_found);
-                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                     errorMessage = getString(R.string.error_server);
-                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
                                     errorMessage = getString(R.string.error_maintenance);
                                 }
                             } catch (JSONException e) {
@@ -430,7 +424,7 @@ public class ArticleActivity extends AppCompatActivity implements
                                 errorMessage = getString(R.string.error_parse_data);
                             }
                         }
-                        AppHelper.toastColored(getBaseContext(), errorMessage,
+                        Helper.toastColor(getBaseContext(), errorMessage,
                                 ContextCompat.getColor(getBaseContext(), R.color.color_danger));
                         progress.dismiss();
                     }
@@ -453,7 +447,7 @@ public class ArticleActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onArticleFragmentInteraction(View view, Article article) {
+    public void onArticleInteraction(View view, Article article) {
         viewArticle(article);
     }
 
@@ -489,7 +483,7 @@ public class ArticleActivity extends AppCompatActivity implements
 
                     connectionDetector.dismissNotification();
                 } else {
-                    onLostConnectionNotified(getBaseContext());
+                    connectionDetector.snackbarDisconnectNotification(swipeRefreshLayout, null);
                 }
 
                 return false;
@@ -570,41 +564,5 @@ public class ArticleActivity extends AppCompatActivity implements
     @Override
     public void onDeleteClicked(View view, Article article) {
         deleteArticle(view, article);
-    }
-
-    @Override
-    public void onLostConnectionNotified(Context context) {
-        connectionDetector.snackbarDisconnectNotification(findViewById(android.R.id.content), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                connectionDetector.dismissNotification();
-
-                if (!connectionDetector.isNetworkAvailable()) {
-                    connectionDetector.snackbarDisconnectNotification(findViewById(android.R.id.content), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            onLostConnectionNotified(getBaseContext());
-                        }
-                    }, Constant.jokes[(int) Math.floor(Math.random() * Constant.jokes.length)] + " stole my internet T_T", getString(R.string.action_retry));
-                } else {
-                    connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            connectionDetector.dismissNotification();
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onConnectionEstablished(Context context) {
-        connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                connectionDetector.dismissNotification();
-            }
-        });
     }
 }

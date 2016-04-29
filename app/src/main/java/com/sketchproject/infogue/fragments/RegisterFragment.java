@@ -23,10 +23,9 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.Validator;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.APIBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -234,7 +233,7 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
     }
 
     private void registrationRequest() {
-        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_REGISTER,
+        StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_REGISTER,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -243,7 +242,7 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
                             String status = result.getString("status");
                             String message = result.getString("message");
 
-                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                            if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 alert.setAlertType(AlertFragment.ALERT_SUCCESS);
                                 alert.setAlertTitle("Registration Complete");
                                 alert.setAlertMessage("Activation link has been sent to your email.");
@@ -270,7 +269,7 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
                                 String status = response.getString("status");
                                 String message = response.getString("message");
 
-                                if (status.equals(Constant.REQUEST_EXIST) && networkResponse.statusCode == 400) {
+                                if (status.equals(APIBuilder.REQUEST_EXIST) && networkResponse.statusCode == 400) {
                                     alert.setAlertType(AlertFragment.ALERT_WARNING);
                                     alert.setAlertTitle("Please review your inputs");
                                     alert.setAlertMessage(message);

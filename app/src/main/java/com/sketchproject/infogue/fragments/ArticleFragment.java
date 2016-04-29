@@ -26,9 +26,8 @@ import com.sketchproject.infogue.adapters.ArticleRecyclerViewAdapter;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.AppHelper;
-import com.sketchproject.infogue.utils.Constant;
-import com.sketchproject.infogue.utils.UrlHelper;
+import com.sketchproject.infogue.utils.Helper;
+import com.sketchproject.infogue.utils.APIBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,7 +39,7 @@ import java.util.List;
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnArticleFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnArticleInteractionListener}
  * interface.
  */
 public class ArticleFragment extends Fragment {
@@ -80,7 +79,7 @@ public class ArticleFragment extends Fragment {
 
     private List<Article> allArticles = new ArrayList<>();
     private ArticleRecyclerViewAdapter articleAdapter;
-    private OnArticleFragmentInteractionListener mArticleListListener;
+    private OnArticleInteractionListener mArticleListListener;
     private OnArticleEditableFragmentInteractionListener mArticleEditableListener;
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
@@ -195,23 +194,23 @@ public class ArticleFragment extends Fragment {
 
         if (mSubcategoryId > 0 && mSubcategory != null) {
             Log.i("INFOGUE/Article", "Sub Category " + mSubcategory + " ID : " + mSubcategoryId);
-            apiArticleUrl = UrlHelper.getApiCategoryUrl(mCategory, mSubcategory, 0);
+            apiArticleUrl = APIBuilder.getApiCategoryUrl(mCategory, mSubcategory, 0);
         } else if (mCategoryId > 0 && mCategory != null) {
             Log.i("INFOGUE/Article", "Category " + mCategory + " ID : " + mCategoryId);
-            apiArticleUrl = UrlHelper.getApiCategoryUrl(mCategory, null, 0);
+            apiArticleUrl = APIBuilder.getApiCategoryUrl(mCategory, null, 0);
         } else if (mFeatured != null) {
             hasHeader = true;
             Log.i("INFOGUE/Article", "Featured : " + mFeatured);
-            apiArticleUrl = UrlHelper.getApiFeaturedUrl(mFeatured, 0);
+            apiArticleUrl = APIBuilder.getApiFeaturedUrl(mFeatured, 0);
         } else if (mAuthorId != 0) {
             Log.i("INFOGUE/Article", "Contributor ID : " + String.valueOf(mAuthorId) + " Username : " + mAuthorUsername);
-            apiArticleUrl = UrlHelper.getApiArticleUrl(mAuthorId, mAuthorUsername, mMyArticle, mQuery);
+            apiArticleUrl = APIBuilder.getApiArticleUrl(mAuthorId, mAuthorUsername, mMyArticle, mQuery);
         } else if (mTag != null && !mTag.isEmpty()) {
             Log.i("INFOGUE/Article", "Tag : " + mTag);
-            apiArticleUrl = UrlHelper.getApiTagUrl(mTag);
+            apiArticleUrl = APIBuilder.getApiTagUrl(mTag);
         } else if (mQuery != null && !mQuery.isEmpty()) {
             Log.i("INFOGUE/Article", "Query : " + mQuery);
-            apiArticleUrl = UrlHelper.getApiSearchUrl(mQuery, UrlHelper.SEARCH_ARTICLE);
+            apiArticleUrl = APIBuilder.getApiSearchUrl(mQuery, APIBuilder.SEARCH_ARTICLE, mAuthorId);
         } else {
             Log.i("INFOGUE/Article", "Default");
         }
@@ -293,7 +292,7 @@ public class ArticleFragment extends Fragment {
 
                                 apiArticleUrl = nextUrl;
 
-                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                     if (swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()) {
                                         allArticles.remove(allArticles.size() - 1);
                                         articleAdapter.notifyItemRemoved(allArticles.size());
@@ -348,7 +347,7 @@ public class ArticleFragment extends Fragment {
                                     articleAdapter.notifyItemRangeInserted(curSize, allArticles.size() - 1);
                                     Log.i("INFOGUE/Article", "Load More page " + page);
                                 } else {
-                                    AppHelper.toastColored(getContext(), getString(R.string.error_server), Color.parseColor("#ddd1205e"));
+                                    Helper.toastColor(getContext(), getString(R.string.error_server), Color.parseColor("#ddd1205e"));
 
                                     isEndOfPage = true;
                                     Log.i("INFOGUE/Article", "Empty on page " + page);
@@ -379,7 +378,7 @@ public class ArticleFragment extends Fragment {
                                     errorMessage = getActivity().getString(R.string.error_unknown);
                                 }
                             }
-                            AppHelper.toastColored(getContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            Helper.toastColor(getContext(), errorMessage, Color.parseColor("#ddd1205e"));
 
                             // indicate the error
                             isEndOfPage = true;
@@ -428,8 +427,8 @@ public class ArticleFragment extends Fragment {
             mMyArticle = getArguments().getBoolean(ARG_AUTHOR_IS_ME);
         }
 
-        if (context instanceof OnArticleFragmentInteractionListener) {
-            mArticleListListener = (OnArticleFragmentInteractionListener) context;
+        if (context instanceof OnArticleInteractionListener) {
+            mArticleListListener = (OnArticleInteractionListener) context;
 
             if (mMyArticle) {
                 if (context instanceof OnArticleEditableFragmentInteractionListener) {
@@ -439,7 +438,7 @@ public class ArticleFragment extends Fragment {
                 }
             }
         } else {
-            throw new RuntimeException(context.toString() + " must implement OnArticleFragmentInteractionListener");
+            throw new RuntimeException(context.toString() + " must implement OnArticleInteractionListener");
         }
     }
 
@@ -458,8 +457,8 @@ public class ArticleFragment extends Fragment {
      * to the activity and potentially other fragments contained in that
      * activity.
      */
-    public interface OnArticleFragmentInteractionListener {
-        void onArticleFragmentInteraction(View view, Article article);
+    public interface OnArticleInteractionListener {
+        void onArticleInteraction(View view, Article article);
 
         void onArticlePopupInteraction(View view, Article article);
 

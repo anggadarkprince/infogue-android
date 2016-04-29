@@ -194,6 +194,7 @@
 
     <string name="action_long_rate">Give 5 Stars</string>
     <string name="action_long_share">Share Article</string>
+    <string name="action_long_share_contributor">Share Contributor</string>
     <string name="action_long_browse">Browse in Web</string>
     <string name="action_long_open">View / Open</string>
     <string name="action_long_edit">Edit Article</string>
@@ -351,6 +352,6 @@
     <string name="message_article_discarded">Article is discarded!</string>
     <string name="message_article_invalid">Invalid Article Result!</string>
     <string name="message_article_saved">Article successfully saved!</string>
-    <string name="error_no_connection">No internet connection</string>
+    <string name="error_no_connection">Failed to connect server</string>
 
 </resources>

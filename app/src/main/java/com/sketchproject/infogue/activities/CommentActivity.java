@@ -39,8 +39,8 @@ import com.sketchproject.infogue.models.Comment;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.AppHelper;
-import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.APIBuilder;
+import com.sketchproject.infogue.utils.Helper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,7 +93,7 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
             public void onClick(View v) {
                 if (connectionDetector.isNetworkAvailable()) {
                     if (mCommentInput.getText().toString().trim().isEmpty()) {
-                        AppHelper.toastColored(getBaseContext(), "Comment can't be blank", Color.parseColor("#ddd1205e"));
+                        Helper.toastColor(getBaseContext(), "Comment can't be blank", Color.parseColor("#ddd1205e"));
                     } else {
                         submitComment();
                     }
@@ -119,7 +119,7 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
         CircleImageView avatar = (CircleImageView) mFormComment.findViewById(R.id.avatar);
         if (avatar != null) {
             Glide.with(getBaseContext())
-                    .load(session.getSessionData(SessionManager.KEY_AVATAR, Constant.URL_AVATAR_DEFAULT))
+                    .load(session.getSessionData(SessionManager.KEY_AVATAR, null))
                     .placeholder(R.drawable.placeholder_square)
                     .dontAnimate()
                     .into(avatar);
@@ -207,11 +207,8 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
 
     private void submitComment() {
         progress.show();
-        Log.i("Infogue/Comment", String.valueOf(articleId));
-        Log.i("Infogue/Comment", String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
-        Log.i("Infogue/Comment", mCommentInput.getText().toString());
-        Log.i("Infogue/Comment", session.getSessionData(SessionManager.KEY_TOKEN, null));
-        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_COMMENT,
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_COMMENT,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -227,8 +224,8 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
                             JSONObject result = new JSONObject(response);
                             String status = result.getString("status");
 
-                            if (status.equals(Constant.REQUEST_SUCCESS)) {
-                                AppHelper.toastColored(getBaseContext(), "Comment has been posted!", Color.parseColor("#ddd1205e"));
+                            if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
+                                Helper.toastColor(getBaseContext(), "Comment has been posted!", Color.parseColor("#ddd1205e"));
                             } else {
                                 Log.w("Infogue/Hit", getString(R.string.error_unknown));
                             }
@@ -255,16 +252,16 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
                                 String status = response.getString("status");
                                 String message = response.getString("message");
 
-                                if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                     errorMessage = message + ", please login again!";
-                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                     errorMessage = message;
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
-                        AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                        Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
                     }
                 }
         ) {
@@ -288,7 +285,7 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
 
     private void launchCommentForm() {
         formCommentDialog.show();
-        AppHelper.dialogButtonTheme(getBaseContext(), formCommentDialog);
+        Helper.setDialogButtonTheme(getBaseContext(), formCommentDialog);
     }
 
     @Override
@@ -305,13 +302,13 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
         if (id == android.R.id.home) {
             finish();
         } else if (id == R.id.action_feedback) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_FEEDBACK));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_FEEDBACK));
             startActivity(browserIntent);
         } else if (id == R.id.action_help) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_HELP));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_HELP));
             startActivity(browserIntent);
         } else if (id == R.id.action_rating) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_APP));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_APP));
             startActivity(browserIntent);
         } else if (id == R.id.action_about) {
             Intent aboutActivity = new Intent(getBaseContext(), AboutActivity.class);

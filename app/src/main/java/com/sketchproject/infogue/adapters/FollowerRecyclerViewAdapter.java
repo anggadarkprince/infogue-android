@@ -13,7 +13,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.fragments.FollowerFragment.OnListFragmentInteractionListener;
+import com.sketchproject.infogue.fragments.FollowerFragment;
+import com.sketchproject.infogue.fragments.FollowerFragment.OnFollowerInteractionListener;
 import com.sketchproject.infogue.fragments.holders.ListInfoViewHolder;
 import com.sketchproject.infogue.fragments.holders.LoadingViewHolder;
 import com.sketchproject.infogue.models.Contributor;
@@ -23,7 +24,7 @@ import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Contributor} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
+ * specified {@link OnFollowerInteractionListener}.
  */
 public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -33,12 +34,12 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     private static final int VIEW_TYPE_EMPTY = 3;
 
     private final List<Contributor> mContributors;
-    private final OnListFragmentInteractionListener mListener;
+    private final OnFollowerInteractionListener mListener;
 
     private int mLastPosition = -1;
     private String mScreenType;
 
-    public FollowerRecyclerViewAdapter(List<Contributor> items, OnListFragmentInteractionListener listener, String type) {
+    public FollowerRecyclerViewAdapter(List<Contributor> items, FollowerFragment.OnFollowerInteractionListener listener, String type) {
         mContributors = items;
         mListener = listener;
         mScreenType = type;
@@ -118,7 +119,7 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                         if (null != mListener) {
                             // Notify the active callbacks interface (the activity, if the
                             // fragment is attached to one) that an item has been selected.
-                            mListener.onListFragmentInteraction(followerHolder.mItem, followerHolder.mFollowButton);
+                            mListener.onFollowerInteraction(followerHolder.mItem, followerHolder.mFollowButton);
                         }
                     }
                 });
@@ -127,7 +128,7 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     @Override
                     public boolean onLongClick(View view) {
                         if (null != mListener) {
-                            mListener.onListLongClickInteraction(view, followerHolder.mFollowButton, followerHolder.mItem);
+                            mListener.onFollowerLongClickInteraction(view, followerHolder.mFollowButton, followerHolder.mItem);
                         }
                         return false;
                     }
@@ -137,7 +138,7 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     @Override
                     public void onClick(View view) {
                         if (null != mListener) {
-                            mListener.onListFollowControlInteraction(view, followerHolder.mFollowButton, followerHolder.mItem);
+                            mListener.onFollowerControlInteraction(view, followerHolder.mFollowButton, followerHolder.mItem);
                         }
                     }
                 });

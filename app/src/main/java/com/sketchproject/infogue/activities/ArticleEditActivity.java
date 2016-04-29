@@ -19,11 +19,9 @@ import com.sketchproject.infogue.fragments.AlertFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.models.Category;
 import com.sketchproject.infogue.models.Subcategory;
-import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.AppHelper;
-import com.sketchproject.infogue.utils.Constant;
-import com.sketchproject.infogue.utils.UrlHelper;
+import com.sketchproject.infogue.utils.Helper;
+import com.sketchproject.infogue.utils.APIBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +48,7 @@ public class ArticleEditActivity extends ArticleCreateActivity {
             articleId = extras.getInt(Article.ARTICLE_ID);
             articleSlug = extras.getString(Article.ARTICLE_SLUG);
             articleFeatured = extras.getString(Article.ARTICLE_FEATURED);
-            apiUrl = Constant.URL_API_ARTICLE + "/" + articleSlug;
+            apiUrl = APIBuilder.URL_API_ARTICLE + "/" + articleSlug;
             isUpdate = true;
 
             mFeaturedImage.setVisibility(View.VISIBLE);
@@ -61,7 +59,7 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                     .into(mFeaturedImage);
             realPathFeatured = articleFeatured;
         } else {
-            AppHelper.toastColored(getBaseContext(), "Invalid article!", Color.parseColor("#ddd9534f"));
+            Helper.toastColor(getBaseContext(), "Invalid article!", Color.parseColor("#ddd9534f"));
             finish();
         }
 
@@ -74,14 +72,14 @@ public class ArticleEditActivity extends ArticleCreateActivity {
         progress.setMessage(getString(R.string.label_retrieve_article_progress));
         progress.show();
 
-        JsonObjectRequest articleRequest = new JsonObjectRequest(Request.Method.GET, UrlHelper.getApiPostUrl(articleSlug), null,
+        JsonObjectRequest articleRequest = new JsonObjectRequest(Request.Method.GET, APIBuilder.getApiPostUrl(articleSlug), null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            String status = response.getString(Constant.RESPONSE_STATUS);
+                            String status = response.getString(APIBuilder.RESPONSE_STATUS);
 
-                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                            if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 JSONObject articleObject = response.getJSONObject("article");
                                 JSONObject subcategory = articleObject.getJSONObject(Article.ARTICLE_SUBCATEGORY);
                                 JSONObject category = subcategory.getJSONObject(Article.ARTICLE_CATEGORY);
@@ -149,7 +147,7 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                             finish();
-                            AppHelper.toastColored(getBaseContext(), getString(R.string.error_parse_data),
+                            Helper.toastColor(getBaseContext(), getString(R.string.error_parse_data),
                                     ContextCompat.getColor(getBaseContext(), R.color.primary));
                         }
                         progress.dismiss();
@@ -170,18 +168,18 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                             try {
                                 String result = new String(networkResponse.data);
                                 JSONObject response = new JSONObject(result);
-                                String status = response.optString(Constant.RESPONSE_STATUS);
-                                String message = response.optString(Constant.RESPONSE_MESSAGE);
+                                String status = response.optString(APIBuilder.RESPONSE_STATUS);
+                                String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
                                 Log.e("Infogue/Article", "Error::" + message);
 
-                                if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                     errorMessage = getString(R.string.error_unauthorized);
-                                } else if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                } else if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                     errorMessage = getString(R.string.error_not_found);
-                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                     errorMessage = getString(R.string.error_server);
-                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
                                     errorMessage = getString(R.string.error_maintenance);
                                 }
                             } catch (JSONException e) {
@@ -189,7 +187,7 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                                 errorMessage = getString(R.string.error_parse_data);
                             }
                         }
-                        AppHelper.toastColored(getBaseContext(), errorMessage,
+                        Helper.toastColor(getBaseContext(), errorMessage,
                                 ContextCompat.getColor(getBaseContext(), R.color.color_danger));
                         progress.dismiss();
                     }

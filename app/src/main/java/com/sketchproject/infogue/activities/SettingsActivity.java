@@ -44,9 +44,8 @@ import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.Validator;
 import com.sketchproject.infogue.modules.VolleyMultipartRequest;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.AppHelper;
-import com.sketchproject.infogue.utils.Constant;
-import com.sketchproject.infogue.utils.UrlHelper;
+import com.sketchproject.infogue.utils.Helper;
+import com.sketchproject.infogue.utils.APIBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -587,7 +586,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         progress.show();
         String username = session.getSessionData(SessionManager.KEY_USERNAME, null);
 
-        JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, UrlHelper.getApiContributorUrl(username), null,
+        JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, APIBuilder.getApiContributorUrl(username), null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -595,7 +594,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                             String status = response.getString("status");
                             JSONObject contributor = response.getJSONObject("contributor");
 
-                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                            if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 Glide.clear(mAvatarImage);
                                 Glide.with(getBaseContext()).load(contributor.getString(Contributor.CONTRIBUTOR_AVATAR_REF))
                                         .placeholder(R.drawable.placeholder_square)
@@ -628,12 +627,12 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                                 mEmailInput.setText(contributor.getString(Contributor.CONTRIBUTOR_EMAIL));
                             } else {
                                 Log.w("Infogue/Profile", getString(R.string.error_unknown));
-                                AppHelper.toastColored(getBaseContext(), getString(R.string.error_unknown), Color.parseColor("#ddd1205e"));
+                                Helper.toastColor(getBaseContext(), getString(R.string.error_unknown), Color.parseColor("#ddd1205e"));
                             }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            AppHelper.toastColored(getBaseContext(), getString(R.string.error_parse_data), Color.parseColor("#ddd1205e"));
+                            Helper.toastColor(getBaseContext(), getString(R.string.error_parse_data), Color.parseColor("#ddd1205e"));
                         }
 
                         progress.dismiss();
@@ -655,9 +654,9 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                                 String status = response.getString("status");
                                 String message = response.getString("message");
 
-                                if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                     errorMessage = getString(R.string.error_not_found);
-                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                     errorMessage = message;
                                 }
                             } catch (JSONException e) {
@@ -665,7 +664,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                                 errorMessage = getString(R.string.error_parse_data);
                             }
                         }
-                        AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                        Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
                         progress.dismiss();
 
                         Intent returnIntent = new Intent();
@@ -709,13 +708,13 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
             finish();
         } else {
             dialogDiscard.show();
-            AppHelper.dialogButtonTheme(this, dialogDiscard);
+            Helper.setDialogButtonTheme(this, dialogDiscard);
         }
     }
 
     private void saveConfirmation() {
         dialogSave.show();
-        AppHelper.dialogButtonTheme(this, dialogSave);
+        Helper.setDialogButtonTheme(this, dialogSave);
     }
 
     private void saveSettings() {
@@ -723,7 +722,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
             progress.setMessage(getString(R.string.label_save_setting_progress));
             progress.show();
 
-            VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, Constant.URL_API_SETTING, new Response.Listener<NetworkResponse>() {
+            VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, APIBuilder.URL_API_SETTING, new Response.Listener<NetworkResponse>() {
                 @Override
                 public void onResponse(NetworkResponse response) {
                     String resultResponse = new String(response.data);
@@ -733,7 +732,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                         String message = result.getString("message");
                         JSONObject contributorUpdated = result.getJSONObject("contributor");
 
-                        if (status.equals(Constant.REQUEST_SUCCESS)) {
+                        if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                             alert.setAlertType(AlertFragment.ALERT_SUCCESS);
                             alert.setAlertMessage(message);
                             mIsSaved = true;
@@ -777,13 +776,13 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                             String status = response.getString("status");
                             String message = response.getString("message");
 
-                            if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                            if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                 errorMessage = getString(R.string.error_not_found);
-                            } else if (status.equals(Constant.REQUEST_MISMATCH) && networkResponse.statusCode == 401) {
+                            } else if (status.equals(APIBuilder.REQUEST_MISMATCH) && networkResponse.statusCode == 401) {
                                 errorMessage = message;
-                            } else if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                            } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
                                 errorMessage = message;
-                            } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                            } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                 errorMessage = message;
                             }
                         } catch (JSONException e) {
@@ -834,10 +833,10 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                 protected Map<String, DataPart> getByteData() {
                     Map<String, DataPart> params = new HashMap<>();
                     if (mRealPathAvatar != null && !mRealPathAvatar.trim().isEmpty()) {
-                        params.put(Contributor.CONTRIBUTOR_AVATAR, new DataPart("file_avatar.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), mAvatarImage.getDrawable()), "image/jpeg"));
+                        params.put(Contributor.CONTRIBUTOR_AVATAR, new DataPart("file_avatar.jpg", Helper.getFileDataFromDrawable(mAvatarImage.getDrawable()), "image/jpeg"));
                     }
                     if (mRealPathCover != null && !mRealPathCover.trim().isEmpty()) {
-                        params.put(Contributor.CONTRIBUTOR_COVER, new DataPart("file_cover.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), mCoverImage.getDrawable()), "image/jpeg"));
+                        params.put(Contributor.CONTRIBUTOR_COVER, new DataPart("file_cover.jpg", Helper.getFileDataFromDrawable(mCoverImage.getDrawable()), "image/jpeg"));
                     }
 
                     return params;

@@ -15,8 +15,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.ArticleFragment.OnArticleEditableFragmentInteractionListener;
-import com.sketchproject.infogue.fragments.ArticleFragment.OnArticleFragmentInteractionListener;
+import com.sketchproject.infogue.fragments.ArticleFragment.OnArticleInteractionListener;
 import com.sketchproject.infogue.fragments.holders.ListInfoViewHolder;
 import com.sketchproject.infogue.fragments.holders.LoadingViewHolder;
 import com.sketchproject.infogue.models.Article;
@@ -25,7 +26,7 @@ import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Article} and makes a call to the
- * specified {@link OnArticleFragmentInteractionListener}.
+ * specified {@link OnArticleInteractionListener}.
  */
 public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -37,14 +38,14 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     private static final int VIEW_TYPE_EMPTY = 5;
 
     private final List<Article> mArticles;
-    private final OnArticleFragmentInteractionListener mInteractionListener;
+    private final ArticleFragment.OnArticleInteractionListener mInteractionListener;
     private final OnArticleEditableFragmentInteractionListener mEditableListener;
 
     private boolean mHeader;
     private boolean mIsEditable;
     private int mLastPosition = -1;
 
-    public ArticleRecyclerViewAdapter(List<Article> items, OnArticleFragmentInteractionListener listListener, boolean hasHeader) {
+    public ArticleRecyclerViewAdapter(List<Article> items, OnArticleInteractionListener listListener, boolean hasHeader) {
         mArticles = items;
         mInteractionListener = listListener;
         mEditableListener = null;
@@ -52,7 +53,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         mIsEditable = false;
     }
 
-    public ArticleRecyclerViewAdapter(List<Article> items, OnArticleFragmentInteractionListener listListener, OnArticleEditableFragmentInteractionListener editableListener) {
+    public ArticleRecyclerViewAdapter(List<Article> items, ArticleFragment.OnArticleInteractionListener listListener, OnArticleEditableFragmentInteractionListener editableListener) {
         mArticles = items;
         mInteractionListener = listListener;
         mEditableListener = editableListener;
@@ -261,7 +262,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             @Override
             public void onClick(View view) {
                 if (null != mInteractionListener) {
-                    mInteractionListener.onArticleFragmentInteraction(view, article);
+                    mInteractionListener.onArticleInteraction(view, article);
                 }
             }
         });

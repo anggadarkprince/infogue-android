@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="items_unfollow_people">
+        <item>@string/action_long_open</item>
+        <item>@string/action_long_browse</item>
+        <item>@string/action_long_share_contributor</item>
+        <item>@string/action_long_unfollow</item>
+    </string-array>
+
+    <string-array name="items_follow_people">
+        <item>@string/action_long_open</item>
+        <item>@string/action_long_browse</item>
+        <item>@string/action_long_share_contributor</item>
+        <item>@string/action_long_follow</item>
+    </string-array>
+
+    <string-array name="items_follow_profile">
+        <item>@string/action_long_open</item>
+        <item>@string/action_long_browse</item>
+        <item>@string/action_long_share_contributor</item>
+    </string-array>
+
+    <string-array name="items_article">
+        <item>@string/action_long_open</item>
+        <item>@string/action_long_browse</item>
+        <item>@string/action_long_share</item>
+        <item>@string/action_long_rate</item>
+    </string-array>
+</resources>

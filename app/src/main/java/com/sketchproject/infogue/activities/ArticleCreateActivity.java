@@ -53,8 +53,8 @@ import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.Validator;
 import com.sketchproject.infogue.modules.VolleyMultipartRequest;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.AppHelper;
-import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.APIBuilder;
+import com.sketchproject.infogue.utils.Helper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -352,7 +352,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
                 AlertDialog dialog = builder.create();
                 dialog.show();
-                AppHelper.dialogButtonTheme(v.getContext(), dialog);
+                Helper.setDialogButtonTheme(v.getContext(), dialog);
             }
         });
 
@@ -368,7 +368,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
                 final EditText link = new EditText(v.getContext());
                 link.setHint("Link URL");
-                link.setText(Constant.URL_APP);
+                link.setText(APIBuilder.URL_APP);
                 link.setLayoutParams(params);
                 layout.addView(link);
 
@@ -397,7 +397,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
                 AlertDialog dialog = builder.create();
                 dialog.show();
-                AppHelper.dialogButtonTheme(v.getContext(), dialog);
+                Helper.setDialogButtonTheme(v.getContext(), dialog);
             }
         });
 
@@ -425,7 +425,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         progress.setIndeterminate(true);
 
         isNewFeatured = false;
-        apiUrl = Constant.URL_API_ARTICLE;
+        apiUrl = APIBuilder.URL_API_ARTICLE;
         isUpdate = false;
     }
 
@@ -531,7 +531,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
         AlertDialog dialogSave = builder.create();
         dialogSave.show();
-        AppHelper.dialogButtonTheme(this, dialogSave);
+        Helper.setDialogButtonTheme(this, dialogSave);
     }
 
     protected void discardConfirmation() {
@@ -570,7 +570,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
         dialogDiscard = builder.create();
         dialogDiscard.show();
-        AppHelper.dialogButtonTheme(this, dialogDiscard);
+        Helper.setDialogButtonTheme(this, dialogDiscard);
     }
 
     @Override
@@ -762,11 +762,11 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                     String resultResponse = new String(response.data);
                     try {
                         JSONObject result = new JSONObject(resultResponse);
-                        String status = result.getString(Constant.RESPONSE_STATUS);
-                        String message = result.getString(Constant.RESPONSE_MESSAGE);
+                        String status = result.getString(APIBuilder.RESPONSE_STATUS);
+                        String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
                         Log.i("Infogue/Article", message);
 
-                        if (status.equals(Constant.REQUEST_SUCCESS)) {
+                        if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                             if (isCalledFromMainActivity) {
                                 Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
                                 articleIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
@@ -816,20 +816,20 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                         try {
                             String result = new String(networkResponse.data);
                             JSONObject response = new JSONObject(result);
-                            String status = response.optString(Constant.RESPONSE_STATUS);
-                            String message = response.optString(Constant.RESPONSE_MESSAGE);
+                            String status = response.optString(APIBuilder.RESPONSE_STATUS);
+                            String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
                             Log.e("Infogue/Article", "Error::" + message);
 
-                            if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                            if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
                                 errorMessage = message;
-                            } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                            } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                 errorMessage = getString(R.string.error_unauthorized);
-                            } else if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                            } else if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                 errorMessage = getString(R.string.error_not_found);
-                            } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                            } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
                                 errorMessage = getString(R.string.error_maintenance);
-                            } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                            } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                 errorMessage = message;
                             }
                         } catch (JSONException e) {
@@ -868,7 +868,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 protected Map<String, DataPart> getByteData() {
                     Map<String, DataPart> params = new HashMap<>();
                     if (realPathFeatured != null && !realPathFeatured.isEmpty() && isNewFeatured) {
-                        byte[] featuredData = AppHelper.getFileDataFromDrawable(getBaseContext(), mFeaturedImage.getDrawable());
+                        byte[] featuredData = Helper.getFileDataFromDrawable(mFeaturedImage.getDrawable());
                         params.put(Article.ARTICLE_FEATURED, new DataPart("file_featured.jpg", featuredData, "image/jpeg"));
                     }
 

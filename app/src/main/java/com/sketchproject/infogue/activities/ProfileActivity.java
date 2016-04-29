@@ -1,10 +1,10 @@
 package com.sketchproject.infogue.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -30,9 +30,8 @@ import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.AppHelper;
-import com.sketchproject.infogue.utils.Constant;
-import com.sketchproject.infogue.utils.UrlHelper;
+import com.sketchproject.infogue.utils.APIBuilder;
+import com.sketchproject.infogue.utils.Helper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,9 +39,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProfileActivity extends AppCompatActivity implements
-        ConnectionDetector.OnLostConnectionListener,
-        ConnectionDetector.OnConnectionEstablished {
+public class ProfileActivity extends AppCompatActivity {
 
     public static final int PROFILE_RESULT_CODE = 200;
 
@@ -65,8 +62,6 @@ public class ProfileActivity extends AppCompatActivity implements
 
         session = new SessionManager(getBaseContext());
         connectionDetector = new ConnectionDetector(getBaseContext());
-        connectionDetector.setLostConnectionListener(this);
-        connectionDetector.setEstablishedConnectionListener(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -89,7 +84,7 @@ public class ProfileActivity extends AppCompatActivity implements
 
             String status = extras.getString(SessionManager.KEY_STATUS, "invalid");
             if (!status.equals(Contributor.STATUS_ACTIVATED)) {
-                AppHelper.toastColored(getBaseContext(), "Contributor is " + status, Color.parseColor("#ddd1205e"));
+                Helper.toastColor(getBaseContext(), "Contributor is " + status, Color.parseColor("#ddd1205e"));
                 Intent returnIntent = new Intent();
                 setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
                 finish();
@@ -137,7 +132,7 @@ public class ProfileActivity extends AppCompatActivity implements
 
             buildProfileEventHandler(contributorId, username);
         } else {
-            AppHelper.toastColored(getBaseContext(), "Invalid user profile", Color.parseColor("#ddd1205e"));
+            Helper.toastColor(getBaseContext(), "Invalid user profile", Color.parseColor("#ddd1205e"));
             Intent returnIntent = new Intent();
             setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
             finish();
@@ -155,10 +150,14 @@ public class ProfileActivity extends AppCompatActivity implements
             mArticleButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
-                    articleIntent.putExtra(SessionManager.KEY_ID, idContributor);
-                    articleIntent.putExtra(SessionManager.KEY_USERNAME, usernameContributor);
-                    startActivity(articleIntent);
+                    if (connectionDetector.isNetworkAvailable()) {
+                        Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
+                        articleIntent.putExtra(SessionManager.KEY_ID, idContributor);
+                        articleIntent.putExtra(SessionManager.KEY_USERNAME, usernameContributor);
+                        startActivity(articleIntent);
+                    } else {
+                        connectionDetector.snackbarDisconnectNotification(findViewById(R.id.scroll_container), null);
+                    }
                 }
             });
         }
@@ -168,11 +167,15 @@ public class ProfileActivity extends AppCompatActivity implements
             mFollowerButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent followerIntent = new Intent(getBaseContext(), FollowerActivity.class);
-                    followerIntent.putExtra(FollowerActivity.SCREEN_REQUEST, FollowerActivity.FOLLOWER_SCREEN);
-                    followerIntent.putExtra(SessionManager.KEY_ID, idContributor);
-                    followerIntent.putExtra(SessionManager.KEY_USERNAME, usernameContributor);
-                    startActivity(followerIntent);
+                    if (connectionDetector.isNetworkAvailable()) {
+                        Intent followerIntent = new Intent(getBaseContext(), FollowerActivity.class);
+                        followerIntent.putExtra(FollowerActivity.SCREEN_REQUEST, FollowerActivity.FOLLOWER_SCREEN);
+                        followerIntent.putExtra(SessionManager.KEY_ID, idContributor);
+                        followerIntent.putExtra(SessionManager.KEY_USERNAME, usernameContributor);
+                        startActivity(followerIntent);
+                    } else {
+                        connectionDetector.snackbarDisconnectNotification(findViewById(R.id.scroll_container), null);
+                    }
                 }
             });
         }
@@ -182,11 +185,15 @@ public class ProfileActivity extends AppCompatActivity implements
             mFollowingButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent followingIntent = new Intent(getBaseContext(), FollowerActivity.class);
-                    followingIntent.putExtra(FollowerActivity.SCREEN_REQUEST, FollowerActivity.FOLLOWING_SCREEN);
-                    followingIntent.putExtra(SessionManager.KEY_ID, idContributor);
-                    followingIntent.putExtra(SessionManager.KEY_USERNAME, usernameContributor);
-                    startActivity(followingIntent);
+                    if (connectionDetector.isNetworkAvailable()) {
+                        Intent followingIntent = new Intent(getBaseContext(), FollowerActivity.class);
+                        followingIntent.putExtra(FollowerActivity.SCREEN_REQUEST, FollowerActivity.FOLLOWING_SCREEN);
+                        followingIntent.putExtra(SessionManager.KEY_ID, idContributor);
+                        followingIntent.putExtra(SessionManager.KEY_USERNAME, usernameContributor);
+                        startActivity(followingIntent);
+                    } else {
+                        connectionDetector.snackbarDisconnectNotification(findViewById(R.id.scroll_container), null);
+                    }
                 }
             });
         }
@@ -206,7 +213,7 @@ public class ProfileActivity extends AppCompatActivity implements
                 mDetailButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String url = UrlHelper.getContributorDetailUrl(usernameContributor);
+                        String url = APIBuilder.getContributorDetailUrl(usernameContributor);
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(browserIntent);
                     }
@@ -231,7 +238,12 @@ public class ProfileActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(View v) {
                         if (session.isLoggedIn()) {
-                            toggleFollowHandler(mFollowButton);
+                            if(connectionDetector.isNetworkAvailable()){
+                                toggleFollowHandler(mFollowButton);
+                            }
+                            else{
+                                connectionDetector.snackbarDisconnectNotification(findViewById(R.id.scroll_container), null);
+                            }
                         } else {
                             Intent authIntent = new Intent(getBaseContext(), AuthenticationActivity.class);
                             startActivity(authIntent);
@@ -244,7 +256,7 @@ public class ProfileActivity extends AppCompatActivity implements
                 mMessageButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String url = UrlHelper.getContributorConversationUrl(usernameContributor);
+                        String url = APIBuilder.getContributorConversationUrl(usernameContributor);
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(browserIntent);
                     }
@@ -255,7 +267,7 @@ public class ProfileActivity extends AppCompatActivity implements
                 mInfoButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String url = UrlHelper.getContributorDetailUrl(usernameContributor);
+                        String url = APIBuilder.getContributorDetailUrl(usernameContributor);
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(browserIntent);
                     }
@@ -275,7 +287,7 @@ public class ProfileActivity extends AppCompatActivity implements
             stateUnfollow(mFollowButton);
             Log.i("INFOGUE/PROFILE", "Unfollow " + contributorId + " " + username);
 
-            StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_UNFOLLOW,
+            StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_UNFOLLOW,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -284,7 +296,7 @@ public class ProfileActivity extends AppCompatActivity implements
                                 String status = result.getString("status");
                                 String message = result.getString("message");
 
-                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                     Log.i("Infogue/Unfollow", message);
                                 } else {
                                     Log.w("Infogue/Unfollow", getString(R.string.error_unknown));
@@ -310,18 +322,18 @@ public class ProfileActivity extends AppCompatActivity implements
                                     String status = response.getString("status");
                                     String message = response.getString("message");
 
-                                    if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                    if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                         errorMessage = message + ", please login again!";
-                                    } else if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                    } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
                                         errorMessage = message;
-                                    } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                         errorMessage = message;
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
-                            AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
 
                             stateFollow(mFollowButton);
                         }
@@ -347,7 +359,7 @@ public class ProfileActivity extends AppCompatActivity implements
             stateFollow(mFollowButton);
             Log.i("INFOGUE/PROFILE", "Follow " + contributorId + " " + username);
 
-            StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_FOLLOW,
+            StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_FOLLOW,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -356,7 +368,7 @@ public class ProfileActivity extends AppCompatActivity implements
                                 String status = result.getString("status");
                                 String message = result.getString("message");
 
-                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                     Log.i("Infogue/Follow", message);
                                 } else {
                                     Log.w("Infogue/Follow", getString(R.string.error_unknown));
@@ -382,18 +394,18 @@ public class ProfileActivity extends AppCompatActivity implements
                                     String status = response.getString("status");
                                     String message = response.getString("message");
 
-                                    if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                    if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                         errorMessage = message + ", please login again!";
-                                    } else if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                    } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
                                         errorMessage = message;
-                                    } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                         errorMessage = message;
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
-                            AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
 
                             stateUnfollow(mFollowButton);
                         }
@@ -420,7 +432,7 @@ public class ProfileActivity extends AppCompatActivity implements
     }
 
     private void updateProfileInBackground() {
-        JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, UrlHelper.getApiContributorUrl(username), null,
+        JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, APIBuilder.getApiContributorUrl(username), null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -428,7 +440,7 @@ public class ProfileActivity extends AppCompatActivity implements
                             String status = response.getString("status");
                             JSONObject contributor = response.getJSONObject("contributor");
 
-                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                            if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 session.setSessionData(SessionManager.KEY_ARTICLE, contributor.getInt("article_total"));
                                 session.setSessionData(SessionManager.KEY_FOLLOWER, contributor.getInt("followers_total"));
                                 session.setSessionData(SessionManager.KEY_FOLLOWING, contributor.getInt("following_total"));
@@ -468,17 +480,15 @@ public class ProfileActivity extends AppCompatActivity implements
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(contributorRequest);
     }
 
-    @SuppressWarnings("deprecation")
     private void stateFollow(Button mFollowButton) {
         mFollowButton.setBackgroundResource(R.drawable.btn_primary);
-        mFollowButton.setTextColor(getResources().getColor(R.color.light));
+        mFollowButton.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.light));
         mFollowButton.setText(getString(R.string.action_unfollow));
     }
 
-    @SuppressWarnings("deprecation")
     private void stateUnfollow(Button mFollowButton) {
         mFollowButton.setBackgroundResource(R.drawable.btn_toggle);
-        mFollowButton.setTextColor(getResources().getColor(R.color.primary));
+        mFollowButton.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.primary));
         mFollowButton.setText(getString(R.string.action_follow));
     }
 
@@ -504,13 +514,13 @@ public class ProfileActivity extends AppCompatActivity implements
                 finish();
             }
         } else if (id == R.id.action_feedback) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_FEEDBACK));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_FEEDBACK));
             startActivity(browserIntent);
         } else if (id == R.id.action_help) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_HELP));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_HELP));
             startActivity(browserIntent);
         } else if (id == R.id.action_rating) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_APP));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_APP));
             startActivity(browserIntent);
         } else if (id == R.id.action_about) {
             Intent aboutActivity = new Intent(getBaseContext(), AboutActivity.class);
@@ -539,41 +549,5 @@ public class ProfileActivity extends AppCompatActivity implements
         applicationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(applicationIntent);
         finish();
-    }
-
-    @Override
-    public void onLostConnectionNotified(Context context) {
-        connectionDetector.snackbarDisconnectNotification(findViewById(android.R.id.content), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                connectionDetector.dismissNotification();
-
-                if (!connectionDetector.isNetworkAvailable()) {
-                    connectionDetector.snackbarDisconnectNotification(findViewById(android.R.id.content), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            onLostConnectionNotified(getBaseContext());
-                        }
-                    }, Constant.jokes[(int) Math.floor(Math.random() * Constant.jokes.length)] + " stole my internet T_T", getString(R.string.action_retry));
-                } else {
-                    connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            connectionDetector.dismissNotification();
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onConnectionEstablished(Context context) {
-        connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                connectionDetector.dismissNotification();
-            }
-        });
     }
 }

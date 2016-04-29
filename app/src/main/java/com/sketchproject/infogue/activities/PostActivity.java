@@ -39,9 +39,8 @@ import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.models.Subcategory;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.AppHelper;
-import com.sketchproject.infogue.utils.Constant;
-import com.sketchproject.infogue.utils.UrlHelper;
+import com.sketchproject.infogue.utils.Helper;
+import com.sketchproject.infogue.utils.APIBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -189,14 +188,14 @@ public class PostActivity extends AppCompatActivity {
                     .into(mArticleFeatured);
             mArticleTitle.setText(extras.getString(Article.ARTICLE_TITLE));
 
-            JsonObjectRequest articleRequest = new JsonObjectRequest(Request.Method.GET, UrlHelper.getApiPostUrl(articleSlug, mLoggedId), null,
+            JsonObjectRequest articleRequest = new JsonObjectRequest(Request.Method.GET, APIBuilder.getApiPostUrl(articleSlug, mLoggedId), null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
                                 String status = response.getString("status");
 
-                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                     JSONObject article = response.getJSONObject("article");
                                     final JSONObject author = article.getJSONObject("contributor");
                                     JSONObject subcategory = article.getJSONObject(Article.ARTICLE_SUBCATEGORY);
@@ -206,7 +205,7 @@ public class PostActivity extends AppCompatActivity {
                                     mArticleCategory.setText(category.getString(Category.COLUMN_CATEGORY).toUpperCase());
                                     mArticleContributor.setText(author.getString(Contributor.CONTRIBUTOR_NAME));
                                     mArticlePublished.setText(article.getString(Article.ARTICLE_CREATED_AT));
-                                    mArticleContent.loadData(AppHelper.wrapHtmlString(article.getString(Article.ARTICLE_CONTENT)), "text/html", "UTF-8");
+                                    mArticleContent.loadData(Helper.wrapHtmlString(article.getString(Article.ARTICLE_CONTENT)), "text/html", "UTF-8");
                                     String excerpt = article.getString(Article.ARTICLE_EXCERPT);
                                     if (excerpt == null || excerpt.isEmpty()) {
                                         mArticleExcerpt.setVisibility(View.GONE);
@@ -307,7 +306,7 @@ public class PostActivity extends AppCompatActivity {
 
                                     mArticleWrapper.setVisibility(View.VISIBLE);
                                 } else {
-                                    AppHelper.toastColored(getBaseContext(), getString(R.string.error_server), Color.parseColor("#ddd1205e"));
+                                    Helper.toastColor(getBaseContext(), getString(R.string.error_server), Color.parseColor("#ddd1205e"));
                                 }
 
                                 progress.dismiss();
@@ -330,7 +329,7 @@ public class PostActivity extends AppCompatActivity {
                                     errorMessage = getString(R.string.error_unknown);
                                 }
                             }
-                            AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
                         }
                     }
             );
@@ -345,7 +344,7 @@ public class PostActivity extends AppCompatActivity {
             articleId = 0;
             articleSlug = "";
             progress.dismiss();
-            AppHelper.toastColored(getBaseContext(), "Invalid article data", Color.parseColor("#ddd1205e"));
+            Helper.toastColor(getBaseContext(), "Invalid article data", Color.parseColor("#ddd1205e"));
             finish();
         }
     }
@@ -354,7 +353,7 @@ public class PostActivity extends AppCompatActivity {
         if (isFollowingAuthor) {
             mContributorFollowButton.setImageResource(R.drawable.btn_follow);
 
-            StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_UNFOLLOW,
+            StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_UNFOLLOW,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -363,7 +362,7 @@ public class PostActivity extends AppCompatActivity {
                                 String status = result.getString("status");
                                 String message = result.getString("message");
 
-                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                     Log.i("Infogue/Unfollow", message);
                                 } else {
                                     Log.w("Infogue/Unfollow", getString(R.string.error_unknown));
@@ -389,18 +388,18 @@ public class PostActivity extends AppCompatActivity {
                                     String status = response.getString("status");
                                     String message = response.getString("message");
 
-                                    if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                    if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                         errorMessage = message+", please login again!";
-                                    } else if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                    } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
                                         errorMessage = message;
-                                    } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                         errorMessage = message;
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
-                            AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
 
                             mContributorFollowButton.setImageResource(R.drawable.btn_unfollow);
                             isFollowingAuthor = true;
@@ -426,7 +425,7 @@ public class PostActivity extends AppCompatActivity {
         } else {
             mContributorFollowButton.setImageResource(R.drawable.btn_unfollow);
 
-            StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_FOLLOW,
+            StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_FOLLOW,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -435,7 +434,7 @@ public class PostActivity extends AppCompatActivity {
                                 String status = result.getString("status");
                                 String message = result.getString("message");
 
-                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                     Log.i("Infogue/Follow", message);
                                 } else {
                                     Log.w("Infogue/Follow", getString(R.string.error_unknown));
@@ -461,18 +460,18 @@ public class PostActivity extends AppCompatActivity {
                                     String status = response.getString("status");
                                     String message = response.getString("message");
 
-                                    if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                    if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                         errorMessage = message+", please login again!";
-                                    } else if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                    } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
                                         errorMessage = message;
-                                    } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                         errorMessage = message;
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
-                            AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
 
                             mContributorFollowButton.setImageResource(R.drawable.btn_follow);
                             isFollowingAuthor = false;
@@ -503,7 +502,7 @@ public class PostActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_HIT,
+                StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_HIT,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -512,7 +511,7 @@ public class PostActivity extends AppCompatActivity {
                                     String status = result.getString("status");
                                     String message = result.getString("message");
 
-                                    if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                    if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                         Log.i("Infogue/Hit", "Current hit article id : " + articleId + " is " + message);
                                     } else {
                                         Log.w("Infogue/Hit", getString(R.string.error_unknown));
@@ -556,7 +555,7 @@ public class PostActivity extends AppCompatActivity {
 
     private void rateArticle(final float rating, boolean fromUser) {
         if (rating > 0 && fromUser) {
-            StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_RATE,
+            StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_RATE,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -565,11 +564,11 @@ public class PostActivity extends AppCompatActivity {
                                 String status = result.getString("status");
                                 String message = result.getString("message");
 
-                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                     Log.i("Infogue/Rate", "Average rating for article id : " + articleId + " is " + message);
                                 } else {
                                     String errorMessage = getString(R.string.error_unknown) + "\r\nYour rating was discarded";
-                                    AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                                    Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -594,7 +593,7 @@ public class PostActivity extends AppCompatActivity {
                                     String status = response.getString("status");
                                     String message = response.getString("message");
 
-                                    if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                         errorMessage = message;
                                     } else {
                                         errorMessage = getString(R.string.error_unknown);
@@ -603,7 +602,7 @@ public class PostActivity extends AppCompatActivity {
                                     e.printStackTrace();
                                 }
                             }
-                            AppHelper.toastColored(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
                         }
                     }
             ) {
@@ -623,9 +622,9 @@ public class PostActivity extends AppCompatActivity {
             VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
 
             if (rating >= 3) {
-                AppHelper.toastColored(getBaseContext(), "Awesome!, you give " + rating + " Stars on \n\r\"" + articleTitle + "\"", Color.parseColor("#ddd1205e"));
+                Helper.toastColor(getBaseContext(), "Awesome!, you give " + rating + " Stars on \n\r\"" + articleTitle + "\"", Color.parseColor("#ddd1205e"));
             } else {
-                AppHelper.toastColored(getBaseContext(), "Too bad!, you give under 3 Stars on \n\r\"" + articleTitle + "\"", Color.parseColor("#ddf1ae50"));
+                Helper.toastColor(getBaseContext(), "Too bad!, you give under 3 Stars on \n\r\"" + articleTitle + "\"", Color.parseColor("#ddf1ae50"));
             }
         }
     }
@@ -647,14 +646,14 @@ public class PostActivity extends AppCompatActivity {
         } else if (id == R.id.action_share) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(articleSlug));
+            sendIntent.putExtra(Intent.EXTRA_TEXT, APIBuilder.getShareArticleText(articleSlug));
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
         } else if (id == R.id.action_refresh) {
             progress.show();
             buildArticle();
         } else if (id == R.id.action_browse) {
-            String articleUrl = UrlHelper.getArticleUrl(articleSlug);
+            String articleUrl = APIBuilder.getArticleUrl(articleSlug);
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
             startActivity(browserIntent);
         } else if (id == R.id.action_comment) {

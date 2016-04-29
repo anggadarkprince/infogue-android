@@ -21,14 +21,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.activities.CommentActivity;
-import com.sketchproject.infogue.activities.FollowerActivity;
 import com.sketchproject.infogue.adapters.CommentRecyclerViewAdapter;
 import com.sketchproject.infogue.models.Comment;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.AppHelper;
-import com.sketchproject.infogue.utils.Constant;
-import com.sketchproject.infogue.utils.UrlHelper;
+import com.sketchproject.infogue.utils.Helper;
+import com.sketchproject.infogue.utils.APIBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -84,7 +82,7 @@ public class CommentFragment extends Fragment {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             String mArticleSlug = getArguments().getString(ARG_ARTICLE_SLUG);
 
-            apiCommentUrl = UrlHelper.getApiCommentUrl(mArticleSlug);
+            apiCommentUrl = APIBuilder.getApiCommentUrl(mArticleSlug);
             apiCommentUrlFirstPage = apiCommentUrl;
         }
     }
@@ -153,7 +151,7 @@ public class CommentFragment extends Fragment {
 
                                 apiCommentUrl = nextUrl;
 
-                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                     if (swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()) {
                                         allComments.remove(allComments.size() - 1);
                                         commentAdapter.notifyItemRemoved(allComments.size());
@@ -204,7 +202,7 @@ public class CommentFragment extends Fragment {
                                     commentAdapter.notifyItemRangeInserted(curSize, allComments.size() - 1);
                                     Log.i("INFOGUE/Comment", "Load More page " + page);
                                 } else {
-                                    AppHelper.toastColored(getContext(), getActivity().getString(R.string.error_server), Color.parseColor("#ddd1205e"));
+                                    Helper.toastColor(getContext(), getActivity().getString(R.string.error_server), Color.parseColor("#ddd1205e"));
 
                                     // indicate the error
                                     isEndOfPage = true;
@@ -234,7 +232,7 @@ public class CommentFragment extends Fragment {
                                     errorMessage = getActivity().getString(R.string.error_unknown);
                                 }
                             }
-                            AppHelper.toastColored(getContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            Helper.toastColor(getContext(), errorMessage, Color.parseColor("#ddd1205e"));
 
                             // indicate the error or timeout
                             isEndOfPage = true;

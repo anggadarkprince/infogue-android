@@ -26,9 +26,8 @@ import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.AppHelper;
-import com.sketchproject.infogue.utils.Constant;
-import com.sketchproject.infogue.utils.UrlHelper;
+import com.sketchproject.infogue.utils.Helper;
+import com.sketchproject.infogue.utils.APIBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,7 +39,7 @@ import java.util.List;
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnFollowerInteractionListener}
  * interface.
  */
 public class FollowerFragment extends Fragment {
@@ -58,7 +57,7 @@ public class FollowerFragment extends Fragment {
 
     private List<Contributor> allFollowers;
     private FollowerRecyclerViewAdapter followerAdapter;
-    private OnListFragmentInteractionListener mListener;
+    private OnFollowerInteractionListener mListener;
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private String apiFollowerUrl = "";
@@ -109,10 +108,10 @@ public class FollowerFragment extends Fragment {
 
             if (mQuery != null && !mQuery.isEmpty()) {
                 Log.i("INFOGUE/Follower", "Query : " + mQuery);
-                apiFollowerUrl = UrlHelper.getApiSearchUrl(mQuery, UrlHelper.SEARCH_CONTRIBUTOR);
+                apiFollowerUrl = APIBuilder.getApiSearchUrl(mQuery, APIBuilder.SEARCH_CONTRIBUTOR, mLoggedId);
             } else if (mUsername != null && !mUsername.isEmpty()) {
                 Log.i("INFOGUE/Follower", "Username : " + mUsername);
-                apiFollowerUrl = UrlHelper.getApiFollowerUrl(mType, mLoggedId, mUsername);
+                apiFollowerUrl = APIBuilder.getApiFollowerUrl(mType, mLoggedId, mUsername);
             } else {
                 Log.i("INFOGUE/Follower", "Default");
             }
@@ -188,7 +187,7 @@ public class FollowerFragment extends Fragment {
 
                                 apiFollowerUrl = nextUrl;
 
-                                if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                     if (swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()) {
                                         allFollowers.remove(allFollowers.size() - 1);
                                         followerAdapter.notifyItemRemoved(allFollowers.size());
@@ -243,7 +242,7 @@ public class FollowerFragment extends Fragment {
                                     followerAdapter.notifyItemRangeInserted(curSize, allFollowers.size() - 1);
                                     Log.i("INFOGUE/Contributor", "Load More page " + page);
                                 } else {
-                                    AppHelper.toastColored(getContext(), getActivity().getString(R.string.error_server), Color.parseColor("#ddd1205e"));
+                                    Helper.toastColor(getContext(), getActivity().getString(R.string.error_server), Color.parseColor("#ddd1205e"));
 
                                     // indicate the error
                                     isEndOfPage = true;
@@ -272,7 +271,7 @@ public class FollowerFragment extends Fragment {
                                     errorMessage = getActivity().getString(R.string.error_unknown);
                                 }
                             }
-                            AppHelper.toastColored(getContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            Helper.toastColor(getContext(), errorMessage, Color.parseColor("#ddd1205e"));
 
                             // indicate the error or timeout
                             isEndOfPage = true;
@@ -302,10 +301,10 @@ public class FollowerFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
+        if (context instanceof OnFollowerInteractionListener) {
+            mListener = (OnFollowerInteractionListener) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener");
+            throw new RuntimeException(context.toString() + " must implement OnFollowerInteractionListener");
         }
     }
 
@@ -321,11 +320,11 @@ public class FollowerFragment extends Fragment {
      * to the activity and potentially other fragments contained in that
      * activity.
      */
-    public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(Contributor contributor, View followControl);
+    public interface OnFollowerInteractionListener {
+        void onFollowerInteraction(Contributor contributor, View followControl);
 
-        void onListFollowControlInteraction(View view, View followControl, Contributor contributor);
+        void onFollowerControlInteraction(View view, View followControl, Contributor contributor);
 
-        void onListLongClickInteraction(View view, View followControl, Contributor contributor);
+        void onFollowerLongClickInteraction(View view, View followControl, Contributor contributor);
     }
 }

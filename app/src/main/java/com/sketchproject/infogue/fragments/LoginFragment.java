@@ -39,7 +39,7 @@ import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.Validator;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.Constant;
+import com.sketchproject.infogue.utils.APIBuilder;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
@@ -259,7 +259,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         mForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_FORGOT));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_FORGOT));
                 startActivity(browserIntent);
             }
         });
@@ -351,7 +351,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
     }
 
     private void loginRequest() {
-        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_LOGIN,
+        StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_LOGIN,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -361,7 +361,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                             String message = result.getString("message");
                             String login = result.getString("login");
 
-                            if (status.equals(Contributor.STATUS_ACTIVATED) && login.equals(Constant.REQUEST_GRANTED)) {
+                            if (status.equals(Contributor.STATUS_ACTIVATED) && login.equals(APIBuilder.REQUEST_GRANTED)) {
                                 JSONObject user = result.getJSONObject("user");
                                 if (populateSessionData(user)) {
                                     getActivity().finish();
@@ -414,11 +414,11 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                 String message = response.getString("message");
                                 String login = response.getString("login");
 
-                                if ((status.equals(Constant.REQUEST_UNREGISTERED) || login.equals(Constant.REQUEST_RESTRICT)) && networkResponse.statusCode == 403) {
+                                if ((status.equals(APIBuilder.REQUEST_UNREGISTERED) || login.equals(APIBuilder.REQUEST_RESTRICT)) && networkResponse.statusCode == 403) {
                                     alert.setAlertType(AlertFragment.ALERT_DANGER);
                                     alert.setAlertMessage(message);
                                 } else if (status.equals(Contributor.STATUS_PENDING) && networkResponse.statusCode == 403) {
-                                    String urlResendEmail = Constant.BASE_URL + "auth/resend/" + response.getString("token");
+                                    String urlResendEmail = APIBuilder.BASE_URL + "auth/resend/" + response.getString("token");
                                     alert.setAlertType(AlertFragment.ALERT_WARNING);
                                     alert.setAlertTitle("Pending");
                                     alert.setAlertMessage("Account is pending please activate via email.\nResend email activation?\n" + urlResendEmail);
@@ -426,7 +426,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                     alert.setAlertType(AlertFragment.ALERT_DANGER);
                                     alert.setAlertTitle("Suspended");
                                     alert.setAlertMessage("Account is suspended");
-                                } else if (login.equals(Constant.REQUEST_MISMATCH) && networkResponse.statusCode == 401) {
+                                } else if (login.equals(APIBuilder.REQUEST_MISMATCH) && networkResponse.statusCode == 401) {
                                     alert.setAlertType(AlertFragment.ALERT_DANGER);
                                     alert.setAlertMessage(message);
                                 } else {

@@ -139,6 +139,14 @@ public class SessionManager {
         return pref.getInt(key, defValue);
     }
 
+    public boolean isMe(int id){
+        return getSessionData(SessionManager.KEY_ID, 0) == id;
+    }
+
+    public boolean isMe(String username){
+        return getSessionData(SessionManager.KEY_ID, "").equals(username);
+    }
+
     /**
      * Get stored session data
      *

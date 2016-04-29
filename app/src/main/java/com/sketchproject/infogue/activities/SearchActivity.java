@@ -12,13 +12,11 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,17 +39,18 @@ import com.android.volley.toolbox.StringRequest;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.adapters.ArticleRecyclerViewAdapter;
 import com.sketchproject.infogue.adapters.FollowerRecyclerViewAdapter;
+import com.sketchproject.infogue.events.ArticleContextBuilder;
+import com.sketchproject.infogue.events.ArticleListEvent;
+import com.sketchproject.infogue.events.ArticlePopupBuilder;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.FollowerFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.ConnectionDetector;
-import com.sketchproject.infogue.modules.IconizedMenu;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.AppHelper;
-import com.sketchproject.infogue.utils.Constant;
-import com.sketchproject.infogue.utils.UrlHelper;
+import com.sketchproject.infogue.utils.Helper;
+import com.sketchproject.infogue.utils.APIBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,8 +62,8 @@ import java.util.List;
 import java.util.Map;
 
 public class SearchActivity extends AppCompatActivity implements
-        FollowerFragment.OnListFragmentInteractionListener,
-        ArticleFragment.OnArticleFragmentInteractionListener {
+        FollowerFragment.OnFollowerInteractionListener,
+        ArticleFragment.OnArticleInteractionListener {
 
     public static final String QUERY_STRING = "query";
 
@@ -86,9 +85,6 @@ public class SearchActivity extends AppCompatActivity implements
     private List<Article> allArticles;
     private FollowerRecyclerViewAdapter contributorAdapter;
     private ArticleRecyclerViewAdapter articleAdapter;
-
-    private CharSequence[] itemsWithControl;
-    private CharSequence[] itemsWithoutControl;
 
     private int mColumnCount;
     private int mResultContributor;
@@ -126,12 +122,6 @@ public class SearchActivity extends AppCompatActivity implements
         mResultContributor = 0;
         mResultArticle = 0;
 
-        itemsWithoutControl = new CharSequence[]{
-                getString(R.string.action_long_open),
-                getString(R.string.action_long_browse),
-                getString(R.string.action_long_share),
-        };
-
         handleIntent(getIntent());
     }
 
@@ -156,16 +146,17 @@ public class SearchActivity extends AppCompatActivity implements
     @SuppressLint("SetTextI18n")
     private void setupSearchResult() {
         showProgress(true);
-        JsonObjectRequest menuRequest = new JsonObjectRequest(Request.Method.GET, UrlHelper.getApiSearchUrl(mSearchQuery, UrlHelper.SEARCH_BOTH), null,
+        String url = APIBuilder.getApiSearchUrl(mSearchQuery, APIBuilder.SEARCH_BOTH, session.getSessionData(SessionManager.KEY_ID, 0));
+        JsonObjectRequest menuRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            String status = response.getString(Constant.RESPONSE_STATUS);
+                            String status = response.getString(APIBuilder.RESPONSE_STATUS);
                             JSONObject contributors = response.getJSONObject("contributors");
                             JSONObject articles = response.getJSONObject("articles");
 
-                            if (status.equals(Constant.REQUEST_SUCCESS)) {
+                            if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 mResultContributor = contributors.getInt("total");
                                 mResultArticle = articles.getInt("total");
 
@@ -173,12 +164,12 @@ public class SearchActivity extends AppCompatActivity implements
                                 populateArticleResult(articles.getJSONArray("data"));
                             } else {
                                 String successMessage = getString(R.string.error_unknown);
-                                AppHelper.toastColored(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.primary));
+                                Helper.toastColor(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.primary));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                             String successMessage = getString(R.string.error_parse_data);
-                            AppHelper.toastColored(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.primary));
+                            Helper.toastColor(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.primary));
                         }
                         showProgress(false);
                     }
@@ -200,16 +191,16 @@ public class SearchActivity extends AppCompatActivity implements
                             try {
                                 String result = new String(networkResponse.data);
                                 JSONObject response = new JSONObject(result);
-                                String status = response.optString(Constant.RESPONSE_STATUS);
-                                String message = response.optString(Constant.RESPONSE_MESSAGE);
+                                String status = response.optString(APIBuilder.RESPONSE_STATUS);
+                                String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
                                 Log.e("Infogue/Search", "Error::" + message);
 
-                                if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                     errorMessage = getString(R.string.error_not_found);
-                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                     errorMessage = getString(R.string.error_server);
-                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
                                     errorMessage = getString(R.string.error_maintenance);
                                 } else if (message != null) {
                                     errorMessage = message;
@@ -219,7 +210,7 @@ public class SearchActivity extends AppCompatActivity implements
                                 errorMessage = getString(R.string.error_parse_data);
                             }
                         }
-                        AppHelper.toastColored(getBaseContext(), errorMessage,
+                        Helper.toastColor(getBaseContext(), errorMessage,
                                 ContextCompat.getColor(getBaseContext(), R.color.color_danger));
 
                         showProgress(false);
@@ -385,11 +376,11 @@ public class SearchActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 200) {
+        if (requestCode == ProfileActivity.PROFILE_RESULT_CODE && data != null) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 boolean isFollowing = data.getBooleanExtra(SessionManager.KEY_IS_FOLLOWING, false);
-                Log.i("INFOGUE/Follower", "Result " + isFollowing);
                 mContributor.setIsFollowing(isFollowing);
+
                 if (isFollowing) {
                     ((ImageButton) mControlButton).setImageResource(R.drawable.btn_unfollow);
                 } else {
@@ -400,17 +391,16 @@ public class SearchActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onListFragmentInteraction(Contributor contributor, View followControl) {
+    public void onFollowerInteraction(Contributor contributor, View followControl) {
         if (connectionDetector.isNetworkAvailable()) {
             showProfile(contributor, followControl);
-            mContributor = contributor;
         } else {
             lostConnectionNotification();
         }
     }
 
     @Override
-    public void onListFollowControlInteraction(View view, View followControl, final Contributor contributor) {
+    public void onFollowerControlInteraction(View view, View followControl, final Contributor contributor) {
         final SessionManager session = new SessionManager(getBaseContext());
         if (session.isLoggedIn()) {
             final ImageButton control = (ImageButton) followControl;
@@ -418,16 +408,16 @@ public class SearchActivity extends AppCompatActivity implements
                 control.setImageResource(R.drawable.btn_follow);
                 contributor.setIsFollowing(false);
 
-                StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_UNFOLLOW,
+                StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_UNFOLLOW,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
                                 try {
                                     JSONObject result = new JSONObject(response);
-                                    String status = result.getString(Constant.RESPONSE_STATUS);
-                                    String message = result.getString(Constant.RESPONSE_MESSAGE);
+                                    String status = result.getString(APIBuilder.RESPONSE_STATUS);
+                                    String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
 
-                                    if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                    if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                         Log.i("Infogue/Unfollow", message);
                                     } else {
                                         Log.w("Infogue/Unfollow", getString(R.string.error_unknown));
@@ -452,21 +442,21 @@ public class SearchActivity extends AppCompatActivity implements
                                     String result = new String(networkResponse.data);
                                     try {
                                         JSONObject response = new JSONObject(result);
-                                        String status = response.optString(Constant.RESPONSE_STATUS);
-                                        String message = response.optString(Constant.RESPONSE_MESSAGE);
+                                        String status = response.optString(APIBuilder.RESPONSE_STATUS);
+                                        String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
-                                        if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                        if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                             errorMessage = getString(R.string.error_unauthorized);
-                                        } else if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                        } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
                                             errorMessage = message;
-                                        } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                        } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                             errorMessage = getString(R.string.error_server);
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
                                 }
-                                AppHelper.toastColored(getBaseContext(), errorMessage,
+                                Helper.toastColor(getBaseContext(), errorMessage,
                                         ContextCompat.getColor(getBaseContext(), R.color.color_danger));
 
                                 control.setImageResource(R.drawable.btn_unfollow);
@@ -494,16 +484,16 @@ public class SearchActivity extends AppCompatActivity implements
                 control.setImageResource(R.drawable.btn_unfollow);
                 contributor.setIsFollowing(true);
 
-                StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_FOLLOW,
+                StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_FOLLOW,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
                                 try {
                                     JSONObject result = new JSONObject(response);
-                                    String status = result.getString(Constant.RESPONSE_STATUS);
-                                    String message = result.getString(Constant.RESPONSE_MESSAGE);
+                                    String status = result.getString(APIBuilder.RESPONSE_STATUS);
+                                    String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
 
-                                    if (status.equals(Constant.REQUEST_SUCCESS)) {
+                                    if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                         Log.i("Infogue/Follow", message);
                                     } else {
                                         Log.w("Infogue/Follow", getString(R.string.error_unknown));
@@ -528,21 +518,21 @@ public class SearchActivity extends AppCompatActivity implements
                                     String result = new String(networkResponse.data);
                                     try {
                                         JSONObject response = new JSONObject(result);
-                                        String status = response.optString(Constant.RESPONSE_STATUS);
-                                        String message = response.optString(Constant.RESPONSE_MESSAGE);
+                                        String status = response.optString(APIBuilder.RESPONSE_STATUS);
+                                        String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
-                                        if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                        if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                             errorMessage = getString(R.string.error_unauthorized);
-                                        } else if (status.equals(Constant.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                        } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
                                             errorMessage = message;
-                                        } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                        } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                             errorMessage = message;
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
                                 }
-                                AppHelper.toastColored(getBaseContext(), errorMessage,
+                                Helper.toastColor(getBaseContext(), errorMessage,
                                         ContextCompat.getColor(getBaseContext(), R.color.color_danger));
 
                                 control.setImageResource(R.drawable.btn_follow);
@@ -573,241 +563,31 @@ public class SearchActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onListLongClickInteraction(final View view, final View followControl, final Contributor contributor) {
-        itemsWithControl = new CharSequence[]{
-                getString(R.string.action_long_open),
-                getString(R.string.action_long_browse),
-                getString(R.string.action_long_share),
-                contributor.isFollowing() ? getString(R.string.action_long_unfollow) : getString(R.string.action_long_follow)
-        };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        SessionManager session = new SessionManager(getBaseContext());
-        if (session.getSessionData(SessionManager.KEY_ID, 0) == contributor.getId()) {
-            builder.setItems(itemsWithoutControl, new FollowerOnLongClickListener(contributor, followControl));
-        } else {
-            builder.setItems(itemsWithControl, new FollowerOnLongClickListener(contributor, followControl));
+    public void onFollowerLongClickInteraction(View view, View followControl, Contributor contributor) {
+        int menuRes = contributor.isFollowing() ? R.array.items_unfollow_people : R.array.items_follow_people;
+        if (session.isMe(contributor.getId())) {
+            menuRes = R.array.items_follow_profile;
         }
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setItems(menuRes, new ContributorOnLongClickListener(contributor, followControl));
         AlertDialog alert = builder.create();
         alert.show();
     }
 
-    private class FollowerOnLongClickListener implements DialogInterface.OnClickListener{
-        private Contributor contributor;
-        private View followControl;
-
-        public FollowerOnLongClickListener(Contributor contributor, View followControl){
-            this.contributor = contributor;
-            this.followControl = followControl;
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int item) {
-            if (connectionDetector.isNetworkAvailable()) {
-                String selectedItem = itemsWithControl[item].toString();
-                if (selectedItem.equals(getString(R.string.action_long_open))) {
-                    showProfile(contributor, followControl);
-                    mContributor = contributor;
-                }
-                else if (selectedItem.equals(getString(R.string.action_long_browse))) {
-                    String articleUrl = UrlHelper.getContributorUrl(contributor.getUsername());
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
-                    startActivity(browserIntent);
-                }
-                else if (selectedItem.equals(getString(R.string.action_long_share))) {
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareContributorText(contributor.getUsername()));
-                    sendIntent.setType("text/plain");
-                    startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
-                }
-                else if (selectedItem.equals(getString(R.string.action_long_follow))) {
-                    ((ImageButton) followControl).setImageResource(R.drawable.btn_unfollow);
-                    contributor.setIsFollowing(true);
-                }
-                else if (selectedItem.equals(getString(R.string.action_long_unfollow))) {
-                    ((ImageButton) followControl).setImageResource(R.drawable.btn_follow);
-                    contributor.setIsFollowing(false);
-                }
-            } else {
-                lostConnectionNotification();
-            }
-        }
-    }
-
     @Override
-    public void onArticleFragmentInteraction(View view, Article article) {
-        if (connectionDetector.isNetworkAvailable()) {
-            Log.i("INFOGUE/Article", article.getId() + " " + article.getSlug() + " " + article.getTitle());
-            Intent postIntent = new Intent(getBaseContext(), PostActivity.class);
-            postIntent.putExtra(Article.ARTICLE_ID, article.getId());
-            postIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
-            postIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
-            postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
-            startActivity(postIntent);
-            connectionDetector.dismissNotification();
-        } else {
-            lostConnectionNotification();
-        }
+    public void onArticleInteraction(View view, Article article) {
+        new ArticleListEvent(this, article).viewArticle();
     }
 
     @Override
     public void onArticlePopupInteraction(View view, final Article article) {
-        IconizedMenu popup = new IconizedMenu(new ContextThemeWrapper(view.getContext(), R.style.AppTheme_PopupOverlay), view);
-        popup.inflate(R.menu.article);
-        popup.setGravity(Gravity.END);
-        popup.setOnMenuItemClickListener(new IconizedMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-
-                if (connectionDetector.isNetworkAvailable()) {
-                    if (id == R.id.action_view) {
-                        Intent postIntent = new Intent(getBaseContext(), PostActivity.class);
-                        postIntent.putExtra(Article.ARTICLE_ID, article.getId());
-                        postIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
-                        postIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
-                        postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
-                        startActivity(postIntent);
-                    } else if (id == R.id.action_browse) {
-                        String articleUrl = UrlHelper.getArticleUrl(article.getSlug());
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
-                        startActivity(browserIntent);
-                    } else if (id == R.id.action_share) {
-                        Intent sendIntent = new Intent();
-                        sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(article.getSlug()));
-                        sendIntent.setType("text/plain");
-                        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
-                    } else if (id == R.id.action_rate) {
-                        rateArticle(article);
-                    }
-                    connectionDetector.dismissNotification();
-                } else {
-                    lostConnectionNotification();
-                }
-
-                return false;
-            }
-        });
-        popup.show();
-    }
-
-    private void rateArticle(final Article article) {
-        StringRequest postRequest = new StringRequest(Request.Method.POST, Constant.URL_API_RATE,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject result = new JSONObject(response);
-                            String status = result.getString(Constant.RESPONSE_STATUS);
-                            String message = result.getString(Constant.RESPONSE_MESSAGE);
-
-                            if (status.equals(Constant.REQUEST_SUCCESS)) {
-                                Log.i("Infogue/Rate", "Success::Average rating for article id " + article.getId() + " is " + message);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-
-                        NetworkResponse networkResponse = error.networkResponse;
-                        String errorMessage = getString(R.string.error_unknown);
-                        if (networkResponse == null) {
-                            if (error.getClass().equals(TimeoutError.class)) {
-                                errorMessage = getString(R.string.error_timeout);
-                            }
-                        } else {
-                            try {
-                                String result = new String(networkResponse.data);
-                                JSONObject response = new JSONObject(result);
-                                String status = response.getString(Constant.RESPONSE_STATUS);
-                                String message = response.getString(Constant.RESPONSE_MESSAGE);
-
-                                Log.i("Infogue/Article", "Error::" + message);
-
-                                if (status.equals(Constant.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
-                                    errorMessage = getString(R.string.error_not_found);
-                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
-                                    errorMessage = getString(R.string.error_server);
-                                } else if (status.equals(Constant.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
-                                    errorMessage = getString(R.string.error_maintenance);
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        String rateMessage = errorMessage + "\r\nYour rating was discarded";
-                        AppHelper.toastColored(getBaseContext(), rateMessage, ContextCompat.getColor(getBaseContext(), R.color.color_danger));
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put(Article.ARTICLE_FOREIGN, String.valueOf(article.getId()));
-                params.put(Article.ARTICLE_RATE, String.valueOf(5));
-                return params;
-            }
-        };
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
-
-        String successMessage = "Awesome!, you give 5 Stars on \n\r\"" + article.getTitle() + "\"";
-        AppHelper.toastColored(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.primary));
+        new ArticlePopupBuilder().buildPopup(this, view, article).show();
     }
 
     @Override
     public void onArticleLongClickInteraction(View view, final Article article) {
-        final CharSequence[] items = {
-                getString(R.string.action_long_open),
-                getString(R.string.action_long_browse),
-                getString(R.string.action_long_share),
-                getString(R.string.action_long_rate)
-        };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                if (connectionDetector.isNetworkAvailable()) {
-                    if (items[item].toString().equals(getString(R.string.action_long_open))) {
-                        Intent postIntent = new Intent(getBaseContext(), PostActivity.class);
-                        postIntent.putExtra(Article.ARTICLE_ID, article.getId());
-                        postIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
-                        postIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
-                        postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
-                        startActivity(postIntent);
-                    } else if (items[item].toString().equals(getString(R.string.action_long_browse))) {
-                        String articleUrl = UrlHelper.getArticleUrl(article.getSlug());
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
-                        startActivity(browserIntent);
-                    } else if (items[item].toString().equals(getString(R.string.action_long_share))) {
-                        Intent sendIntent = new Intent();
-                        sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_TEXT, UrlHelper.getShareArticleText(article.getSlug()));
-                        sendIntent.setType("text/plain");
-                        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
-                    } else if (items[item].toString().equals(getString(R.string.action_long_rate))) {
-                        rateArticle(article);
-                    }
-                } else {
-                    lostConnectionNotification();
-                }
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
+        new ArticleContextBuilder().buildContext(this, article).show();
     }
 
     private void showProgress(final boolean show) {
@@ -840,6 +620,7 @@ public class SearchActivity extends AppCompatActivity implements
     private void showProfile(Contributor contributor, View buttonControl) {
         Log.i("INFOGUE/Contributor", contributor.getId() + " " + contributor.getUsername());
         mControlButton = buttonControl;
+        mContributor = contributor;
 
         Intent profileIntent = new Intent(getBaseContext(), ProfileActivity.class);
         profileIntent.putExtra(SessionManager.KEY_ID, contributor.getId());
@@ -858,11 +639,54 @@ public class SearchActivity extends AppCompatActivity implements
     }
 
     private void lostConnectionNotification() {
-        connectionDetector.snackbarDisconnectNotification(mSearchContainer, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                connectionDetector.dismissNotification();
+        connectionDetector.snackbarDisconnectNotification(mSearchContainer, null);
+    }
+
+    private class ContributorOnLongClickListener implements DialogInterface.OnClickListener {
+        private Contributor contributor;
+        private View followControl;
+        private CharSequence[] itemsWithControl;
+
+        public ContributorOnLongClickListener(Contributor contributor, View followControl) {
+            this.contributor = contributor;
+            this.followControl = followControl;
+
+            itemsWithControl = getResources().getStringArray(R.array.items_follow_people);
+            if (contributor.isFollowing()) {
+                itemsWithControl = getResources().getStringArray(R.array.items_unfollow_people);
             }
-        });
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (connectionDetector.isNetworkAvailable()) {
+                String selectedItem = itemsWithControl[which].toString();
+                if (selectedItem.equals(getString(R.string.action_long_open))) {
+                    showProfile(contributor, followControl);
+                }
+                else if (selectedItem.equals(getString(R.string.action_long_browse))) {
+                    String articleUrl = APIBuilder.getContributorUrl(contributor.getUsername());
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
+                    startActivity(browserIntent);
+                }
+                else if (selectedItem.equals(getString(R.string.action_long_share_contributor))) {
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, APIBuilder.getShareContributorText(contributor.getUsername()));
+                    sendIntent.setType("text/plain");
+                    startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
+                }
+                else if (selectedItem.equals(getString(R.string.action_long_follow))) {
+                    ((ImageButton) followControl).setImageResource(R.drawable.btn_unfollow);
+                    contributor.setIsFollowing(true);
+                }
+                else if (selectedItem.equals(getString(R.string.action_long_unfollow))) {
+                    ((ImageButton) followControl).setImageResource(R.drawable.btn_follow);
+                    contributor.setIsFollowing(false);
+                }
+            } else {
+                lostConnectionNotification();
+            }
+        }
     }
 }
