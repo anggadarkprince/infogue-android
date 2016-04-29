@@ -92,20 +92,22 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             case VIEW_TYPE_FOLLOWER:
                 final FollowerViewHolder followerHolder = (FollowerViewHolder) holder;
                 followerHolder.mItem = mContributors.get(holder.getAdapterPosition());
-                followerHolder.mNameView.setText(mContributors.get(holder.getAdapterPosition()).getName());
-                followerHolder.mLocationView.setText(mContributors.get(holder.getAdapterPosition()).getLocation());
+                followerHolder.mNameView.setText(followerHolder.mItem.getName());
+                followerHolder.mLocationView.setText(followerHolder.mItem.getLocation());
                 Glide.with(followerHolder.mView.getContext())
-                        .load(mContributors.get(holder.getAdapterPosition()).getAvatar())
+                        .load(followerHolder.mItem.getAvatar())
                         .placeholder(R.drawable.placeholder_square)
                         .crossFade()
                         .into(followerHolder.mAvatarImage);
-                if (mContributors.get(holder.getAdapterPosition()).isFollowing()) {
+                if (followerHolder.mItem.isFollowing()) {
                     followerHolder.mFollowButton.setImageResource(R.drawable.btn_unfollow);
                 }
 
                 SessionManager session = new SessionManager(followerHolder.itemView.getContext());
                 if(session.isLoggedIn()){
-                    if(followerHolder.mItem.getId() == session.getSessionData(SessionManager.KEY_ID, 0)){
+                    boolean isActivated = followerHolder.mItem.getStatus().equals(Contributor.STATUS_ACTIVATED);
+                    boolean isMe = session.isMe(followerHolder.mItem.getId());
+                    if(isMe || !isActivated){
                         followerHolder.mFollowButton.setVisibility(View.GONE);
                     }
                     else{

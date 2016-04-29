@@ -7,6 +7,7 @@ import java.util.List;
  * Created by Angga on 12/04/2016 22.09.
  */
 public class Article {
+    public static final String ARTICLE_TABLE = "articles";
     public static final String ARTICLE_ID = "id";
     public static final String ARTICLE_SLUG = "slug";
     public static final String ARTICLE_TITLE = "title";

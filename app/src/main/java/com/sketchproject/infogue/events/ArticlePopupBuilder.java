@@ -23,12 +23,24 @@ public class ArticlePopupBuilder {
     public ArticlePopupBuilder() {
     }
 
-    public IconizedMenu buildPopup(final Context popupContext, View viewAnchor, final Article data) {
+    public ArticlePopupBuilder(Context popupContext, View viewAnchor, Article data) {
         context = popupContext;
         view = viewAnchor;
         article = data;
+    }
 
-        popupIconized = new IconizedMenu(new ContextThemeWrapper(context, R.style.AppTheme_PopupOverlay), view);
+    public IconizedMenu buildPopup(){
+        return buildPopup(context, view, article);
+    }
+
+    public IconizedMenu buildPopup(final Context popupContext, View viewAnchor, final Article data) {
+        if (popupContext == null || viewAnchor == null || data == null) {
+            throw new IllegalArgumentException(ArticlePopupBuilder.class.getSimpleName() +
+                    " Context, viewAnchor, Article is not initialized. Make sure use"+
+                    " ArticlePopupBuilder(Context popupContext, View viewAnchor, Article data) instead");
+        }
+
+        popupIconized = new IconizedMenu(new ContextThemeWrapper(popupContext, R.style.AppTheme_PopupOverlay), viewAnchor);
         popupIconized.inflate(R.menu.article);
         popupIconized.setGravity(Gravity.END);
         popupIconized.setOnMenuItemClickListener(new IconizedMenu.OnMenuItemClickListener() {
@@ -37,13 +49,13 @@ public class ArticlePopupBuilder {
                 int id = item.getItemId();
 
                 if (id == R.id.action_view) {
-                    new ArticleListEvent(context, article).viewArticle();
+                    new ArticleListEvent(popupContext, data).viewArticle();
                 } else if (id == R.id.action_browse) {
-                    new ArticleListEvent(context, article).browseArticle();
+                    new ArticleListEvent(popupContext, data).browseArticle();
                 } else if (id == R.id.action_share) {
-                    new ArticleListEvent(context, article).shareArticle();
+                    new ArticleListEvent(popupContext, data).shareArticle();
                 } else if (id == R.id.action_rate) {
-                    new ArticleListEvent(context, article).rateArticle();
+                    new ArticleListEvent(popupContext, data).rateArticle();
                 }
 
                 return false;

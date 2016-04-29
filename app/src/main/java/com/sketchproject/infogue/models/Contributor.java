@@ -7,6 +7,7 @@ import java.util.Date;
  * Created by Angga on 10/04/2016 21.32.
  */
 public class Contributor {
+    public static final String CONTRIBUTOR_TABLE = "contributors";
     public static final String CONTRIBUTOR_ID = "id";
     public static final String CONTRIBUTOR_FOREIGN = "contributor_id";
     public static final String CONTRIBUTOR_API = "api_token";

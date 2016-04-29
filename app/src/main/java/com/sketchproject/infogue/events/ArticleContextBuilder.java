@@ -21,22 +21,36 @@ public class ArticleContextBuilder {
         items = context.getResources().getStringArray(R.array.items_article);
     }
 
-    public AlertDialog buildContext(Context dialogContext, Article data) {
+    public ArticleContextBuilder(Context dialogContext, Article data) {
         context = dialogContext;
         article = data;
+        items = context.getResources().getStringArray(R.array.items_article);
+    }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    public AlertDialog buildContext(){
+        return buildContext(context, article);
+    }
+
+    public AlertDialog buildContext(final Context dialogContext, final Article data) {
+        if (dialogContext == null || data == null) {
+            throw new IllegalArgumentException(ArticlePopupBuilder.class.getSimpleName() +
+                    " Context, Article is not initialized. Make sure use"+
+                    " ArticleContextBuilder(Context dialogContext, Article data) instead");
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(dialogContext);
         builder.setItems(R.array.items_article, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 String menu = items[which];
-                if (menu.equals(context.getString(R.string.action_long_open))) {
-                    new ArticleListEvent(context, article).viewArticle();
-                } else if (menu.equals(context.getString(R.string.action_long_browse))) {
-                    new ArticleListEvent(context, article).browseArticle();
-                } else if (menu.equals(context.getString(R.string.action_long_share))) {
-                    new ArticleListEvent(context, article).shareArticle();
-                } else if (menu.equals(context.getString(R.string.action_long_rate))) {
-                    new ArticleListEvent(context, article).rateArticle();
+                ArticleListEvent event = new ArticleListEvent(dialogContext, data);
+                if (menu.equals(dialogContext.getString(R.string.action_long_open))) {
+                    event.viewArticle();
+                } else if (menu.equals(dialogContext.getString(R.string.action_long_browse))) {
+                    event.browseArticle();
+                } else if (menu.equals(dialogContext.getString(R.string.action_long_share))) {
+                    event.shareArticle();
+                } else if (menu.equals(dialogContext.getString(R.string.action_long_rate))) {
+                    event.rateArticle();
                 }
             }
         });
