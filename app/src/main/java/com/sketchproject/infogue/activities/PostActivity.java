@@ -149,6 +149,7 @@ public class PostActivity extends AppCompatActivity {
         progress = new ProgressDialog(PostActivity.this);
         progress.setMessage(getString(R.string.label_retrieve_article_progress));
         progress.setIndeterminate(true);
+        progress.setCanceledOnTouchOutside(false);
         progress.show();
 
         buildArticle();

@@ -9,6 +9,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +25,63 @@ import java.io.ByteArrayOutputStream;
  * Created by Angga on 12/04/2016 14.27.
  */
 public class Helper {
+
+    /**
+     * Create dialog with positive and negative button.
+     *
+     * @param context dialog
+     * @param titleId title resource id
+     * @param messageId message resource id
+     * @param textIdPositive text button positive
+     * @param textIdNegative text button negative
+     * @param positiveListener button positive event handler
+     * @param negativeListener button negative event handler
+     * @return Alert dialog
+     */
+    public static AlertDialog createDialog(Context context, int titleId, int messageId, int textIdPositive, int textIdNegative,
+                                           DialogInterface.OnClickListener positiveListener,
+                                           DialogInterface.OnClickListener negativeListener){
+
+        return createDialog(context, titleId, messageId, textIdPositive, textIdNegative, 0, positiveListener, negativeListener, null);
+    }
+
+    /**
+     * Create dialog with positive, negative and neutral button.
+     *
+     * @param context dialog
+     * @param titleId title resource id
+     * @param messageId message resource id
+     * @param textIdPositive text button positive
+     * @param textIdNegative text button negative
+     * @param textIdNeutral text button neutral
+     * @param positiveListener button positive event handler
+     * @param negativeListener button negative event handler
+     * @param neutralListener button neutral event handler
+     * @return Alert dialog
+     */
+    public static AlertDialog createDialog(Context context, int titleId, int messageId,
+                                           int textIdPositive, int textIdNegative, int textIdNeutral,
+                                           DialogInterface.OnClickListener positiveListener,
+                                           DialogInterface.OnClickListener negativeListener,
+                                           DialogInterface.OnClickListener neutralListener){
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.AppTheme_NoActionBar));
+        builder.setTitle(titleId);
+        builder.setMessage(messageId);
+        builder.setPositiveButton(textIdPositive, positiveListener);
+        builder.setNegativeButton(textIdNegative, negativeListener);
+        if(textIdNeutral != 0 && neutralListener != null){
+            builder.setNeutralButton(textIdNegative, negativeListener);
+        }
+
+        AlertDialog dialog = builder.create();
+
+        dialog.show();
+        Helper.setDialogButtonTheme(context, dialog);
+        dialog.hide();
+
+        return dialog;
+    }
 
     public static AlertDialog setDialogButtonTheme(Context context, AlertDialog dialog) {
         Button mButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);

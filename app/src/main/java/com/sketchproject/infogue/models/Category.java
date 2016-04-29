@@ -5,7 +5,7 @@ package com.sketchproject.infogue.models;
  * Created by Angga on 24/04/2016 09.16.
  */
 public class Category {
-    public static final String TABLE = "category";
+    public static final String TABLE = "categories";
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_CATEGORY = "category";
 

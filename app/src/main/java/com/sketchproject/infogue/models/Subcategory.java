@@ -5,7 +5,7 @@ package com.sketchproject.infogue.models;
  * Created by Angga on 24/04/2016 09.20.
  */
 public class Subcategory {
-    public static final String TABLE = "subcategory";
+    public static final String TABLE = "subcategories";
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_CATEGORY_ID = "category_id";
     public static final String COLUMN_SUBCATEGORY = "subcategory";

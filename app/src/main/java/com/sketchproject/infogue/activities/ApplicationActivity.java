@@ -5,7 +5,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +14,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -22,11 +22,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -40,17 +38,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.database.DBHelper;
 import com.sketchproject.infogue.database.DatabaseManager;
+import com.sketchproject.infogue.events.ArticleContextBuilder;
+import com.sketchproject.infogue.events.ArticleListEvent;
+import com.sketchproject.infogue.events.ArticlePopupBuilder;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.HomeFragment;
 import com.sketchproject.infogue.models.Article;
@@ -59,7 +57,6 @@ import com.sketchproject.infogue.models.Repositories.CategoryRepository;
 import com.sketchproject.infogue.models.Repositories.SubcategoryRepository;
 import com.sketchproject.infogue.models.Subcategory;
 import com.sketchproject.infogue.modules.ConnectionDetector;
-import com.sketchproject.infogue.modules.IconizedMenu;
 import com.sketchproject.infogue.modules.ObjectPooling;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
@@ -71,9 +68,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ApplicationActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
@@ -106,6 +101,8 @@ public class ApplicationActivity extends AppCompatActivity implements
         progress = new ProgressDialog(this);
         progress.setMessage(getString(R.string.label_retrieve_category_progress));
         progress.setIndeterminate(true);
+        progress.setCancelable(false);
+        progress.setCanceledOnTouchOutside(false);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -113,6 +110,7 @@ public class ApplicationActivity extends AppCompatActivity implements
             getSupportActionBar().setLogo(R.drawable.img_logo_small);
         }
 
+        // sync navigation drawer with layout
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         if (drawer != null) {
@@ -120,22 +118,19 @@ public class ApplicationActivity extends AppCompatActivity implements
         }
         toggle.syncState();
 
+        // get navigation and proceed the content
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         if (navigationView != null) {
             navigationView.setNavigationItemSelectedListener(this);
             navigationView.setCheckedItem(R.id.nav_home);
+            handleNavigationLayout();
+
+            // set default selected menu
+            MenuItem home = navigationView.getMenu().getItem(0).getSubMenu().getItem(0);
+            onNavigationItemSelected(home);
         }
 
-        MenuItem home = null;
-        if (navigationView != null) {
-            home = navigationView.getMenu().getItem(0).getSubMenu().getItem(0);
-        }
-        onNavigationItemSelected(home);
-
-        navigationHeader = navigationView.getHeaderView(0);
-
-        handleNavigationLayout();
-
+        // let user learn there is navigation on sidebar and must download the category menu
         if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
             if (drawer != null) {
                 drawer.openDrawer(GravityCompat.START);
@@ -146,6 +141,7 @@ public class ApplicationActivity extends AppCompatActivity implements
             populateMenu(categoryRepository.retrieveData());
         }
 
+        // define swipe to refresh layout and delegate event through home fragment or direct article fragment
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setEnabled(true);
@@ -166,10 +162,18 @@ public class ApplicationActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Set swipe to refresh enable or disable, user could swipe when reach top.
+     *
+     * @param state enable or not
+     */
     public void setSwipeEnable(boolean state) {
         swipeRefreshLayout.setEnabled(state);
     }
 
+    /**
+     * Build category from server to local repository
+     */
     private void downloadCategoryMenu() {
         progress.show();
         JsonObjectRequest menuRequest = new JsonObjectRequest(Request.Method.GET, APIBuilder.URL_API_CATEGORY, null,
@@ -177,12 +181,13 @@ public class ApplicationActivity extends AppCompatActivity implements
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            String status = response.getString("status");
-                            JSONArray categories = response.getJSONArray("menus");
+                            String status = response.getString(APIBuilder.RESPONSE_STATUS);
+                            JSONArray categories = response.getJSONArray(Category.TABLE);
 
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 CategoryRepository categoryRepository = new CategoryRepository();
                                 categoryRepository.clearData();
+
                                 SubcategoryRepository subcategoryRepository = new SubcategoryRepository();
                                 subcategoryRepository.clearData();
 
@@ -195,7 +200,7 @@ public class ApplicationActivity extends AppCompatActivity implements
 
                                     categoryRepository.createData(category);
 
-                                    JSONArray subcategories = categoryObject.getJSONArray("subcategories");
+                                    JSONArray subcategories = categoryObject.getJSONArray(Subcategory.TABLE);
                                     for (int j = 0; j < subcategories.length(); j++) {
                                         JSONObject subcategoryObject = subcategories.getJSONObject(j);
 
@@ -212,11 +217,9 @@ public class ApplicationActivity extends AppCompatActivity implements
                                 }
                                 session.setSessionData(SessionManager.KEY_USER_LEARNED, true);
                             } else {
-                                progress.cancel();
                                 confirmRetry();
                             }
                         } catch (JSONException e) {
-                            progress.cancel();
                             e.printStackTrace();
                         }
                         progress.dismiss();
@@ -225,7 +228,8 @@ public class ApplicationActivity extends AppCompatActivity implements
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progress.cancel();
+                        error.printStackTrace();
+                        progress.dismiss();
                         confirmRetry();
                     }
                 }
@@ -235,7 +239,6 @@ public class ApplicationActivity extends AppCompatActivity implements
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-        // Access the RequestQueue through your singleton class.
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(menuRequest);
     }
 
@@ -243,6 +246,8 @@ public class ApplicationActivity extends AppCompatActivity implements
      * Decide to show which header and set according login status.
      */
     private void handleNavigationLayout() {
+        navigationHeader = navigationView.getHeaderView(0);
+
         ViewGroup headerSigned = (RelativeLayout) navigationHeader.findViewById(R.id.signed_header);
         ViewGroup headerUnsigned = (LinearLayout) navigationHeader.findViewById(R.id.unsigned_header);
 
@@ -251,20 +256,17 @@ public class ApplicationActivity extends AppCompatActivity implements
             headerSigned.setVisibility(View.VISIBLE);
             headerUnsigned.setVisibility(View.GONE);
 
-            updateSideProfile(false);
+            // build sidebar profile
+            buildSideNavigationProfile(false);
 
             // Delegating create article event
             Button mCreateArticleButton = (Button) navigationHeader.findViewById(R.id.btn_save_article);
             mCreateArticleButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (session.isLoggedIn()) {
-                        Intent createArticleIntent = new Intent(ApplicationActivity.this, ArticleCreateActivity.class);
-                        createArticleIntent.putExtra(ArticleCreateActivity.CALLED_FROM_MAIN, true);
-                        startActivity(createArticleIntent);
-                    } else {
-                        signOutUser();
-                    }
+                    Intent createArticleIntent = new Intent(ApplicationActivity.this, ArticleCreateActivity.class);
+                    createArticleIntent.putExtra(ArticleCreateActivity.CALLED_FROM_MAIN, true);
+                    startActivity(createArticleIntent);
                 }
             });
 
@@ -288,10 +290,8 @@ public class ApplicationActivity extends AppCompatActivity implements
             mSignInButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!isSessionActive()) {
-                        authIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.LOGIN_SCREEN);
-                        startActivity(authIntent);
-                    }
+                    authIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.LOGIN_SCREEN);
+                    startActivity(authIntent);
                 }
             });
 
@@ -300,16 +300,19 @@ public class ApplicationActivity extends AppCompatActivity implements
             mSignUpButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!isSessionActive()) {
-                        authIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.REGISTER_SCREEN);
-                        startActivity(authIntent);
-                    }
+                    authIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.REGISTER_SCREEN);
+                    startActivity(authIntent);
                 }
             });
         }
     }
 
-    private void updateSideProfile(boolean skipCache){
+    /**
+     * Build sidebar profile when activity created or update where settings are changed.
+     *
+     * @param skipCache skipping hit cache, prefer force download fresh one.
+     */
+    private void buildSideNavigationProfile(boolean skipCache) {
         // Avatar image view delegating event and download image async
         ImageView mAvatarImage = (ImageView) navigationHeader.findViewById(R.id.avatar);
         mAvatarImage.setOnClickListener(new View.OnClickListener() {
@@ -318,7 +321,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                 showProfile();
             }
         });
-        if(skipCache){
+        if (skipCache) {
             Glide.clear(mAvatarImage);
         }
         Glide.with(this).load(session.getSessionData(SessionManager.KEY_AVATAR, null))
@@ -329,7 +332,7 @@ public class ApplicationActivity extends AppCompatActivity implements
 
         // Cover image view delegating event and download image async with cross fade effect
         ImageView mCoverImage = (ImageView) navigationHeader.findViewById(R.id.cover);
-        if(skipCache){
+        if (skipCache) {
             Glide.clear(mCoverImage);
         }
         Glide.with(this).load(session.getSessionData(SessionManager.KEY_COVER, null))
@@ -339,7 +342,7 @@ public class ApplicationActivity extends AppCompatActivity implements
 
         // Name view delegating event
         TextView mNameView = (TextView) navigationHeader.findViewById(R.id.name);
-        mNameView.setText(session.getSessionData(SessionManager.KEY_NAME, "Anonymous"));
+        mNameView.setText(session.getSessionData(SessionManager.KEY_NAME, getString(R.string.placeholder_name)));
         mNameView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -349,96 +352,93 @@ public class ApplicationActivity extends AppCompatActivity implements
 
         // Set location text view
         TextView mLocationView = (TextView) navigationHeader.findViewById(R.id.location);
-        mLocationView.setText(session.getSessionData(SessionManager.KEY_LOCATION, "No Location"));
+        mLocationView.setText(session.getSessionData(SessionManager.KEY_LOCATION, getString(R.string.placeholder_location)));
+        mLocationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showProfile();
+            }
+        });
     }
 
-    private boolean isSessionActive() {
-        if (session.isLoggedIn()) {
-            finish();
-            Intent applicationIntent = new Intent(getBaseContext(), ApplicationActivity.class);
-            startActivity(applicationIntent);
-            return true;
-        }
-        return false;
-    }
-
+    /**
+     * Show confirm dialog before decide to retry download menu category
+     */
     private void confirmRetry() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
-        builder.setTitle(R.string.action_retry);
-        builder.setMessage(R.string.message_request_timeout);
-        builder.setPositiveButton(R.string.action_retry, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                downloadCategoryMenu();
-            }
-        });
-        builder.setNegativeButton(R.string.action_exit, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        });
-
-        dialogConfirmation = builder.create();
+        dialogConfirmation = Helper.createDialog(this,
+                R.string.action_retry,
+                R.string.message_request_timeout,
+                R.string.action_retry,
+                R.string.action_exit,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        downloadCategoryMenu();
+                    }
+                },
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
         dialogConfirmation.show();
-        Helper.setDialogButtonTheme(this, dialogConfirmation);
     }
 
     /**
      * Show confirm dialog before exit.
      */
     private void confirmExit() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
-        builder.setTitle(R.string.app_name);
-        builder.setMessage(R.string.message_exit_confirm);
-        builder.setPositiveButton(R.string.action_yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        });
-        builder.setNegativeButton(R.string.action_no, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.setNeutralButton(R.string.action_open_infogue, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.BASE_URL));
-                startActivity(browserIntent);
-            }
-        });
-
-        dialogConfirmation = builder.create();
+        dialogConfirmation = Helper.createDialog(this,
+                R.string.app_name,
+                R.string.message_exit_confirm,
+                R.string.action_yes,
+                R.string.action_no,
+                R.string.action_open_infogue,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        signOutUser();
+                    }
+                },
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                },
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.BASE_URL));
+                        startActivity(browserIntent);
+                    }
+                });
         dialogConfirmation.show();
-        Helper.setDialogButtonTheme(this, dialogConfirmation);
     }
 
     /**
      * Show dialog confirmation before sign out.
      */
     private void confirmSignOut() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme_NoActionBar));
-        builder.setTitle(R.string.action_sign_out);
-        builder.setMessage(R.string.message_logout_confirm);
-        builder.setPositiveButton(R.string.action_sign_out, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                signOutUser();
-            }
-        });
-        builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        dialogConfirmation = builder.create();
+        dialogConfirmation = Helper.createDialog(this,
+                R.string.action_sign_out,
+                R.string.message_logout_confirm,
+                R.string.action_sign_out,
+                R.string.action_cancel,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        signOutUser();
+                    }
+                },
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
         dialogConfirmation.show();
-        Helper.setDialogButtonTheme(this, dialogConfirmation);
     }
 
     /**
@@ -449,24 +449,18 @@ public class ApplicationActivity extends AppCompatActivity implements
             Intent loginIntent = new Intent(ApplicationActivity.this, AuthenticationActivity.class);
             loginIntent.putExtra(AuthenticationActivity.AFTER_LOGOUT, true);
             loginIntent.putExtra(AuthenticationActivity.SCREEN_REQUEST, AuthenticationActivity.LOGIN_SCREEN);
-
             // Closing all the Activities
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-            // Add new Flag to start new Activity
+            // Add new Flag to start new Activity in new task
             loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
             startActivity(loginIntent);
-
             finish();
         } else {
-            // Notify remove persistent session data is failed
+            // Notify that removing persistent session data is failed
             View view = findViewById(R.id.container_body);
-            final Snackbar snackbar;
             if (view != null) {
-                snackbar = Snackbar.make(view, R.string.message_logout_failed, Snackbar.LENGTH_LONG);
-                // noinspection deprecation
-                snackbar.setActionTextColor(getResources().getColor(R.color.light));
+                final Snackbar snackbar = Snackbar.make(view, R.string.message_logout_failed, Snackbar.LENGTH_LONG);
+                snackbar.setActionTextColor(ContextCompat.getColor(getBaseContext(), R.color.light));
                 snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -476,6 +470,9 @@ public class ApplicationActivity extends AppCompatActivity implements
                 }).show();
                 View snackbarView = snackbar.getView();
                 snackbarView.setBackgroundResource(R.color.color_danger);
+            } else {
+                throw new IllegalArgumentException(ApplicationActivity.class.getSimpleName() +
+                        " View to handle sign out snackbar is null try another");
             }
         }
     }
@@ -502,7 +499,8 @@ public class ApplicationActivity extends AppCompatActivity implements
     }
 
     /**
-     * Create category menu on navigation drawer.
+     * Create category menu on navigation drawer. Clear and loop through menu from parameter
+     * add icon and set list is checkable.
      */
     private void populateMenu(List<Category> menu) {
         SubMenu navMenu = navigationView.getMenu().getItem(1).getSubMenu();
@@ -517,7 +515,9 @@ public class ApplicationActivity extends AppCompatActivity implements
 
     /**
      * Take care of popping the fragment back stack or finishing the activity
-     * as appropriate.
+     * as appropriate. if drawer opened then close it, if dialog confirmation logout or exit
+     * is showed then close it too, if not then show exit dialog. Necessary to remove super()
+     * method to prevent this activity closed.
      */
     @Override
     public void onBackPressed() {
@@ -543,7 +543,6 @@ public class ApplicationActivity extends AppCompatActivity implements
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         if (session.isLoggedIn()) {
             getMenuInflater().inflate(R.menu.account, menu);
         } else {
@@ -582,18 +581,26 @@ public class ApplicationActivity extends AppCompatActivity implements
         return super.onPrepareOptionsPanel(view, menu);
     }
 
+    /**
+     * Check if there is result from setting activity, if so update information on sidebar
+     * like avatar, cover name and location.
+     *
+     * @param requestCode code request when setting activity called
+     * @param resultCode  result if user save or discard (RESULT_OK = save | RESULT_CANCELED = discard)
+     * @param data        data from activity called if necessary
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SettingsActivity.SETTING_RESULT_CODE) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
-                updateSideProfile(true);
+                buildSideNavigationProfile(true);
             }
         }
     }
 
     /**
-     * Select option menu.
+     * Select action for option menu.
      *
      * @param item of selected option menu
      * @return boolean
@@ -604,10 +611,8 @@ public class ApplicationActivity extends AppCompatActivity implements
 
         switch (id) {
             case R.id.action_login:
-                if (!isSessionActive()) {
-                    Intent loginIntent = new Intent(getBaseContext(), AuthenticationActivity.class);
-                    startActivity(loginIntent);
-                }
+                Intent loginIntent = new Intent(getBaseContext(), AuthenticationActivity.class);
+                startActivity(loginIntent);
                 break;
             case R.id.action_feedback: {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_FEEDBACK));
@@ -693,180 +698,43 @@ public class ApplicationActivity extends AppCompatActivity implements
     /**
      * Interaction with article row.
      *
+     * @param view    row article list recycler view holder
      * @param article contain article model data
      */
     @Override
     public void onArticleInteraction(View view, Article article) {
-        if (connectionDetector.isNetworkAvailable()) {
-            Log.i("INFOGUE/Article", article.getId() + " " + article.getSlug() + " " + article.getTitle());
-            Intent postIntent = new Intent(getBaseContext(), PostActivity.class);
-            postIntent.putExtra(Article.ARTICLE_ID, article.getId());
-            postIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
-            postIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
-            postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
-            startActivity(postIntent);
-            connectionDetector.dismissNotification();
-        } else {
-            onLostConnectionNotified(getBaseContext());
-        }
-    }
-
-    @Override
-    public void onArticlePopupInteraction(final View view, final Article article) {
-        IconizedMenu popup = new IconizedMenu(new ContextThemeWrapper(view.getContext(), R.style.AppTheme_PopupOverlay), view);
-        popup.inflate(R.menu.article);
-        popup.setGravity(Gravity.END);
-        popup.setOnMenuItemClickListener(new IconizedMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-
-                if (connectionDetector.isNetworkAvailable()) {
-                    if (id == R.id.action_view) {
-                        Intent postIntent = new Intent(getBaseContext(), PostActivity.class);
-                        postIntent.putExtra(Article.ARTICLE_ID, article.getId());
-                        postIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
-                        postIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
-                        postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
-                        startActivity(postIntent);
-                    } else if (id == R.id.action_browse) {
-                        String articleUrl = APIBuilder.getArticleUrl(article.getSlug());
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
-                        startActivity(browserIntent);
-                    } else if (id == R.id.action_share) {
-                        Intent sendIntent = new Intent();
-                        sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_TEXT, APIBuilder.getShareArticleText(article.getSlug()));
-                        sendIntent.setType("text/plain");
-                        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
-                    } else if (id == R.id.action_rate) {
-                        givePerfectRating(article);
-                    }
-                    connectionDetector.dismissNotification();
-                } else {
-                    onLostConnectionNotified(getBaseContext());
-                }
-
-                return false;
-            }
-        });
-        popup.show();
-    }
-
-    @Override
-    public void onArticleLongClickInteraction(final View view, final Article article) {
-        final CharSequence[] items = {
-                getString(R.string.action_long_open),
-                getString(R.string.action_long_browse),
-                getString(R.string.action_long_share),
-                getString(R.string.action_long_rate)
-        };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                if (connectionDetector.isNetworkAvailable()) {
-                    if (items[item].toString().equals(getString(R.string.action_long_open))) {
-                        Intent postIntent = new Intent(getBaseContext(), PostActivity.class);
-                        postIntent.putExtra(Article.ARTICLE_ID, article.getId());
-                        postIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
-                        postIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
-                        postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
-                        startActivity(postIntent);
-                    } else if (items[item].toString().equals(getString(R.string.action_long_browse))) {
-                        String articleUrl = APIBuilder.getArticleUrl(article.getSlug());
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
-                        startActivity(browserIntent);
-                    } else if (items[item].toString().equals(getString(R.string.action_long_share))) {
-                        Intent sendIntent = new Intent();
-                        sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_TEXT, APIBuilder.getShareArticleText(article.getSlug()));
-                        sendIntent.setType("text/plain");
-                        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
-                    } else if (items[item].toString().equals(getString(R.string.action_long_rate))) {
-                        givePerfectRating(article);
-                    }
-                } else {
-                    onLostConnectionNotified(getBaseContext());
-                }
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    private void givePerfectRating(final Article article){
-        StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_RATE,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject result = new JSONObject(response);
-                            String status = result.getString("status");
-                            String message = result.getString("message");
-
-                            if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                Log.i("Infogue/Rate", "Average rating for article id : " + article.getId() + " is " + message);
-                            } else {
-                                String errorMessage = getString(R.string.error_unknown) + "\r\nYour rating was discarded";
-                                Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        NetworkResponse networkResponse = error.networkResponse;
-                        String errorMessage = getString(R.string.error_server);
-                        if (networkResponse == null) {
-                            if (error.getClass().equals(TimeoutError.class)) {
-                                errorMessage = getString(R.string.error_timeout) + "\r\nYour rating was discarded";
-                            } else {
-                                errorMessage = getString(R.string.error_unknown);
-                            }
-                        } else {
-                            try {
-                                String result = new String(networkResponse.data);
-                                JSONObject response = new JSONObject(result);
-                                String status = response.getString("status");
-                                String message = response.getString("message");
-
-                                if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
-                                    errorMessage = message;
-                                } else {
-                                    errorMessage = getString(R.string.error_unknown);
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put(Article.ARTICLE_FOREIGN, String.valueOf(article.getId()));
-                params.put(Article.ARTICLE_RATE, String.valueOf(5));
-                return params;
-            }
-        };
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
-
-        Helper.toastColor(getBaseContext(), "Awesome!, you give 5 Stars on \n\r\"" + article.getTitle() + "\"", Color.parseColor("#ddd1205e"));
+        new ArticleListEvent(this, article)
+                .viewArticle();
     }
 
     /**
-     * Select navigation menu.
+     * Show popup and show more action to interact with related article.
+     *
+     * @param view    row article list recycler view holder
+     * @param article plain old java object for article
+     */
+    @Override
+    public void onArticlePopupInteraction(final View view, final Article article) {
+        new ArticlePopupBuilder(this, view, article)
+                .buildPopup()
+                .show();
+    }
+
+    /**
+     * When user do long tap on view holder, show identical action like popup.
+     *
+     * @param view    row article list recycler view holder
+     * @param article plain old java object for article
+     */
+    @Override
+    public void onArticleLongClickInteraction(final View view, final Article article) {
+        new ArticleContextBuilder(this, article)
+                .buildContext()
+                .show();
+    }
+
+    /**
+     * Select action for side navigation drawer menu.
      *
      * @param item of selected navigation drawer menu
      * @return boolean
@@ -912,8 +780,8 @@ public class ApplicationActivity extends AppCompatActivity implements
                 } else {
                     fragment = (ArticleFragment) objectFragment;
                 }
-                title = "Featured Article";
-                subtitle = "Random";
+                title = getString(R.string.title_activity_article_featured);
+                subtitle = category;
                 elevation = 2;
                 logo = false;
             } else if (id == R.id.nav_headline) {
@@ -924,8 +792,8 @@ public class ApplicationActivity extends AppCompatActivity implements
                 } else {
                     fragment = (ArticleFragment) objectFragment;
                 }
-                title = "Featured Article";
-                subtitle = "Headline";
+                title = getString(R.string.title_activity_article_featured);
+                subtitle = category;
                 elevation = 2;
                 logo = false;
             } else {
@@ -976,6 +844,11 @@ public class ApplicationActivity extends AppCompatActivity implements
         return true;
     }
 
+    /**
+     * Triggered when connection lost once and force to confirm the info.
+     *
+     * @param context activity context
+     */
     @Override
     public void onLostConnectionNotified(Context context) {
         connectionDetector.snackbarDisconnectNotification(findViewById(android.R.id.content), new View.OnClickListener() {
@@ -992,6 +865,11 @@ public class ApplicationActivity extends AppCompatActivity implements
         });
     }
 
+    /**
+     * Triggered when connection established once.
+     *
+     * @param context activity context
+     */
     @Override
     public void onConnectionEstablished(Context context) {
         connectionDetector.snackbarConnectedNotification(findViewById(android.R.id.content), new View.OnClickListener() {

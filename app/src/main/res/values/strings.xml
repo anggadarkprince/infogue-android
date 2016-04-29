@@ -8,6 +8,7 @@
     <string name="title_activity_follower">Followers</string>
     <string name="title_activity_profile">Profile</string>
     <string name="title_activity_article">Article</string>
+    <string name="title_activity_article_featured">Featured Article</string>
     <string name="title_activity_article_create">Create Article</string>
     <string name="title_activity_article_edit">Edit Article</string>
     <string name="title_activity_post">Article Post</string>
@@ -43,6 +44,7 @@
     <string name="error_timeout">Request server timeout, try again!</string>
     <string name="error_unauthorized">Unauthorized, please login again!</string>
     <string name="error_not_found">Data not found</string>
+    <string name="error_no_connection">Failed to connect server</string>
     <string name="error_parse_data">Error parse data</string>
     <string name="error_maintenance">Server currently still maintenance</string>
     <string name="error_password_required">Password is required</string>
@@ -130,6 +132,8 @@
     <string name="label_dialog_save_article">Save Article</string>
     <string name="label_dialog_discard_setting">Discard Settings</string>
     <string name="label_dialog_save_setting">Save Settings</string>
+    <string name="label_separator_articles">ARTICLES</string>
+    <string name="label_separator_contributors">CONTRIBUTORS</string>
     <string name="label_radio_male">Male</string>
     <string name="label_radio_female">Female</string>
     <string name="label_checkbox_subscribe">Subscribe new articles</string>
@@ -191,6 +195,7 @@
     <string name="action_save_setting">Save Settings</string>
     <string name="action_change">CHANGE</string>
     <string name="action_change_cover">CHANGE COVER</string>
+    <string name="action_view_all">VIEW ALL</string>
 
     <string name="action_long_rate">Give 5 Stars</string>
     <string name="action_long_share">Share Article</string>
@@ -207,7 +212,7 @@
     <string name="about_copyright">© Copyright 2016 Sketch Project Studio</string>
     <string name="about_copyright_owner">All rights reserved by respective owner</string>
     <string name="about_contact_title">Developer Contact</string>
-    <string name="about_contact_content">Mobile (+62) 85655479868\nEmail sketchprojectstudio@gmail.com\nJawa 6 No 5 Jember, East Java - Indonesia</string>
+    <string name="about_contact_content">Mobile (+62) 85655479868\nEmail sketchprojectstudio@gmail.com\nJava 6 No 5 Jember, East Java - Indonesia</string>
     <string name="about_social">Follow our social account</string>
 
     <string name="menu_home">Home</string>
@@ -266,7 +271,7 @@
                 technologically advanced and open to imagination and magic.
                 Surfaces and edges of the material provide visual cues that are grounded in reality. The
                 use of familiar tactile attributes helps users quickly understand affordances. Yet the
-                flexibility of the material creates new affordances that supercede those in the physical
+                flexibility of the material creates new affordances that supersede those in the physical
                 world, without breaking the rules of physics.
                 The fundamentals of light, surface, and movement are key to conveying how objects move,
                 interact, and exist in space and in relation to each other. Realistic lighting shows
@@ -293,7 +298,7 @@
                 All action takes place in a single environment. Objects are presented to the user without
                 breaking the continuity of experience even as they transform and reorganize.
                 Motion is meaningful and appropriate, serving to focus attention and maintain continuity.
-                Feedback is subtle yet clear. Transitions are efﬁcient yet coherent.<br>
+                Feedback is subtle yet clear. Transitions are efficient yet coherent.<br>
 
                 <h4>Light and shadow.</h4>
 
@@ -335,6 +340,10 @@
     <string name="message_try_again">Please try again!</string>
     <string name="message_account_updated">Account successfully updated</string>
     <string name="message_validation_warning">Oops, check your inputs!</string>
+    <string name="message_article_discarded">Article is discarded!</string>
+    <string name="message_article_invalid">Invalid Article Result!</string>
+    <string name="message_article_saved">Article successfully saved!</string>
+    <string name="message_request_timeout">Request server time out</string>
 
     <string name="hint_location">Eg. Jakarta, Indonesia</string>
     <string name="hint_description">Hint. Tell people what is your interest</string>
@@ -342,16 +351,8 @@
     <string name="hint_googleplus">Eg. https://plus.google.com/+infogue</string>
     <string name="hint_twitter">Eg. https://twitter.com/infogue</string>
     <string name="hint_facebook">Eg. https://facebook.com/infogue</string>
-    <string name="action_view_all">VIEW ALL</string>
-    <string name="label_separator_articles">ARTICLES</string>
-    <string name="label_separator_contributors">CONTRIBUTORS</string>
-    <string name="message_request_timeout">Request server time out</string>
 
     <string name="facebook_app_id">577855965712128</string>
     <string name="fb_login_protocol_scheme">fb577855965712128</string>
-    <string name="message_article_discarded">Article is discarded!</string>
-    <string name="message_article_invalid">Invalid Article Result!</string>
-    <string name="message_article_saved">Article successfully saved!</string>
-    <string name="error_no_connection">Failed to connect server</string>
 
 </resources>
