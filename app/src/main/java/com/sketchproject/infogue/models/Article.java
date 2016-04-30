@@ -3,33 +3,35 @@ package com.sketchproject.infogue.models;
 import java.util.List;
 
 /**
+ * Article model data.
+ *
  * Sketch Project Studio
  * Created by Angga on 12/04/2016 22.09.
  */
 public class Article {
-    public static final String ARTICLE_TABLE = "articles";
-    public static final String ARTICLE_ID = "id";
-    public static final String ARTICLE_SLUG = "slug";
-    public static final String ARTICLE_TITLE = "title";
-    public static final String ARTICLE_FEATURED = "featured";
-    public static final String ARTICLE_FEATURED_REF = "featured_ref";
-    public static final String ARTICLE_CATEGORY = "category";
-    public static final String ARTICLE_CATEGORY_ID = "category_id";
-    public static final String ARTICLE_SUBCATEGORY = "subcategory";
-    public static final String ARTICLE_SUBCATEGORY_ID = "subcategory_id";
-    public static final String ARTICLE_CONTENT = "content";
-    public static final String ARTICLE_CONTENT_UPDATE = "content_update";
-    public static final String ARTICLE_EXCERPT = "excerpt";
-    public static final String ARTICLE_PUBLISHED_AT = "published_at";
-    public static final String ARTICLE_CREATED_AT = "created_at";
-    public static final String ARTICLE_TAGS = "tags";
-    public static final String ARTICLE_TAG = "tag";
-    public static final String ARTICLE_VIEW = "view";
-    public static final String ARTICLE_RATING_TOTAL = "total_rating";
-    public static final String ARTICLE_RATING = "rating";
-    public static final String ARTICLE_STATUS = "status";
-    public static final String ARTICLE_FOREIGN = "article_id";
-    public static final String ARTICLE_RATE = "rate";
+    public static final String TABLE = "articles";
+    public static final String ID = "id";
+    public static final String SLUG = "slug";
+    public static final String TITLE = "title";
+    public static final String FEATURED = "featured";
+    public static final String FEATURED_REF = "featured_ref";
+    public static final String CATEGORY = "category";
+    public static final String CATEGORY_ID = "category_id";
+    public static final String SUBCATEGORY = "subcategory";
+    public static final String SUBCATEGORY_ID = "subcategory_id";
+    public static final String CONTENT = "content";
+    public static final String CONTENT_UPDATE = "content_update";
+    public static final String EXCERPT = "excerpt";
+    public static final String PUBLISHED_AT = "published_at";
+    public static final String CREATED_AT = "created_at";
+    public static final String TAGS = "tags";
+    public static final String TAG = "tag";
+    public static final String VIEW = "view";
+    public static final String RATING_TOTAL = "total_rating";
+    public static final String RATING = "rating";
+    public static final String STATUS = "status";
+    public static final String FOREIGN = "article_id";
+    public static final String RATE = "rate";
 
     public static final String STATUS_PENDING = "pending";
     public static final String STATUS_UPDATED = "updated";
@@ -55,7 +57,7 @@ public class Article {
     private String status;
     private int authorId;
 
-    public Article(){
+    public Article() {
 
     }
 

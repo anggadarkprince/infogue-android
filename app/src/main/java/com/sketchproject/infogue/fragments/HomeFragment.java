@@ -12,64 +12,60 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.modules.ObjectPooling;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
+    public static final String ARG_NEW_INSTANCE = "newInstance";
 
     private ViewPager viewPager;
     private TabLayout tabLayout;
-    private ObjectPooling objectPooling = new ObjectPooling();
+    private ViewPagerAdapter adapter;
 
     public HomeFragment() {
         // Required empty public constructor
     }
 
+    public static ArticleFragment newInstance(boolean newInstance) {
+        ArticleFragment fragment = new ArticleFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_NEW_INSTANCE, newInstance);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    /**
+     * Perform initialization of AuthenticationActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            adapter = new ViewPagerAdapter(getChildFragmentManager());
+            adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_LATEST),
+                    ArticleFragment.FEATURED_LATEST.toUpperCase());
+            adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_POPULAR),
+                    ArticleFragment.FEATURED_POPULAR.toUpperCase());
+            adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_TRENDING),
+                    ArticleFragment.FEATURED_TRENDING.toUpperCase());
+        }
     }
 
+    /**
+     * Called after onCreate() and before onCreated()
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate view
+     * @param container          If non-null, this is the parent view that the fragment's
+     *                           UI should be attached to (ApplicationActivity).
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from previous
+     * @return return the view
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
-
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_LATEST), ArticleFragment.FEATURED_LATEST.toUpperCase());
-        adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_POPULAR), ArticleFragment.FEATURED_POPULAR.toUpperCase());
-        adapter.addFragment(ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_TRENDING), ArticleFragment.FEATURED_TRENDING.toUpperCase());
-
-        Fragment fragmentLatest;
-        Object objectFragmentLatest = objectPooling.find(ArticleFragment.FEATURED_LATEST);
-        if (objectFragmentLatest == null) {
-            fragmentLatest = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_LATEST);
-            objectPooling.pool(fragmentLatest, ArticleFragment.FEATURED_LATEST);
-        } else {
-            fragmentLatest = (ArticleFragment) objectFragmentLatest;
-        }
-        //adapter.addFragment(fragmentLatest, ArticleFragment.FEATURED_LATEST.toUpperCase());
-
-        Fragment fragmentPopular;
-        Object objectFragmentPopular = objectPooling.find(ArticleFragment.FEATURED_POPULAR);
-        if (objectFragmentPopular == null) {
-            fragmentPopular = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_POPULAR);
-            objectPooling.pool(fragmentPopular, ArticleFragment.FEATURED_POPULAR);
-        } else {
-            fragmentPopular = (ArticleFragment) objectFragmentPopular;
-        }
-        //adapter.addFragment(fragmentPopular, ArticleFragment.FEATURED_POPULAR.toUpperCase());
-
-        Fragment fragmentTrending;
-        Object objectFragmentTrending = objectPooling.find(ArticleFragment.FEATURED_TRENDING);
-        if (objectFragmentTrending == null) {
-            fragmentTrending = ArticleFragment.newInstanceFeatured(1, ArticleFragment.FEATURED_TRENDING);
-            objectPooling.pool(fragmentPopular, ArticleFragment.FEATURED_TRENDING);
-        } else {
-            fragmentTrending = (ArticleFragment) objectFragmentTrending;
-        }
-        //adapter.addFragment(fragmentTrending, ArticleFragment.FEATURED_TRENDING.toUpperCase());
 
         viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
         viewPager.setAdapter(adapter);
@@ -95,6 +91,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        // setup tab icon
         TabLayout.Tab tab;
         tab = tabLayout.getTabAt(0);
         if (tab != null) {
@@ -111,6 +108,11 @@ public class HomeFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Passed swipe refresh triggered from ApplicationActivity to current pager article content.
+     *
+     * @param swipeRefresh swipe view passed from activity
+     */
     public void homeRefresh(SwipeRefreshLayout swipeRefresh) {
         ViewPagerAdapter section = (ViewPagerAdapter) viewPager.getAdapter();
         ArticleFragment articleFragment = (ArticleFragment) section.getItem(tabLayout.getSelectedTabPosition());

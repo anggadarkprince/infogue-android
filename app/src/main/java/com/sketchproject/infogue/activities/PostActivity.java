@@ -128,9 +128,9 @@ public class PostActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent commentIntent = new Intent(getBaseContext(), CommentActivity.class);
-                    commentIntent.putExtra(Article.ARTICLE_ID, articleId);
-                    commentIntent.putExtra(Article.ARTICLE_SLUG, articleSlug);
-                    commentIntent.putExtra(Article.ARTICLE_TITLE, articleTitle);
+                    commentIntent.putExtra(Article.ID, articleId);
+                    commentIntent.putExtra(Article.SLUG, articleSlug);
+                    commentIntent.putExtra(Article.TITLE, articleTitle);
                     startActivity(commentIntent);
                 }
             });
@@ -141,7 +141,7 @@ public class PostActivity extends AppCompatActivity {
             public void onTagClick(String tag) {
                 Log.i("Infogue/Tag", tag);
                 Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
-                articleIntent.putExtra(Article.ARTICLE_TAG, tag);
+                articleIntent.putExtra(Article.TAG, tag);
                 startActivity(articleIntent);
             }
         });
@@ -176,18 +176,18 @@ public class PostActivity extends AppCompatActivity {
     private void buildArticle() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            articleId = extras.getInt(Article.ARTICLE_ID);
-            articleSlug = extras.getString(Article.ARTICLE_SLUG);
-            articleTitle = extras.getString(Article.ARTICLE_TITLE);
+            articleId = extras.getInt(Article.ID);
+            articleSlug = extras.getString(Article.SLUG);
+            articleTitle = extras.getString(Article.TITLE);
 
             mArticleWrapper.setVisibility(View.GONE);
             Glide.with(getBaseContext())
-                    .load(extras.getString(Article.ARTICLE_FEATURED))
+                    .load(extras.getString(Article.FEATURED))
                     .placeholder(R.drawable.placeholder_rectangle)
                     .centerCrop()
                     .crossFade()
                     .into(mArticleFeatured);
-            mArticleTitle.setText(extras.getString(Article.ARTICLE_TITLE));
+            mArticleTitle.setText(extras.getString(Article.TITLE));
 
             JsonObjectRequest articleRequest = new JsonObjectRequest(Request.Method.GET, APIBuilder.getApiPostUrl(articleSlug, mLoggedId), null,
                     new Response.Listener<JSONObject>() {
@@ -199,25 +199,25 @@ public class PostActivity extends AppCompatActivity {
                                 if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                     JSONObject article = response.getJSONObject("article");
                                     final JSONObject author = article.getJSONObject("contributor");
-                                    JSONObject subcategory = article.getJSONObject(Article.ARTICLE_SUBCATEGORY);
-                                    JSONObject category = subcategory.getJSONObject(Article.ARTICLE_CATEGORY);
-                                    JSONArray tags = article.getJSONArray(Article.ARTICLE_TAGS);
+                                    JSONObject subcategory = article.getJSONObject(Article.SUBCATEGORY);
+                                    JSONObject category = subcategory.getJSONObject(Article.CATEGORY);
+                                    JSONArray tags = article.getJSONArray(Article.TAGS);
 
-                                    mArticleCategory.setText(category.getString(Category.COLUMN_CATEGORY).toUpperCase());
-                                    mArticleContributor.setText(author.getString(Contributor.CONTRIBUTOR_NAME));
-                                    mArticlePublished.setText(article.getString(Article.ARTICLE_CREATED_AT));
-                                    mArticleContent.loadData(Helper.wrapHtmlString(article.getString(Article.ARTICLE_CONTENT)), "text/html", "UTF-8");
-                                    String excerpt = article.getString(Article.ARTICLE_EXCERPT);
+                                    mArticleCategory.setText(category.getString(Category.CATEGORY).toUpperCase());
+                                    mArticleContributor.setText(author.getString(Contributor.NAME));
+                                    mArticlePublished.setText(article.getString(Article.CREATED_AT));
+                                    mArticleContent.loadData(Helper.wrapHtmlString(article.getString(Article.CONTENT)), "text/html", "UTF-8");
+                                    String excerpt = article.getString(Article.EXCERPT);
                                     if (excerpt == null || excerpt.isEmpty()) {
                                         mArticleExcerpt.setVisibility(View.GONE);
                                     } else {
                                         mArticleExcerpt.setVisibility(View.VISIBLE);
-                                        mArticleExcerpt.setText(article.getString(Article.ARTICLE_EXCERPT));
+                                        mArticleExcerpt.setText(article.getString(Article.EXCERPT));
                                     }
 
-                                    String sub = subcategory.getString(Subcategory.COLUMN_SUBCATEGORY);
-                                    int view = article.getInt(Article.ARTICLE_VIEW);
-                                    int stars = article.getInt(Article.ARTICLE_RATING);
+                                    String sub = subcategory.getString(Subcategory.SUBCATEGORY);
+                                    int view = article.getInt(Article.VIEW);
+                                    int stars = article.getInt(Article.RATING);
                                     mArticleDetail.setText(sub + "  |  " + view + "X Views  |  " + stars + " Stars");
                                     mArticleRating.setRating(stars);
                                     switch (stars) {
@@ -249,21 +249,21 @@ public class PostActivity extends AppCompatActivity {
 
                                     List<String> tagList = new ArrayList<>();
                                     for (int i = 0; i < tags.length(); i++) {
-                                        tagList.add(tags.getJSONObject(i).getString(Article.ARTICLE_TAG));
+                                        tagList.add(tags.getJSONObject(i).getString(Article.TAG));
                                     }
                                     mArticleTags.setTags(tagList);
 
-                                    mAuthorId = author.getInt(Contributor.CONTRIBUTOR_ID);
+                                    mAuthorId = author.getInt(Contributor.ID);
                                     Glide.with(getBaseContext())
-                                            .load(author.getString(Contributor.CONTRIBUTOR_AVATAR_REF))
+                                            .load(author.getString(Contributor.AVATAR_REF))
                                             .placeholder(R.drawable.placeholder_square)
                                             .centerCrop()
                                             .dontAnimate()
                                             .into(mContributorAvatar);
-                                    mContributorName.setText(author.getString(Contributor.CONTRIBUTOR_NAME));
-                                    mContributorLocation.setText(author.getString(Contributor.CONTRIBUTOR_LOCATION));
+                                    mContributorName.setText(author.getString(Contributor.NAME));
+                                    mContributorLocation.setText(author.getString(Contributor.LOCATION));
 
-                                    isFollowingAuthor = author.getInt(Contributor.CONTRIBUTOR_IS_FOLLOWING) == 1;
+                                    isFollowingAuthor = author.getInt(Contributor.IS_FOLLOWING) == 1;
                                     if (isFollowingAuthor) {
                                         mContributorFollowButton.setImageResource(R.drawable.btn_unfollow);
                                     } else {
@@ -285,17 +285,17 @@ public class PostActivity extends AppCompatActivity {
                                         public void onClick(View v) {
                                             try {
                                                 Intent profileIntent = new Intent(getBaseContext(), ProfileActivity.class);
-                                                profileIntent.putExtra(SessionManager.KEY_ID, author.getInt(Contributor.CONTRIBUTOR_ID));
-                                                profileIntent.putExtra(SessionManager.KEY_USERNAME, author.getString(Contributor.CONTRIBUTOR_USERNAME));
-                                                profileIntent.putExtra(SessionManager.KEY_NAME, author.getString(Contributor.CONTRIBUTOR_NAME));
-                                                profileIntent.putExtra(SessionManager.KEY_LOCATION, author.getString(Contributor.CONTRIBUTOR_LOCATION));
-                                                profileIntent.putExtra(SessionManager.KEY_ABOUT, author.getString(Contributor.CONTRIBUTOR_ABOUT));
-                                                profileIntent.putExtra(SessionManager.KEY_AVATAR, author.getString(Contributor.CONTRIBUTOR_AVATAR_REF));
-                                                profileIntent.putExtra(SessionManager.KEY_COVER, author.getString(Contributor.CONTRIBUTOR_COVER_REF));
-                                                profileIntent.putExtra(SessionManager.KEY_STATUS, author.getString(Contributor.CONTRIBUTOR_STATUS));
-                                                profileIntent.putExtra(SessionManager.KEY_ARTICLE, author.getInt(Contributor.CONTRIBUTOR_ARTICLE));
-                                                profileIntent.putExtra(SessionManager.KEY_FOLLOWER, author.getInt(Contributor.CONTRIBUTOR_FOLLOWERS));
-                                                profileIntent.putExtra(SessionManager.KEY_FOLLOWING, author.getInt(Contributor.CONTRIBUTOR_FOLLOWING));
+                                                profileIntent.putExtra(SessionManager.KEY_ID, author.getInt(Contributor.ID));
+                                                profileIntent.putExtra(SessionManager.KEY_USERNAME, author.getString(Contributor.USERNAME));
+                                                profileIntent.putExtra(SessionManager.KEY_NAME, author.getString(Contributor.NAME));
+                                                profileIntent.putExtra(SessionManager.KEY_LOCATION, author.getString(Contributor.LOCATION));
+                                                profileIntent.putExtra(SessionManager.KEY_ABOUT, author.getString(Contributor.ABOUT));
+                                                profileIntent.putExtra(SessionManager.KEY_AVATAR, author.getString(Contributor.AVATAR_REF));
+                                                profileIntent.putExtra(SessionManager.KEY_COVER, author.getString(Contributor.COVER_REF));
+                                                profileIntent.putExtra(SessionManager.KEY_STATUS, author.getString(Contributor.STATUS));
+                                                profileIntent.putExtra(SessionManager.KEY_ARTICLE, author.getInt(Contributor.ARTICLE));
+                                                profileIntent.putExtra(SessionManager.KEY_FOLLOWER, author.getInt(Contributor.FOLLOWERS));
+                                                profileIntent.putExtra(SessionManager.KEY_FOLLOWING, author.getInt(Contributor.FOLLOWING));
                                                 profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, isFollowingAuthor);
                                                 startActivityForResult(profileIntent, ProfileActivity.PROFILE_RESULT_CODE);
                                             } catch (JSONException e) {
@@ -540,7 +540,7 @@ public class PostActivity extends AppCompatActivity {
                     @Override
                     protected Map<String, String> getParams() {
                         Map<String, String> params = new HashMap<>();
-                        params.put(Article.ARTICLE_FOREIGN, String.valueOf(articleId));
+                        params.put(Article.FOREIGN, String.valueOf(articleId));
                         return params;
                     }
                 };
@@ -610,8 +610,8 @@ public class PostActivity extends AppCompatActivity {
                 @Override
                 protected Map<String, String> getParams() {
                     Map<String, String> params = new HashMap<>();
-                    params.put(Article.ARTICLE_FOREIGN, String.valueOf(articleId));
-                    params.put(Article.ARTICLE_RATE, String.valueOf((int) rating));
+                    params.put(Article.FOREIGN, String.valueOf(articleId));
+                    params.put(Article.RATE, String.valueOf((int) rating));
                     return params;
                 }
             };
@@ -659,9 +659,9 @@ public class PostActivity extends AppCompatActivity {
             startActivity(browserIntent);
         } else if (id == R.id.action_comment) {
             Intent commentIntent = new Intent(getBaseContext(), CommentActivity.class);
-            commentIntent.putExtra(Article.ARTICLE_ID, articleId);
-            commentIntent.putExtra(Article.ARTICLE_SLUG, articleSlug);
-            commentIntent.putExtra(Article.ARTICLE_TITLE, articleTitle);
+            commentIntent.putExtra(Article.ID, articleId);
+            commentIntent.putExtra(Article.SLUG, articleSlug);
+            commentIntent.putExtra(Article.TITLE, articleTitle);
             startActivity(commentIntent);
         }
 

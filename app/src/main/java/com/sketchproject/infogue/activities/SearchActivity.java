@@ -235,8 +235,8 @@ public class SearchActivity extends AppCompatActivity implements
                     public void onResponse(JSONObject response) {
                         try {
                             String status = response.getString(APIBuilder.RESPONSE_STATUS);
-                            JSONObject contributors = response.getJSONObject(Contributor.CONTRIBUTOR_TABLE);
-                            JSONObject articles = response.getJSONObject(Article.ARTICLE_TABLE);
+                            JSONObject contributors = response.getJSONObject(Contributor.TABLE);
+                            JSONObject articles = response.getJSONObject(Article.TABLE);
 
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 mResultContributor = contributors.getInt("total");
@@ -321,20 +321,20 @@ public class SearchActivity extends AppCompatActivity implements
                 JSONObject contributorData = contributors.getJSONObject(i);
 
                 Contributor contributor = new Contributor();
-                contributor.setId(contributorData.getInt(Contributor.CONTRIBUTOR_ID));
-                contributor.setToken(contributorData.getString(Contributor.CONTRIBUTOR_TOKEN));
-                contributor.setUsername(contributorData.getString(Contributor.CONTRIBUTOR_USERNAME));
-                contributor.setName(contributorData.getString(Contributor.CONTRIBUTOR_NAME));
-                contributor.setEmail(contributorData.getString(Contributor.CONTRIBUTOR_EMAIL));
-                contributor.setLocation(contributorData.getString(Contributor.CONTRIBUTOR_LOCATION));
-                contributor.setAbout(contributorData.getString(Contributor.CONTRIBUTOR_ABOUT));
-                contributor.setAvatar(contributorData.getString(Contributor.CONTRIBUTOR_AVATAR_REF));
-                contributor.setCover(contributorData.getString(Contributor.CONTRIBUTOR_COVER_REF));
-                contributor.setStatus(contributorData.getString(Contributor.CONTRIBUTOR_STATUS));
-                contributor.setArticle(contributorData.getInt(Contributor.CONTRIBUTOR_ARTICLE));
-                contributor.setFollowers(contributorData.getInt(Contributor.CONTRIBUTOR_FOLLOWERS));
-                contributor.setFollowing(contributorData.getInt(Contributor.CONTRIBUTOR_FOLLOWING));
-                contributor.setIsFollowing(contributorData.getInt(Contributor.CONTRIBUTOR_IS_FOLLOWING) == 1);
+                contributor.setId(contributorData.getInt(Contributor.ID));
+                contributor.setToken(contributorData.getString(Contributor.TOKEN));
+                contributor.setUsername(contributorData.getString(Contributor.USERNAME));
+                contributor.setName(contributorData.getString(Contributor.NAME));
+                contributor.setEmail(contributorData.getString(Contributor.EMAIL));
+                contributor.setLocation(contributorData.getString(Contributor.LOCATION));
+                contributor.setAbout(contributorData.getString(Contributor.ABOUT));
+                contributor.setAvatar(contributorData.getString(Contributor.AVATAR_REF));
+                contributor.setCover(contributorData.getString(Contributor.COVER_REF));
+                contributor.setStatus(contributorData.getString(Contributor.STATUS));
+                contributor.setArticle(contributorData.getInt(Contributor.ARTICLE));
+                contributor.setFollowers(contributorData.getInt(Contributor.FOLLOWERS));
+                contributor.setFollowing(contributorData.getInt(Contributor.FOLLOWING));
+                contributor.setIsFollowing(contributorData.getInt(Contributor.IS_FOLLOWING) == 1);
 
                 allContributors.add(contributor);
             }
@@ -382,20 +382,20 @@ public class SearchActivity extends AppCompatActivity implements
                 JSONObject articleData = articles.getJSONObject(i);
 
                 Article article = new Article();
-                article.setId(articleData.getInt(Article.ARTICLE_ID));
-                article.setSlug(articleData.getString(Article.ARTICLE_SLUG));
-                article.setTitle(articleData.getString(Article.ARTICLE_TITLE));
-                article.setFeatured(articleData.getString(Article.ARTICLE_FEATURED_REF));
-                article.setCategoryId(articleData.getInt(Article.ARTICLE_CATEGORY_ID));
-                article.setCategory(articleData.getString(Article.ARTICLE_CATEGORY));
-                article.setSubcategoryId(articleData.getInt(Article.ARTICLE_SUBCATEGORY_ID));
-                article.setSubcategory(articleData.getString(Article.ARTICLE_SUBCATEGORY));
-                article.setContent(articleData.getString(Article.ARTICLE_CONTENT));
-                article.setContentUpdate(articleData.getString(Article.ARTICLE_CONTENT_UPDATE));
-                article.setPublishedAt(articleData.getString(Article.ARTICLE_PUBLISHED_AT));
-                article.setView(articleData.getInt(Article.ARTICLE_VIEW));
-                article.setRating(articleData.getInt(Article.ARTICLE_RATING_TOTAL));
-                article.setStatus(articleData.getString(Article.ARTICLE_STATUS));
+                article.setId(articleData.getInt(Article.ID));
+                article.setSlug(articleData.getString(Article.SLUG));
+                article.setTitle(articleData.getString(Article.TITLE));
+                article.setFeatured(articleData.getString(Article.FEATURED_REF));
+                article.setCategoryId(articleData.getInt(Article.CATEGORY_ID));
+                article.setCategory(articleData.getString(Article.CATEGORY));
+                article.setSubcategoryId(articleData.getInt(Article.SUBCATEGORY_ID));
+                article.setSubcategory(articleData.getString(Article.SUBCATEGORY));
+                article.setContent(articleData.getString(Article.CONTENT));
+                article.setContentUpdate(articleData.getString(Article.CONTENT_UPDATE));
+                article.setPublishedAt(articleData.getString(Article.PUBLISHED_AT));
+                article.setView(articleData.getInt(Article.VIEW));
+                article.setRating(articleData.getInt(Article.RATING_TOTAL));
+                article.setStatus(articleData.getString(Article.STATUS));
 
                 allArticles.add(article);
             }

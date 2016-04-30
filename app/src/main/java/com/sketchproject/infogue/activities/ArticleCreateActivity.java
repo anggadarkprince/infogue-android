@@ -849,15 +849,15 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 @Override
                 protected Map<String, String> getParams() {
                     Map<String, String> params = new HashMap<>();
-                    params.put(Contributor.CONTRIBUTOR_API, session.getSessionData(SessionManager.KEY_TOKEN, null));
-                    params.put(Contributor.CONTRIBUTOR_FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
-                    params.put(Article.ARTICLE_TITLE, article.getTitle());
-                    params.put(Article.ARTICLE_SLUG, article.getSlug());
-                    params.put(Article.ARTICLE_TAGS, TextUtils.join(",", article.getTags()));
-                    params.put(Article.ARTICLE_SUBCATEGORY_ID, String.valueOf(article.getSubcategoryId()));
-                    params.put(Article.ARTICLE_CONTENT, article.getContent());
-                    params.put(Article.ARTICLE_EXCERPT, article.getExcerpt());
-                    params.put(Article.ARTICLE_STATUS, article.getStatus());
+                    params.put(Contributor.TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
+                    params.put(Contributor.FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
+                    params.put(Article.TITLE, article.getTitle());
+                    params.put(Article.SLUG, article.getSlug());
+                    params.put(Article.TAGS, TextUtils.join(",", article.getTags()));
+                    params.put(Article.SUBCATEGORY_ID, String.valueOf(article.getSubcategoryId()));
+                    params.put(Article.CONTENT, article.getContent());
+                    params.put(Article.EXCERPT, article.getExcerpt());
+                    params.put(Article.STATUS, article.getStatus());
                     if (isUpdate) {
                         params.put("_method", "put");
                     }
@@ -869,7 +869,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                     Map<String, DataPart> params = new HashMap<>();
                     if (realPathFeatured != null && !realPathFeatured.isEmpty() && isNewFeatured) {
                         byte[] featuredData = Helper.getFileDataFromDrawable(mFeaturedImage.getDrawable());
-                        params.put(Article.ARTICLE_FEATURED, new DataPart("file_featured.jpg", featuredData, "image/jpeg"));
+                        params.put(Article.FEATURED, new DataPart("file_featured.jpg", featuredData, "image/jpeg"));
                     }
 
                     return params;

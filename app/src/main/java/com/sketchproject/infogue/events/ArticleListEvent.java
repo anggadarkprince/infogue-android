@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
@@ -85,6 +86,8 @@ public class ArticleListEvent {
                         if (networkResponse == null) {
                             if (error.getClass().equals(TimeoutError.class)) {
                                 errorMessage = context.getString(R.string.error_timeout);
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage = context.getString(R.string.error_no_connection);
                             }
                         } else {
                             try {
@@ -114,8 +117,8 @@ public class ArticleListEvent {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put(Article.ARTICLE_FOREIGN, String.valueOf(article.getId()));
-                params.put(Article.ARTICLE_RATE, String.valueOf(5));
+                params.put(Article.FOREIGN, String.valueOf(article.getId()));
+                params.put(Article.RATE, String.valueOf(5));
                 return params;
             }
         };
@@ -155,10 +158,10 @@ public class ArticleListEvent {
      */
     public void viewArticle() {
         Intent postIntent = new Intent(context, PostActivity.class);
-        postIntent.putExtra(Article.ARTICLE_ID, article.getId());
-        postIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
-        postIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
-        postIntent.putExtra(Article.ARTICLE_TITLE, article.getTitle());
+        postIntent.putExtra(Article.ID, article.getId());
+        postIntent.putExtra(Article.SLUG, article.getSlug());
+        postIntent.putExtra(Article.FEATURED, article.getFeatured());
+        postIntent.putExtra(Article.TITLE, article.getTitle());
         context.startActivity(postIntent);
     }
 
@@ -167,9 +170,9 @@ public class ArticleListEvent {
      */
     public void editArticle() {
         Intent editIntent = new Intent(context, ArticleEditActivity.class);
-        editIntent.putExtra(Article.ARTICLE_ID, article.getId());
-        editIntent.putExtra(Article.ARTICLE_SLUG, article.getSlug());
-        editIntent.putExtra(Article.ARTICLE_FEATURED, article.getFeatured());
+        editIntent.putExtra(Article.ID, article.getId());
+        editIntent.putExtra(Article.SLUG, article.getSlug());
+        editIntent.putExtra(Article.FEATURED, article.getFeatured());
         editIntent.putExtra(ArticleCreateActivity.CALLED_FROM_MAIN, false);
         if (context instanceof FragmentActivity) {
             ((FragmentActivity) context).startActivityForResult(editIntent, ArticleCreateActivity.ARTICLE_FORM_CODE);
@@ -293,7 +296,7 @@ public class ArticleListEvent {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 params.put(APIBuilder.METHOD, APIBuilder.METHOD_DELETE);
-                params.put(Contributor.CONTRIBUTOR_API, new SessionManager(context).getSessionData(SessionManager.KEY_TOKEN, null));
+                params.put(Contributor.TOKEN, new SessionManager(context).getSessionData(SessionManager.KEY_TOKEN, null));
                 return params;
             }
         };

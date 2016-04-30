@@ -173,8 +173,8 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            articleId = extras.getInt(Article.ARTICLE_ID);
-            String articleSlug = extras.getString(Article.ARTICLE_SLUG);
+            articleId = extras.getInt(Article.ID);
+            String articleSlug = extras.getString(Article.SLUG);
 
             Fragment fragment = CommentFragment.newInstance(1, articleId, articleSlug);
             FragmentManager fragmentManager = getSupportFragmentManager();

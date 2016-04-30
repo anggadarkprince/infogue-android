@@ -311,20 +311,20 @@ public class ArticleFragment extends Fragment {
                                         for (int i = 0; i < data.length(); i++) {
                                             JSONObject articleData = data.getJSONObject(i);
                                             Article article = new Article();
-                                            article.setId(articleData.getInt(Article.ARTICLE_ID));
-                                            article.setSlug(articleData.getString(Article.ARTICLE_SLUG));
-                                            article.setTitle(articleData.getString(Article.ARTICLE_TITLE));
-                                            article.setFeatured(articleData.getString(Article.ARTICLE_FEATURED_REF));
-                                            article.setCategoryId(articleData.getInt(Article.ARTICLE_CATEGORY_ID));
-                                            article.setCategory(articleData.getString(Article.ARTICLE_CATEGORY));
-                                            article.setSubcategoryId(articleData.getInt(Article.ARTICLE_SUBCATEGORY_ID));
-                                            article.setSubcategory(articleData.getString(Article.ARTICLE_SUBCATEGORY));
-                                            article.setContent(articleData.getString(Article.ARTICLE_CONTENT));
-                                            article.setContentUpdate(articleData.getString(Article.ARTICLE_CONTENT_UPDATE));
-                                            article.setPublishedAt(articleData.getString(Article.ARTICLE_PUBLISHED_AT));
-                                            article.setView(articleData.getInt(Article.ARTICLE_VIEW));
-                                            article.setRating(articleData.getInt(Article.ARTICLE_RATING_TOTAL));
-                                            article.setStatus(articleData.getString(Article.ARTICLE_STATUS));
+                                            article.setId(articleData.getInt(Article.ID));
+                                            article.setSlug(articleData.getString(Article.SLUG));
+                                            article.setTitle(articleData.getString(Article.TITLE));
+                                            article.setFeatured(articleData.getString(Article.FEATURED_REF));
+                                            article.setCategoryId(articleData.getInt(Article.CATEGORY_ID));
+                                            article.setCategory(articleData.getString(Article.CATEGORY));
+                                            article.setSubcategoryId(articleData.getInt(Article.SUBCATEGORY_ID));
+                                            article.setSubcategory(articleData.getString(Article.SUBCATEGORY));
+                                            article.setContent(articleData.getString(Article.CONTENT));
+                                            article.setContentUpdate(articleData.getString(Article.CONTENT_UPDATE));
+                                            article.setPublishedAt(articleData.getString(Article.PUBLISHED_AT));
+                                            article.setView(articleData.getInt(Article.VIEW));
+                                            article.setRating(articleData.getInt(Article.RATING_TOTAL));
+                                            article.setStatus(articleData.getString(Article.STATUS));
                                             moreArticles.add(article);
                                         }
                                     }

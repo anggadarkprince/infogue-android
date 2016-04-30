@@ -21,8 +21,8 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
         SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(Category.COLUMN_ID, data.getId());
-        values.put(Category.COLUMN_CATEGORY, data.getCategory());
+        values.put(Category.ID, data.getId());
+        values.put(Category.CATEGORY, data.getCategory());
 
         long newCategoryId = db.insert(Category.TABLE, null, values);
         db.close();
@@ -35,10 +35,10 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
         SQLiteDatabase db = DatabaseManager.getInstance().getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
-        String[] projection = {Category.COLUMN_ID, Category.COLUMN_CATEGORY};
+        String[] projection = {Category.ID, Category.CATEGORY};
 
         // How we want the results sorted in the resulting Cursor
-        String sortOrder = Category.COLUMN_ID + " ASC";
+        String sortOrder = Category.ID + " ASC";
 
         Cursor cursor = db.query(
                 Category.TABLE,     // The table to query
@@ -56,8 +56,8 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
         if (cursor.moveToFirst()) {
             do {
                 category = new Category();
-                category.setId(cursor.getInt(cursor.getColumnIndexOrThrow(Category.COLUMN_ID)));
-                category.setCategory(cursor.getString(cursor.getColumnIndex(Category.COLUMN_CATEGORY)));
+                category.setId(cursor.getInt(cursor.getColumnIndexOrThrow(Category.ID)));
+                category.setCategory(cursor.getString(cursor.getColumnIndex(Category.CATEGORY)));
                 categoryList.add(category);
             } while (cursor.moveToNext());
         }
@@ -73,16 +73,16 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
         SQLiteDatabase db = DatabaseManager.getInstance().getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
-        String[] projection = {Category.COLUMN_ID, Category.COLUMN_CATEGORY};
+        String[] projection = {Category.ID, Category.CATEGORY};
 
-        String selection = Category.COLUMN_ID + " = ?";
+        String selection = Category.ID + " = ?";
         String[] selectionArgs = {String.valueOf(data.getId())};
 
         Category category = new Category();
         Cursor cursor = db.query(Category.TABLE, projection, selection, selectionArgs, null, null, null);
         if (cursor.moveToFirst()) {
-            category.setId(cursor.getInt(cursor.getColumnIndexOrThrow(Category.COLUMN_ID)));
-            category.setCategory(cursor.getString(cursor.getColumnIndex(Category.COLUMN_CATEGORY)));
+            category.setId(cursor.getInt(cursor.getColumnIndexOrThrow(Category.ID)));
+            category.setCategory(cursor.getString(cursor.getColumnIndex(Category.CATEGORY)));
         }
 
         cursor.close();
@@ -97,11 +97,11 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
 
         // New value for one column
         ContentValues values = new ContentValues();
-        values.put(Category.COLUMN_ID, data.getId());
-        values.put(Category.COLUMN_CATEGORY, data.getCategory());
+        values.put(Category.ID, data.getId());
+        values.put(Category.CATEGORY, data.getCategory());
 
         // Which row to update, based on the ID
-        String selection = Category.COLUMN_ID + " = ?";
+        String selection = Category.ID + " = ?";
         String[] selectionArgs = {String.valueOf(reference)};
 
         int affected = db.update(Category.TABLE, values, selection, selectionArgs);
@@ -114,7 +114,7 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
     public boolean deleteData(Category data) {
         SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
 
-        String selection = Category.COLUMN_ID + " = ?";
+        String selection = Category.ID + " = ?";
         String[] selectionArgs = {String.valueOf(data.getId())};
         int affectedRows = db.delete(Category.TABLE, selection, selectionArgs);
 

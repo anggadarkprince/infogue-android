@@ -1,6 +1,5 @@
 package com.sketchproject.infogue.fragments;
 
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
@@ -18,7 +17,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
@@ -60,13 +61,18 @@ import java.util.Map;
 import io.fabric.sdk.android.Fabric;
 
 /**
- * A simple {@link Fragment} subclass.
+ * A simple {@link Fragment} subclass to handle login screen inside view pager.
+ *
+ * Sketch Project Studio
+ * Created by Angga on 1/04/2016 10.37.
  */
 public class LoginFragment extends Fragment implements Validator.ViewValidation {
-
-    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "Rg1JqRPoxbflYe7XtQGCkcKsw";
     private static final String TWITTER_SECRET = "tVI6dgYF89AHNTkVz3yqywoE9WvjrF4ZVdq2dmk0l2bndLdW9d";
+
+    private static final String VENDOR_MOBILE = "mobile";
+    private static final String VENDOR_FACEBOOK = "facebook";
+    private static final String VENDOR_TWITTER = "twitter";
 
     private Validator validator;
     private AlertFragment alert;
@@ -79,14 +85,22 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
     private TwitterLoginButton loginButtonTwitter;
     private CallbackManager callbackManager;
 
+    private List<String> validationMessage;
     private String username;
     private String password;
-    private List<String> validationMessage;
 
+    /**
+     * Default constructor fragment, triggered when device rotate and first instantiate
+     */
     public LoginFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * Perform initialization of AuthenticationActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +109,14 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         Fabric.with(getContext(), new Twitter(authConfig));
     }
 
+    /**
+     * Init views and preparing login UI.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate view
+     * @param container parent (activity) container
+     * @param savedInstanceState latest instance state
+     * @return View
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         validator = new Validator();
@@ -122,21 +144,23 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                         new GraphRequest.GraphJSONObjectCallback() {
                             @Override
                             public void onCompleted(JSONObject object, GraphResponse response) {
-                                Log.i("Infogue/facebook", response.toString());
+                                Log.i("Infogue/Facebook", response.toString());
 
                                 try {
-                                    String name = object.getString("name");
-                                    String email = object.getString("email");
-                                    String birthday = object.getString("birthday");
-                                    String gender = object.getString("gender");
-                                    String about = object.getString("website");
+                                    Map<String, String> values = new HashMap<>();
+                                    values.put("id", object.getString("id"));
+                                    values.put("name", object.getString("name"));
+                                    values.put("email", object.getString("email"));
+                                    values.put("avatar", object.getJSONObject("picture").getJSONObject("data").getString("url"));
+                                    values.put("cover", object.getJSONObject("cover").getString("source"));
+                                    loginRequest(VENDOR_FACEBOOK, values);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
                         });
                 Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,email,gender,birthday,website");
+                parameters.putString("fields", "id,name,email,gender,birthday,website,picture.height(720),cover");
                 request.setParameters(parameters);
                 request.executeAsync();
             }
@@ -204,14 +228,11 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         return view;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-        loginButtonTwitter.onActivityResult(requestCode, resultCode, data);
-        Log.i("Infogue/twitter", String.valueOf(resultCode));
-    }
-
+    /**
+     * Triggered after parent (activity) created, to make sure UI is accessible.
+     *
+     * @param savedInstanceState latest state if exist
+     */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -224,7 +245,8 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                preValidation();
+                postValidation(onValidateView());
             }
         });
 
@@ -270,9 +292,19 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         alert = (AlertFragment) getChildFragmentManager().findFragmentById(R.id.alert_fragment);
     }
 
-    private void attemptLogin() {
-        preValidation();
-        postValidation(onValidateView());
+    /**
+     * Populate data from oAuth facebook & twitter and passing into their callback.
+     *
+     * @param requestCode code request when oauth activity called
+     * @param resultCode  result state activity
+     * @param data        data from activity called if necessary
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        loginButtonTwitter.onActivityResult(requestCode, resultCode, data);
+        Log.i("Infogue/twitter", String.valueOf(resultCode));
     }
 
     /**
@@ -305,6 +337,9 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                 });
     }
 
+    /**
+     * Placeholder validator method to handle populating inputs.
+     */
     @Override
     public void preValidation() {
         // Store values at the time of the login attempt.
@@ -313,6 +348,11 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         validationMessage = new ArrayList<>();
     }
 
+    /**
+     * Placeholder validator method to handle validation rules.
+     *
+     * @return boolean
+     */
     @Override
     public boolean onValidateView() {
         boolean isInvalid = false;
@@ -337,12 +377,21 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         return !isInvalid;
     }
 
+    /**
+     * Validator placeholder function to handle process after validation.
+     *
+     * @param isValid indicate input form is valid or not
+     */
     @Override
     public void postValidation(boolean isValid) {
         if (isValid) {
             alert.dismiss();
             showProgress(true);
-            loginRequest();
+
+            Map<String, String> values = new HashMap<>();
+            values.put("username", mUsernameView.getText().toString());
+            values.put("password", mPasswordView.getText().toString());
+            loginRequest(VENDOR_MOBILE, values);
         } else {
             alert.setAlertType(AlertFragment.ALERT_WARNING);
             alert.setAlertMessage(validationMessage);
@@ -350,15 +399,26 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         }
     }
 
-    private void loginRequest() {
-        StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_LOGIN,
+    /**
+     * Send login request to server, data depend on the way of user
+     * login (default, facebook, twitter) and catch necessary errors.
+     */
+    private void loginRequest(String vendor, final Map<String, String> values) {
+        String url = APIBuilder.URL_API_LOGIN;
+        if (vendor.equals(VENDOR_FACEBOOK)) {
+            url = APIBuilder.URL_API_OAUTH_FACEBOOK;
+        } else if (vendor.equals(VENDOR_TWITTER)) {
+            url = APIBuilder.URL_API_OAUTH_TWITTER;
+        }
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
                             JSONObject result = new JSONObject(response);
-                            String status = result.getString("status");
-                            String message = result.getString("message");
+                            String status = result.getString(APIBuilder.RESPONSE_STATUS);
+                            String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
                             String login = result.getString("login");
 
                             if (status.equals(Contributor.STATUS_ACTIVATED) && login.equals(APIBuilder.REQUEST_GRANTED)) {
@@ -386,101 +446,114 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                     startActivity(profileIntent);
                                 } else {
                                     alert.setAlertType(AlertFragment.ALERT_DANGER);
-                                    alert.setAlertMessage("Creating session failed");
+                                    alert.setAlertMessage(getString(R.string.error_creating_session));
                                     alert.show();
-                                    showProgress(false);
                                 }
                             } else {
                                 alert.setAlertType(AlertFragment.ALERT_DANGER);
                                 alert.setAlertMessage(message);
                                 alert.show();
-                                showProgress(false);
                             }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        showProgress(false);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        NetworkResponse networkResponse = error.networkResponse;
-                        if (networkResponse != null) {
-                            String result = new String(networkResponse.data);
-                            try {
-                                JSONObject response = new JSONObject(result);
-                                String status = response.getString("status");
-                                String message = response.getString("message");
-                                String login = response.getString("login");
+                        error.printStackTrace();
 
-                                if ((status.equals(APIBuilder.REQUEST_UNREGISTERED) || login.equals(APIBuilder.REQUEST_RESTRICT)) && networkResponse.statusCode == 403) {
-                                    alert.setAlertType(AlertFragment.ALERT_DANGER);
-                                    alert.setAlertMessage(message);
-                                } else if (status.equals(Contributor.STATUS_PENDING) && networkResponse.statusCode == 403) {
-                                    String urlResendEmail = APIBuilder.BASE_URL + "auth/resend/" + response.getString("token");
-                                    alert.setAlertType(AlertFragment.ALERT_WARNING);
-                                    alert.setAlertTitle("Pending");
-                                    alert.setAlertMessage("Account is pending please activate via email.\nResend email activation?\n" + urlResendEmail);
-                                } else if (status.equals(Contributor.STATUS_SUSPENDED) && networkResponse.statusCode == 403) {
-                                    alert.setAlertType(AlertFragment.ALERT_DANGER);
-                                    alert.setAlertTitle("Suspended");
-                                    alert.setAlertMessage("Account is suspended");
+                        NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = getString(R.string.error_unknown);
+                        String errorTitle = "";
+                        int type = AlertFragment.ALERT_DANGER;
+                        if (networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                errorMessage = getString(R.string.error_timeout);
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage = getString(R.string.error_no_connection);
+                            }
+                        } else {
+                            try {
+                                String result = new String(networkResponse.data);
+                                JSONObject response = new JSONObject(result);
+                                String status = response.optString(APIBuilder.RESPONSE_STATUS);
+                                String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
+                                String login = response.optString("login");
+
+                                if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    errorMessage = getString(R.string.error_server);
+                                } else if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                    errorMessage = getString(R.string.error_not_found);
+                                } else if ((status.equals(APIBuilder.REQUEST_UNREGISTERED) || login.equals(APIBuilder.REQUEST_RESTRICT)) && networkResponse.statusCode == 403) {
+                                    errorMessage = message; // mismatch
+                                    if (status.equals(Contributor.STATUS_PENDING)) { // turns out pending
+                                        String urlResendEmail = APIBuilder.BASE_URL + "auth/resend/" + response.getString("token");
+                                        type = AlertFragment.ALERT_WARNING;
+                                        errorMessage = "Account is pending please activate via email.\n\rResend email activation?\n\r" + urlResendEmail;
+                                        errorTitle = "Pending";
+                                    } else if (status.equals(Contributor.STATUS_SUSPENDED)) { // turns out suspended
+                                        errorTitle = "Suspended";
+                                        errorMessage = "Account is suspended";
+                                    }
                                 } else if (login.equals(APIBuilder.REQUEST_MISMATCH) && networkResponse.statusCode == 401) {
-                                    alert.setAlertType(AlertFragment.ALERT_DANGER);
-                                    alert.setAlertMessage(message);
-                                } else {
-                                    alert.setAlertType(AlertFragment.ALERT_DANGER);
-                                    alert.setAlertMessage(message);
+                                    errorMessage = getString(R.string.error_unauthorized);
+                                } else if (status.equals(APIBuilder.REQUEST_EXIST) && networkResponse.statusCode == 400) {
+                                    errorMessage = message; // catch credentials exist when using oAuth
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                        } else {
-                            alert.setAlertType(AlertFragment.ALERT_DANGER);
-                            if (error.getClass().equals(TimeoutError.class)) {
-                                alert.setAlertMessage(getString(R.string.error_timeout));
-                            }
-                            else{
-                                alert.setAlertMessage(getString(R.string.error_unknown));
-                            }
                         }
+
+                        alert.setAlertType(type);
+                        if (!errorTitle.isEmpty()) {
+                            alert.setAlertTitle(errorTitle);
+                        }
+                        alert.setAlertMessage(errorMessage);
                         alert.show();
 
                         showProgress(false);
-                        error.printStackTrace();
                     }
                 }
         ) {
             @Override
             protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("username", mUsernameView.getText().toString());
-                params.put("password", mPasswordView.getText().toString());
+                Map<String, String> params;
+                params = values;
                 return params;
             }
         };
 
-        // Access the RequestQueue through your singleton class.
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(15000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getContext()).addToRequestQueue(postRequest);
     }
 
+    /**
+     * Populate and mapping data into session.
+     *
+     * @param result result of login data
+     * @return boolean
+     */
     private boolean populateSessionData(JSONObject result) {
         SessionManager sessionManager = new SessionManager(getActivity().getBaseContext());
         HashMap<String, Object> user = new HashMap<>();
         try {
-            user.put(SessionManager.KEY_ID, result.getInt("id"));
-            user.put(SessionManager.KEY_TOKEN, result.getString("api_token"));
-            user.put(SessionManager.KEY_USERNAME, result.getString("username"));
-            user.put(SessionManager.KEY_NAME, result.getString("name"));
-            user.put(SessionManager.KEY_LOCATION, result.getString("location"));
-            user.put(SessionManager.KEY_ABOUT, result.getString("about"));
-            user.put(SessionManager.KEY_AVATAR, result.getString("avatar_ref"));
-            user.put(SessionManager.KEY_COVER, result.getString("cover_ref"));
-            user.put(SessionManager.KEY_STATUS, result.getString("status"));
-            user.put(SessionManager.KEY_ARTICLE, result.getInt("article_total"));
-            user.put(SessionManager.KEY_FOLLOWER, result.getInt("followers_total"));
-            user.put(SessionManager.KEY_FOLLOWING, result.getInt("following_total"));
+            user.put(SessionManager.KEY_ID, result.getInt(Contributor.ID));
+            user.put(SessionManager.KEY_TOKEN, result.getString(Contributor.TOKEN));
+            user.put(SessionManager.KEY_USERNAME, result.getString(Contributor.USERNAME));
+            user.put(SessionManager.KEY_NAME, result.getString(Contributor.NAME));
+            user.put(SessionManager.KEY_LOCATION, result.getString(Contributor.LOCATION));
+            user.put(SessionManager.KEY_ABOUT, result.getString(Contributor.ABOUT));
+            user.put(SessionManager.KEY_AVATAR, result.getString(Contributor.AVATAR_REF));
+            user.put(SessionManager.KEY_COVER, result.getString(Contributor.COVER_REF));
+            user.put(SessionManager.KEY_STATUS, result.getString(Contributor.STATUS));
+            user.put(SessionManager.KEY_ARTICLE, result.getInt(Contributor.ARTICLE));
+            user.put(SessionManager.KEY_FOLLOWER, result.getInt(Contributor.FOLLOWERS));
+            user.put(SessionManager.KEY_FOLLOWING, result.getInt(Contributor.FOLLOWING));
             return sessionManager.createLoginSession(user);
         } catch (JSONException e) {
             e.printStackTrace();

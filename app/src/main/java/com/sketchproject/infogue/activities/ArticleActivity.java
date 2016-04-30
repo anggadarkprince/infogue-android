@@ -1,7 +1,5 @@
 package com.sketchproject.infogue.activities;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,7 +24,6 @@ import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.utils.APIBuilder;
-import com.sketchproject.infogue.utils.Helper;
 
 public class ArticleActivity extends AppCompatActivity implements
         ArticleFragment.OnArticleInteractionListener,
@@ -60,7 +57,7 @@ public class ArticleActivity extends AppCompatActivity implements
             int authorId = extras.getInt(SessionManager.KEY_ID);
             String authorUsername = extras.getString(SessionManager.KEY_USERNAME);
             String query = extras.getString(SearchActivity.QUERY_STRING);
-            String tag = extras.getString(Article.ARTICLE_TAG);
+            String tag = extras.getString(Article.TAG);
 
             // set actionbar title and subtitle (if needed)
             if (getSupportActionBar() != null) {

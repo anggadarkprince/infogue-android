@@ -596,35 +596,35 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
 
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 Glide.clear(mAvatarImage);
-                                Glide.with(getBaseContext()).load(contributor.getString(Contributor.CONTRIBUTOR_AVATAR_REF))
+                                Glide.with(getBaseContext()).load(contributor.getString(Contributor.AVATAR_REF))
                                         .placeholder(R.drawable.placeholder_square)
                                         .centerCrop()
                                         .crossFade()
                                         .into(mAvatarImage);
                                 Glide.clear(mCoverImage);
-                                Glide.with(getBaseContext()).load(contributor.getString(Contributor.CONTRIBUTOR_COVER_REF))
+                                Glide.with(getBaseContext()).load(contributor.getString(Contributor.COVER_REF))
                                         .placeholder(R.drawable.placeholder_rectangle)
                                         .centerCrop()
                                         .crossFade()
                                         .into(mCoverImage);
-                                mNameInput.setText(contributor.getString(Contributor.CONTRIBUTOR_NAME));
-                                mLocationInput.setText(contributor.getString(Contributor.CONTRIBUTOR_LOCATION));
-                                mAboutInput.setText(contributor.getString(Contributor.CONTRIBUTOR_ABOUT));
-                                mContact.setText(contributor.getString(Contributor.CONTRIBUTOR_CONTACT));
-                                mGenderMaleRadio.setChecked(contributor.getString(Contributor.CONTRIBUTOR_GENDER).equals(Contributor.GENDER_MALE));
-                                mGenderFemaleRadio.setChecked(contributor.getString(Contributor.CONTRIBUTOR_GENDER).equals(Contributor.GENDER_FEMALE));
-                                mBirthdayInput.setText(contributor.getString(Contributor.CONTRIBUTOR_BIRTHDAY));
-                                mFacebookInput.setText(contributor.getString(Contributor.CONTRIBUTOR_FACEBOOK));
-                                mTwitterInput.setText(contributor.getString(Contributor.CONTRIBUTOR_TWITTER));
-                                mGooglePlusInput.setText(contributor.getString(Contributor.CONTRIBUTOR_GOOGLE_PLUS));
-                                mInstagramInput.setText(contributor.getString(Contributor.CONTRIBUTOR_INSTAGRAM));
-                                mNotificationSubscribeCheck.setChecked(contributor.getInt(Contributor.CONTRIBUTOR_SUBSCRIPTION) == 1);
-                                mNotificationMessageCheck.setChecked(contributor.getInt(Contributor.CONTRIBUTOR_MESSAGE) == 1);
-                                mNotificationFollowerCheck.setChecked(contributor.getInt(Contributor.CONTRIBUTOR_FOLLOWER) == 1);
-                                mNotificationStreamCheck.setChecked(contributor.getInt(Contributor.CONTRIBUTOR_FEED) == 1);
-                                mPushNotificationSwitch.setChecked(contributor.getInt(Contributor.CONTRIBUTOR_MOBILE) == 1);
-                                mUsernameInput.setText(contributor.getString(Contributor.CONTRIBUTOR_USERNAME));
-                                mEmailInput.setText(contributor.getString(Contributor.CONTRIBUTOR_EMAIL));
+                                mNameInput.setText(contributor.getString(Contributor.NAME));
+                                mLocationInput.setText(contributor.getString(Contributor.LOCATION));
+                                mAboutInput.setText(contributor.getString(Contributor.ABOUT));
+                                mContact.setText(contributor.getString(Contributor.CONTACT));
+                                mGenderMaleRadio.setChecked(contributor.getString(Contributor.GENDER).equals(Contributor.GENDER_MALE));
+                                mGenderFemaleRadio.setChecked(contributor.getString(Contributor.GENDER).equals(Contributor.GENDER_FEMALE));
+                                mBirthdayInput.setText(contributor.getString(Contributor.BIRTHDAY));
+                                mFacebookInput.setText(contributor.getString(Contributor.FACEBOOK));
+                                mTwitterInput.setText(contributor.getString(Contributor.TWITTER));
+                                mGooglePlusInput.setText(contributor.getString(Contributor.GOOGLE_PLUS));
+                                mInstagramInput.setText(contributor.getString(Contributor.INSTAGRAM));
+                                mNotificationSubscribeCheck.setChecked(contributor.getInt(Contributor.SUBSCRIPTION) == 1);
+                                mNotificationMessageCheck.setChecked(contributor.getInt(Contributor.MESSAGE) == 1);
+                                mNotificationFollowerCheck.setChecked(contributor.getInt(Contributor.FOLLOWER) == 1);
+                                mNotificationStreamCheck.setChecked(contributor.getInt(Contributor.FEED) == 1);
+                                mPushNotificationSwitch.setChecked(contributor.getInt(Contributor.MOBILE) == 1);
+                                mUsernameInput.setText(contributor.getString(Contributor.USERNAME));
+                                mEmailInput.setText(contributor.getString(Contributor.EMAIL));
                             } else {
                                 Log.w("Infogue/Profile", getString(R.string.error_unknown));
                                 Helper.toastColor(getBaseContext(), getString(R.string.error_unknown), Color.parseColor("#ddd1205e"));
@@ -737,12 +737,12 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                             alert.setAlertMessage(message);
                             mIsSaved = true;
 
-                            session.setSessionData(SessionManager.KEY_NAME, contributorUpdated.getString(Contributor.CONTRIBUTOR_NAME));
-                            session.setSessionData(SessionManager.KEY_USERNAME, contributorUpdated.getString(Contributor.CONTRIBUTOR_USERNAME));
-                            session.setSessionData(SessionManager.KEY_LOCATION, contributorUpdated.getString(Contributor.CONTRIBUTOR_LOCATION));
-                            session.setSessionData(SessionManager.KEY_ABOUT, contributorUpdated.getString(Contributor.CONTRIBUTOR_ABOUT));
-                            session.setSessionData(SessionManager.KEY_AVATAR, contributorUpdated.getString(Contributor.CONTRIBUTOR_AVATAR_REF));
-                            session.setSessionData(SessionManager.KEY_COVER, contributorUpdated.getString(Contributor.CONTRIBUTOR_COVER_REF));
+                            session.setSessionData(SessionManager.KEY_NAME, contributorUpdated.getString(Contributor.NAME));
+                            session.setSessionData(SessionManager.KEY_USERNAME, contributorUpdated.getString(Contributor.USERNAME));
+                            session.setSessionData(SessionManager.KEY_LOCATION, contributorUpdated.getString(Contributor.LOCATION));
+                            session.setSessionData(SessionManager.KEY_ABOUT, contributorUpdated.getString(Contributor.ABOUT));
+                            session.setSessionData(SessionManager.KEY_AVATAR, contributorUpdated.getString(Contributor.AVATAR_REF));
+                            session.setSessionData(SessionManager.KEY_COVER, contributorUpdated.getString(Contributor.COVER_REF));
                         } else {
                             alert.setAlertType(AlertFragment.ALERT_INFO);
                             alert.setAlertMessage(getString(R.string.error_unknown));
@@ -805,27 +805,27 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                 protected Map<String, String> getParams() {
                     Map<String, String> params = new HashMap<>();
                     params.put("_method", "put");
-                    params.put(Contributor.CONTRIBUTOR_API, session.getSessionData(SessionManager.KEY_TOKEN, null));
-                    params.put(Contributor.CONTRIBUTOR_FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
-                    params.put(Contributor.CONTRIBUTOR_NAME, contributor.getName());
-                    params.put(Contributor.CONTRIBUTOR_LOCATION, contributor.getLocation());
-                    params.put(Contributor.CONTRIBUTOR_ABOUT, contributor.getAbout());
-                    params.put(Contributor.CONTRIBUTOR_CONTACT, contributor.getContact());
-                    params.put(Contributor.CONTRIBUTOR_GENDER, contributor.getGender());
-                    params.put(Contributor.CONTRIBUTOR_BIRTHDAY, new SimpleDateFormat("yyyy-mm-dd", Locale.getDefault()).format(contributor.getBirthday()));
-                    params.put(Contributor.CONTRIBUTOR_FACEBOOK, contributor.getFacebook());
-                    params.put(Contributor.CONTRIBUTOR_TWITTER, contributor.getTwitter());
-                    params.put(Contributor.CONTRIBUTOR_GOOGLE_PLUS, contributor.getGooglePlus());
-                    params.put(Contributor.CONTRIBUTOR_INSTAGRAM, contributor.getInstagram());
-                    params.put(Contributor.CONTRIBUTOR_EMAIL, contributor.getEmail());
-                    params.put(Contributor.CONTRIBUTOR_USERNAME, contributor.getUsername());
-                    params.put(Contributor.CONTRIBUTOR_SUBSCRIPTION, String.valueOf(contributor.isNotificationSubscribe() ? 1 : 0));
-                    params.put(Contributor.CONTRIBUTOR_MESSAGE, String.valueOf(contributor.isNotificationMessage() ? 1 : 0));
-                    params.put(Contributor.CONTRIBUTOR_FOLLOWER, String.valueOf(contributor.isNotificationFollower() ? 1 : 0));
-                    params.put(Contributor.CONTRIBUTOR_FEED, String.valueOf(contributor.isNotificationStream() ? 1 : 0));
-                    params.put(Contributor.CONTRIBUTOR_MOBILE, String.valueOf(contributor.isPushNotification() ? 1 : 0));
-                    params.put(Contributor.CONTRIBUTOR_PASSWORD, String.valueOf(contributor.getPassword()));
-                    params.put(Contributor.CONTRIBUTOR_NEW_PASSWORD, String.valueOf(contributor.getNewPassword()));
+                    params.put(Contributor.TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
+                    params.put(Contributor.FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
+                    params.put(Contributor.NAME, contributor.getName());
+                    params.put(Contributor.LOCATION, contributor.getLocation());
+                    params.put(Contributor.ABOUT, contributor.getAbout());
+                    params.put(Contributor.CONTACT, contributor.getContact());
+                    params.put(Contributor.GENDER, contributor.getGender());
+                    params.put(Contributor.BIRTHDAY, new SimpleDateFormat("yyyy-mm-dd", Locale.getDefault()).format(contributor.getBirthday()));
+                    params.put(Contributor.FACEBOOK, contributor.getFacebook());
+                    params.put(Contributor.TWITTER, contributor.getTwitter());
+                    params.put(Contributor.GOOGLE_PLUS, contributor.getGooglePlus());
+                    params.put(Contributor.INSTAGRAM, contributor.getInstagram());
+                    params.put(Contributor.EMAIL, contributor.getEmail());
+                    params.put(Contributor.USERNAME, contributor.getUsername());
+                    params.put(Contributor.SUBSCRIPTION, String.valueOf(contributor.isNotificationSubscribe() ? 1 : 0));
+                    params.put(Contributor.MESSAGE, String.valueOf(contributor.isNotificationMessage() ? 1 : 0));
+                    params.put(Contributor.FOLLOWER, String.valueOf(contributor.isNotificationFollower() ? 1 : 0));
+                    params.put(Contributor.FEED, String.valueOf(contributor.isNotificationStream() ? 1 : 0));
+                    params.put(Contributor.MOBILE, String.valueOf(contributor.isPushNotification() ? 1 : 0));
+                    params.put(Contributor.PASSWORD, String.valueOf(contributor.getPassword()));
+                    params.put(Contributor.NEW_PASSWORD, String.valueOf(contributor.getNewPassword()));
                     return params;
                 }
 
@@ -833,10 +833,10 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                 protected Map<String, DataPart> getByteData() {
                     Map<String, DataPart> params = new HashMap<>();
                     if (mRealPathAvatar != null && !mRealPathAvatar.trim().isEmpty()) {
-                        params.put(Contributor.CONTRIBUTOR_AVATAR, new DataPart("file_avatar.jpg", Helper.getFileDataFromDrawable(mAvatarImage.getDrawable()), "image/jpeg"));
+                        params.put(Contributor.AVATAR, new DataPart("file_avatar.jpg", Helper.getFileDataFromDrawable(mAvatarImage.getDrawable()), "image/jpeg"));
                     }
                     if (mRealPathCover != null && !mRealPathCover.trim().isEmpty()) {
-                        params.put(Contributor.CONTRIBUTOR_COVER, new DataPart("file_cover.jpg", Helper.getFileDataFromDrawable(mCoverImage.getDrawable()), "image/jpeg"));
+                        params.put(Contributor.COVER, new DataPart("file_cover.jpg", Helper.getFileDataFromDrawable(mCoverImage.getDrawable()), "image/jpeg"));
                     }
 
                     return params;

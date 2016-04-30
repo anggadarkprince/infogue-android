@@ -1,15 +1,17 @@
 package com.sketchproject.infogue.models;
 
 /**
+ * Subcategory model data.
+ *
  * Sketch Project Studio
  * Created by Angga on 24/04/2016 09.20.
  */
 public class Subcategory {
     public static final String TABLE = "subcategories";
-    public static final String COLUMN_ID = "id";
-    public static final String COLUMN_CATEGORY_ID = "category_id";
-    public static final String COLUMN_SUBCATEGORY = "subcategory";
-    public static final String COLUMN_LABEL = "label";
+    public static final String ID = "id";
+    public static final String CATEGORY_ID = "category_id";
+    public static final String SUBCATEGORY = "subcategory";
+    public static final String LABEL = "label";
 
     private int id;
     private int category_id;

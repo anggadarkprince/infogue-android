@@ -3,43 +3,44 @@ package com.sketchproject.infogue.models;
 import java.util.Date;
 
 /**
+ * Contributor model data.
+ *
  * Sketch Project Studio
  * Created by Angga on 10/04/2016 21.32.
  */
 public class Contributor {
-    public static final String CONTRIBUTOR_TABLE = "contributors";
-    public static final String CONTRIBUTOR_ID = "id";
-    public static final String CONTRIBUTOR_FOREIGN = "contributor_id";
-    public static final String CONTRIBUTOR_API = "api_token";
-    public static final String CONTRIBUTOR_TOKEN = "api_token";
-    public static final String CONTRIBUTOR_USERNAME = "username";
-    public static final String CONTRIBUTOR_EMAIL = "email";
-    public static final String CONTRIBUTOR_NAME = "name";
-    public static final String CONTRIBUTOR_LOCATION = "location";
-    public static final String CONTRIBUTOR_ABOUT = "about";
-    public static final String CONTRIBUTOR_CONTACT = "contact";
-    public static final String CONTRIBUTOR_GENDER = "gender";
-    public static final String CONTRIBUTOR_BIRTHDAY = "birthday";
-    public static final String CONTRIBUTOR_FACEBOOK = "facebook";
-    public static final String CONTRIBUTOR_TWITTER = "twitter";
-    public static final String CONTRIBUTOR_GOOGLE_PLUS = "googleplus";
-    public static final String CONTRIBUTOR_INSTAGRAM = "instagram";
-    public static final String CONTRIBUTOR_SUBSCRIPTION = "email_subscription";
-    public static final String CONTRIBUTOR_MESSAGE = "email_message";
-    public static final String CONTRIBUTOR_FOLLOWER = "email_follow";
-    public static final String CONTRIBUTOR_FEED = "email_feed";
-    public static final String CONTRIBUTOR_MOBILE = "mobile_notification";
-    public static final String CONTRIBUTOR_AVATAR = "avatar";
-    public static final String CONTRIBUTOR_AVATAR_REF = "avatar_ref";
-    public static final String CONTRIBUTOR_COVER = "cover";
-    public static final String CONTRIBUTOR_COVER_REF = "cover_ref";
-    public static final String CONTRIBUTOR_STATUS = "status";
-    public static final String CONTRIBUTOR_ARTICLE = "article_total";
-    public static final String CONTRIBUTOR_FOLLOWERS = "followers_total";
-    public static final String CONTRIBUTOR_FOLLOWING = "following_total";
-    public static final String CONTRIBUTOR_IS_FOLLOWING = "is_following";
-    public static final String CONTRIBUTOR_PASSWORD = "password";
-    public static final String CONTRIBUTOR_NEW_PASSWORD = "new_password";
+    public static final String TABLE = "contributors";
+    public static final String ID = "id";
+    public static final String FOREIGN = "contributor_id";
+    public static final String TOKEN = "api_token";
+    public static final String USERNAME = "username";
+    public static final String EMAIL = "email";
+    public static final String NAME = "name";
+    public static final String LOCATION = "location";
+    public static final String ABOUT = "about";
+    public static final String CONTACT = "contact";
+    public static final String GENDER = "gender";
+    public static final String BIRTHDAY = "birthday";
+    public static final String FACEBOOK = "facebook";
+    public static final String TWITTER = "twitter";
+    public static final String GOOGLE_PLUS = "googleplus";
+    public static final String INSTAGRAM = "instagram";
+    public static final String SUBSCRIPTION = "email_subscription";
+    public static final String MESSAGE = "email_message";
+    public static final String FOLLOWER = "email_follow";
+    public static final String FEED = "email_feed";
+    public static final String MOBILE = "mobile_notification";
+    public static final String AVATAR = "avatar";
+    public static final String AVATAR_REF = "avatar_ref";
+    public static final String COVER = "cover";
+    public static final String COVER_REF = "cover_ref";
+    public static final String STATUS = "status";
+    public static final String ARTICLE = "article_total";
+    public static final String FOLLOWERS = "followers_total";
+    public static final String FOLLOWING = "following_total";
+    public static final String IS_FOLLOWING = "is_following";
+    public static final String PASSWORD = "password";
+    public static final String NEW_PASSWORD = "new_password";
 
     public static final String GENDER_MALE = "male";
     public static final String GENDER_FEMALE = "female";
@@ -78,7 +79,7 @@ public class Contributor {
     private int following;
     private boolean isFollowing;
 
-    public Contributor(){
+    public Contributor() {
 
     }
 

@@ -200,8 +200,8 @@ public class ApplicationActivity extends AppCompatActivity implements
                                     JSONObject categoryObject = categories.getJSONObject(i);
 
                                     Category category = new Category();
-                                    category.setId(categoryObject.getInt(Category.COLUMN_ID));
-                                    category.setCategory(categoryObject.getString(Category.COLUMN_CATEGORY));
+                                    category.setId(categoryObject.getInt(Category.ID));
+                                    category.setCategory(categoryObject.getString(Category.CATEGORY));
 
                                     categoryRepository.createData(category);
 
@@ -210,10 +210,10 @@ public class ApplicationActivity extends AppCompatActivity implements
                                         JSONObject subcategoryObject = subcategories.getJSONObject(j);
 
                                         Subcategory subcategory = new Subcategory();
-                                        subcategory.setId(subcategoryObject.getInt(Subcategory.COLUMN_ID));
-                                        subcategory.setCategoryId(subcategoryObject.getInt(Subcategory.COLUMN_CATEGORY_ID));
-                                        subcategory.setSubcategory(subcategoryObject.getString(Subcategory.COLUMN_SUBCATEGORY));
-                                        subcategory.setLabel(subcategoryObject.getString(Subcategory.COLUMN_LABEL));
+                                        subcategory.setId(subcategoryObject.getInt(Subcategory.ID));
+                                        subcategory.setCategoryId(subcategoryObject.getInt(Subcategory.CATEGORY_ID));
+                                        subcategory.setSubcategory(subcategoryObject.getString(Subcategory.SUBCATEGORY));
+                                        subcategory.setLabel(subcategoryObject.getString(Subcategory.LABEL));
 
                                         subcategoryRepository.createData(subcategory);
                                     }
@@ -766,10 +766,10 @@ public class ApplicationActivity extends AppCompatActivity implements
             startActivity(aboutActivity);
         } else {
             if (id == R.id.nav_home) {
-                Object objectFragment = objectPooling.find("home");
+                Object objectFragment = objectPooling.find(getString(R.string.app_name));
                 if (objectFragment == null) {
-                    fragment = new HomeFragment();
-                    objectPooling.pool(fragment, "home");
+                    fragment = HomeFragment.newInstance(true);
+                    objectPooling.pool(fragment, getString(R.string.app_name));
                 } else {
                     fragment = (HomeFragment) objectFragment;
                 }

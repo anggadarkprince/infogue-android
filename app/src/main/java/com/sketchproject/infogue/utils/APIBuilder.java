@@ -20,6 +20,8 @@ public class APIBuilder {
     public static final String URL_API_CATEGORY = BASE_URL_API + "category";
     public static final String URL_API_SETTING = BASE_URL_API + "account";
     public static final String URL_API_LOGIN = BASE_URL_API + "account/login";
+    public static final String URL_API_OAUTH_FACEBOOK = BASE_URL_API + "oauth/facebook";
+    public static final String URL_API_OAUTH_TWITTER = BASE_URL_API + "oauth/twitter";
     public static final String URL_API_REGISTER = BASE_URL_API + "account/register";
 
     public static final String URL_APP = "http://play.google.com/store/apps/details?id=com.sketchproject.infogue";

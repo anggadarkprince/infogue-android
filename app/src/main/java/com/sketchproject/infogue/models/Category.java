@@ -1,13 +1,15 @@
 package com.sketchproject.infogue.models;
 
 /**
+ * Category model data.
+ * 
  * Sketch Project Studio
  * Created by Angga on 24/04/2016 09.16.
  */
 public class Category {
     public static final String TABLE = "categories";
-    public static final String COLUMN_ID = "id";
-    public static final String COLUMN_CATEGORY = "category";
+    public static final String ID = "id";
+    public static final String CATEGORY = "category";
 
     private int id;
     private String category;

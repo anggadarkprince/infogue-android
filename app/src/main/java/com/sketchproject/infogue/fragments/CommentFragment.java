@@ -170,14 +170,14 @@ public class CommentFragment extends Fragment {
                                             JSONObject commentData = data.getJSONObject(i);
 
                                             Comment comment = new Comment();
-                                            comment.setId(commentData.getInt(Comment.COMMENT_ID));
-                                            comment.setContributorId(commentData.getInt(Comment.COMMENT_CONTRIBUTOR_ID));
-                                            comment.setArticleId(commentData.getInt(Comment.COMMENT_ARTICLE_ID));
-                                            comment.setUsername(commentData.getString(Comment.COMMENT_USERNAME));
-                                            comment.setName(commentData.getString(Comment.COMMENT_NAME));
-                                            comment.setComment(commentData.getString(Comment.COMMENT_CONTENT));
-                                            comment.setAvatar(commentData.getString(Comment.COMMENT_AVATAR));
-                                            comment.setTimestamp(commentData.getString(Comment.COMMENT_TIMESTAMP));
+                                            comment.setId(commentData.getInt(Comment.ID));
+                                            comment.setContributorId(commentData.getInt(Comment.CONTRIBUTOR_ID));
+                                            comment.setArticleId(commentData.getInt(Comment.ARTICLE_ID));
+                                            comment.setUsername(commentData.getString(Comment.USERNAME));
+                                            comment.setName(commentData.getString(Comment.NAME));
+                                            comment.setComment(commentData.getString(Comment.CONTENT));
+                                            comment.setAvatar(commentData.getString(Comment.AVATAR));
+                                            comment.setTimestamp(commentData.getString(Comment.TIMESTAMP));
                                             moreComments.add(comment);
                                         }
                                     }

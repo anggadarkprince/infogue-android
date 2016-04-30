@@ -17,13 +17,13 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "Infogue.db";
 
     private static final String SQL_CREATE_CATEGORY = "CREATE TABLE " + Category.TABLE + " (" +
-            Category.COLUMN_ID + " INTEGER PRIMARY KEY," +
-            Category.COLUMN_CATEGORY + " TEXT)";
+            Category.ID + " INTEGER PRIMARY KEY," +
+            Category.CATEGORY + " TEXT)";
     private static final String SQL_CREATE_SUBCATEGORY = "CREATE TABLE " + Subcategory.TABLE + " (" +
-            Subcategory.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            Subcategory.COLUMN_CATEGORY_ID + " INTEGER," +
-            Subcategory.COLUMN_SUBCATEGORY + " TEXT," +
-            Subcategory.COLUMN_LABEL + " TEXT)";
+            Subcategory.ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            Subcategory.CATEGORY_ID + " INTEGER," +
+            Subcategory.SUBCATEGORY + " TEXT," +
+            Subcategory.LABEL + " TEXT)";
 
     private static final String SQL_DROP_CATEGORY = "DROP TABLE IF EXISTS " + Category.TABLE;
     private static final String SQL_DROP_SUBCATEGORY = "DROP TABLE IF EXISTS " + Subcategory.TABLE;

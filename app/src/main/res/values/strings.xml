@@ -47,6 +47,7 @@
     <string name="error_no_connection">Failed to connect server</string>
     <string name="error_parse_data">Error parse data</string>
     <string name="error_maintenance">Server currently still maintenance</string>
+    <string name="error_creating_session">Creating session failed</string>
     <string name="error_password_required">Password is required</string>
     <string name="error_password_range">Password must be 6 to 20 characters</string>
     <string name="error_password_confirmed">New Password must be confirmed</string>
@@ -147,6 +148,7 @@
     <string name="label_retrieve_setting_progress">Retrieving account data</string>
     <string name="label_retrieve_category_progress">Downloading Category Menu</string>
     <string name="label_retrieve_article_progress">Loading Article Data</string>
+    <string name="label_registration_complete">Registration Complete</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -344,6 +346,7 @@
     <string name="message_article_invalid">Invalid Article Result!</string>
     <string name="message_article_saved">Article successfully saved!</string>
     <string name="message_request_timeout">Request server time out</string>
+    <string name="message_activation_link">Activation link has been sent to your email.</string>
 
     <string name="hint_location">Eg. Jakarta, Indonesia</string>
     <string name="hint_description">Hint. Tell people what is your interest</string>

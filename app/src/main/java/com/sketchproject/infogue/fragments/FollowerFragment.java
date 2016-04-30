@@ -206,20 +206,20 @@ public class FollowerFragment extends Fragment {
                                             JSONObject contributorData = data.getJSONObject(i);
 
                                             Contributor contributor = new Contributor();
-                                            contributor.setId(contributorData.getInt(Contributor.CONTRIBUTOR_ID));
-                                            contributor.setToken(contributorData.getString(Contributor.CONTRIBUTOR_TOKEN));
-                                            contributor.setUsername(contributorData.getString(Contributor.CONTRIBUTOR_USERNAME));
-                                            contributor.setName(contributorData.getString(Contributor.CONTRIBUTOR_NAME));
-                                            contributor.setEmail(contributorData.getString(Contributor.CONTRIBUTOR_EMAIL));
-                                            contributor.setLocation(contributorData.getString(Contributor.CONTRIBUTOR_LOCATION));
-                                            contributor.setAbout(contributorData.getString(Contributor.CONTRIBUTOR_ABOUT));
-                                            contributor.setAvatar(contributorData.getString(Contributor.CONTRIBUTOR_AVATAR_REF));
-                                            contributor.setCover(contributorData.getString(Contributor.CONTRIBUTOR_COVER_REF));
-                                            contributor.setStatus(contributorData.getString(Contributor.CONTRIBUTOR_STATUS));
-                                            contributor.setArticle(contributorData.getInt(Contributor.CONTRIBUTOR_ARTICLE));
-                                            contributor.setFollowers(contributorData.getInt(Contributor.CONTRIBUTOR_FOLLOWERS));
-                                            contributor.setFollowing(contributorData.getInt(Contributor.CONTRIBUTOR_FOLLOWING));
-                                            contributor.setIsFollowing(contributorData.getInt(Contributor.CONTRIBUTOR_IS_FOLLOWING) == 1);
+                                            contributor.setId(contributorData.getInt(Contributor.ID));
+                                            contributor.setToken(contributorData.getString(Contributor.TOKEN));
+                                            contributor.setUsername(contributorData.getString(Contributor.USERNAME));
+                                            contributor.setName(contributorData.getString(Contributor.NAME));
+                                            contributor.setEmail(contributorData.getString(Contributor.EMAIL));
+                                            contributor.setLocation(contributorData.getString(Contributor.LOCATION));
+                                            contributor.setAbout(contributorData.getString(Contributor.ABOUT));
+                                            contributor.setAvatar(contributorData.getString(Contributor.AVATAR_REF));
+                                            contributor.setCover(contributorData.getString(Contributor.COVER_REF));
+                                            contributor.setStatus(contributorData.getString(Contributor.STATUS));
+                                            contributor.setArticle(contributorData.getInt(Contributor.ARTICLE));
+                                            contributor.setFollowers(contributorData.getInt(Contributor.FOLLOWERS));
+                                            contributor.setFollowing(contributorData.getInt(Contributor.FOLLOWING));
+                                            contributor.setIsFollowing(contributorData.getInt(Contributor.IS_FOLLOWING) == 1);
                                             moreFollowers.add(contributor);
                                         }
                                     }

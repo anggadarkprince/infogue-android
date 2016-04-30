@@ -20,17 +20,26 @@ import java.util.List;
 
 /**
  * A login screen that offers login via email/password.
+ *
+ * Sketch Project Studio
+ * Created by Angga on 1/04/2016 10.37.
  */
 public class AuthenticationActivity extends AppCompatActivity {
     public static final String SCREEN_REQUEST = "AuthScreen";
     public static final String AFTER_LOGOUT = "AfterLogout";
     public static final String AFTER_LOGIN = "AfterLogin";
+
     public static final int LOGIN_SCREEN = 0;
     public static final int REGISTER_SCREEN = 1;
 
     private ViewPager viewPager;
     private boolean isAfterLogout;
 
+    /**
+     * Perform initialization of AuthenticationActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,12 +80,12 @@ public class AuthenticationActivity extends AppCompatActivity {
             });
         }
 
-
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         if (tabLayout != null) {
             tabLayout.setupWithViewPager(viewPager);
         }
 
+        // collect extras data from activity which sent
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             isAfterLogout = extras.getBoolean(AFTER_LOGOUT, false);
@@ -91,10 +100,15 @@ public class AuthenticationActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Select action for option menu.
+     *
+     * @param item of selected option menu
+     * @return boolean
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == android.R.id.home) {
             if (isAfterLogout) {
                 launchMainActivity();
@@ -102,19 +116,25 @@ public class AuthenticationActivity extends AppCompatActivity {
                 finish();
             }
         }
-
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * If isAfterLogout is true it means this activity called from ApplicationActivity
+     * it finished for good to prevent leave pieces state before logout,and there is nothing in
+     * back stack so relaunch the new one.
+     */
     @Override
     public void onBackPressed() {
         if (isAfterLogout) {
             launchMainActivity();
         }
-
         super.onBackPressed();
     }
 
+    /**
+     * Launch new ApplicationActivity in new task and make sure clear all back stack in top.
+     */
     private void launchMainActivity() {
         Intent applicationIntent = new Intent(getBaseContext(), ApplicationActivity.class);
         applicationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -122,14 +142,23 @@ public class AuthenticationActivity extends AppCompatActivity {
         startActivity(applicationIntent);
     }
 
-    public void setTabRegisterActive() {
-        viewPager.setCurrentItem(REGISTER_SCREEN, true);
-    }
-
+    /**
+     * Set current tab at login section (index 0 default)
+     */
     public void setTabLoginActive() {
         viewPager.setCurrentItem(LOGIN_SCREEN, true);
     }
 
+    /**
+     * Set current tab at register section (index 1)
+     */
+    public void setTabRegisterActive() {
+        viewPager.setCurrentItem(REGISTER_SCREEN, true);
+    }
+
+    /**
+     * View pager to handle content of tab and related title.
+     */
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();

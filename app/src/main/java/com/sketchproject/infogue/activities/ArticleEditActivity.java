@@ -45,9 +45,9 @@ public class ArticleEditActivity extends ArticleCreateActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            articleId = extras.getInt(Article.ARTICLE_ID);
-            articleSlug = extras.getString(Article.ARTICLE_SLUG);
-            articleFeatured = extras.getString(Article.ARTICLE_FEATURED);
+            articleId = extras.getInt(Article.ID);
+            articleSlug = extras.getString(Article.SLUG);
+            articleFeatured = extras.getString(Article.FEATURED);
             apiUrl = APIBuilder.URL_API_ARTICLE + "/" + articleSlug;
             isUpdate = true;
 
@@ -81,23 +81,23 @@ public class ArticleEditActivity extends ArticleCreateActivity {
 
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 JSONObject articleObject = response.getJSONObject("article");
-                                JSONObject subcategory = articleObject.getJSONObject(Article.ARTICLE_SUBCATEGORY);
-                                JSONObject category = subcategory.getJSONObject(Article.ARTICLE_CATEGORY);
-                                JSONArray tags = articleObject.getJSONArray(Article.ARTICLE_TAGS);
+                                JSONObject subcategory = articleObject.getJSONObject(Article.SUBCATEGORY);
+                                JSONObject category = subcategory.getJSONObject(Article.CATEGORY);
+                                JSONArray tags = articleObject.getJSONArray(Article.TAGS);
 
-                                mTitleInput.setText(articleObject.getString(Article.ARTICLE_TITLE));
-                                mSlugInput.setText(articleObject.getString(Article.ARTICLE_SLUG));
-                                String contentUpdate = articleObject.getString(Article.ARTICLE_CONTENT_UPDATE);
+                                mTitleInput.setText(articleObject.getString(Article.TITLE));
+                                mSlugInput.setText(articleObject.getString(Article.SLUG));
+                                String contentUpdate = articleObject.getString(Article.CONTENT_UPDATE);
                                 if (contentUpdate != null && !contentUpdate.equals("null") && !contentUpdate.trim().isEmpty()) {
                                     mContentEditor.setHtml(contentUpdate);
                                 } else {
-                                    mContentEditor.setHtml(articleObject.getString(Article.ARTICLE_CONTENT));
+                                    mContentEditor.setHtml(articleObject.getString(Article.CONTENT));
                                 }
 
-                                mExcerptInput.setText(articleObject.getString(Article.ARTICLE_EXCERPT));
+                                mExcerptInput.setText(articleObject.getString(Article.EXCERPT));
 
                                 for (int i = 0; i < categoriesList.size(); i++) {
-                                    if (categoriesList.get(i).getId() == category.getInt(Category.COLUMN_ID)) {
+                                    if (categoriesList.get(i).getId() == category.getInt(Category.ID)) {
                                         mCategorySpinner.setSelection(i +1);
                                         populateSubcategory(i);
                                         break;
@@ -105,7 +105,7 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                                 }
 
                                 for (int j = 0; j < subcategoriesList.size(); j++) {
-                                    if (subcategoriesList.get(j).getId() == subcategory.getInt(Subcategory.COLUMN_ID)) {
+                                    if (subcategoriesList.get(j).getId() == subcategory.getInt(Subcategory.ID)) {
                                         final int position = j;
                                         mSubcategorySpinner.postDelayed(new Runnable() {
                                             @Override
@@ -121,13 +121,13 @@ public class ArticleEditActivity extends ArticleCreateActivity {
 
                                 List<String> tagsList = new ArrayList<>();
                                 for (int i = 0; i < tags.length(); i++) {
-                                    tagsList.add(tags.getJSONObject(i).getString(Article.ARTICLE_TAG));
+                                    tagsList.add(tags.getJSONObject(i).getString(Article.TAG));
                                 }
                                 mTagsInput.setTags(tagsList);
 
-                                boolean isPending = articleObject.getString(Article.ARTICLE_STATUS).equals(Article.STATUS_PENDING);
-                                boolean isPublished = articleObject.getString(Article.ARTICLE_STATUS).equals(Article.STATUS_PUBLISHED);
-                                boolean isDraft = articleObject.getString(Article.ARTICLE_STATUS).equals(Article.STATUS_DRAFT);
+                                boolean isPending = articleObject.getString(Article.STATUS).equals(Article.STATUS_PENDING);
+                                boolean isPublished = articleObject.getString(Article.STATUS).equals(Article.STATUS_PUBLISHED);
+                                boolean isDraft = articleObject.getString(Article.STATUS).equals(Article.STATUS_DRAFT);
                                 if (isPending || isPublished) {
                                     mPublishedRadio.setChecked(true);
                                 } else if (isDraft) {

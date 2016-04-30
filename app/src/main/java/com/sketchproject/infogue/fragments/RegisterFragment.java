@@ -1,6 +1,5 @@
 package com.sketchproject.infogue.fragments;
 
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
@@ -17,12 +16,14 @@ import android.widget.EditText;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.Validator;
 import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.APIBuilder;
@@ -36,10 +37,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A simple {@link Fragment} subclass.
+ * A simple {@link Fragment} subclass to handle register screen inside view pager.
+ *
+ * Sketch Project Studio
+ * Created by Angga on 1/04/2016 10.37.
  */
 public class RegisterFragment extends Fragment implements Validator.ViewValidation {
-
     private Validator validator;
     private AlertFragment alert;
 
@@ -57,16 +60,32 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
     private String password;
     private List<String> validationMessage;
 
+    /**
+     * Default constructor fragment, triggered when device rotate and first instantiate
+     */
     public RegisterFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * Init views and preparing login UI.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate view
+     * @param container parent (activity) container
+     * @param savedInstanceState latest instance state
+     * @return View
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         validator = new Validator();
         return inflater.inflate(R.layout.fragment_register, container, false);
     }
 
+    /**
+     * Triggered after parent (activity) created, to make sure UI is accessible.
+     *
+     * @param savedInstanceState latest state if exist
+     */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -84,7 +103,8 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptRegister();
+                preValidation();
+                postValidation(onValidateView());
             }
         });
 
@@ -94,13 +114,8 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
         alert = (AlertFragment) getChildFragmentManager().findFragmentById(R.id.alert_register);
     }
 
-    private void attemptRegister() {
-        preValidation();
-        postValidation(onValidateView());
-    }
-
     /**
-     * Shows the progress UI and hides the login form.
+     * Shows the progress UI and hides the registration form.
      */
     private void showProgress(final boolean show) {
         int mediumAnimTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);
@@ -129,6 +144,9 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
                 });
     }
 
+    /**
+     * Placeholder validator method to handle populating inputs.
+     */
     @Override
     public void preValidation() {
         // Store values at the time of the login attempt.
@@ -139,6 +157,11 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
         validationMessage = new ArrayList<>();
     }
 
+    /**
+     * Placeholder validator method to handle validation rules.
+     *
+     * @return boolean
+     */
     @Override
     public boolean onValidateView() {
         boolean isInvalid = false;
@@ -219,6 +242,11 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
         return !isInvalid;
     }
 
+    /**
+     * Validator placeholder function to handle process after validation.
+     *
+     * @param isValid indicate input form is valid or not
+     */
     @Override
     public void postValidation(boolean isValid) {
         if (isValid) {
@@ -232,6 +260,10 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
         }
     }
 
+    /**
+     * Send registration request to server with passing data name, username, email and password.
+     * Catch necessary error like contributor exist and internal server error
+     */
     private void registrationRequest() {
         StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_REGISTER,
                 new Response.Listener<String>() {
@@ -239,13 +271,13 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
                     public void onResponse(String response) {
                         try {
                             JSONObject result = new JSONObject(response);
-                            String status = result.getString("status");
-                            String message = result.getString("message");
+                            String status = result.getString(APIBuilder.RESPONSE_STATUS);
+                            String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
 
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 alert.setAlertType(AlertFragment.ALERT_SUCCESS);
-                                alert.setAlertTitle("Registration Complete");
-                                alert.setAlertMessage("Activation link has been sent to your email.");
+                                alert.setAlertTitle(getString(R.string.label_registration_complete));
+                                alert.setAlertMessage(getString(R.string.message_activation_link));
                             } else {
                                 alert.setAlertType(AlertFragment.ALERT_DANGER);
                                 alert.setAlertMessage(message);
@@ -261,57 +293,59 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        NetworkResponse networkResponse = error.networkResponse;
-                        if (networkResponse != null) {
-                            String result = new String(networkResponse.data);
-                            try {
-                                JSONObject response = new JSONObject(result);
-                                String status = response.getString("status");
-                                String message = response.getString("message");
+                        error.printStackTrace();
 
+                        NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = getString(R.string.error_unknown);
+                        int type = AlertFragment.ALERT_DANGER;
+                        if (networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                errorMessage = getString(R.string.error_timeout);
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage = getString(R.string.error_no_connection);
+                            }
+                        } else {
+                            try {
+                                String result = new String(networkResponse.data);
+                                JSONObject response = new JSONObject(result);
+                                String status = response.optString(APIBuilder.RESPONSE_STATUS);
+                                String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
+
+                                if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    errorMessage = getString(R.string.error_server);
+                                } else if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                    errorMessage = getString(R.string.error_not_found);
+                                }
                                 if (status.equals(APIBuilder.REQUEST_EXIST) && networkResponse.statusCode == 400) {
-                                    alert.setAlertType(AlertFragment.ALERT_WARNING);
-                                    alert.setAlertTitle("Please review your inputs");
-                                    alert.setAlertMessage(message);
-                                } else {
-                                    alert.setAlertType(AlertFragment.ALERT_DANGER);
-                                    alert.setAlertMessage(message);
+                                    type = AlertFragment.ALERT_WARNING;
+                                    errorMessage = message;
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                            }
-                        } else {
-                            alert.setAlertType(AlertFragment.ALERT_DANGER);
-                            if (error.getClass().equals(TimeoutError.class)) {
-                                alert.setAlertMessage(getString(R.string.error_timeout));
-                            }
-                            else{
-                                alert.setAlertMessage(getString(R.string.error_unknown));
+                                errorMessage = getString(R.string.error_parse_data);
                             }
                         }
+
+                        alert.setAlertType(type);
+                        alert.setAlertMessage(errorMessage);
                         alert.show();
 
                         showProgress(false);
-                        error.printStackTrace();
                     }
                 }
         ) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("name", mNameView.getText().toString());
-                params.put("email", mEmailView.getText().toString());
-                params.put("username", mUsernameView.getText().toString());
-                params.put("password", mPasswordView.getText().toString());
+                params.put(Contributor.NAME, mNameView.getText().toString());
+                params.put(Contributor.EMAIL, mEmailView.getText().toString());
+                params.put(Contributor.USERNAME, mUsernameView.getText().toString());
+                params.put(Contributor.PASSWORD, mPasswordView.getText().toString());
                 return params;
             }
         };
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-        // Access the RequestQueue through your singleton class.
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(15000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getContext()).addToRequestQueue(postRequest);
     }
 }

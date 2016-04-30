@@ -16,11 +16,23 @@ import android.widget.ImageView;
 import com.sketchproject.infogue.R;
 
 public class FeaturedActivity extends AppCompatActivity {
+    private ImageView pagination1;
+    private ImageView pagination2;
+    private ImageView pagination3;
 
+    /**
+     * Perform initialization of FeaturedActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_featured);
+
+        pagination1 = (ImageView) findViewById(R.id.page1);
+        pagination2 = (ImageView) findViewById(R.id.page2);
+        pagination3 = (ImageView) findViewById(R.id.page3);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -73,39 +85,24 @@ public class FeaturedActivity extends AppCompatActivity {
     }
 
     /**
+     * Change pager content and set the pagination.
+     *
      * @param position index position of pager view
      */
     private void changePage(int position) {
-        ImageView view1 = (ImageView) findViewById(R.id.page1);
-        if (view1 != null) {
-            view1.setImageResource(R.drawable.circle_featured_normal);
-        }
-
-        ImageView view2 = (ImageView) findViewById(R.id.page2);
-        if (view2 != null) {
-            view2.setImageResource(R.drawable.circle_featured_normal);
-        }
-
-        ImageView view3 = (ImageView) findViewById(R.id.page3);
-        if (view3 != null) {
-            view3.setImageResource(R.drawable.circle_featured_normal);
-        }
+        pagination1.setImageResource(R.drawable.circle_featured_normal);
+        pagination2.setImageResource(R.drawable.circle_featured_normal);
+        pagination3.setImageResource(R.drawable.circle_featured_normal);
 
         switch (position) {
             case 0:
-                if (view1 != null) {
-                    view1.setImageResource(R.drawable.circle_featured_active);
-                }
+                pagination1.setImageResource(R.drawable.circle_featured_active);
                 break;
             case 1:
-                if (view2 != null) {
-                    view2.setImageResource(R.drawable.circle_featured_active);
-                }
+                pagination2.setImageResource(R.drawable.circle_featured_active);
                 break;
             case 2:
-                if (view3 != null) {
-                    view3.setImageResource(R.drawable.circle_featured_active);
-                }
+                pagination3.setImageResource(R.drawable.circle_featured_active);
                 break;
         }
     }
