@@ -1,4 +1,4 @@
-package com.sketchproject.infogue.fragments.dummy;
+package com.sketchproject.infogue.utils.dummy;
 
 import com.sketchproject.infogue.models.Contributor;
 

@@ -52,7 +52,6 @@ public class ArticleListEvent {
      * @param article model data of article
      */
     public ArticleListEvent(Context context, Article article) {
-        Log.i("Infogue/Article", "ID : " + article.getId() + " Title : " + article.getTitle());
         this.context = context;
         this.article = article;
     }
@@ -61,6 +60,7 @@ public class ArticleListEvent {
      * Rate article silently, just give feedback if fail.
      */
     public void rateArticle(final int rate) {
+        Log.i("Infogue/Article", "Rate article ID : " + article.getId() + " Title : " + article.getTitle() + " with " + rate + " Stars");
         StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_RATE,
                 new Response.Listener<String>() {
                     @Override
@@ -71,7 +71,9 @@ public class ArticleListEvent {
                             String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
 
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                Log.i("Infogue/Rate", "[Rate] Success : Average rating for article id " + article.getId() + " is " + message);
+                                Log.i("Infogue/Article", "[Rate] Success : Average rating for article id " + article.getId() + " is " + message);
+                            } else {
+                                Log.w("Infogue/Article", "[Rate] " + context.getString(R.string.error_unknown));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -83,8 +85,8 @@ public class ArticleListEvent {
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
 
-                        NetworkResponse networkResponse = error.networkResponse;
                         String errorMessage = context.getString(R.string.error_unknown);
+                        NetworkResponse networkResponse = error.networkResponse;
                         if (networkResponse == null) {
                             if (error.getClass().equals(TimeoutError.class)) {
                                 errorMessage = context.getString(R.string.error_timeout);
@@ -98,7 +100,7 @@ public class ArticleListEvent {
                                 String status = response.getString(APIBuilder.RESPONSE_STATUS);
                                 String message = response.getString(APIBuilder.RESPONSE_MESSAGE);
 
-                                Log.e("Infogue/Article", "Error : " + message);
+                                Log.e("Infogue/Article", "[Rate] Error : " + message);
 
                                 if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                     errorMessage = context.getString(R.string.error_not_found);
@@ -125,11 +127,11 @@ public class ArticleListEvent {
                 return params;
             }
         };
+
         postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000,
+                APIBuilder.TIMEOUT_SHORT,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
         VolleySingleton.getInstance(context).addToRequestQueue(postRequest);
 
         String rateMessage;
@@ -178,8 +180,11 @@ public class ArticleListEvent {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+
                         String errorMessage = "[Hit] Error : ";
-                        if (error.networkResponse == null) {
+                        NetworkResponse networkResponse = error.networkResponse;
+                        if (networkResponse == null) {
                             if (error.getClass().equals(TimeoutError.class)) {
                                 errorMessage += context.getString(R.string.error_timeout);
                             } else if (error.getClass().equals(NoConnectionError.class)) {
@@ -188,7 +193,15 @@ public class ArticleListEvent {
                                 errorMessage += context.getString(R.string.error_unknown);
                             }
                         } else {
-                            errorMessage += context.getString(R.string.error_server);
+                            if (networkResponse.statusCode == 404) {
+                                errorMessage = context.getString(R.string.error_not_found);
+                            } else if (networkResponse.statusCode == 500) {
+                                errorMessage = context.getString(R.string.error_server);
+                            } else if (networkResponse.statusCode == 503) {
+                                errorMessage = context.getString(R.string.error_maintenance);
+                            } else {
+                                errorMessage += context.getString(R.string.error_unknown);
+                            }
                         }
                         Log.e("Infogue/Hit", errorMessage);
                     }
@@ -201,11 +214,11 @@ public class ArticleListEvent {
                 return params;
             }
         };
+
         postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000,
+                APIBuilder.TIMEOUT_SHORT,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
         VolleySingleton.getInstance(context).addToRequestQueue(postRequest);
     }
 
@@ -229,7 +242,7 @@ public class ArticleListEvent {
         context.startActivity(browserIntent);
     }
 
-    public void leaveComment(){
+    public void leaveComment() {
         Intent commentIntent = new Intent(context, CommentActivity.class);
         commentIntent.putExtra(Article.ID, article.getId());
         commentIntent.putExtra(Article.SLUG, article.getSlug());
@@ -347,6 +360,7 @@ public class ArticleListEvent {
                             try {
                                 String result = new String(networkResponse.data);
                                 JSONObject response = new JSONObject(result);
+
                                 String status = response.optString(APIBuilder.RESPONSE_STATUS);
                                 String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
@@ -376,12 +390,15 @@ public class ArticleListEvent {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 params.put(APIBuilder.METHOD, APIBuilder.METHOD_DELETE);
-                params.put(Contributor.TOKEN, new SessionManager(context).getSessionData(SessionManager.KEY_TOKEN, null));
+                params.put(Contributor.API_TOKEN, new SessionManager(context).getSessionData(SessionManager.KEY_TOKEN, null));
                 return params;
             }
         };
 
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(30000, 2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                APIBuilder.TIMEOUT_MEDIUM,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(context).addToRequestQueue(postRequest);
     }
 

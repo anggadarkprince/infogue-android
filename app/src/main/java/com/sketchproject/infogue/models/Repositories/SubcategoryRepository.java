@@ -11,11 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Subcategory repository handle CRUD operation on category table.
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 24/04/2016 09.52.
  */
 public class SubcategoryRepository implements DatabaseManager.PersistDataOperator<Subcategory> {
 
+    /**
+     * Create subcategory record.
+     *
+     * @param data subcategory model
+     * @return boolean
+     */
     @Override
     public boolean createData(Subcategory data) {
         SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
@@ -32,11 +40,22 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
         return newSubCategoryId != -1;
     }
 
+    /**
+     * Retrieve all subcategory, passing 0 value indicate select all.
+     *
+     * @return list of subcategory
+     */
     @Override
     public List<Subcategory> retrieveData() {
         return retrieveData(0);
     }
 
+    /**
+     * Retrieve data by category id.
+     *
+     * @param categoryId reference of category
+     * @return list of subcategory
+     */
     public List<Subcategory> retrieveData(int categoryId) {
         SQLiteDatabase db = DatabaseManager.getInstance().getReadableDatabase();
 
@@ -48,10 +67,10 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
 
         Cursor cursor;
 
-        if(categoryId <= 0){
+        // select all
+        if (categoryId <= 0) {
             cursor = db.query(Subcategory.TABLE, projection, null, null, null, null, sortOrder);
-        }
-        else{
+        } else { // select by category
             String selection = Subcategory.CATEGORY_ID + " = ?";
             String[] selectionArgs = {String.valueOf(categoryId)};
 
@@ -78,6 +97,12 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
         return subcategoryList;
     }
 
+    /**
+     * Retrieve subcategory data by id.
+     *
+     * @param data subcategory model
+     * @return subcategory data model
+     */
     @Override
     public Subcategory findData(Subcategory data) {
         SQLiteDatabase db = DatabaseManager.getInstance().getReadableDatabase();
@@ -103,6 +128,13 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
         return subcategory;
     }
 
+    /**
+     * Update subcategory data.
+     *
+     * @param data      subcategory model
+     * @param reference update reference
+     * @return boolean
+     */
     @Override
     public boolean updateData(Subcategory data, Object reference) {
         SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
@@ -124,6 +156,12 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
         return affected > 0;
     }
 
+    /**
+     * Delete subcategory by id.
+     *
+     * @param data subcategory model
+     * @return boolean
+     */
     @Override
     public boolean deleteData(Subcategory data) {
         SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
@@ -136,7 +174,12 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
         return affectedRows > 0;
     }
 
-    public boolean clearData(){
+    /**
+     * Remove all subcategory data in database.
+     *
+     * @return boolean
+     */
+    public boolean clearData() {
         SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
 
         int affectedRows = db.delete(Subcategory.TABLE, null, null);

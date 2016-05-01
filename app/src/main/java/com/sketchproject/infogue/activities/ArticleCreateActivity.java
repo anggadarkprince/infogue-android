@@ -878,7 +878,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 @Override
                 protected Map<String, String> getParams() {
                     Map<String, String> params = new HashMap<>();
-                    params.put(Contributor.TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
+                    params.put(Contributor.API_TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
                     params.put(Contributor.FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
                     params.put(Article.TITLE, article.getTitle());
                     params.put(Article.SLUG, article.getSlug());

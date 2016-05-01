@@ -67,8 +67,8 @@ import io.fabric.sdk.android.Fabric;
  * Created by Angga on 1/04/2016 10.37.
  */
 public class LoginFragment extends Fragment implements Validator.ViewValidation {
-    private static final String TWITTER_KEY = "Rg1JqRPoxbflYe7XtQGCkcKsw";
-    private static final String TWITTER_SECRET = "tVI6dgYF89AHNTkVz3yqywoE9WvjrF4ZVdq2dmk0l2bndLdW9d";
+    public static final String TWITTER_KEY = "Rg1JqRPoxbflYe7XtQGCkcKsw";
+    public static final String TWITTER_SECRET = "tVI6dgYF89AHNTkVz3yqywoE9WvjrF4ZVdq2dmk0l2bndLdW9d";
 
     private static final String VENDOR_MOBILE = "mobile";
     private static final String VENDOR_FACEBOOK = "facebook";
@@ -104,9 +104,6 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(getContext(), new Twitter(authConfig));
     }
 
     /**
@@ -148,11 +145,11 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
 
                                 try {
                                     Map<String, String> values = new HashMap<>();
-                                    values.put("id", object.getString("id"));
-                                    values.put("name", object.getString("name"));
-                                    values.put("email", object.getString("email"));
-                                    values.put("avatar", object.getJSONObject("picture").getJSONObject("data").getString("url"));
-                                    values.put("cover", object.getJSONObject("cover").getString("source"));
+                                    values.put(Contributor.ID, object.getString("id"));
+                                    values.put(Contributor.NAME, object.getString("name"));
+                                    values.put(Contributor.EMAIL, object.getString("email"));
+                                    values.put(Contributor.AVATAR, object.getJSONObject("picture").getJSONObject("data").getString("url"));
+                                    values.put(Contributor.COVER, object.getJSONObject("cover").getString("source"));
                                     loginRequest(VENDOR_FACEBOOK, values);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -168,20 +165,22 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
             @Override
             public void onCancel() {
                 alert.setAlertType(AlertFragment.ALERT_WARNING);
-                alert.setAlertMessage("Facebook login attempt canceled");
+                alert.setAlertMessage(getContext().getString(R.string.message_facebook_cancel));
                 alert.show();
             }
 
             @Override
             public void onError(FacebookException exception) {
                 alert.setAlertType(AlertFragment.ALERT_DANGER);
-                alert.setAlertMessage("Facebook login attempt failed");
+                alert.setAlertMessage(getContext().getString(R.string.message_facebook_failed));
                 alert.show();
             }
         });
 
-
         // Twitter Fabric
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(getContext(), new Twitter(authConfig));
+
         loginButtonTwitter = (TwitterLoginButton) view.findViewById(R.id.login_button_twitter);
         loginButtonTwitter.setCallback(new Callback<TwitterSession>() {
             @Override
@@ -205,13 +204,15 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                         String avatar = user.profileImageUrl;
                         String cover = user.profileBannerUrl;
 
+                        // loginRequest(VENDOR_TWITTER, values);
+
                         Log.i("Infogue/twitter", name + " " + username + " " + location + " " + email + " " + about + " " + avatar + " " + cover);
                     }
 
                     @Override
                     public void failure(TwitterException e) {
                         alert.setAlertType(AlertFragment.ALERT_DANGER);
-                        alert.setAlertMessage("Login with Twitter failure");
+                        alert.setAlertMessage(getContext().getString(R.string.message_twitter_failure));
                         alert.show();
                     }
                 });
@@ -220,7 +221,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
             @Override
             public void failure(TwitterException exception) {
                 alert.setAlertType(AlertFragment.ALERT_DANGER);
-                alert.setAlertMessage("Login with Twitter failure");
+                alert.setAlertMessage(getContext().getString(R.string.message_twitter_failure));
                 alert.show();
             }
         });
@@ -304,7 +305,6 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
         loginButtonTwitter.onActivityResult(requestCode, resultCode, data);
-        Log.i("Infogue/twitter", String.valueOf(resultCode));
     }
 
     /**
@@ -342,7 +342,6 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
      */
     @Override
     public void preValidation() {
-        // Store values at the time of the login attempt.
         username = mUsernameView.getText().toString();
         password = mPasswordView.getText().toString();
         validationMessage = new ArrayList<>();
@@ -385,12 +384,9 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
     @Override
     public void postValidation(boolean isValid) {
         if (isValid) {
-            alert.dismiss();
-            showProgress(true);
-
             Map<String, String> values = new HashMap<>();
-            values.put("username", mUsernameView.getText().toString());
-            values.put("password", mPasswordView.getText().toString());
+            values.put(Contributor.USERNAME, mUsernameView.getText().toString());
+            values.put(Contributor.PASSWORD, mPasswordView.getText().toString());
             loginRequest(VENDOR_MOBILE, values);
         } else {
             alert.setAlertType(AlertFragment.ALERT_WARNING);
@@ -404,6 +400,9 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
      * login (default, facebook, twitter) and catch necessary errors.
      */
     private void loginRequest(String vendor, final Map<String, String> values) {
+        alert.dismiss();
+        showProgress(true);
+
         String url = APIBuilder.URL_API_LOGIN;
         if (vendor.equals(VENDOR_FACEBOOK)) {
             url = APIBuilder.URL_API_OAUTH_FACEBOOK;
@@ -417,14 +416,16 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                     public void onResponse(String response) {
                         try {
                             JSONObject result = new JSONObject(response);
+
                             String status = result.getString(APIBuilder.RESPONSE_STATUS);
                             String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
-                            String login = result.getString("login");
+                            String login = result.getString(APIBuilder.RESPONSE_LOGIN);
 
                             if (status.equals(Contributor.STATUS_ACTIVATED) && login.equals(APIBuilder.REQUEST_GRANTED)) {
-                                JSONObject user = result.getJSONObject("user");
-                                if (populateSessionData(user)) {
+                                JSONObject user = result.getJSONObject(Contributor.USER);
+                                if (createSessionData(user)) {
                                     getActivity().finish();
+
                                     Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
                                     SessionManager session = new SessionManager(getContext());
 
@@ -441,8 +442,10 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                     profileIntent.putExtra(SessionManager.KEY_FOLLOWING, session.getSessionData(SessionManager.KEY_FOLLOWING, 0));
                                     profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, false);
                                     profileIntent.putExtra(AuthenticationActivity.AFTER_LOGIN, true);
+
                                     profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     profileIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
                                     startActivity(profileIntent);
                                 } else {
                                     alert.setAlertType(AlertFragment.ALERT_DANGER);
@@ -450,7 +453,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                     alert.show();
                                 }
                             } else {
-                                alert.setAlertType(AlertFragment.ALERT_DANGER);
+                                alert.setAlertType(AlertFragment.ALERT_WARNING);
                                 alert.setAlertMessage(message);
                                 alert.show();
                             }
@@ -458,6 +461,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+
                         showProgress(false);
                     }
                 },
@@ -466,10 +470,11 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
 
-                        NetworkResponse networkResponse = error.networkResponse;
                         String errorMessage = getString(R.string.error_unknown);
                         String errorTitle = "";
                         int type = AlertFragment.ALERT_DANGER;
+
+                        NetworkResponse networkResponse = error.networkResponse;
                         if (networkResponse == null) {
                             if (error.getClass().equals(TimeoutError.class)) {
                                 errorMessage = getString(R.string.error_timeout);
@@ -480,24 +485,29 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                             try {
                                 String result = new String(networkResponse.data);
                                 JSONObject response = new JSONObject(result);
+
                                 String status = response.optString(APIBuilder.RESPONSE_STATUS);
                                 String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
-                                String login = response.optString("login");
+                                String login = response.optString(APIBuilder.RESPONSE_LOGIN);
 
                                 if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                     errorMessage = getString(R.string.error_server);
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                    errorMessage = getString(R.string.error_maintenance);
                                 } else if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                     errorMessage = getString(R.string.error_not_found);
-                                } else if ((status.equals(APIBuilder.REQUEST_UNREGISTERED) || login.equals(APIBuilder.REQUEST_RESTRICT)) && networkResponse.statusCode == 403) {
+                                } else if ((status.equals(APIBuilder.REQUEST_UNREGISTERED) || login.equals(APIBuilder.REQUEST_RESTRICT))
+                                        && networkResponse.statusCode == 403) {
                                     errorMessage = message; // mismatch
                                     if (status.equals(Contributor.STATUS_PENDING)) { // turns out pending
-                                        String urlResendEmail = APIBuilder.BASE_URL + "auth/resend/" + response.getString("token");
+                                        String urlResendEmail = APIBuilder.getResendEmail(response.getString(Contributor.TOKEN));
                                         type = AlertFragment.ALERT_WARNING;
-                                        errorMessage = "Account is pending please activate via email.\n\rResend email activation?\n\r" + urlResendEmail;
+                                        errorMessage = "Account is pending please activate via email." +
+                                                "\n\rResend email activation?\n\r" + urlResendEmail;
                                         errorTitle = "Pending";
                                     } else if (status.equals(Contributor.STATUS_SUSPENDED)) { // turns out suspended
-                                        errorTitle = "Suspended";
                                         errorMessage = "Account is suspended";
+                                        errorTitle = "Suspended";
                                     }
                                 } else if (login.equals(APIBuilder.REQUEST_MISMATCH) && networkResponse.statusCode == 401) {
                                     errorMessage = getString(R.string.error_unauthorized);
@@ -506,6 +516,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                errorMessage = getString(R.string.error_parse_data);
                             }
                         }
 
@@ -522,13 +533,11 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         ) {
             @Override
             protected Map<String, String> getParams() {
-                Map<String, String> params;
-                params = values;
-                return params;
+                return values;
             }
         };
 
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(15000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(30000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getContext()).addToRequestQueue(postRequest);
     }
 
@@ -538,12 +547,12 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
      * @param result result of login data
      * @return boolean
      */
-    private boolean populateSessionData(JSONObject result) {
+    private boolean createSessionData(JSONObject result) {
         SessionManager sessionManager = new SessionManager(getActivity().getBaseContext());
         HashMap<String, Object> user = new HashMap<>();
         try {
             user.put(SessionManager.KEY_ID, result.getInt(Contributor.ID));
-            user.put(SessionManager.KEY_TOKEN, result.getString(Contributor.TOKEN));
+            user.put(SessionManager.KEY_TOKEN, result.getString(Contributor.API_TOKEN));
             user.put(SessionManager.KEY_USERNAME, result.getString(Contributor.USERNAME));
             user.put(SessionManager.KEY_NAME, result.getString(Contributor.NAME));
             user.put(SessionManager.KEY_LOCATION, result.getString(Contributor.LOCATION));

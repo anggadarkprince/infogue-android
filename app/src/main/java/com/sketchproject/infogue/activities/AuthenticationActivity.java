@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.sketchproject.infogue.R;
@@ -34,6 +35,7 @@ public class AuthenticationActivity extends AppCompatActivity {
     public static final int REGISTER_SCREEN = 1;
 
     private ViewPager viewPager;
+    private TabLayout tabLayout;
     private boolean isAfterLogout;
 
     /**
@@ -81,7 +83,7 @@ public class AuthenticationActivity extends AppCompatActivity {
             });
         }
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
         if (tabLayout != null) {
             tabLayout.setupWithViewPager(viewPager);
         }
@@ -98,6 +100,20 @@ public class AuthenticationActivity extends AppCompatActivity {
             }
         } else {
             isAfterLogout = false;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        ViewPagerAdapter section = (ViewPagerAdapter) viewPager.getAdapter();
+        if(tabLayout.getSelectedTabPosition() == LOGIN_SCREEN){
+            LoginFragment loginFragment = (LoginFragment) section.getItem(tabLayout.getSelectedTabPosition());
+            if(loginFragment != null){
+                Log.i("Infogue/Auth", "Passing result from AuthenticationActivity");
+                loginFragment.onActivityResult(requestCode, resultCode, data);
+            }
         }
     }
 

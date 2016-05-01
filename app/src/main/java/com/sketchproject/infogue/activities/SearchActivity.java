@@ -318,7 +318,7 @@ public class SearchActivity extends AppCompatActivity implements
 
                 Contributor contributor = new Contributor();
                 contributor.setId(contributorData.getInt(Contributor.ID));
-                contributor.setToken(contributorData.getString(Contributor.TOKEN));
+                contributor.setToken(contributorData.getString(Contributor.API_TOKEN));
                 contributor.setUsername(contributorData.getString(Contributor.USERNAME));
                 contributor.setName(contributorData.getString(Contributor.NAME));
                 contributor.setEmail(contributorData.getString(Contributor.EMAIL));

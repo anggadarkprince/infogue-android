@@ -38,10 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A fragment representing a list of Items.
- * <p>
+ * A fragment representing a list of follower Items.
  * Activities containing this fragment MUST implement the {@link OnFollowerInteractionListener}
  * interface.
+ *
+ * Sketch Project Studio
+ * Created by Angga on 11/04/2016 10.37.
  */
 public class FollowerFragment extends Fragment {
 
@@ -208,7 +210,7 @@ public class FollowerFragment extends Fragment {
 
                                             Contributor contributor = new Contributor();
                                             contributor.setId(contributorData.getInt(Contributor.ID));
-                                            contributor.setToken(contributorData.getString(Contributor.TOKEN));
+                                            contributor.setToken(contributorData.getString(Contributor.API_TOKEN));
                                             contributor.setUsername(contributorData.getString(Contributor.USERNAME));
                                             contributor.setName(contributorData.getString(Contributor.NAME));
                                             contributor.setEmail(contributorData.getString(Contributor.EMAIL));

@@ -39,9 +39,11 @@ import java.util.List;
 
 /**
  * A fragment representing a list of Items.
- * <p/>
  * Activities containing this fragment MUST implement the {@link OnArticleInteractionListener}
  * interface.
+ *
+ * Sketch Project Studio
+ * Created by Angga on 26/04/2016 19.09.
  */
 public class ArticleFragment extends Fragment {
 

@@ -18,6 +18,10 @@ public class Subcategory {
     private String subcategory;
     private String label;
 
+    public Subcategory(){
+
+    }
+
     public int getId() {
         return id;
     }

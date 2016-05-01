@@ -20,7 +20,11 @@ import com.sketchproject.infogue.R;
 import java.util.List;
 
 /**
- * A simple {@link Fragment} subclass.
+ * A simple {@link Fragment} subclass. show alert by categorizing to danger, warning, success
+ * and info type and messages.
+ *
+ * Sketch Project Studio
+ * Created by Angga on 21/04/2016 19.09.
  */
 public class AlertFragment extends Fragment {
     public static final int ALERT_DEFAULT = 0;

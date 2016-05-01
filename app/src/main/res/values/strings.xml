@@ -381,5 +381,8 @@
     <string name="label_article_excellent">EXCELLENT ARTICLE</string>
     <string name="label_article_great">GREAT ARTICLE</string>
     <string name="label_article_unrated">UNRATED ARTICLE</string>
+    <string name="message_facebook_cancel">Facebook login attempt canceled</string>
+    <string name="message_facebook_failed">Facebook login attempt failed</string>
+    <string name="message_twitter_failure">Login with Twitter failure</string>
 
 </resources>

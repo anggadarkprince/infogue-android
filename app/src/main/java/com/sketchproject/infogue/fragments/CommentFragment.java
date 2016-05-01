@@ -37,6 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A fragment representing a list of comment Items.
+ * Activities containing this fragment MUST implement the {@link OnCommentInteractionListener}
+ * interface.
+ *
  * Sketch Project Studio
  * Created by Angga on 26/04/2016 19.09.
  */

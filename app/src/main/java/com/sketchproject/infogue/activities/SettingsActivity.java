@@ -843,7 +843,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                 protected Map<String, String> getParams() {
                     Map<String, String> params = new HashMap<>();
                     params.put(APIBuilder.METHOD, APIBuilder.METHOD_PUT);
-                    params.put(Contributor.TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
+                    params.put(Contributor.API_TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
                     params.put(Contributor.FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
                     params.put(Contributor.NAME, contributor.getName());
                     params.put(Contributor.LOCATION, contributor.getLocation());

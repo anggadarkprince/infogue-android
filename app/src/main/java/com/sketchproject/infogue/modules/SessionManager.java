@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+import com.facebook.login.LoginManager;
+import com.twitter.sdk.android.Twitter;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -218,6 +221,9 @@ public class SessionManager {
         editor.remove(KEY_FOLLOWING);
         editor.remove(KEY_STATUS);
         editor.remove(IS_LOGIN);
+
+        LoginManager.getInstance().logOut();
+        Twitter.logOut();
 
         // editor.clear();
 

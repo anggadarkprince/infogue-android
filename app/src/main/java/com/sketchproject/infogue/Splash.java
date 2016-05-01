@@ -11,7 +11,12 @@ import com.sketchproject.infogue.activities.ApplicationActivity;
 import com.sketchproject.infogue.activities.FeaturedActivity;
 import com.sketchproject.infogue.database.DBHelper;
 import com.sketchproject.infogue.database.DatabaseManager;
+import com.sketchproject.infogue.fragments.LoginFragment;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+
+import io.fabric.sdk.android.Fabric;
 
 public class Splash extends Activity {
 
@@ -23,6 +28,9 @@ public class Splash extends Activity {
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(getApplication());
+
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(LoginFragment.TWITTER_KEY, LoginFragment.TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
 
         DBHelper dbHelper = new DBHelper(getApplicationContext());
         DatabaseManager.initializeInstance(dbHelper);

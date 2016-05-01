@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Follower event list.
+ *
  * Sketch Project Studio
  * Created by Angga on 29/04/2016 16.50.
  */
@@ -60,9 +62,9 @@ public class FollowerListEvent {
      * @param buttonControl   toggle button follow (castable to ImageButton)
      */
     public FollowerListEvent(Context context, Contributor contributorData, View buttonControl) {
-        Log.i("Infogue/Contributor", "ID : " + contributorData.getId() + " Username : " + contributorData.getUsername());
         this.context = context;
         contributor = contributorData;
+
         if (buttonControl instanceof ImageButton) {
             followButton = buttonControl;
         } else if (buttonControl instanceof Button) {
@@ -81,6 +83,8 @@ public class FollowerListEvent {
             throwArgumentContributorException();
         }
 
+        Log.i("Infogue/Contributor", "Share ID : "+contributor.getId() + " Username : " + contributor.getUsername());
+
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, APIBuilder.getShareContributorText(contributor.getUsername()));
@@ -96,6 +100,8 @@ public class FollowerListEvent {
             throwArgumentContributorException();
         }
 
+        Log.i("Infogue/Contributor", "Browse ID : "+contributor.getId() + " Username : " + contributor.getUsername());
+
         String articleUrl = APIBuilder.getContributorUrl(contributor.getUsername());
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
         context.startActivity(browserIntent);
@@ -105,11 +111,11 @@ public class FollowerListEvent {
      * Launch Profile Activity and passing necessary value from contributor data.
      */
     public void viewProfile() {
-        Log.i("Infogue/Contributor", contributor.getId() + " " + contributor.getUsername());
-
         if (contributor == null) {
             throwArgumentContributorException();
         }
+
+        Log.i("Infogue/Contributor", "View ID : "+contributor.getId() + " Username : " + contributor.getUsername());
 
         Intent profileIntent = new Intent(context, ProfileActivity.class);
         profileIntent.putExtra(SessionManager.KEY_ID, contributor.getId());
@@ -213,6 +219,8 @@ public class FollowerListEvent {
                                             errorMessage = message;
                                         } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                             errorMessage = context.getString(R.string.error_unauthorized);
+                                        } else if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                            errorMessage = context.getString(R.string.error_not_found);
                                         } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                             errorMessage = context.getString(R.string.error_server);
                                         } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
@@ -233,7 +241,7 @@ public class FollowerListEvent {
                     @Override
                     protected Map<String, String> getParams() {
                         Map<String, String> params = new HashMap<>();
-                        params.put(Contributor.TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
+                        params.put(Contributor.API_TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
                         params.put(Contributor.FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
                         params.put(Contributor.FOLLOWING_CONTRIBUTOR, String.valueOf(contributor.getId()));
                         params.put(APIBuilder.METHOD, APIBuilder.METHOD_DELETE);
@@ -241,7 +249,7 @@ public class FollowerListEvent {
                     }
                 };
                 postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                        15000,
+                        APIBuilder.TIMEOUT_SHORT,
                         DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                         DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
@@ -293,6 +301,8 @@ public class FollowerListEvent {
                                             errorMessage = message;
                                         } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                             errorMessage = context.getString(R.string.error_unauthorized);
+                                        } else if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                            errorMessage = context.getString(R.string.error_not_found);
                                         } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                             errorMessage = context.getString(R.string.error_server);
                                         } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
@@ -313,17 +323,16 @@ public class FollowerListEvent {
                     @Override
                     protected Map<String, String> getParams() {
                         Map<String, String> params = new HashMap<>();
-                        params.put(Contributor.TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
+                        params.put(Contributor.API_TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
                         params.put(Contributor.FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
                         params.put(Contributor.FOLLOWING_CONTRIBUTOR, String.valueOf(contributor.getId()));
                         return params;
                     }
                 };
                 postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                        30000,
-                        0,
+                        APIBuilder.TIMEOUT_MEDIUM,
+                        APIBuilder.NO_RETRY,
                         DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
                 VolleySingleton.getInstance(context).addToRequestQueue(postRequest);
             }
         } else {

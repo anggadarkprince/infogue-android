@@ -11,11 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Category repository handle CRUD operation on category table.
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 24/04/2016 09.47.
  */
 public class CategoryRepository implements DatabaseManager.PersistDataOperator<Category> {
 
+    /**
+     * Create category record.
+     *
+     * @param data category model
+     * @return boolean
+     */
     @Override
     public boolean createData(Category data) {
         SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
@@ -30,6 +38,11 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
         return newCategoryId != -1;
     }
 
+    /**
+     * Retrieve all category from database.
+     *
+     * @return list of category
+     */
     @Override
     public List<Category> retrieveData() {
         SQLiteDatabase db = DatabaseManager.getInstance().getReadableDatabase();
@@ -68,6 +81,12 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
         return categoryList;
     }
 
+    /**
+     * Retrieve category data by id.
+     *
+     * @param data category model
+     * @return category data model
+     */
     @Override
     public Category findData(Category data) {
         SQLiteDatabase db = DatabaseManager.getInstance().getReadableDatabase();
@@ -91,6 +110,13 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
         return category;
     }
 
+    /**
+     * Update category data.
+     *
+     * @param data      category model
+     * @param reference update reference
+     * @return boolean
+     */
     @Override
     public boolean updateData(Category data, Object reference) {
         SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
@@ -110,6 +136,12 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
         return affected > 0;
     }
 
+    /**
+     * Delete category by id.
+     *
+     * @param data category model
+     * @return boolean
+     */
     @Override
     public boolean deleteData(Category data) {
         SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
@@ -122,7 +154,12 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
         return affectedRows > 0;
     }
 
-    public boolean clearData(){
+    /**
+     * Remove all category data in database.
+     *
+     * @return boolean
+     */
+    public boolean clearData() {
         SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
 
         int affectedRows = db.delete(Category.TABLE, null, null);

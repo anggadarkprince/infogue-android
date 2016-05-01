@@ -9,6 +9,8 @@ import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.SessionManager;
 
 /**
+ * Create context menu on article list view holder.
+ *
  * Sketch Project Studio
  * Created by Angga on 29/04/2016 10.55.
  */
@@ -51,7 +53,8 @@ public class ArticleContextBuilder {
                     " ArticleContextBuilder(Context dialogContext, Article data) instead");
         }
 
-        final int menu = new SessionManager(dialogContext).isMe(data.getAuthorId()) ? R.array.items_article_editable : R.array.items_article;
+        final int menu = new SessionManager(dialogContext).isMe(data.getAuthorId()) ?
+                R.array.items_article_editable : R.array.items_article;
         final String[] items = context.getResources().getStringArray(R.array.items_article);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(dialogContext);
@@ -79,7 +82,7 @@ public class ArticleContextBuilder {
     }
 
     /**
-     * Show alert if initialized.
+     * Show alert if it's initialized.
      */
     public void show() {
         if (alert == null) {
@@ -90,7 +93,7 @@ public class ArticleContextBuilder {
     }
 
     /**
-     * Dismiss alert if initialized.
+     * Dismiss alert if it's initialized.
      */
     public void dismiss() {
         if (alert == null) {

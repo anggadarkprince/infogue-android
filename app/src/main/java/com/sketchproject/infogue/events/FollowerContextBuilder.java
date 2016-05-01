@@ -10,6 +10,8 @@ import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.SessionManager;
 
 /**
+ * Create context menu on follower list view holder.
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 29/04/2016 16.42.
  */

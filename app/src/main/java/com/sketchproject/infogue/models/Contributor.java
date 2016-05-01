@@ -12,7 +12,8 @@ public class Contributor {
     public static final String TABLE = "contributors";
     public static final String ID = "id";
     public static final String FOREIGN = "contributor_id";
-    public static final String TOKEN = "api_token";
+    public static final String TOKEN = "token";
+    public static final String API_TOKEN = "api_token";
     public static final String USERNAME = "username";
     public static final String EMAIL = "email";
     public static final String NAME = "name";
@@ -42,6 +43,7 @@ public class Contributor {
     public static final String PASSWORD = "password";
     public static final String NEW_PASSWORD = "new_password";
     public static final String DATA = "contributor";
+    public static final String USER = "user";
     public static final String FOLLOWING_CONTRIBUTOR = "following_id";
 
     public static final String GENDER_MALE = "male";

@@ -12,6 +12,8 @@ import com.sketchproject.infogue.modules.IconizedMenu;
 import com.sketchproject.infogue.modules.SessionManager;
 
 /**
+ * Create article popup on article list view holder.
+ *
  * Sketch Project Studio
  * Created by Angga on 29/04/2016 10.46.
  */
@@ -97,7 +99,7 @@ public class ArticlePopupBuilder {
     }
 
     /**
-     * Show popup if initialized.
+     * Show popup if it's initialized.
      */
     public void show() {
         if (popupIconized == null) {
@@ -108,7 +110,7 @@ public class ArticlePopupBuilder {
     }
 
     /**
-     * Dismiss popup if initialized.
+     * Dismiss popup if it's initialized.
      */
     public void dismiss() {
         if (popupIconized == null) {

@@ -289,7 +289,7 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
                 params.put(Article.COMMENT, mCommentInput.getText().toString());
                 params.put(Article.FOREIGN, String.valueOf(articleId));
                 params.put(Contributor.FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
-                params.put(Contributor.TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
+                params.put(Contributor.API_TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
                 return params;
             }
         };

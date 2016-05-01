@@ -16,6 +16,12 @@ import com.sketchproject.infogue.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Home with tab fragment.
+ *
+ * Sketch Project Studio
+ * Created by Angga on 6/04/2016 10.37.
+ */
 public class HomeFragment extends Fragment {
     public static final String ARG_NEW_INSTANCE = "newInstance";
 
@@ -27,8 +33,8 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static ArticleFragment newInstance(boolean newInstance) {
-        ArticleFragment fragment = new ArticleFragment();
+    public static HomeFragment newInstance(boolean newInstance) {
+        HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
         args.putBoolean(ARG_NEW_INSTANCE, newInstance);
         fragment.setArguments(args);

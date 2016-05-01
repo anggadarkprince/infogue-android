@@ -38,7 +38,7 @@ import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass to handle register screen inside view pager.
- *
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 1/04/2016 10.37.
  */
@@ -70,8 +70,8 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
     /**
      * Init views and preparing login UI.
      *
-     * @param inflater The LayoutInflater object that can be used to inflate view
-     * @param container parent (activity) container
+     * @param inflater           The LayoutInflater object that can be used to inflate view
+     * @param container          parent (activity) container
      * @param savedInstanceState latest instance state
      * @return View
      */
@@ -116,6 +116,8 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
 
     /**
      * Shows the progress UI and hides the registration form.
+     *
+     * @param show progress visibility
      */
     private void showProgress(final boolean show) {
         int mediumAnimTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);
@@ -279,7 +281,7 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
                                 alert.setAlertTitle(getString(R.string.label_registration_complete));
                                 alert.setAlertMessage(getString(R.string.message_activation_link));
                             } else {
-                                alert.setAlertType(AlertFragment.ALERT_DANGER);
+                                alert.setAlertType(AlertFragment.ALERT_WARNING);
                                 alert.setAlertMessage(message);
                             }
                             alert.show();
@@ -295,9 +297,10 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
 
-                        NetworkResponse networkResponse = error.networkResponse;
                         String errorMessage = getString(R.string.error_unknown);
                         int type = AlertFragment.ALERT_DANGER;
+
+                        NetworkResponse networkResponse = error.networkResponse;
                         if (networkResponse == null) {
                             if (error.getClass().equals(TimeoutError.class)) {
                                 errorMessage = getString(R.string.error_timeout);
@@ -308,16 +311,20 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
                             try {
                                 String result = new String(networkResponse.data);
                                 JSONObject response = new JSONObject(result);
+
                                 String status = response.optString(APIBuilder.RESPONSE_STATUS);
                                 String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
                                 if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                     errorMessage = getString(R.string.error_server);
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                    errorMessage = getString(R.string.error_maintenance);
                                 } else if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                     errorMessage = getString(R.string.error_not_found);
-                                }
-                                if (status.equals(APIBuilder.REQUEST_EXIST) && networkResponse.statusCode == 400) {
+                                } else if (status.equals(APIBuilder.REQUEST_EXIST) && networkResponse.statusCode == 400) {
                                     type = AlertFragment.ALERT_WARNING;
+                                    errorMessage = message;
+                                } else if (message != null) {
                                     errorMessage = message;
                                 }
                             } catch (JSONException e) {
@@ -345,7 +352,7 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
             }
         };
 
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(15000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(50000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getContext()).addToRequestQueue(postRequest);
     }
 }

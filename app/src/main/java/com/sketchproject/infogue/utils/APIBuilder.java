@@ -41,6 +41,7 @@ public class APIBuilder {
 
     public static final String RESPONSE_STATUS = "status";
     public static final String RESPONSE_MESSAGE = "message";
+    public static final String RESPONSE_LOGIN = "login";
 
     public static final String METHOD = "_method";
     public static final String METHOD_PUT = "put";
@@ -49,6 +50,12 @@ public class APIBuilder {
     public static final String SEARCH_BOTH = "both";
     public static final String SEARCH_CONTRIBUTOR = "contributor";
     public static final String SEARCH_ARTICLE = "article";
+
+    public static final int TIMEOUT_SHORT = 15000;
+    public static final int TIMEOUT_MEDIUM = 30000;
+    public static final int TIMEOUT_LONG = 50000;
+
+    public static final int NO_RETRY = 0;
 
     /**
      * Build featured article url.
@@ -235,6 +242,16 @@ public class APIBuilder {
      */
     public static String getApiCommentUrl(String slug) {
         return BASE_URL_API + "article/" + slug + "/comment";
+    }
+
+    /**
+     * Build resend confirmation email url.
+     *
+     * @param token user token activation
+     * @return string url
+     */
+    public static String getResendEmail(String token){
+        return APIBuilder.BASE_URL + "auth/resend/" + token;
     }
 
     /**
