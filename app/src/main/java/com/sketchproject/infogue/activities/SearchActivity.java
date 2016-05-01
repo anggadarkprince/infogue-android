@@ -6,7 +6,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -246,12 +245,10 @@ public class SearchActivity extends AppCompatActivity implements
                                 populateArticleResult(articles.getJSONArray("data"));
                             } else {
                                 String successMessage = getString(R.string.error_unknown);
-                                Helper.toastColor(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.primary));
+                                Helper.toastColor(getBaseContext(), successMessage, R.color.color_warning_transparent);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            String successMessage = getString(R.string.error_parse_data);
-                            Helper.toastColor(getBaseContext(), successMessage, ContextCompat.getColor(getBaseContext(), R.color.primary));
                         }
                         showProgress(false);
                     }
@@ -292,8 +289,7 @@ public class SearchActivity extends AppCompatActivity implements
                                 errorMessage = getString(R.string.error_parse_data);
                             }
                         }
-                        Helper.toastColor(getBaseContext(), errorMessage,
-                                ContextCompat.getColor(getBaseContext(), R.color.color_danger));
+                        Helper.toastColor(getBaseContext(), errorMessage, R.color.color_danger_transparent);
 
                         showProgress(false);
                     }

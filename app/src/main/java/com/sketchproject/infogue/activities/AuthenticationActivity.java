@@ -19,12 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A login screen that offers login via email/password.
+ * A {@link AppCompatActivity} subclass, login screen that offers login via email/password.
  *
  * Sketch Project Studio
  * Created by Angga on 1/04/2016 10.37.
  */
 public class AuthenticationActivity extends AppCompatActivity {
+
     public static final String SCREEN_REQUEST = "AuthScreen";
     public static final String AFTER_LOGOUT = "AfterLogout";
     public static final String AFTER_LOGIN = "AfterLogin";
@@ -52,8 +53,8 @@ public class AuthenticationActivity extends AppCompatActivity {
         }
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new LoginFragment(), "Log In");
-        adapter.addFragment(new RegisterFragment(), "Register");
+        adapter.addFragment(new LoginFragment(), getString(R.string.label_title_login));
+        adapter.addFragment(new RegisterFragment(), getString(R.string.label_title_register));
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         if (viewPager != null) {
@@ -62,9 +63,9 @@ public class AuthenticationActivity extends AppCompatActivity {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                     if (position == 0) {
-                        getSupportActionBar().setTitle("Contributor Sign In");
+                        getSupportActionBar().setTitle(R.string.title_activity_sign_in);
                     } else {
-                        getSupportActionBar().setTitle("Create an Account");
+                        getSupportActionBar().setTitle(R.string.title_activity_sign_up);
                     }
                 }
 

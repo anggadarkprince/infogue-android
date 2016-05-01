@@ -79,7 +79,7 @@ public class ArticlePopupBuilder {
                         event.shareArticle();
                         break;
                     case R.id.action_rate:
-                        event.rateArticle();
+                        event.rateArticle(5);
                         break;
                     case R.id.action_edit:
                         event.editArticle();

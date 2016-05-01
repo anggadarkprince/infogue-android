@@ -8,9 +8,21 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.utils.APIBuilder;
 
+/**
+ * A simple {@link AppCompatActivity} subclass to show credit title.
+ *
+ * Sketch Project Studio
+ * Created by Angga on 1/04/2016 10.37.
+ */
 public class AboutActivity extends AppCompatActivity {
 
+    /**
+     * Perform initialization of AboutActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,7 +33,7 @@ public class AboutActivity extends AppCompatActivity {
             mFacebookButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://facebook.com/sketchproject"));
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_FACEBOOK_DEVELOPER));
                     startActivity(browserIntent);
                 }
             });
@@ -32,7 +44,7 @@ public class AboutActivity extends AppCompatActivity {
             mTwitterButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/sketchproject"));
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_TWITTER_DEVELOPER));
                     startActivity(browserIntent);
                 }
             });

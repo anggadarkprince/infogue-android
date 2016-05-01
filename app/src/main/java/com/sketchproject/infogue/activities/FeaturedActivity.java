@@ -15,6 +15,12 @@ import android.widget.ImageView;
 
 import com.sketchproject.infogue.R;
 
+/**
+ * A {@link AppCompatActivity} subclass, featured screen show slide show image and feature.
+ * <p>
+ * Sketch Project Studio
+ * Created by Angga on 1/04/2016 10.37.
+ */
 public class FeaturedActivity extends AppCompatActivity {
     private ImageView pagination1;
     private ImageView pagination2;

@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +28,7 @@ import android.widget.ScrollView;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
@@ -44,8 +44,8 @@ import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.Validator;
 import com.sketchproject.infogue.modules.VolleyMultipartRequest;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.Helper;
 import com.sketchproject.infogue.utils.APIBuilder;
+import com.sketchproject.infogue.utils.Helper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,15 +63,16 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Setting activity handle user configuration and password
+ * Setting activity handle user configuration and password.
+ * <p>
+ * Sketch Project Studio
  * Created by Angga 20/04/2016 19:32
  */
 public class SettingsActivity extends AppCompatActivity implements Validator.ViewValidation {
 
     public static final int SETTING_RESULT_CODE = 100;
-
-    protected final int PICK_IMAGE_AVATAR = 1;
-    protected final int PICK_IMAGE_COVER = 2;
+    public final int PICK_IMAGE_AVATAR = 1;
+    public final int PICK_IMAGE_COVER = 2;
 
     private Validator validator;
     private SessionManager session;
@@ -551,6 +552,13 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         }
     }
 
+    /**
+     * Catch result from select image provider.
+     *
+     * @param requestCode code request when another provider being called
+     * @param resultCode  result if provider return ok or cancel state
+     * @param data        data from provider which called if exist
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -581,6 +589,9 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         }
     }
 
+    /**
+     * Retrieve setting account.
+     */
     private void retrieveProfile() {
         progress.setMessage(getString(R.string.label_retrieve_setting_progress));
         progress.show();
@@ -591,8 +602,8 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            String status = response.getString("status");
-                            JSONObject contributor = response.getJSONObject("contributor");
+                            String status = response.getString(APIBuilder.RESPONSE_STATUS);
+                            JSONObject contributor = response.getJSONObject(Contributor.DATA);
 
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 Glide.clear(mAvatarImage);
@@ -627,12 +638,11 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                                 mEmailInput.setText(contributor.getString(Contributor.EMAIL));
                             } else {
                                 Log.w("Infogue/Profile", getString(R.string.error_unknown));
-                                Helper.toastColor(getBaseContext(), getString(R.string.error_unknown), Color.parseColor("#ddd1205e"));
+                                Helper.toastColor(getBaseContext(), R.string.error_unknown, R.color.color_warning_transparent);
                             }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Helper.toastColor(getBaseContext(), getString(R.string.error_parse_data), Color.parseColor("#ddd1205e"));
                         }
 
                         progress.dismiss();
@@ -646,17 +656,23 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                         if (networkResponse == null) {
                             if (error.getClass().equals(TimeoutError.class)) {
                                 errorMessage = getString(R.string.error_timeout);
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage = getString(R.string.error_no_connection);
                             }
                         } else {
                             String result = new String(networkResponse.data);
                             try {
                                 JSONObject response = new JSONObject(result);
-                                String status = response.getString("status");
-                                String message = response.getString("message");
+                                String status = response.optString(APIBuilder.RESPONSE_STATUS);
+                                String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
                                 if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                     errorMessage = getString(R.string.error_not_found);
                                 } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    errorMessage = getString(R.string.error_server);
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                    errorMessage = getString(R.string.error_maintenance);
+                                } else if (message != null) {
                                     errorMessage = message;
                                 }
                             } catch (JSONException e) {
@@ -664,7 +680,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                                 errorMessage = getString(R.string.error_parse_data);
                             }
                         }
-                        Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                        Helper.toastColor(getBaseContext(), errorMessage, R.color.color_danger_transparent);
                         progress.dismiss();
 
                         Intent returnIntent = new Intent();
@@ -673,14 +689,15 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                     }
                 }
         );
-        contributorRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000,
+        contributorRequest.setRetryPolicy(new DefaultRetryPolicy(15000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(contributorRequest);
     }
 
+    /**
+     * Show select date dialog.
+     */
     private void selectDate() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -694,6 +711,12 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         }, year, month, day).show();
     }
 
+    /**
+     * Select image for avatar and cover.
+     *
+     * @param title dialog title
+     * @param type  kind of dialog
+     */
     private void selectImage(String title, int type) {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -701,6 +724,9 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         startActivityForResult(Intent.createChooser(intent, title), type);
     }
 
+    /**
+     * Confirm dialog to discard current setting.
+     */
     private void discardConfirmation() {
         if (mIsSaved) {
             Intent returnIntent = new Intent();
@@ -712,11 +738,17 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         }
     }
 
+    /**
+     * Confirm save dialog.
+     */
     private void saveConfirmation() {
         dialogSave.show();
         Helper.setDialogButtonTheme(this, dialogSave);
     }
 
+    /**
+     * Perform save setting request to server.
+     */
     private void saveSettings() {
         if (connectionDetector.isNetworkAvailable()) {
             progress.setMessage(getString(R.string.label_save_setting_progress));
@@ -728,9 +760,9 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                     String resultResponse = new String(response.data);
                     try {
                         JSONObject result = new JSONObject(resultResponse);
-                        String status = result.getString("status");
-                        String message = result.getString("message");
-                        JSONObject contributorUpdated = result.getJSONObject("contributor");
+                        String status = result.getString(APIBuilder.RESPONSE_STATUS);
+                        String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
+                        JSONObject contributorUpdated = result.getJSONObject(Contributor.DATA);
 
                         if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                             alert.setAlertType(AlertFragment.ALERT_SUCCESS);
@@ -763,18 +795,22 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    error.printStackTrace();
+
                     NetworkResponse networkResponse = error.networkResponse;
                     String errorMessage = getString(R.string.error_unknown);
                     if (networkResponse == null) {
                         if (error.getClass().equals(TimeoutError.class)) {
                             errorMessage = getString(R.string.error_timeout);
+                        } else if (error.getClass().equals(NoConnectionError.class)) {
+                            errorMessage = getString(R.string.error_no_connection);
                         }
                     } else {
                         String result = new String(networkResponse.data);
                         try {
                             JSONObject response = new JSONObject(result);
-                            String status = response.getString("status");
-                            String message = response.getString("message");
+                            String status = response.optString(APIBuilder.RESPONSE_STATUS);
+                            String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
                             if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
                                 errorMessage = getString(R.string.error_not_found);
@@ -783,6 +819,10 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                             } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
                                 errorMessage = message;
                             } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                errorMessage = message;
+                            } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                errorMessage = getString(R.string.error_maintenance);
+                            } else if (message != null) {
                                 errorMessage = message;
                             }
                         } catch (JSONException e) {
@@ -797,14 +837,12 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
 
                     mScrollView.smoothScrollTo(0, 0);
                     progress.dismiss();
-
-                    error.printStackTrace();
                 }
             }) {
                 @Override
                 protected Map<String, String> getParams() {
                     Map<String, String> params = new HashMap<>();
-                    params.put("_method", "put");
+                    params.put(APIBuilder.METHOD, APIBuilder.METHOD_PUT);
                     params.put(Contributor.TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
                     params.put(Contributor.FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
                     params.put(Contributor.NAME, contributor.getName());

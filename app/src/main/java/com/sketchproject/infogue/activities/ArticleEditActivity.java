@@ -1,13 +1,13 @@
 package com.sketchproject.infogue.activities;
 
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
@@ -15,13 +15,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
-import com.sketchproject.infogue.fragments.AlertFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.models.Category;
 import com.sketchproject.infogue.models.Subcategory;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.Helper;
 import com.sketchproject.infogue.utils.APIBuilder;
+import com.sketchproject.infogue.utils.Helper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,8 +29,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A {@link AppCompatActivity} subclass contains article form and handle save operation.
+ * <p>
+ * Sketch Project Studio
+ * Created by Angga on 7/04/2016 10.37.
+ */
 public class ArticleEditActivity extends ArticleCreateActivity {
-    private int articleId;
     private String articleSlug;
     private String articleFeatured;
 
@@ -43,35 +47,41 @@ public class ArticleEditActivity extends ArticleCreateActivity {
             getSupportActionBar().setTitle(R.string.title_activity_article_edit);
         }
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            articleId = extras.getInt(Article.ID);
-            articleSlug = extras.getString(Article.SLUG);
-            articleFeatured = extras.getString(Article.FEATURED);
-            apiUrl = APIBuilder.URL_API_ARTICLE + "/" + articleSlug;
-            isUpdate = true;
-
-            mFeaturedImage.setVisibility(View.VISIBLE);
-            Glide.with(getBaseContext()).load(articleFeatured)
-                    .placeholder(R.drawable.placeholder_rectangle)
-                    .centerCrop()
-                    .crossFade()
-                    .into(mFeaturedImage);
-            realPathFeatured = articleFeatured;
-        } else {
-            Helper.toastColor(getBaseContext(), "Invalid article!", Color.parseColor("#ddd9534f"));
-            finish();
-        }
-
         mSaveButton.setText(R.string.action_update_article);
 
-        retrieveArticleData();
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            // int articleId = extras.getInt(Article.ID);
+            articleSlug = extras.getString(Article.SLUG);
+            articleFeatured = extras.getString(Article.FEATURED);
+            apiUrl = APIBuilder.getApiPostUrl(articleSlug);
+            isUpdate = true;
+
+            retrieveArticleData();
+        } else {
+            Helper.toastColor(getBaseContext(), R.string.message_invalid_article, R.color.color_danger_transparent);
+            finish();
+        }
     }
 
+    /**
+     * Retrieve article which performed to update.
+     */
     private void retrieveArticleData() {
+        // make request image featured immediately from extras data
+        mFeaturedImage.setVisibility(View.VISIBLE);
+        Glide.with(getBaseContext()).load(articleFeatured)
+                .placeholder(R.drawable.placeholder_rectangle)
+                .centerCrop()
+                .crossFade()
+                .into(mFeaturedImage);
+        realPathFeatured = articleFeatured;
+
+        // set progress active
         progress.setMessage(getString(R.string.label_retrieve_article_progress));
         progress.show();
 
+        // retrieve post request from server
         JsonObjectRequest articleRequest = new JsonObjectRequest(Request.Method.GET, APIBuilder.getApiPostUrl(articleSlug), null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -79,14 +89,18 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                         try {
                             String status = response.getString(APIBuilder.RESPONSE_STATUS);
 
+                            Log.e("Infogue/Article", "[Edit] Success : " + status);
+
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                JSONObject articleObject = response.getJSONObject("article");
+                                JSONObject articleObject = response.getJSONObject(Article.DATA);
                                 JSONObject subcategory = articleObject.getJSONObject(Article.SUBCATEGORY);
                                 JSONObject category = subcategory.getJSONObject(Article.CATEGORY);
                                 JSONArray tags = articleObject.getJSONArray(Article.TAGS);
 
+                                // set plain input text and content
                                 mTitleInput.setText(articleObject.getString(Article.TITLE));
                                 mSlugInput.setText(articleObject.getString(Article.SLUG));
+                                mExcerptInput.setText(articleObject.getString(Article.EXCERPT));
                                 String contentUpdate = articleObject.getString(Article.CONTENT_UPDATE);
                                 if (contentUpdate != null && !contentUpdate.equals("null") && !contentUpdate.trim().isEmpty()) {
                                     mContentEditor.setHtml(contentUpdate);
@@ -94,24 +108,23 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                                     mContentEditor.setHtml(articleObject.getString(Article.CONTENT));
                                 }
 
-                                mExcerptInput.setText(articleObject.getString(Article.EXCERPT));
-
+                                // populate category data into spinner
                                 for (int i = 0; i < categoriesList.size(); i++) {
                                     if (categoriesList.get(i).getId() == category.getInt(Category.ID)) {
-                                        mCategorySpinner.setSelection(i +1);
+                                        mCategorySpinner.setSelection(i + 1);
                                         populateSubcategory(i);
                                         break;
                                     }
                                 }
 
+                                // populate subcategory data into spinner
                                 for (int j = 0; j < subcategoriesList.size(); j++) {
                                     if (subcategoriesList.get(j).getId() == subcategory.getInt(Subcategory.ID)) {
                                         final int position = j;
                                         mSubcategorySpinner.postDelayed(new Runnable() {
                                             @Override
                                             public void run() {
-                                                mSubcategorySpinner.setSelection(position+1);
-                                                Log.i("Infogue/Subcategory","Set selection 2 - "+position);
+                                                mSubcategorySpinner.setSelection(position + 1);
                                             }
                                         }, 200);
 
@@ -119,12 +132,14 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                                     }
                                 }
 
+                                // populate tags into tags input
                                 List<String> tagsList = new ArrayList<>();
                                 for (int i = 0; i < tags.length(); i++) {
                                     tagsList.add(tags.getJSONObject(i).getString(Article.TAG));
                                 }
                                 mTagsInput.setTags(tagsList);
 
+                                // determine checked status
                                 boolean isPending = articleObject.getString(Article.STATUS).equals(Article.STATUS_PENDING);
                                 boolean isPublished = articleObject.getString(Article.STATUS).equals(Article.STATUS_PUBLISHED);
                                 boolean isDraft = articleObject.getString(Article.STATUS).equals(Article.STATUS_DRAFT);
@@ -139,16 +154,13 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                                 mScrollView.smoothScrollTo(0, 0);
 
                             } else {
-                                alert.setAlertType(AlertFragment.ALERT_INFO);
-                                alert.setAlertMessage(getString(R.string.error_unknown));
-                                alert.show();
                                 mScrollView.smoothScrollTo(0, 0);
+                                Helper.toastColor(getBaseContext(), R.string.error_unknown, R.color.color_danger_transparent);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                             finish();
-                            Helper.toastColor(getBaseContext(), getString(R.string.error_parse_data),
-                                    ContextCompat.getColor(getBaseContext(), R.color.primary));
+                            Helper.toastColor(getBaseContext(), R.string.error_parse_data, R.color.color_danger_transparent);
                         }
                         progress.dismiss();
                     }
@@ -163,6 +175,8 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                         if (networkResponse == null) {
                             if (error.getClass().equals(TimeoutError.class)) {
                                 errorMessage = getString(R.string.error_timeout);
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage = getString(R.string.error_no_connection);
                             }
                         } else {
                             try {
@@ -171,7 +185,7 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                                 String status = response.optString(APIBuilder.RESPONSE_STATUS);
                                 String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
-                                Log.e("Infogue/Article", "Error::" + message);
+                                Log.e("Infogue/Article", "[Edit] Error : " + message);
 
                                 if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                     errorMessage = getString(R.string.error_unauthorized);
@@ -187,17 +201,13 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                                 errorMessage = getString(R.string.error_parse_data);
                             }
                         }
-                        Helper.toastColor(getBaseContext(), errorMessage,
-                                ContextCompat.getColor(getBaseContext(), R.color.color_danger));
+                        Helper.toastColor(getBaseContext(), errorMessage, R.color.color_danger_transparent);
                         progress.dismiss();
                     }
                 }
         );
-        articleRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
+        articleRequest.setRetryPolicy(new DefaultRetryPolicy(50000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(articleRequest);
     }
 }

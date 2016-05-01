@@ -25,6 +25,12 @@ import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.utils.APIBuilder;
 
+/**
+ * A simple {@link AppCompatActivity} subclass to show credit title.
+ *
+ * Sketch Project Studio
+ * Created by Angga on 7/04/2016 10.37.
+ */
 public class ArticleActivity extends AppCompatActivity implements
         ArticleFragment.OnArticleInteractionListener,
         ArticleFragment.OnArticleEditableFragmentInteractionListener {
@@ -122,6 +128,7 @@ public class ArticleActivity extends AppCompatActivity implements
                 fragment = ArticleFragment.newInstanceAuthor(1, authorId, authorUsername, isMyArticle);
             }
 
+            // replacing fragment
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.fragment, fragment);

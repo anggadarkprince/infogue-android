@@ -2,7 +2,7 @@ package com.sketchproject.infogue.models;
 
 /**
  * Category model data.
- * 
+ *
  * Sketch Project Studio
  * Created by Angga on 24/04/2016 09.16.
  */

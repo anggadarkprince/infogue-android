@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -20,6 +19,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.activities.ArticleCreateActivity;
 import com.sketchproject.infogue.activities.ArticleEditActivity;
+import com.sketchproject.infogue.activities.CommentActivity;
 import com.sketchproject.infogue.activities.PostActivity;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.models.Article;
@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Article events list.
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 29/04/2016 10.37.
  */
@@ -58,7 +60,7 @@ public class ArticleListEvent {
     /**
      * Rate article silently, just give feedback if fail.
      */
-    public void rateArticle() {
+    public void rateArticle(final int rate) {
         StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_RATE,
                 new Response.Listener<String>() {
                     @Override
@@ -69,7 +71,7 @@ public class ArticleListEvent {
                             String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
 
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                Log.i("Infogue/Rate", "Success : Average rating for article id " + article.getId() + " is " + message);
+                                Log.i("Infogue/Rate", "[Rate] Success : Average rating for article id " + article.getId() + " is " + message);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -107,10 +109,11 @@ public class ArticleListEvent {
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                errorMessage = context.getString(R.string.error_parse_data);
                             }
                         }
                         String rateMessage = errorMessage + "\r\nYour rating was discarded";
-                        Helper.toastColor(context, rateMessage, ContextCompat.getColor(context, R.color.color_danger));
+                        Helper.toastColor(context, rateMessage, R.color.color_danger);
                     }
                 }
         ) {
@@ -118,7 +121,7 @@ public class ArticleListEvent {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 params.put(Article.FOREIGN, String.valueOf(article.getId()));
-                params.put(Article.RATE, String.valueOf(5));
+                params.put(Article.RATE, String.valueOf(rate));
                 return params;
             }
         };
@@ -129,8 +132,81 @@ public class ArticleListEvent {
 
         VolleySingleton.getInstance(context).addToRequestQueue(postRequest);
 
-        String successMessage = "Awesome!, you give 5 Stars on \n\r\"" + article.getTitle() + "\"";
-        Helper.toastColor(context, successMessage, ContextCompat.getColor(context, R.color.primary));
+        String rateMessage;
+        if (rate > 3) {
+            rateMessage = "Awesome!, you give 5 Stars on \n\r\"" + article.getTitle() + "\"";
+        } else {
+            rateMessage = "Too bad!, you give under 3 Stars on \n\r\"" + article.getTitle() + "\"";
+        }
+
+        int color = R.color.color_hazard_transparent;
+        if (rate == 5) {
+            color = R.color.color_success_transparent;
+        } else if (rate == 4) {
+            color = R.color.color_info_transparent;
+        } else if (rate == 3) {
+            color = R.color.color_warning_transparent;
+        } else if (rate == 2) {
+            color = R.color.color_caution_transparent;
+        }
+        Helper.toastColor(context, rateMessage, color);
+    }
+
+    /**
+     * Increment viewer article.
+     */
+    public void countViewer() {
+        StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_HIT,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject result = new JSONObject(response);
+                            String status = result.getString(APIBuilder.RESPONSE_STATUS);
+                            String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
+
+                            if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
+                                Log.i("Infogue/Article", "[Hit] Current viewer article id : " + article.getId() + " is " + message);
+                            } else {
+                                Log.w("Infogue/Article", "[Hit] " + context.getString(R.string.error_unknown));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        String errorMessage = "[Hit] Error : ";
+                        if (error.networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                errorMessage += context.getString(R.string.error_timeout);
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage += context.getString(R.string.error_no_connection);
+                            } else {
+                                errorMessage += context.getString(R.string.error_unknown);
+                            }
+                        } else {
+                            errorMessage += context.getString(R.string.error_server);
+                        }
+                        Log.e("Infogue/Hit", errorMessage);
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put(Article.FOREIGN, String.valueOf(article.getId()));
+                return params;
+            }
+        };
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        VolleySingleton.getInstance(context).addToRequestQueue(postRequest);
     }
 
     /**
@@ -151,6 +227,14 @@ public class ArticleListEvent {
         String articleUrl = APIBuilder.getArticleUrl(article.getSlug());
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
         context.startActivity(browserIntent);
+    }
+
+    public void leaveComment(){
+        Intent commentIntent = new Intent(context, CommentActivity.class);
+        commentIntent.putExtra(Article.ID, article.getId());
+        commentIntent.putExtra(Article.SLUG, article.getSlug());
+        commentIntent.putExtra(Article.TITLE, article.getTitle());
+        context.startActivity(commentIntent);
     }
 
     /**
@@ -224,7 +308,7 @@ public class ArticleListEvent {
                             String status = result.getString(APIBuilder.RESPONSE_STATUS);
                             String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
 
-                            Log.i("Infogue/Article", "Success : " + message);
+                            Log.i("Infogue/Article", "[Delete] Success : " + message);
 
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 if (context instanceof FragmentActivity) {
@@ -234,18 +318,13 @@ public class ArticleListEvent {
                                     fragment.deleteArticleRow(article.getId());
 
                                     String successMessage = "You have deleted article \r\n\"" + article.getTitle() + "\"";
-                                    Helper.toastColor(context, successMessage,
-                                            ContextCompat.getColor(context, R.color.color_warning));
+                                    Helper.toastColor(context, successMessage, R.color.color_warning_transparent);
                                 } else {
                                     throwInstanceException();
                                 }
-
-
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Helper.toastColor(context, context.getString(R.string.error_parse_data),
-                                    ContextCompat.getColor(context, R.color.primary));
                         }
 
                         progress.dismiss();
@@ -261,6 +340,8 @@ public class ArticleListEvent {
                         if (networkResponse == null) {
                             if (error.getClass().equals(TimeoutError.class)) {
                                 errorMessage = context.getString(R.string.error_timeout);
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage = context.getString(R.string.error_no_connection);
                             }
                         } else {
                             try {
@@ -269,7 +350,7 @@ public class ArticleListEvent {
                                 String status = response.optString(APIBuilder.RESPONSE_STATUS);
                                 String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
-                                Log.e("Infogue/Article", "Error : " + message);
+                                Log.e("Infogue/Article", "[Delete] Error : " + message);
 
                                 if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                     errorMessage = context.getString(R.string.error_unauthorized);
@@ -285,8 +366,7 @@ public class ArticleListEvent {
                                 errorMessage = context.getString(R.string.error_parse_data);
                             }
                         }
-                        Helper.toastColor(context, errorMessage,
-                                ContextCompat.getColor(context, R.color.color_danger));
+                        Helper.toastColor(context, errorMessage, R.color.color_danger_transparent);
 
                         progress.dismiss();
                     }
@@ -301,7 +381,7 @@ public class ArticleListEvent {
             }
         };
 
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(30000, 1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(30000, 2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(context).addToRequestQueue(postRequest);
     }
 

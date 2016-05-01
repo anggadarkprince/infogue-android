@@ -3,7 +3,6 @@ package com.sketchproject.infogue.activities;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -22,10 +21,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
@@ -36,6 +35,7 @@ import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.CommentFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.models.Comment;
+import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
@@ -50,20 +50,28 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * A {@link AppCompatActivity} subclass contain comment list.
+ * <p>
+ * Sketch Project Studio
+ * Created by Angga on 25/04/2016 10.37.
+ */
 public class CommentActivity extends AppCompatActivity implements CommentFragment.OnCommentInteractionListener {
-
     private SessionManager session;
     private ConnectionDetector connectionDetector;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private AlertDialog formCommentDialog;
-
     private EditText mCommentInput;
     private ProgressDialog progress;
 
     private int articleId;
 
-    @SuppressLint("SetJavaScriptEnabled")
+    /**
+     * Perform initialization of CommentActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +88,7 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
         }
 
         progress = new ProgressDialog(CommentActivity.this);
-        progress.setMessage("Submitting comment");
+        progress.setMessage(getString(R.string.label_submit_comment));
         progress.setIndeterminate(true);
 
         @SuppressLint("InflateParams")
@@ -93,17 +101,12 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
             public void onClick(View v) {
                 if (connectionDetector.isNetworkAvailable()) {
                     if (mCommentInput.getText().toString().trim().isEmpty()) {
-                        Helper.toastColor(getBaseContext(), "Comment can't be blank", Color.parseColor("#ddd1205e"));
+                        Helper.toastColor(getBaseContext(), R.string.error_comment_required, R.color.color_danger_transparent);
                     } else {
                         submitComment();
                     }
                 } else {
-                    connectionDetector.snackbarDisconnectNotification(v, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            connectionDetector.dismissNotification();
-                        }
-                    });
+                    connectionDetector.snackbarDisconnectNotification(v, null);
                 }
             }
         });
@@ -138,7 +141,6 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
         final AlertDialog.Builder builder = new AlertDialog.Builder(CommentActivity.this);
         builder.setTitle(R.string.prompt_leave_a_comment);
         builder.setView(mFormComment);
-
         formCommentDialog = builder.create();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -182,10 +184,9 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
             fragmentTransaction.replace(R.id.fragment, fragment);
             fragmentTransaction.commit();
         } else {
-            Toast.makeText(getBaseContext(), "Invalid comment data", Toast.LENGTH_LONG).show();
+            Helper.toastColor(getBaseContext(), R.string.message_invalid_comment, R.color.color_danger);
             finish();
         }
-
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
         if (swipeRefreshLayout != null) {
@@ -201,10 +202,18 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
         }
     }
 
+    /**
+     * Set swipe to refresh enable or disable, user could swipe when reach top.
+     *
+     * @param state enable or not
+     */
     public void setSwipeEnable(boolean state) {
         swipeRefreshLayout.setEnabled(state);
     }
 
+    /**
+     * Perform submit comment request to server.
+     */
     private void submitComment() {
         progress.show();
 
@@ -222,12 +231,14 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
 
                         try {
                             JSONObject result = new JSONObject(response);
-                            String status = result.getString("status");
+                            String status = result.getString(APIBuilder.RESPONSE_STATUS);
+
+                            Log.e("Infogue/Comment", "[Submit] Success : " + status);
 
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                Helper.toastColor(getBaseContext(), "Comment has been posted!", Color.parseColor("#ddd1205e"));
+                                Helper.toastColor(getBaseContext(), getString(R.string.message_comment_posted), R.color.color_success_transparent);
                             } else {
-                                Log.w("Infogue/Hit", getString(R.string.error_unknown));
+                                Log.w("Infogue/Comment", "[Submit] 200 Code : " + getString(R.string.error_unknown));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -243,58 +254,78 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
                         if (networkResponse == null) {
                             if (error.getClass().equals(TimeoutError.class)) {
                                 errorMessage = getString(R.string.error_timeout);
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage = getString(R.string.error_no_connection);
                             }
                         } else {
                             String result = new String(networkResponse.data);
-                            Log.i("Infogue/Comment", result);
+
                             try {
                                 JSONObject response = new JSONObject(result);
-                                String status = response.getString("status");
-                                String message = response.getString("message");
+                                String status = response.optString(APIBuilder.RESPONSE_STATUS);
+                                String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
+
+                                Log.e("Infogue/Comment", "[Submit] Error : " + message);
 
                                 if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
-                                    errorMessage = message + ", please login again!";
+                                    errorMessage = getString(R.string.error_unauthorized);
+                                } else if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                    errorMessage = getString(R.string.error_not_found);
                                 } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                     errorMessage = message;
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                errorMessage = getString(R.string.error_parse_data);
                             }
                         }
-                        Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                        Helper.toastColor(getBaseContext(), errorMessage, R.color.color_danger_transparent);
                     }
                 }
         ) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("article_id", String.valueOf(articleId));
-                params.put("contributor_id", String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
-                params.put("comment", mCommentInput.getText().toString());
-                params.put("api_token", session.getSessionData(SessionManager.KEY_TOKEN, null));
+                params.put(Article.COMMENT, mCommentInput.getText().toString());
+                params.put(Article.FOREIGN, String.valueOf(articleId));
+                params.put(Contributor.FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
+                params.put(Contributor.TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
                 return params;
             }
         };
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000,
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(15000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
     }
 
+    /**
+     * Show comment form
+     */
     private void launchCommentForm() {
         formCommentDialog.show();
         Helper.setDialogButtonTheme(getBaseContext(), formCommentDialog);
     }
 
+    /**
+     * Create option menu, default info action related web app.
+     *
+     * @param menu being inflate
+     * @return boolean
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.info, menu);
         return true;
     }
 
+    /**
+     * Perform action when user select menu.
+     *
+     * @param item selected current menu
+     * @return boolean
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -318,8 +349,13 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Interaction listener when user click view holder of comment.
+     *
+     * @param comment model data
+     */
     @Override
     public void onCommentListClicked(Comment comment) {
-
+        // interact with comment list, for now do nothing! because we doesn't need to perform more further
     }
 }

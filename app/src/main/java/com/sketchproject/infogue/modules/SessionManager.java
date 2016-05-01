@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Handle session data and preferences.
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 10/04/2016 18.16 18.17.
  */
@@ -18,13 +20,9 @@ public class SessionManager {
     private SharedPreferences pref;
     private Editor editor;
 
-    // Shared pref unique file name
-    private static final String PREF_NAME = "INFOGUE_PREF";
-
-    // All Shared Preferences keys status
+    private static final String PREF_NAME = "com.sketchproject.infogue";
     private static final String IS_LOGIN = "isLoggedIn";
 
-    // User pref key
     public static final String KEY_ID = "id";
     public static final String KEY_NAME = "name";
     public static final String KEY_LOCATION = "location";
@@ -40,6 +38,11 @@ public class SessionManager {
     public static final String KEY_STATUS = "status";
     public static final String KEY_USER_LEARNED = "learned";
 
+    /**
+     * Default constructor of SessionManager
+     *
+     * @param context parent context
+     */
     public SessionManager(Context context) {
         pref = context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
         editor = pref.edit();
@@ -139,11 +142,24 @@ public class SessionManager {
         return pref.getInt(key, defValue);
     }
 
-    public boolean isMe(int id){
+    /**
+     * Quick check if id which given matched with active session.
+     *
+     * @param id reference id of session data
+     * @return boolean indicate is me or not
+     */
+    public boolean isMe(int id) {
         return getSessionData(SessionManager.KEY_ID, 0) == id;
     }
 
-    public boolean isMe(String username){
+    /**
+     * Quick check if username which given matched with active session.
+     *
+     * @param username reference unique user identity of session data
+     * @return boolean indicate is me or not
+     */
+    @SuppressWarnings("unused")
+    public boolean isMe(String username) {
         return getSessionData(SessionManager.KEY_ID, "").equals(username);
     }
 
@@ -153,17 +169,21 @@ public class SessionManager {
      * @return HashMap
      */
     @SuppressWarnings("unused")
-    public HashMap<String, String> getUserDetails() {
-        HashMap<String, String> user = new HashMap<>();
+    public HashMap<String, Object> getUserDetails() {
+        HashMap<String, Object> user = new HashMap<>();
 
         // Populate user data
-        user.put(KEY_ID, pref.getString(KEY_ID, null));
+        user.put(KEY_ID, pref.getInt(KEY_ID, 0));
         user.put(KEY_NAME, pref.getString(KEY_NAME, null));
         user.put(KEY_LOCATION, pref.getString(KEY_LOCATION, null));
         user.put(KEY_AVATAR, pref.getString(KEY_AVATAR, null));
         user.put(KEY_COVER, pref.getString(KEY_COVER, null));
         user.put(KEY_USERNAME, pref.getString(KEY_USERNAME, null));
         user.put(KEY_TOKEN, pref.getString(KEY_TOKEN, null));
+        user.put(KEY_ARTICLE, pref.getInt(KEY_ARTICLE, 0));
+        user.put(KEY_FOLLOWER, pref.getInt(KEY_FOLLOWER, 0));
+        user.put(KEY_FOLLOWING, pref.getInt(KEY_FOLLOWING, 0));
+        user.put(KEY_STATUS, pref.getString(KEY_STATUS, null));
         return user;
     }
 
@@ -183,7 +203,7 @@ public class SessionManager {
      * @return int
      */
     @SuppressWarnings("unused")
-    public int getSesionSize() {
+    public int getSessionSize() {
         return pref.getAll().size();
     }
 
@@ -199,6 +219,10 @@ public class SessionManager {
         editor.remove(KEY_COVER);
         editor.remove(KEY_USERNAME);
         editor.remove(KEY_TOKEN);
+        editor.remove(KEY_ARTICLE);
+        editor.remove(KEY_FOLLOWER);
+        editor.remove(KEY_FOLLOWING);
+        editor.remove(KEY_STATUS);
         editor.remove(IS_LOGIN);
 
         // editor.clear();

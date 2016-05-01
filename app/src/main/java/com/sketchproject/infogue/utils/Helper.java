@@ -5,8 +5,8 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
+import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ContextThemeWrapper;
@@ -29,18 +29,18 @@ public class Helper {
     /**
      * Create dialog with positive and negative button.
      *
-     * @param context dialog
-     * @param titleId title resource id
-     * @param messageId message resource id
-     * @param textIdPositive text button positive
-     * @param textIdNegative text button negative
+     * @param context          dialog
+     * @param titleId          title resource id
+     * @param messageId        message resource id
+     * @param textIdPositive   text button positive
+     * @param textIdNegative   text button negative
      * @param positiveListener button positive event handler
      * @param negativeListener button negative event handler
      * @return Alert dialog
      */
     public static AlertDialog createDialog(Context context, int titleId, int messageId, int textIdPositive, int textIdNegative,
                                            DialogInterface.OnClickListener positiveListener,
-                                           DialogInterface.OnClickListener negativeListener){
+                                           DialogInterface.OnClickListener negativeListener) {
 
         return createDialog(context, titleId, messageId, textIdPositive, textIdNegative, 0, positiveListener, negativeListener, null);
     }
@@ -48,29 +48,29 @@ public class Helper {
     /**
      * Create dialog with positive, negative and neutral button.
      *
-     * @param context dialog
-     * @param titleId title resource id
-     * @param messageId message resource id
-     * @param textIdPositive text button positive
-     * @param textIdNegative text button negative
-     * @param textIdNeutral text button neutral
+     * @param context          dialog
+     * @param titleId          title resource id
+     * @param messageId        message resource id
+     * @param textIdPositive   text button positive
+     * @param textIdNegative   text button negative
+     * @param textIdNeutral    text button neutral
      * @param positiveListener button positive event handler
      * @param negativeListener button negative event handler
-     * @param neutralListener button neutral event handler
+     * @param neutralListener  button neutral event handler
      * @return Alert dialog
      */
     public static AlertDialog createDialog(Context context, int titleId, int messageId,
                                            int textIdPositive, int textIdNegative, int textIdNeutral,
                                            DialogInterface.OnClickListener positiveListener,
                                            DialogInterface.OnClickListener negativeListener,
-                                           DialogInterface.OnClickListener neutralListener){
+                                           DialogInterface.OnClickListener neutralListener) {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.AppTheme_NoActionBar));
         builder.setTitle(titleId);
         builder.setMessage(messageId);
         builder.setPositiveButton(textIdPositive, positiveListener);
         builder.setNegativeButton(textIdNegative, negativeListener);
-        if(textIdNeutral != 0 && neutralListener != null){
+        if (textIdNeutral != 0 && neutralListener != null) {
             builder.setNeutralButton(textIdNegative, negativeListener);
         }
 
@@ -100,10 +100,10 @@ public class Helper {
         return dialog;
     }
 
-    public static Toast toastColor(Context context, String message, @ColorInt int color) {
+    public static Toast toastColor(Context context, @StringRes int message, @ColorRes int color) {
         Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
         View view = toast.getView();
-        view.setBackgroundColor(color);
+        view.setBackgroundResource(color);
         view.setPadding(20, 20, 20, 20);
         TextView tv = (TextView) view.findViewById(android.R.id.message);
         tv.setShadowLayer(0, 0, 0, ContextCompat.getColor(context, R.color.transparent));
@@ -114,10 +114,10 @@ public class Helper {
         return toast;
     }
 
-    public static Toast toastColorResource(Context context, String message, @ColorRes int color) {
+    public static Toast toastColor(Context context, String message, @ColorRes int color) {
         Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
         View view = toast.getView();
-        view.setBackgroundColor(ContextCompat.getColor(context, color));
+        view.setBackgroundResource(color);
         view.setPadding(20, 20, 20, 20);
         TextView tv = (TextView) view.findViewById(android.R.id.message);
         tv.setShadowLayer(0, 0, 0, ContextCompat.getColor(context, R.color.transparent));

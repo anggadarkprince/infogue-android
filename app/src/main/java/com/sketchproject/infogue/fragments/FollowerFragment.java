@@ -1,7 +1,6 @@
 package com.sketchproject.infogue.fragments;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
@@ -26,8 +27,8 @@ import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.Helper;
 import com.sketchproject.infogue.utils.APIBuilder;
+import com.sketchproject.infogue.utils.Helper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +39,7 @@ import java.util.List;
 
 /**
  * A fragment representing a list of Items.
- * <p/>
+ * <p>
  * Activities containing this fragment MUST implement the {@link OnFollowerInteractionListener}
  * interface.
  */
@@ -242,11 +243,10 @@ public class FollowerFragment extends Fragment {
                                     followerAdapter.notifyItemRangeInserted(curSize, allFollowers.size() - 1);
                                     Log.i("INFOGUE/Contributor", "Load More page " + page);
                                 } else {
-                                    Helper.toastColor(getContext(), getActivity().getString(R.string.error_server), Color.parseColor("#ddd1205e"));
+                                    Helper.toastColor(getContext(), R.string.error_unknown, R.color.color_warning_transparent);
 
-                                    // indicate the error
+                                    // add error view holder
                                     isEndOfPage = true;
-                                    Log.i("INFOGUE/Contributor", "Failure on page " + page);
                                     Contributor failureContributor = new Contributor(-1, null);
                                     allFollowers.add(failureContributor);
                                 }
@@ -259,23 +259,33 @@ public class FollowerFragment extends Fragment {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+
                             // remove last loading
                             allFollowers.remove(allFollowers.size() - 1);
                             followerAdapter.notifyItemRemoved(allFollowers.size());
 
+                            NetworkResponse networkResponse = error.networkResponse;
                             String errorMessage = getActivity().getString(R.string.error_server);
-                            if (error.networkResponse == null) {
+                            if (networkResponse == null) {
                                 if (error.getClass().equals(TimeoutError.class)) {
                                     errorMessage = getActivity().getString(R.string.error_timeout);
-                                } else {
-                                    errorMessage = getActivity().getString(R.string.error_unknown);
+                                } else if (error.getClass().equals(NoConnectionError.class)) {
+                                    errorMessage = getString(R.string.error_no_connection);
+                                }
+                            } else {
+                                if (networkResponse.statusCode == 404) {
+                                    errorMessage = getString(R.string.error_not_found);
+                                } else if (networkResponse.statusCode == 500) {
+                                    errorMessage = getString(R.string.error_server);
+                                } else if (networkResponse.statusCode == 503) {
+                                    errorMessage = getString(R.string.error_maintenance);
                                 }
                             }
-                            Helper.toastColor(getContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            Helper.toastColor(getContext(), errorMessage, R.color.color_danger_transparent);
 
-                            // indicate the error or timeout
+                            // add error view holder
                             isEndOfPage = true;
-                            Log.i("INFOGUE/Contributor", "Failure or timeout on page " + page);
                             Contributor failureContributor = new Contributor(-1, null);
                             allFollowers.add(failureContributor);
                         }

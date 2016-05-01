@@ -1,7 +1,6 @@
 package com.sketchproject.infogue.fragments;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
@@ -26,8 +27,8 @@ import com.sketchproject.infogue.adapters.ArticleRecyclerViewAdapter;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.Helper;
 import com.sketchproject.infogue.utils.APIBuilder;
+import com.sketchproject.infogue.utils.Helper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -347,7 +348,7 @@ public class ArticleFragment extends Fragment {
                                     articleAdapter.notifyItemRangeInserted(curSize, allArticles.size() - 1);
                                     Log.i("INFOGUE/Article", "Load More page " + page);
                                 } else {
-                                    Helper.toastColor(getContext(), getString(R.string.error_server), Color.parseColor("#ddd1205e"));
+                                    Helper.toastColor(getContext(), R.string.error_server, R.color.color_warning_transparent);
 
                                     isEndOfPage = true;
                                     Log.i("INFOGUE/Article", "Empty on page " + page);
@@ -362,6 +363,8 @@ public class ArticleFragment extends Fragment {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+
                             if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                                 swipeRefreshLayout.setRefreshing(false);
                             }
@@ -370,22 +373,30 @@ public class ArticleFragment extends Fragment {
                             allArticles.remove(allArticles.size() - 1);
                             articleAdapter.notifyItemRemoved(allArticles.size());
 
-                            String errorMessage = getActivity().getString(R.string.error_server);
-                            if (error.networkResponse == null) {
+                            NetworkResponse networkResponse = error.networkResponse;
+                            String errorMessage = getActivity().getString(R.string.error_unknown);
+                            if (networkResponse == null) {
                                 if (error.getClass().equals(TimeoutError.class)) {
                                     errorMessage = getActivity().getString(R.string.error_timeout);
-                                } else {
-                                    errorMessage = getActivity().getString(R.string.error_unknown);
+                                } else if (error.getClass().equals(NoConnectionError.class)) {
+                                    errorMessage = getString(R.string.error_no_connection);
                                 }
                             }
-                            Helper.toastColor(getContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                            else{
+                                if (networkResponse.statusCode == 404) {
+                                    errorMessage = getString(R.string.error_not_found);
+                                } else if (networkResponse.statusCode == 500) {
+                                    errorMessage = getString(R.string.error_server);
+                                } else if (networkResponse.statusCode == 503) {
+                                    errorMessage = getString(R.string.error_maintenance);
+                                }
+                            }
+                            Helper.toastColor(getContext(), errorMessage, R.color.color_danger_transparent);
 
-                            // indicate the error
+                            // add error view holder
                             isEndOfPage = true;
-                            Log.i("INFOGUE/Article", "Empty on page " + page);
-                            Article emptyArticle = new Article(0, null, "Empty page");
+                            Article emptyArticle = new Article(0, null, "Error page");
                             allArticles.add(emptyArticle);
-                            error.printStackTrace();
                         }
                     }
             );

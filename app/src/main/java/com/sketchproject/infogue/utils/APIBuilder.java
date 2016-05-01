@@ -26,6 +26,8 @@ public class APIBuilder {
 
     public static final String URL_APP = "http://play.google.com/store/apps/details?id=com.sketchproject.infogue";
     public static final String URL_DISQUS_TEMPLATE = "http://infogue.angga-ari.com/mobiletemplate.html";
+    public static final String URL_FACEBOOK_DEVELOPER = "https://facebook.com/sketchproject";
+    public static final String URL_TWITTER_DEVELOPER = "https://twitter.com/sketchproject";
 
     public static final String REQUEST_EXIST = "exist"; // code 400 bad request
     public static final String REQUEST_DENIED = "denied"; // code 400 bad request

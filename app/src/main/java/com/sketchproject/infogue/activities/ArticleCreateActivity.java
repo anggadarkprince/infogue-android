@@ -35,6 +35,7 @@ import android.widget.ScrollView;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
@@ -70,6 +71,12 @@ import fr.ganfra.materialspinner.MaterialSpinner;
 import jp.wasabeef.richeditor.RichEditor;
 import me.gujun.android.taggroup.TagGroup;
 
+/**
+ * A {@link AppCompatActivity} subclass contains article form and handle save operation.
+ *
+ * Sketch Project Studio
+ * Created by Angga on 7/04/2016 10.37.
+ */
 public class ArticleCreateActivity extends AppCompatActivity implements Validator.ViewValidation {
 
     public static final String CALLED_FROM_MAIN = "fromMainActivity";
@@ -87,7 +94,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
     protected ProgressDialog progress;
     protected ScrollView mScrollView;
 
-    protected AlertDialog dialogDiscard;
+    protected AlertDialog confirmationDialog;
     protected EditText mTitleInput;
     protected MaterialSpinner mCategorySpinner;
     protected MaterialSpinner mSubcategorySpinner;
@@ -108,10 +115,10 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
     protected List<Category> categoriesList;
     protected List<Subcategory> subcategoriesList;
 
-    protected String realPathFeatured;
     protected boolean isCalledFromMainActivity;
     protected boolean isNewFeatured;
     protected boolean isUpdate;
+    protected String realPathFeatured;
     protected String apiUrl;
 
     @SuppressWarnings("ConstantConditions")
@@ -159,7 +166,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mSlugInput.setText(createSlug(s.toString()));
+                mSlugInput.setText(Helper.createSlug(s.toString()));
             }
 
             @Override
@@ -323,27 +330,27 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 params.setMargins(40, 0, 40, 5);
 
                 final EditText link = new EditText(v.getContext());
-                link.setHint("Image link");
+                link.setHint(R.string.prompt_image_link);
                 link.setLayoutParams(params);
                 layout.addView(link);
 
                 final EditText title = new EditText(v.getContext());
-                title.setHint("Alternative title");
+                title.setHint(R.string.prompt_image_title);
                 title.setLayoutParams(params);
                 layout.addView(title);
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(ArticleCreateActivity.this);
-                builder.setTitle("Insert Image");
-                builder.setMessage("Put complete image link and alternative title.");
+                builder.setTitle(R.string.action_insert_image);
+                builder.setMessage(getString(R.string.message_put_image));
                 builder.setView(layout);
-                builder.setPositiveButton("Insert", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(R.string.action_insert_image, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mContentEditor.insertImage(link.getText().toString(), title.getText().toString());
                     }
                 });
 
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -367,28 +374,28 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 params.setMargins(40, 0, 40, 5);
 
                 final EditText link = new EditText(v.getContext());
-                link.setHint("Link URL");
+                link.setHint(R.string.prompt_link_url);
                 link.setText(APIBuilder.URL_APP);
                 link.setLayoutParams(params);
                 layout.addView(link);
 
                 final EditText title = new EditText(v.getContext());
-                title.setHint("Link title");
+                title.setHint(R.string.prompt_link_title);
                 title.setLayoutParams(params);
                 layout.addView(title);
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(ArticleCreateActivity.this);
-                builder.setTitle("Insert Link");
-                builder.setMessage("Put complete link url and link title.");
+                builder.setTitle(R.string.action_insert_link);
+                builder.setMessage(R.string.message_put_link);
                 builder.setView(layout);
-                builder.setPositiveButton("Insert Link", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(R.string.action_insert_link, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mContentEditor.insertLink(link.getText().toString(), title.getText().toString());
                     }
                 });
 
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -408,7 +415,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 // Always show the chooser (if there are multiple options available)
-                startActivityForResult(Intent.createChooser(intent, "Select Featured"), PICK_IMAGE_REQUEST);
+                startActivityForResult(Intent.createChooser(intent, getString(R.string.label_select_featured)), PICK_IMAGE_REQUEST);
             }
         });
 
@@ -493,16 +500,17 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
     @Override
     public void onBackPressed() {
-        if (dialogDiscard != null && dialogDiscard.isShowing()) {
-            dialogDiscard.cancel();
+        if (confirmationDialog != null && confirmationDialog.isShowing()) {
+            confirmationDialog.cancel();
         } else {
             discardConfirmation();
         }
     }
 
+    /**
+     * Show save dialog to make sure user perform the right action.
+     */
     protected void saveConfirmation() {
-        Log.i("Infogue/Sub id", String.valueOf(article.getSubcategoryId()));
-
         int action;
         if (mPublishedRadio.isChecked()) {
             action = R.string.action_save_publish;
@@ -521,7 +529,6 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 saveData();
             }
         });
-
         builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -529,11 +536,14 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
             }
         });
 
-        AlertDialog dialogSave = builder.create();
-        dialogSave.show();
-        Helper.setDialogButtonTheme(this, dialogSave);
+        confirmationDialog = builder.create();
+        confirmationDialog.show();
+        Helper.setDialogButtonTheme(this, confirmationDialog);
     }
 
+    /**
+     * Show discard dialog when user try to hit home or back from navigation bar.
+     */
     protected void discardConfirmation() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.label_dialog_discard_article));
@@ -568,11 +578,14 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
             }
         });
 
-        dialogDiscard = builder.create();
-        dialogDiscard.show();
-        Helper.setDialogButtonTheme(this, dialogDiscard);
+        confirmationDialog = builder.create();
+        confirmationDialog.show();
+        Helper.setDialogButtonTheme(this, confirmationDialog);
     }
 
+    /**
+     * Placeholder validator method to handle populating inputs.
+     */
     @Override
     public void preValidation() {
         article = new Article();
@@ -581,8 +594,6 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
         if (categoriesList != null) {
             int index = mCategorySpinner.getSelectedItemPosition() - 1;
-            Log.i("Infogue/Category", "Selected index "+String.valueOf(index));
-
             if(mCategorySpinner.getSelectedItemPosition() - 1 >= 0){
                 int categoryId = categoriesList.get(index).getId();
                 String categoryLabel = categoriesList.get(index).getCategory();
@@ -594,14 +605,12 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 article.setCategoryId(0);
                 article.setCategory(null);
             }
-            Log.i("Infogue/Category", "Id " + article.getCategoryId() + " Label " + article.getCategory());
         } else {
-            Log.e("Infogue/Category", "is null");
+            Log.e("Infogue/Category", "List is null");
         }
 
         if (subcategoriesList != null) {
             int index = mSubcategorySpinner.getSelectedItemPosition() - 1;
-            Log.i("Infogue/Subcategory", String.valueOf(index));
             if(index >= 0){
                 int subcategoryId = subcategoriesList.get(index).getId();
                 String subcategoryLabel = subcategoriesList.get(index).getSubcategory();
@@ -613,10 +622,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 article.setSubcategoryId(0);
                 article.setSubcategory(null);
             }
-
-            Log.i("Infogue/Subcategory", "Id " + article.getSubcategoryId() + " Label " + article.getSubcategory());
         } else {
-            Log.e("Infogue/Subcategory", "is null");
+            Log.e("Infogue/Subcategory", "List is null");
         }
 
         article.setFeatured(realPathFeatured);
@@ -628,6 +635,11 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         article.setAuthorId(session.getSessionData(SessionManager.KEY_ID, 0));
     }
 
+    /**
+     * Placeholder validator method to handle validation rules.
+     *
+     * @return boolean
+     */
     @Override
     public boolean onValidateView() {
         validationMessage = new ArrayList<>();
@@ -737,6 +749,11 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         return !isInvalid;
     }
 
+    /**
+     * Validator placeholder function to handle process after validation.
+     *
+     * @param isValid indicate input form is valid or not
+     */
     @Override
     public void postValidation(boolean isValid) {
         if (isValid) {
@@ -751,12 +768,17 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         }
     }
 
+    /**
+     * Perform save article request to server, save request depend on activity was called,
+     * create activity or edit activity.
+     */
     protected void saveData() {
         if (connectionDetector.isNetworkAvailable()) {
             progress.setMessage(getString(R.string.label_save_article_progress));
             progress.show();
 
-            VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, apiUrl, new Response.Listener<NetworkResponse>() {
+            VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(
+                    Request.Method.POST, apiUrl, new Response.Listener<NetworkResponse>() {
                 @Override
                 public void onResponse(NetworkResponse response) {
                     String resultResponse = new String(response.data);
@@ -764,10 +786,13 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                         JSONObject result = new JSONObject(resultResponse);
                         String status = result.getString(APIBuilder.RESPONSE_STATUS);
                         String message = result.getString(APIBuilder.RESPONSE_MESSAGE);
-                        Log.i("Infogue/Article", message);
+
+                        Log.i("Infogue/Article", "[Create] Success : " + message);
 
                         if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                             if (isCalledFromMainActivity) {
+                                // if this activity called from main activity, we need to call new article list activity
+                                // and passing author of those articles
                                 Intent articleIntent = new Intent(getBaseContext(), ArticleActivity.class);
                                 articleIntent.putExtra(SessionManager.KEY_ID, session.getSessionData(SessionManager.KEY_ID, 0));
                                 articleIntent.putExtra(SessionManager.KEY_USERNAME, session.getSessionData(SessionManager.KEY_USERNAME, null));
@@ -777,6 +802,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                                 articleIntent.putExtra(RESULT_CODE, AppCompatActivity.RESULT_OK);
                                 startActivity(articleIntent);
                             } else {
+                                // if this activity is not called from main activity then called from article list,
+                                // after success just finish and return intent which contain status true.
                                 Intent returnIntent = new Intent();
                                 returnIntent.putExtra(ArticleActivity.SAVE_ARTICLE, true);
                                 returnIntent.putExtra(CALLED_FROM_MAIN, isCalledFromMainActivity);
@@ -785,19 +812,19 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                             finish();
 
                         } else {
+                            mScrollView.smoothScrollTo(0, 0);
                             alert.setAlertType(AlertFragment.ALERT_INFO);
                             alert.setAlertMessage(getString(R.string.error_unknown));
                             alert.show();
-                            mScrollView.smoothScrollTo(0, 0);
                         }
                         realPathFeatured = null;
 
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        mScrollView.smoothScrollTo(0, 0);
                         alert.setAlertType(AlertFragment.ALERT_WARNING);
                         alert.setAlertMessage(getString(R.string.error_parse_data));
                         alert.show();
-                        mScrollView.smoothScrollTo(0, 0);
                     }
                     progress.cancel();
                 }
@@ -811,6 +838,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                     if (networkResponse == null) {
                         if (error.getClass().equals(TimeoutError.class)) {
                             errorMessage = getString(R.string.error_timeout);
+                        } else if (error.getClass().equals(NoConnectionError.class)) {
+                            errorMessage = getString(R.string.error_no_connection);
                         }
                     } else {
                         try {
@@ -819,7 +848,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                             String status = response.optString(APIBuilder.RESPONSE_STATUS);
                             String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
-                            Log.e("Infogue/Article", "Error::" + message);
+                            Log.e("Infogue/Article", "[Create] Error : " + message);
 
                             if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
                                 errorMessage = message;
@@ -859,7 +888,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                     params.put(Article.EXCERPT, article.getExcerpt());
                     params.put(Article.STATUS, article.getStatus());
                     if (isUpdate) {
-                        params.put("_method", "put");
+                        params.put(APIBuilder.METHOD, APIBuilder.METHOD_PUT);
                     }
                     return params;
                 }
@@ -875,28 +904,10 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                     return params;
                 }
             };
-            multipartRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    50000,
-                    0,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
+            multipartRequest.setRetryPolicy(new DefaultRetryPolicy(50000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
         } else {
-            connectionDetector.snackbarDisconnectNotification(mSelectButton, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    connectionDetector.dismissNotification();
-                }
-            });
+            connectionDetector.snackbarDisconnectNotification(mSelectButton, null);
         }
-    }
-
-    protected String createSlug(String title) {
-        String trimmed = title.trim();
-        String slug = trimmed
-                .replaceAll("[^a-zA-Z0-9-]", "-")
-                .replaceAll("-+", "-")
-                .replaceAll("^-|-$", "");
-        return slug.toLowerCase();
     }
 }

@@ -66,7 +66,7 @@ public class ArticleContextBuilder {
                 } else if (menu.equals(dialogContext.getString(R.string.action_long_share))) {
                     event.shareArticle();
                 } else if (menu.equals(dialogContext.getString(R.string.action_long_rate))) {
-                    event.rateArticle();
+                    event.rateArticle(5);
                 } else if (menu.equals(dialogContext.getString(R.string.action_long_edit))) {
                     event.editArticle();
                 } else if (menu.equals(dialogContext.getString(R.string.action_long_delete))) {

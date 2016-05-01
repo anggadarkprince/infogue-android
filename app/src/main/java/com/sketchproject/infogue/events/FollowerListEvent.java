@@ -8,10 +8,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
@@ -39,7 +41,7 @@ import java.util.Map;
 public class FollowerListEvent {
     private Context context;
     private static Contributor contributor;
-    private static ImageButton followButton;
+    private static View followButton;
 
     /**
      * Initialize Follower event list.
@@ -61,7 +63,14 @@ public class FollowerListEvent {
         Log.i("Infogue/Contributor", "ID : " + contributorData.getId() + " Username : " + contributorData.getUsername());
         this.context = context;
         contributor = contributorData;
-        followButton = (ImageButton) buttonControl;
+        if (buttonControl instanceof ImageButton) {
+            followButton = buttonControl;
+        } else if (buttonControl instanceof Button) {
+            followButton = buttonControl;
+        } else {
+            followButton = null;
+            throwArgumentException();
+        }
     }
 
     /**
@@ -140,11 +149,7 @@ public class FollowerListEvent {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 boolean isFollowing = data.getBooleanExtra(SessionManager.KEY_IS_FOLLOWING, false);
                 contributor.setIsFollowing(isFollowing);
-                if (isFollowing) {
-                    followButton.setImageResource(R.drawable.btn_unfollow);
-                } else {
-                    followButton.setImageResource(R.drawable.btn_follow);
-                }
+                toggleFollowButton(contributor.isFollowing());
             }
         }
     }
@@ -162,8 +167,8 @@ public class FollowerListEvent {
         final SessionManager session = new SessionManager(context);
         if (session.isLoggedIn()) {
             if (contributor.isFollowing()) {
-                followButton.setImageResource(R.drawable.btn_follow);
                 contributor.setIsFollowing(false);
+                toggleFollowButton(contributor.isFollowing());
 
                 StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_UNFOLLOW,
                         new Response.Listener<String>() {
@@ -194,6 +199,8 @@ public class FollowerListEvent {
                                 if (networkResponse == null) {
                                     if (error.getClass().equals(TimeoutError.class)) {
                                         errorMessage = context.getString(R.string.error_timeout);
+                                    } else if (error.getClass().equals(NoConnectionError.class)) {
+                                        errorMessage = context.getString(R.string.error_no_connection);
                                     }
                                 } else {
                                     String result = new String(networkResponse.data);
@@ -202,32 +209,34 @@ public class FollowerListEvent {
                                         String status = response.optString(APIBuilder.RESPONSE_STATUS);
                                         String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
-                                        if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
-                                            errorMessage = context.getString(R.string.error_unauthorized);
-                                        } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                        if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
                                             errorMessage = message;
+                                        } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                            errorMessage = context.getString(R.string.error_unauthorized);
                                         } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
                                             errorMessage = context.getString(R.string.error_server);
+                                        } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                            errorMessage = context.getString(R.string.error_maintenance);
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
+                                        errorMessage = context.getString(R.string.error_parse_data);
                                     }
                                 }
-                                Helper.toastColor(context, errorMessage,
-                                        ContextCompat.getColor(context, R.color.color_danger));
+                                Helper.toastColor(context, errorMessage, R.color.color_danger_transparent);
 
-                                followButton.setImageResource(R.drawable.btn_unfollow);
                                 contributor.setIsFollowing(true);
+                                toggleFollowButton(contributor.isFollowing());
                             }
                         }
                 ) {
                     @Override
                     protected Map<String, String> getParams() {
                         Map<String, String> params = new HashMap<>();
-                        params.put("api_token", session.getSessionData(SessionManager.KEY_TOKEN, null));
-                        params.put("contributor_id", String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
-                        params.put("following_id", String.valueOf(contributor.getId()));
-                        params.put("_method", "delete");
+                        params.put(Contributor.TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
+                        params.put(Contributor.FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
+                        params.put(Contributor.FOLLOWING_CONTRIBUTOR, String.valueOf(contributor.getId()));
+                        params.put(APIBuilder.METHOD, APIBuilder.METHOD_DELETE);
                         return params;
                     }
                 };
@@ -238,8 +247,8 @@ public class FollowerListEvent {
 
                 VolleySingleton.getInstance(context).addToRequestQueue(postRequest);
             } else {
-                followButton.setImageResource(R.drawable.btn_unfollow);
                 contributor.setIsFollowing(true);
+                toggleFollowButton(contributor.isFollowing());
 
                 StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_FOLLOW,
                         new Response.Listener<String>() {
@@ -270,6 +279,8 @@ public class FollowerListEvent {
                                 if (networkResponse == null) {
                                     if (error.getClass().equals(TimeoutError.class)) {
                                         errorMessage = context.getString(R.string.error_timeout);
+                                    } else if (error.getClass().equals(NoConnectionError.class)) {
+                                        errorMessage = context.getString(R.string.error_no_connection);
                                     }
                                 } else {
                                     String result = new String(networkResponse.data);
@@ -278,31 +289,33 @@ public class FollowerListEvent {
                                         String status = response.optString(APIBuilder.RESPONSE_STATUS);
                                         String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
-                                        if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
+                                        if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
+                                            errorMessage = message;
+                                        } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
                                             errorMessage = context.getString(R.string.error_unauthorized);
-                                        } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
-                                            errorMessage = message;
                                         } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
-                                            errorMessage = message;
+                                            errorMessage = context.getString(R.string.error_server);
+                                        } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                            errorMessage = context.getString(R.string.error_maintenance);
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
+                                        errorMessage = context.getString(R.string.error_parse_data);
                                     }
                                 }
-                                Helper.toastColor(context, errorMessage,
-                                        ContextCompat.getColor(context, R.color.color_danger));
+                                Helper.toastColor(context, errorMessage, R.color.color_danger_transparent);
 
-                                followButton.setImageResource(R.drawable.btn_follow);
                                 contributor.setIsFollowing(false);
+                                toggleFollowButton(contributor.isFollowing());
                             }
                         }
                 ) {
                     @Override
                     protected Map<String, String> getParams() {
                         Map<String, String> params = new HashMap<>();
-                        params.put("api_token", session.getSessionData(SessionManager.KEY_TOKEN, null));
-                        params.put("contributor_id", String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
-                        params.put("following_id", String.valueOf(contributor.getId()));
+                        params.put(Contributor.TOKEN, session.getSessionData(SessionManager.KEY_TOKEN, null));
+                        params.put(Contributor.FOREIGN, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
+                        params.put(Contributor.FOLLOWING_CONTRIBUTOR, String.valueOf(contributor.getId()));
                         return params;
                     }
                 };
@@ -316,6 +329,31 @@ public class FollowerListEvent {
         } else {
             Intent authIntent = new Intent(context, AuthenticationActivity.class);
             context.startActivity(authIntent);
+        }
+    }
+
+    /**
+     * Toggle button state is following or unfollowing.
+     *
+     * @param isFollowing current following state
+     */
+    private void toggleFollowButton(boolean isFollowing){
+        if (isFollowing) {
+            if(followButton instanceof ImageButton){
+                ((ImageButton)followButton).setImageResource(R.drawable.btn_unfollow);
+            } else if (followButton instanceof Button){
+                followButton.setBackgroundResource(R.drawable.btn_primary);
+                ((Button)followButton).setTextColor(ContextCompat.getColor(context, R.color.light));
+                ((Button)followButton).setText(R.string.action_unfollow);
+            }
+        } else {
+            if(followButton instanceof ImageButton){
+                ((ImageButton)followButton).setImageResource(R.drawable.btn_follow);
+            } else if (followButton instanceof Button){
+                followButton.setBackgroundResource(R.drawable.btn_toggle);
+                ((Button)followButton).setTextColor(ContextCompat.getColor(context, R.color.primary));
+                ((Button)followButton).setText(R.string.action_follow);
+            }
         }
     }
 

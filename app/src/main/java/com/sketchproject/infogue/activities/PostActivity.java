@@ -1,10 +1,8 @@
 package com.sketchproject.infogue.activities;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -25,44 +23,43 @@ import android.widget.TextView;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.events.ArticleListEvent;
+import com.sketchproject.infogue.events.FollowerListEvent;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.models.Category;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.models.Subcategory;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
-import com.sketchproject.infogue.utils.Helper;
 import com.sketchproject.infogue.utils.APIBuilder;
+import com.sketchproject.infogue.utils.Helper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import me.gujun.android.taggroup.TagGroup;
 
+/**
+ * A {@link AppCompatActivity} subclass, show post article.
+ *
+ * Sketch Project Studio
+ * Created by Angga on 20/012/2016 10.37.
+ */
 public class PostActivity extends AppCompatActivity {
-    private SessionManager session;
     private int mLoggedId;
-    private int mAuthorId;
-    private String mApiToken;
-
-    private int articleId;
     private String articleSlug;
-    private String articleTitle;
-    private boolean isFollowingAuthor;
 
     private LinearLayout mArticleWrapper;
     private ImageView mArticleFeatured;
@@ -82,8 +79,17 @@ public class PostActivity extends AppCompatActivity {
     private TextView mContributorLocation;
     private ImageButton mContributorFollowButton;
 
-    private ProgressDialog progress;
+    private Article articleModel;
+    private Contributor contributorModel;
 
+    private ProgressDialog progress;
+    private Context context;
+
+    /**
+     * Perform initialization of PostActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,9 +100,9 @@ public class PostActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        session = new SessionManager(getBaseContext());
+        context = this;
+        SessionManager session = new SessionManager(getBaseContext());
         mLoggedId = session.getSessionData(SessionManager.KEY_ID, 0);
-        mApiToken = session.getSessionData(SessionManager.KEY_TOKEN, "");
 
         mArticleWrapper = (LinearLayout) findViewById(R.id.article);
         mArticleFeatured = (ImageView) findViewById(R.id.featured);
@@ -122,20 +128,6 @@ public class PostActivity extends AppCompatActivity {
         mContributorButton = (RelativeLayout) findViewById(R.id.btn_contributor);
         mContributorFollowButton = (ImageButton) findViewById(R.id.btn_follow_control);
 
-        Button mCommentButton = (Button) findViewById(R.id.btn_comment);
-        if (mCommentButton != null) {
-            mCommentButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent commentIntent = new Intent(getBaseContext(), CommentActivity.class);
-                    commentIntent.putExtra(Article.ID, articleId);
-                    commentIntent.putExtra(Article.SLUG, articleSlug);
-                    commentIntent.putExtra(Article.TITLE, articleTitle);
-                    startActivity(commentIntent);
-                }
-            });
-        }
-
         mArticleTags.setOnTagClickListener(new TagGroup.OnTagClickListener() {
             @Override
             public void onTagClick(String tag) {
@@ -150,519 +142,302 @@ public class PostActivity extends AppCompatActivity {
         progress.setMessage(getString(R.string.label_retrieve_article_progress));
         progress.setIndeterminate(true);
         progress.setCanceledOnTouchOutside(false);
-        progress.show();
 
-        buildArticle();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ProfileActivity.PROFILE_RESULT_CODE) {
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-                boolean isFollowing = data.getBooleanExtra(SessionManager.KEY_IS_FOLLOWING, false);
-                Log.i("INFOGUE/Post", "Result " + isFollowing);
-                isFollowingAuthor = isFollowing;
-                if (isFollowing) {
-                    mContributorFollowButton.setImageResource(R.drawable.btn_unfollow);
-                } else {
-                    mContributorFollowButton.setImageResource(R.drawable.btn_follow);
-                }
-            }
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private void buildArticle() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            articleId = extras.getInt(Article.ID);
+            // articleId = extras.getInt(Article.ID);
+            // articleTitle = extras.getString(Article.TITLE);
             articleSlug = extras.getString(Article.SLUG);
-            articleTitle = extras.getString(Article.TITLE);
 
             mArticleWrapper.setVisibility(View.GONE);
+
             Glide.with(getBaseContext())
                     .load(extras.getString(Article.FEATURED))
                     .placeholder(R.drawable.placeholder_rectangle)
                     .centerCrop()
                     .crossFade()
                     .into(mArticleFeatured);
-            mArticleTitle.setText(extras.getString(Article.TITLE));
 
-            JsonObjectRequest articleRequest = new JsonObjectRequest(Request.Method.GET, APIBuilder.getApiPostUrl(articleSlug, mLoggedId), null,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                String status = response.getString("status");
-
-                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                    JSONObject article = response.getJSONObject("article");
-                                    final JSONObject author = article.getJSONObject("contributor");
-                                    JSONObject subcategory = article.getJSONObject(Article.SUBCATEGORY);
-                                    JSONObject category = subcategory.getJSONObject(Article.CATEGORY);
-                                    JSONArray tags = article.getJSONArray(Article.TAGS);
-
-                                    mArticleCategory.setText(category.getString(Category.CATEGORY).toUpperCase());
-                                    mArticleContributor.setText(author.getString(Contributor.NAME));
-                                    mArticlePublished.setText(article.getString(Article.CREATED_AT));
-                                    mArticleContent.loadData(Helper.wrapHtmlString(article.getString(Article.CONTENT)), "text/html", "UTF-8");
-                                    String excerpt = article.getString(Article.EXCERPT);
-                                    if (excerpt == null || excerpt.isEmpty()) {
-                                        mArticleExcerpt.setVisibility(View.GONE);
-                                    } else {
-                                        mArticleExcerpt.setVisibility(View.VISIBLE);
-                                        mArticleExcerpt.setText(article.getString(Article.EXCERPT));
-                                    }
-
-                                    String sub = subcategory.getString(Subcategory.SUBCATEGORY);
-                                    int view = article.getInt(Article.VIEW);
-                                    int stars = article.getInt(Article.RATING);
-                                    mArticleDetail.setText(sub + "  |  " + view + "X Views  |  " + stars + " Stars");
-                                    mArticleRating.setRating(stars);
-                                    switch (stars) {
-                                        case 1:
-                                            mArticleRatingDesc.setText("WORST ARTICLE");
-                                            break;
-                                        case 2:
-                                            mArticleRatingDesc.setText("BAD ARTICLE");
-                                            break;
-                                        case 3:
-                                            mArticleRatingDesc.setText("GOOD ARTICLE");
-                                            break;
-                                        case 4:
-                                            mArticleRatingDesc.setText("EXCELLENT ARTICLE");
-                                            break;
-                                        case 5:
-                                            mArticleRatingDesc.setText("GREAT ARTICLE");
-                                            break;
-                                        default:
-                                            mArticleRatingDesc.setText("UNRATED ARTICLE");
-                                            break;
-                                    }
-                                    mArticleRating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-                                        @Override
-                                        public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                                            rateArticle(rating, fromUser);
-                                        }
-                                    });
-
-                                    List<String> tagList = new ArrayList<>();
-                                    for (int i = 0; i < tags.length(); i++) {
-                                        tagList.add(tags.getJSONObject(i).getString(Article.TAG));
-                                    }
-                                    mArticleTags.setTags(tagList);
-
-                                    mAuthorId = author.getInt(Contributor.ID);
-                                    Glide.with(getBaseContext())
-                                            .load(author.getString(Contributor.AVATAR_REF))
-                                            .placeholder(R.drawable.placeholder_square)
-                                            .centerCrop()
-                                            .dontAnimate()
-                                            .into(mContributorAvatar);
-                                    mContributorName.setText(author.getString(Contributor.NAME));
-                                    mContributorLocation.setText(author.getString(Contributor.LOCATION));
-
-                                    isFollowingAuthor = author.getInt(Contributor.IS_FOLLOWING) == 1;
-                                    if (isFollowingAuthor) {
-                                        mContributorFollowButton.setImageResource(R.drawable.btn_unfollow);
-                                    } else {
-                                        mContributorFollowButton.setImageResource(R.drawable.btn_follow);
-                                    }
-                                    mContributorFollowButton.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            if (session.isLoggedIn()) {
-                                                toggleFollowHandler();
-                                            } else {
-                                                Intent authIntent = new Intent(getBaseContext(), AuthenticationActivity.class);
-                                                startActivity(authIntent);
-                                            }
-                                        }
-                                    });
-                                    mContributorButton.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            try {
-                                                Intent profileIntent = new Intent(getBaseContext(), ProfileActivity.class);
-                                                profileIntent.putExtra(SessionManager.KEY_ID, author.getInt(Contributor.ID));
-                                                profileIntent.putExtra(SessionManager.KEY_USERNAME, author.getString(Contributor.USERNAME));
-                                                profileIntent.putExtra(SessionManager.KEY_NAME, author.getString(Contributor.NAME));
-                                                profileIntent.putExtra(SessionManager.KEY_LOCATION, author.getString(Contributor.LOCATION));
-                                                profileIntent.putExtra(SessionManager.KEY_ABOUT, author.getString(Contributor.ABOUT));
-                                                profileIntent.putExtra(SessionManager.KEY_AVATAR, author.getString(Contributor.AVATAR_REF));
-                                                profileIntent.putExtra(SessionManager.KEY_COVER, author.getString(Contributor.COVER_REF));
-                                                profileIntent.putExtra(SessionManager.KEY_STATUS, author.getString(Contributor.STATUS));
-                                                profileIntent.putExtra(SessionManager.KEY_ARTICLE, author.getInt(Contributor.ARTICLE));
-                                                profileIntent.putExtra(SessionManager.KEY_FOLLOWER, author.getInt(Contributor.FOLLOWERS));
-                                                profileIntent.putExtra(SessionManager.KEY_FOLLOWING, author.getInt(Contributor.FOLLOWING));
-                                                profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, isFollowingAuthor);
-                                                startActivityForResult(profileIntent, ProfileActivity.PROFILE_RESULT_CODE);
-                                            } catch (JSONException e) {
-                                                progress.dismiss();
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    });
-
-                                    mArticleWrapper.setVisibility(View.VISIBLE);
-                                } else {
-                                    Helper.toastColor(getBaseContext(), getString(R.string.error_server), Color.parseColor("#ddd1205e"));
-                                }
-
-                                progress.dismiss();
-                                countArticleViewer();
-                            } catch (JSONException e) {
-                                progress.dismiss();
-                                e.printStackTrace();
-                            }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            progress.dismiss();
-                            String errorMessage = getString(R.string.error_server);
-                            if (error.networkResponse == null) {
-                                if (error.getClass().equals(TimeoutError.class)) {
-                                    errorMessage = getString(R.string.error_timeout);
-                                } else {
-                                    errorMessage = getString(R.string.error_unknown);
-                                }
-                            }
-                            Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
-                        }
-                    }
-            );
-            articleRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    15000,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(articleRequest);
-
+            retrieveArticle();
         } else {
-            articleId = 0;
-            articleSlug = "";
             progress.dismiss();
-            Helper.toastColor(getBaseContext(), "Invalid article data", Color.parseColor("#ddd1205e"));
+            Helper.toastColor(getBaseContext(), R.string.message_invalid_article, R.color.color_danger_transparent);
             finish();
         }
     }
 
-    private void toggleFollowHandler() {
-        if (isFollowingAuthor) {
-            mContributorFollowButton.setImageResource(R.drawable.btn_follow);
-
-            StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_UNFOLLOW,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject result = new JSONObject(response);
-                                String status = result.getString("status");
-                                String message = result.getString("message");
-
-                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                    Log.i("Infogue/Unfollow", message);
-                                } else {
-                                    Log.w("Infogue/Unfollow", getString(R.string.error_unknown));
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            NetworkResponse networkResponse = error.networkResponse;
-                            String errorMessage = getString(R.string.error_unknown);
-                            if (networkResponse == null) {
-                                if (error.getClass().equals(TimeoutError.class)) {
-                                    errorMessage = getString(R.string.error_timeout);
-                                }
-                            } else {
-                                String result = new String(networkResponse.data);
-                                try {
-                                    JSONObject response = new JSONObject(result);
-                                    String status = response.getString("status");
-                                    String message = response.getString("message");
-
-                                    if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
-                                        errorMessage = message+", please login again!";
-                                    } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
-                                        errorMessage = message;
-                                    } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
-                                        errorMessage = message;
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
-
-                            mContributorFollowButton.setImageResource(R.drawable.btn_unfollow);
-                            isFollowingAuthor = true;
-                        }
-                    }
-            ) {
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("api_token", mApiToken);
-                    params.put("contributor_id", String.valueOf(mLoggedId));
-                    params.put("following_id", String.valueOf(mAuthorId));
-                    params.put("_method", "delete");
-                    return params;
-                }
-            };
-            postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    15000,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
-        } else {
-            mContributorFollowButton.setImageResource(R.drawable.btn_unfollow);
-
-            StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_FOLLOW,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject result = new JSONObject(response);
-                                String status = result.getString("status");
-                                String message = result.getString("message");
-
-                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                    Log.i("Infogue/Follow", message);
-                                } else {
-                                    Log.w("Infogue/Follow", getString(R.string.error_unknown));
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            NetworkResponse networkResponse = error.networkResponse;
-                            String errorMessage = getString(R.string.error_unknown);
-                            if (networkResponse == null) {
-                                if (error.getClass().equals(TimeoutError.class)) {
-                                    errorMessage = getString(R.string.error_timeout);
-                                }
-                            } else {
-                                String result = new String(networkResponse.data);
-                                try {
-                                    JSONObject response = new JSONObject(result);
-                                    String status = response.getString("status");
-                                    String message = response.getString("message");
-
-                                    if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
-                                        errorMessage = message+", please login again!";
-                                    } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
-                                        errorMessage = message;
-                                    } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
-                                        errorMessage = message;
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
-
-                            mContributorFollowButton.setImageResource(R.drawable.btn_follow);
-                            isFollowingAuthor = false;
-                        }
-                    }
-            ) {
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("api_token", mApiToken);
-                    params.put("contributor_id", String.valueOf(mLoggedId));
-                    params.put("following_id", String.valueOf(mAuthorId));
-                    return params;
-                }
-            };
-            postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    15000,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
-        }
-
-        isFollowingAuthor = !isFollowingAuthor;
-    }
-
-    private void countArticleViewer() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_HIT,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                try {
-                                    JSONObject result = new JSONObject(response);
-                                    String status = result.getString("status");
-                                    String message = result.getString("message");
-
-                                    if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                        Log.i("Infogue/Hit", "Current hit article id : " + articleId + " is " + message);
-                                    } else {
-                                        Log.w("Infogue/Hit", getString(R.string.error_unknown));
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                if (error.networkResponse == null) {
-                                    if (error.getClass().equals(TimeoutError.class)) {
-                                        Log.e("Infogue/Hit", getString(R.string.error_timeout));
-                                    } else {
-                                        Log.e("Infogue/Hit", getString(R.string.error_unknown));
-                                    }
-                                } else {
-                                    Log.e("Infogue/Hit", getString(R.string.error_server));
-                                }
-                            }
-                        }
-                ) {
+    /**
+     * Retrieve post article from server.
+     */
+    private void retrieveArticle() {
+        progress.show();
+        JsonObjectRequest articleRequest = new JsonObjectRequest(
+                Request.Method.GET, APIBuilder.getApiPostUrl(articleSlug, mLoggedId), null,
+                new Response.Listener<JSONObject>() {
                     @Override
-                    protected Map<String, String> getParams() {
-                        Map<String, String> params = new HashMap<>();
-                        params.put(Article.FOREIGN, String.valueOf(articleId));
-                        return params;
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String status = response.getString(APIBuilder.RESPONSE_STATUS);
+
+                            if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
+                                final JSONObject article = response.getJSONObject(Article.DATA);
+                                final JSONObject author = article.getJSONObject(Contributor.DATA);
+
+                                articleModel = new Article();
+                                articleModel.setId(article.getInt(Article.ID));
+                                articleModel.setTitle(article.getString(Article.TITLE));
+                                articleModel.setSlug(article.getString(Article.SLUG));
+                                articleModel.setFeatured(article.getString(Article.FEATURED_REF));
+                                buildArticle(article, author);
+
+                                contributorModel = new Contributor();
+                                contributorModel.setId(author.getInt(Contributor.ID));
+                                contributorModel.setUsername(author.getString(Contributor.USERNAME));
+                                contributorModel.setName(author.getString(Contributor.NAME));
+                                contributorModel.setLocation(author.getString(Contributor.LOCATION));
+                                contributorModel.setAbout(author.getString(Contributor.ABOUT));
+                                contributorModel.setAvatar(author.getString(Contributor.AVATAR_REF));
+                                contributorModel.setCover(author.getString(Contributor.COVER_REF));
+                                contributorModel.setStatus(author.getString(Contributor.STATUS));
+                                contributorModel.setArticle(author.getInt(Contributor.ARTICLE));
+                                contributorModel.setFollowers(author.getInt(Contributor.FOLLOWERS));
+                                contributorModel.setFollowing(author.getInt(Contributor.FOLLOWING));
+                                contributorModel.setIsFollowing(author.getInt(Contributor.IS_FOLLOWING) == 1);
+                                buildAuthor(author);
+
+                                mArticleWrapper.setVisibility(View.VISIBLE);
+
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        new ArticleListEvent(context, articleModel).countViewer();
+                                    }
+                                }, 15000);
+                            } else {
+                                Helper.toastColor(getBaseContext(), R.string.error_server, R.color.color_danger_transparent);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        progress.dismiss();
                     }
-                };
-                postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                        15000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
 
-                VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
-            }
-        }, 15000);
-    }
+                        NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = getString(R.string.error_unknown);
+                        if (error.networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                errorMessage = getString(R.string.error_timeout);
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage = getString(R.string.error_no_connection);
+                            }
+                        } else {
+                            String result = new String(networkResponse.data);
 
-    private void rateArticle(final float rating, boolean fromUser) {
-        if (rating > 0 && fromUser) {
-            StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_RATE,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
                             try {
-                                JSONObject result = new JSONObject(response);
-                                String status = result.getString("status");
-                                String message = result.getString("message");
+                                JSONObject response = new JSONObject(result);
+                                String status = response.optString(APIBuilder.RESPONSE_STATUS);
+                                String message = response.optString(APIBuilder.RESPONSE_MESSAGE);
 
-                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                    Log.i("Infogue/Rate", "Average rating for article id : " + articleId + " is " + message);
-                                } else {
-                                    String errorMessage = getString(R.string.error_unknown) + "\r\nYour rating was discarded";
-                                    Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
+                                Log.e("Infogue/Post", "[Retrieve] Error : " + message);
+
+                                if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                    errorMessage = getString(R.string.error_not_found);
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    errorMessage = getString(R.string.error_server);
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                    errorMessage = getString(R.string.error_maintenance);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                errorMessage = getString(R.string.error_parse_data);
                             }
                         }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            NetworkResponse networkResponse = error.networkResponse;
-                            String errorMessage = getString(R.string.error_server);
-                            if (networkResponse == null) {
-                                if (error.getClass().equals(TimeoutError.class)) {
-                                    errorMessage = getString(R.string.error_timeout) + "\r\nYour rating was discarded";
-                                } else {
-                                    errorMessage = getString(R.string.error_unknown);
-                                }
-                            } else {
-                                try {
-                                    String result = new String(networkResponse.data);
-                                    JSONObject response = new JSONObject(result);
-                                    String status = response.getString("status");
-                                    String message = response.getString("message");
-
-                                    if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
-                                        errorMessage = message;
-                                    } else {
-                                        errorMessage = getString(R.string.error_unknown);
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
-                        }
+                        Helper.toastColor(getBaseContext(), errorMessage, R.color.color_danger_transparent);
+                        progress.dismiss();
                     }
-            ) {
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<>();
-                    params.put(Article.FOREIGN, String.valueOf(articleId));
-                    params.put(Article.RATE, String.valueOf((int) rating));
-                    return params;
                 }
-            };
-            postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    15000,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        );
+        articleRequest.setRetryPolicy(new DefaultRetryPolicy(15000, 3, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(articleRequest);
+    }
 
-            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
+    /**
+     * Build article data content.
+     *
+     * @param article object article from database
+     * @param author  object contributor data from database.
+     */
+    private void buildArticle(JSONObject article, JSONObject author) {
+        try {
+            JSONObject subcategory = article.getJSONObject(Article.SUBCATEGORY);
+            JSONObject category = subcategory.getJSONObject(Article.CATEGORY);
+            JSONArray tags = article.getJSONArray(Article.TAGS);
 
-            if (rating >= 3) {
-                Helper.toastColor(getBaseContext(), "Awesome!, you give " + rating + " Stars on \n\r\"" + articleTitle + "\"", Color.parseColor("#ddd1205e"));
+            Glide.with(getBaseContext())
+                    .load(article.getString(Article.FEATURED_REF))
+                    .placeholder(R.drawable.placeholder_rectangle)
+                    .centerCrop()
+                    .crossFade()
+                    .into(mArticleFeatured);
+            mArticleTitle.setText(article.getString(Article.TITLE));
+            mArticleCategory.setText(category.getString(Category.CATEGORY).toUpperCase());
+            mArticleContributor.setText(author.getString(Contributor.NAME));
+            mArticlePublished.setText(article.getString(Article.CREATED_AT));
+            mArticleContent.loadData(Helper.wrapHtmlString(article.getString(Article.CONTENT)), "text/html", "UTF-8");
+            String excerpt = article.getString(Article.EXCERPT);
+            if (excerpt == null || excerpt.isEmpty()) {
+                mArticleExcerpt.setVisibility(View.GONE);
             } else {
-                Helper.toastColor(getBaseContext(), "Too bad!, you give under 3 Stars on \n\r\"" + articleTitle + "\"", Color.parseColor("#ddf1ae50"));
+                mArticleExcerpt.setVisibility(View.VISIBLE);
+                mArticleExcerpt.setText(article.getString(Article.EXCERPT));
             }
+
+            String sub = subcategory.getString(Subcategory.SUBCATEGORY);
+            int view = article.getInt(Article.VIEW);
+            int stars = article.getInt(Article.RATING);
+            String stats = sub + "  |  " + view + "X Views  |  " + stars + " Stars";
+            mArticleDetail.setText(stats);
+            mArticleRating.setRating(stars);
+            switch (stars) {
+                case 1:
+                    mArticleRatingDesc.setText(R.string.label_article_worst);
+                    break;
+                case 2:
+                    mArticleRatingDesc.setText(R.string.label_article_bad);
+                    break;
+                case 3:
+                    mArticleRatingDesc.setText(R.string.label_article_good);
+                    break;
+                case 4:
+                    mArticleRatingDesc.setText(R.string.label_article_excellent);
+                    break;
+                case 5:
+                    mArticleRatingDesc.setText(R.string.label_article_great);
+                    break;
+                default:
+                    mArticleRatingDesc.setText(R.string.label_article_unrated);
+                    break;
+            }
+            mArticleRating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+                @Override
+                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                    if (rating > 0 && fromUser) {
+                        new ArticleListEvent(context, articleModel).rateArticle(Math.round(rating));
+                    }
+                }
+            });
+
+            List<String> tagList = new ArrayList<>();
+            for (int i = 0; i < tags.length(); i++) {
+                tagList.add(tags.getJSONObject(i).getString(Article.TAG));
+            }
+            mArticleTags.setTags(tagList);
+
+            Button mCommentButton = (Button) findViewById(R.id.btn_comment);
+            if (mCommentButton != null) {
+                mCommentButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new ArticleListEvent(context, articleModel).leaveComment();
+                    }
+                });
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Build contributor view content.
+     *
+     * @param author object from database
+     */
+    private void buildAuthor(JSONObject author) {
+        try {
+            Glide.with(getBaseContext())
+                    .load(author.getString(Contributor.AVATAR_REF))
+                    .placeholder(R.drawable.placeholder_square)
+                    .centerCrop()
+                    .dontAnimate()
+                    .into(mContributorAvatar);
+            mContributorName.setText(author.getString(Contributor.NAME));
+            mContributorLocation.setText(author.getString(Contributor.LOCATION));
+
+            mContributorFollowButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new FollowerListEvent(context, contributorModel, mContributorFollowButton).followContributor();
+                }
+            });
+            mContributorButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new FollowerListEvent(context, contributorModel, mContributorFollowButton).viewProfile();
+                }
+            });
+
+            boolean isFollowingAuthor = author.getInt(Contributor.IS_FOLLOWING) == 1;
+            if (isFollowingAuthor) {
+                mContributorFollowButton.setImageResource(R.drawable.btn_unfollow);
+            } else {
+                mContributorFollowButton.setImageResource(R.drawable.btn_follow);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Check if there is result from profile activity, if so update button follow state.
+     *
+     * @param requestCode code request when profile activity called
+     * @param resultCode  result state for now just catch RESULT_OK
+     * @param data        data from activity called is follow or unfollow
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        new FollowerListEvent(this).handleProfileResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * Create option menu for post like share, reload and open web version.
+     *
+     * @param menu inflate
+     * @return boolean
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.post, menu);
         return true;
     }
 
-    @SuppressWarnings("deprecation")
+    /**
+     * Select action when user hit option menu.
+     *
+     * @param item selected menu item
+     * @return boolean
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
             finish();
-        } else if (id == R.id.action_share) {
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, APIBuilder.getShareArticleText(articleSlug));
-            sendIntent.setType("text/plain");
-            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.label_intent_share)));
         } else if (id == R.id.action_refresh) {
-            progress.show();
-            buildArticle();
+            retrieveArticle();
+        } else if (id == R.id.action_share) {
+            new ArticleListEvent(this, articleModel).shareArticle();
         } else if (id == R.id.action_browse) {
-            String articleUrl = APIBuilder.getArticleUrl(articleSlug);
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
-            startActivity(browserIntent);
+            new ArticleListEvent(this, articleModel).browseArticle();
         } else if (id == R.id.action_comment) {
-            Intent commentIntent = new Intent(getBaseContext(), CommentActivity.class);
-            commentIntent.putExtra(Article.ID, articleId);
-            commentIntent.putExtra(Article.SLUG, articleSlug);
-            commentIntent.putExtra(Article.TITLE, articleTitle);
-            startActivity(commentIntent);
+            new ArticleListEvent(this, articleModel).leaveComment();
         }
 
         return super.onOptionsItemSelected(item);

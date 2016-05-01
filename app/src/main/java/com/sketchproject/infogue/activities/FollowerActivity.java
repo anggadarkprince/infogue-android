@@ -21,6 +21,12 @@ import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.utils.APIBuilder;
 
+/**
+ * A {@link AppCompatActivity} subclass, show follower and following list.
+ * <p>
+ * Sketch Project Studio
+ * Created by Angga on 1/012/2016 10.37.
+ */
 public class FollowerActivity extends AppCompatActivity implements
         FollowerFragment.OnFollowerInteractionListener {
 

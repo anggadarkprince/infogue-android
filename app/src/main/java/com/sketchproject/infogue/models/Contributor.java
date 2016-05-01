@@ -41,6 +41,8 @@ public class Contributor {
     public static final String IS_FOLLOWING = "is_following";
     public static final String PASSWORD = "password";
     public static final String NEW_PASSWORD = "new_password";
+    public static final String DATA = "contributor";
+    public static final String FOLLOWING_CONTRIBUTOR = "following_id";
 
     public static final String GENDER_MALE = "male";
     public static final String GENDER_FEMALE = "female";

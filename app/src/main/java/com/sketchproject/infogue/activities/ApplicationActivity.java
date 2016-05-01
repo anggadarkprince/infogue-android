@@ -70,6 +70,12 @@ import org.json.JSONObject;
 import java.lang.reflect.Method;
 import java.util.List;
 
+/**
+ * A {@link AppCompatActivity} subclass as main activity, handle home and article fragment.
+ *
+ * Sketch Project Studio
+ * Created by Angga on 1/04/2016 10.37.
+ */
 public class ApplicationActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         ArticleFragment.OnArticleInteractionListener,

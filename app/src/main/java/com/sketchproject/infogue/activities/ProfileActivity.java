@@ -1,7 +1,6 @@
 package com.sketchproject.infogue.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -17,15 +16,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.events.FollowerListEvent;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;
@@ -36,9 +35,12 @@ import com.sketchproject.infogue.utils.Helper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * A {@link AppCompatActivity} subclass, show contributor profile.
+ * <p>
+ * Sketch Project Studio
+ * Created by Angga on 15/012/2016 10.37
+ */
 public class ProfileActivity extends AppCompatActivity {
 
     public static final int PROFILE_RESULT_CODE = 200;
@@ -50,11 +52,16 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView mFollowerView;
     private TextView mFollowingView;
 
-    private int contributorId;
+    private Contributor contributor;
     private String username;
     private boolean isFollowing;
     private boolean isAfterLogin;
 
+    /**
+     * Perform initialization of ProfileActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,13 +85,22 @@ public class ProfileActivity extends AppCompatActivity {
 
         final Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            contributorId = extras.getInt(SessionManager.KEY_ID);
+            int contributorId = extras.getInt(SessionManager.KEY_ID);
             username = extras.getString(SessionManager.KEY_USERNAME);
             isFollowing = extras.getBoolean(SessionManager.KEY_IS_FOLLOWING);
 
+            contributor = new Contributor();
+            contributor.setId(contributorId);
+            contributor.setUsername(username);
+            contributor.setIsFollowing(isFollowing);
+
             String status = extras.getString(SessionManager.KEY_STATUS, "invalid");
             if (!status.equals(Contributor.STATUS_ACTIVATED)) {
-                Helper.toastColor(getBaseContext(), "Contributor is " + status, Color.parseColor("#ddd1205e"));
+                int color = R.color.color_danger_transparent;
+                if (status.equals(Contributor.STATUS_PENDING)) {
+                    color = R.color.color_warning_transparent;
+                }
+                Helper.toastColor(getBaseContext(), "Contributor is " + status, color);
                 Intent returnIntent = new Intent();
                 setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
                 finish();
@@ -132,7 +148,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             buildProfileEventHandler(contributorId, username);
         } else {
-            Helper.toastColor(getBaseContext(), "Invalid user profile", Color.parseColor("#ddd1205e"));
+            Helper.toastColor(getBaseContext(), "Invalid user profile", R.color.color_danger_transparent);
             Intent returnIntent = new Intent();
             setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
             finish();
@@ -238,10 +254,9 @@ public class ProfileActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         if (session.isLoggedIn()) {
-                            if(connectionDetector.isNetworkAvailable()){
+                            if (connectionDetector.isNetworkAvailable()) {
                                 toggleFollowHandler(mFollowButton);
-                            }
-                            else{
+                            } else {
                                 connectionDetector.snackbarDisconnectNotification(findViewById(R.id.scroll_container), null);
                             }
                         } else {
@@ -283,167 +298,26 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void toggleFollowHandler(final Button mFollowButton) {
-        if (isFollowing) {
-            stateUnfollow(mFollowButton);
-            Log.i("INFOGUE/PROFILE", "Unfollow " + contributorId + " " + username);
-
-            StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_UNFOLLOW,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject result = new JSONObject(response);
-                                String status = result.getString("status");
-                                String message = result.getString("message");
-
-                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                    Log.i("Infogue/Unfollow", message);
-                                } else {
-                                    Log.w("Infogue/Unfollow", getString(R.string.error_unknown));
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            NetworkResponse networkResponse = error.networkResponse;
-                            String errorMessage = getString(R.string.error_unknown);
-                            if (networkResponse == null) {
-                                if (error.getClass().equals(TimeoutError.class)) {
-                                    errorMessage = getString(R.string.error_timeout);
-                                }
-                            } else {
-                                String result = new String(networkResponse.data);
-                                try {
-                                    JSONObject response = new JSONObject(result);
-                                    String status = response.getString("status");
-                                    String message = response.getString("message");
-
-                                    if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
-                                        errorMessage = message + ", please login again!";
-                                    } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
-                                        errorMessage = message;
-                                    } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
-                                        errorMessage = message;
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
-
-                            stateFollow(mFollowButton);
-                        }
-                    }
-            ) {
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("api_token", session.getSessionData(SessionManager.KEY_TOKEN, null));
-                    params.put("contributor_id", String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
-                    params.put("following_id", String.valueOf(contributorId));
-                    params.put("_method", "delete");
-                    return params;
-                }
-            };
-            postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    15000,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
-        } else {
-            stateFollow(mFollowButton);
-            Log.i("INFOGUE/PROFILE", "Follow " + contributorId + " " + username);
-
-            StringRequest postRequest = new StringRequest(Request.Method.POST, APIBuilder.URL_API_FOLLOW,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject result = new JSONObject(response);
-                                String status = result.getString("status");
-                                String message = result.getString("message");
-
-                                if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                    Log.i("Infogue/Follow", message);
-                                } else {
-                                    Log.w("Infogue/Follow", getString(R.string.error_unknown));
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            NetworkResponse networkResponse = error.networkResponse;
-                            String errorMessage = getString(R.string.error_unknown);
-                            if (networkResponse == null) {
-                                if (error.getClass().equals(TimeoutError.class)) {
-                                    errorMessage = getString(R.string.error_timeout);
-                                }
-                            } else {
-                                String result = new String(networkResponse.data);
-                                try {
-                                    JSONObject response = new JSONObject(result);
-                                    String status = response.getString("status");
-                                    String message = response.getString("message");
-
-                                    if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 401) {
-                                        errorMessage = message + ", please login again!";
-                                    } else if (status.equals(APIBuilder.REQUEST_DENIED) && networkResponse.statusCode == 400) {
-                                        errorMessage = message;
-                                    } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
-                                        errorMessage = message;
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            Helper.toastColor(getBaseContext(), errorMessage, Color.parseColor("#ddd1205e"));
-
-                            stateUnfollow(mFollowButton);
-                        }
-                    }
-            ) {
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("api_token", session.getSessionData(SessionManager.KEY_TOKEN, null));
-                    params.put("contributor_id", String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
-                    params.put("following_id", String.valueOf(contributorId));
-                    return params;
-                }
-            };
-            postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    15000,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
-        }
-
+        new FollowerListEvent(this, contributor, mFollowButton).followContributor();
         isFollowing = !isFollowing;
     }
 
+    /**
+     * Update session or profile info.
+     */
     private void updateProfileInBackground() {
         JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, APIBuilder.getApiContributorUrl(username), null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            String status = response.getString("status");
-                            JSONObject contributor = response.getJSONObject("contributor");
+                            String status = response.getString(APIBuilder.RESPONSE_STATUS);
+                            JSONObject contributor = response.getJSONObject(Contributor.DATA);
 
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                session.setSessionData(SessionManager.KEY_ARTICLE, contributor.getInt("article_total"));
-                                session.setSessionData(SessionManager.KEY_FOLLOWER, contributor.getInt("followers_total"));
-                                session.setSessionData(SessionManager.KEY_FOLLOWING, contributor.getInt("following_total"));
+                                session.setSessionData(SessionManager.KEY_ARTICLE, contributor.getInt(Contributor.ARTICLE));
+                                session.setSessionData(SessionManager.KEY_FOLLOWER, contributor.getInt(Contributor.FOLLOWERS));
+                                session.setSessionData(SessionManager.KEY_FOLLOWING, contributor.getInt(Contributor.FOLLOWING));
 
                                 mArticleView.setText(String.valueOf(session.getSessionData(SessionManager.KEY_ARTICLE, 0)));
                                 mFollowerView.setText(String.valueOf(session.getSessionData(SessionManager.KEY_FOLLOWER, 0)));
@@ -460,15 +334,19 @@ public class ProfileActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+
+                        String errorMessage = getString(R.string.error_unknown);
                         if (error.networkResponse == null) {
                             if (error.getClass().equals(TimeoutError.class)) {
-                                Log.e("Infogue/Profile", getString(R.string.error_timeout));
-                            } else {
-                                Log.e("Infogue/Profile", getString(R.string.error_unknown));
+                                errorMessage = getString(R.string.error_timeout);
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage = getString(R.string.error_no_connection);
                             }
                         } else {
-                            Log.e("Infogue/Profile", getString(R.string.error_server));
+                            errorMessage = getString(R.string.error_server);
                         }
+                        Log.e("Infogue/Profile", errorMessage);
                     }
                 }
         );
@@ -492,14 +370,24 @@ public class ProfileActivity extends AppCompatActivity {
         mFollowButton.setText(getString(R.string.action_follow));
     }
 
+    /**
+     * Create option menu.
+     *
+     * @param menu content of option menu
+     * @return boolean
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.info, menu);
-
         return true;
     }
 
+    /**
+     * Select action for option menu.
+     *
+     * @param item of selected option menu
+     * @return boolean
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -530,6 +418,9 @@ public class ProfileActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * When user press back destroy and return the status or re launch ApplicationActivity
+     */
     @Override
     public void onBackPressed() {
         if (isAfterLogin) {
@@ -543,6 +434,9 @@ public class ProfileActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+    /**
+     * After login we need to launch new ApplicationActivity because it never exist or has been destroyed.
+     */
     private void launchMainActivity() {
         Intent applicationIntent = new Intent(getBaseContext(), ApplicationActivity.class);
         applicationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

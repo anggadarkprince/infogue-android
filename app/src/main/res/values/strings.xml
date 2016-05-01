@@ -357,5 +357,29 @@
 
     <string name="facebook_app_id">577855965712128</string>
     <string name="fb_login_protocol_scheme">fb577855965712128</string>
+    <string name="action_insert_link">Insert Link</string>
+    <string name="action_insert_image">Insert Image</string>
+    <string name="message_put_link">Put complete link url and link title.</string>
+    <string name="prompt_link_title">Link title</string>
+    <string name="prompt_link_url">Link URL</string>
+    <string name="message_put_image">Put complete image link and alternative title.</string>
+    <string name="prompt_image_title">Alternative title</string>
+    <string name="prompt_image_link">Image link</string>
+    <string name="label_select_featured">Select Featured</string>
+    <string name="message_invalid_article">Invalid article data</string>
+    <string name="title_activity_sign_in">Contributor Sign In</string>
+    <string name="title_activity_sign_up">Create an Account</string>
+    <string name="label_title_login">Log In</string>
+    <string name="label_title_register">Register</string>
+    <string name="label_submit_comment">Submitting comment</string>
+    <string name="error_comment_required">Comment can\'t be blank</string>
+    <string name="message_invalid_comment">Invalid comment data</string>
+    <string name="message_comment_posted">Comment has been posted!</string>
+    <string name="label_article_worst">WORST ARTICLE</string>
+    <string name="label_article_bad">BAD ARTICLE</string>
+    <string name="label_article_good">GOOD ARTICLE</string>
+    <string name="label_article_excellent">EXCELLENT ARTICLE</string>
+    <string name="label_article_great">GREAT ARTICLE</string>
+    <string name="label_article_unrated">UNRATED ARTICLE</string>
 
 </resources>
