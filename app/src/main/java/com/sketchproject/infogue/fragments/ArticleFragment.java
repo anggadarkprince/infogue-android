@@ -251,7 +251,7 @@ public class ArticleFragment extends Fragment {
                 }
 
                 @Override
-                public void onFirstSight(boolean isFirst) {
+                public void onReachTop(boolean isFirst) {
                     if (getActivity() instanceof ArticleActivity) {
                         ((ArticleActivity) getActivity()).setSwipeEnable(isFirst);
                     } else if (getActivity() instanceof ApplicationActivity) {

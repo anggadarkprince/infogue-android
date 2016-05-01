@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * Pooling object into list and retrieve if needed, this class for optimization
+ * and prevent object to recreate again.
+ *
  * Sketch Project Studio
  * Created by Angga on 25/04/2016 09.37.
  */
@@ -16,27 +19,47 @@ public class ObjectPooling {
     private boolean isFixedSize = false;
     private int max = 0;
 
+    /**
+     * Default constructor
+     */
     public ObjectPooling() {
         objects = new ArrayList<>();
     }
 
+    /**
+     * Constructor with default object has been set.
+     *
+     * @param objectList objects with label.
+     */
     public ObjectPooling(List<HashMap<String, Object>> objectList) {
         objects = objectList;
     }
 
+    /**
+     * Create fixed object pooling.
+     *
+     * @param maxSize number of objects can handle.
+     */
     public ObjectPooling(int maxSize) {
         isFixedSize = true;
         max = maxSize;
         objects = new ArrayList<>(max);
     }
 
+    /**
+     * Registering object into list and populate by label.
+     *
+     * @param data object need to returned when needed
+     * @param label label related to data object as reference to identifying it
+     * @return status if the object has been there or not
+     */
     public boolean pool(Object data, String label) {
         if (isObjectAvailable(label)) {
             return false;
         }
 
         if (isFixedSize && getSize() > max) {
-            throw new IllegalStateException(ObjectPooling.class.getSimpleName() +
+            throw new IndexOutOfBoundsException(ObjectPooling.class.getSimpleName() +
                     " is out of max number of container pool object. Max size of object is " + max);
         }
 
@@ -47,6 +70,12 @@ public class ObjectPooling {
         return true;
     }
 
+    /**
+     * Check if an object exist by their label.
+     *
+     * @param label related identity to object
+     * @return boolean that indicate object found or not
+     */
     public boolean isObjectAvailable(String label) {
         for (HashMap object : objects) {
             if (object.get(KEY_LABEL).equals(label)) {
@@ -56,6 +85,12 @@ public class ObjectPooling {
         return false;
     }
 
+    /**
+     * Delete object on list by label.
+     *
+     * @param label related label which object want to destroyed
+     * @return object which destroyed
+     */
     public Object unpool(String label) {
         for (HashMap object : objects) {
             if (object.get(KEY_LABEL).equals(label)) {
@@ -67,6 +102,12 @@ public class ObjectPooling {
         return null;
     }
 
+    /**
+     * Find out if and object related by certain label exist.
+     *
+     * @param label related with object
+     * @return object if found and null if not found
+     */
     public Object find(String label) {
         for (HashMap object : objects) {
             if (object.get(KEY_LABEL).equals(label)) {
@@ -76,18 +117,36 @@ public class ObjectPooling {
         return null;
     }
 
+    /**
+     * Check if current pooling is fixed.
+     *
+     * @return boolean
+     */
     public boolean isFixedSize() {
         return isFixedSize;
     }
 
+    /**
+     * Check if current pooling is empty.
+     *
+     * @return boolean
+     */
     public boolean isEmpty() {
         return objects.isEmpty();
     }
 
+    /**
+     * Count current size object has polled.
+     *
+     * @return number of object
+     */
     public int getSize() {
         return objects.size();
     }
 
+    /**
+     * Destroy all objects.
+     */
     public void clear() {
         objects.clear();
     }

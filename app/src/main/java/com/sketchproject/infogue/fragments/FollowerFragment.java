@@ -149,7 +149,7 @@ public class FollowerFragment extends Fragment {
                 }
 
                 @Override
-                public void onFirstSight(boolean isFirst) {
+                public void onReachTop(boolean isFirst) {
                     ((FollowerActivity) getActivity()).setSwipeEnable(isFirst);
                 }
             });

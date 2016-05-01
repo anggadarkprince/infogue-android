@@ -6,21 +6,24 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Toast;
 
 import com.sketchproject.infogue.R;
 
 /**
+ * Handle detect connection status.
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 10/04/2016 18.17.
  */
 public class ConnectionDetector extends BroadcastReceiver {
-    private Context mContext;
     private OnLostConnectionListener mLostListener;
     private OnConnectionEstablished mEstablishedListener;
-
+    private Context mContext;
     private Snackbar snackbar;
+    private Toast toast;
 
     public ConnectionDetector(Context context) {
         mContext = context;
@@ -39,18 +42,33 @@ public class ConnectionDetector extends BroadcastReceiver {
         if (info != null && info.isConnected()) {
             isAvailable = true;
         }
-
         return isAvailable;
     }
 
+    /**
+     * Listener triggered when connection lost via broadcast.
+     *
+     * @param listener on connection lost listener
+     */
     public void setLostConnectionListener(OnLostConnectionListener listener) {
         mLostListener = listener;
     }
 
+    /**
+     * Listener triggered when connection established via broadcast.
+     *
+     * @param listener on connection established
+     */
     public void setEstablishedConnectionListener(OnConnectionEstablished listener) {
         mEstablishedListener = listener;
     }
 
+    /**
+     * Create snackbar no internet notification.
+     *
+     * @param view          anchor parent snackbar
+     * @param callbackRetry callback handler when action triggered
+     */
     public void snackbarDisconnectNotification(View view, View.OnClickListener callbackRetry) {
         buildSnackNotification(view, callbackRetry,
                 mContext.getString(R.string.message_no_internet),
@@ -58,10 +76,12 @@ public class ConnectionDetector extends BroadcastReceiver {
                 R.color.color_danger, Snackbar.LENGTH_INDEFINITE);
     }
 
-    public void snackbarDisconnectNotification(View view, View.OnClickListener callbackRetry, String message, String action) {
-        buildSnackNotification(view, callbackRetry, message, action, R.color.color_danger, Snackbar.LENGTH_INDEFINITE);
-    }
-
+    /**
+     * Create snackbar internet connect and established.
+     *
+     * @param view          anchor parent snackbar
+     * @param callbackRetry callback handler when action triggered
+     */
     public void snackbarConnectedNotification(View view, View.OnClickListener callbackRetry) {
         buildSnackNotification(view, callbackRetry,
                 mContext.getString(R.string.message_internet_established),
@@ -69,19 +89,22 @@ public class ConnectionDetector extends BroadcastReceiver {
                 R.color.color_success, Snackbar.LENGTH_LONG);
     }
 
-    @SuppressWarnings("unused")
-    public void snackbarConnectedNotification(View view, View.OnClickListener callbackRetry, String message, String action) {
-        buildSnackNotification(view, callbackRetry, message, action, R.color.color_success, Snackbar.LENGTH_LONG);
-    }
-
-    @SuppressWarnings("deprecation")
+    /**
+     * Build and show snackbar immediately.
+     *
+     * @param view            anchor parent snackbar
+     * @param callbackRetry   callback handler when action triggered
+     * @param message         content message text
+     * @param action          action button text
+     * @param backgroundColor resource color background
+     * @param duration        duration show notification
+     */
     private void buildSnackNotification(View view, View.OnClickListener callbackRetry, String message, String action, int backgroundColor, int duration) {
         snackbar = Snackbar.make(view, message, duration);
-        snackbar.setActionTextColor(mContext.getResources().getColor(R.color.light));
+        snackbar.setActionTextColor(ContextCompat.getColor(mContext, R.color.light));
         if (callbackRetry != null) {
             snackbar.setAction(action, callbackRetry);
-        }
-        else{
+        } else {
             snackbar.setAction(action, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -95,18 +118,34 @@ public class ConnectionDetector extends BroadcastReceiver {
         snackbarView.setBackgroundResource(backgroundColor);
     }
 
+    /**
+     * Dismiss all notifications if exist (snackbar and toast).
+     */
     public void dismissNotification() {
         if (snackbar != null) {
             snackbar.dismiss();
         }
+        if (toast != null) {
+            toast.cancel();
+        }
     }
 
-    @SuppressWarnings("unused")
-    public void defaultToastNotification(Context context) {
-        Toast toast = Toast.makeText(context, "No Internet Connection!", Toast.LENGTH_LONG);
+    /**
+     * Prefer toast notification when lost connection.
+     *
+     * @param context parent context
+     */
+    public void toastConnectedNotification(Context context) {
+        toast = Toast.makeText(context, R.string.message_no_internet, Toast.LENGTH_LONG);
         toast.show();
     }
 
+    /**
+     * Receive broadcast information when lost connection and passing into custom listener.
+     *
+     * @param context parent context
+     * @param intent  receive intent data
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
         boolean isConnected = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
@@ -117,10 +156,16 @@ public class ConnectionDetector extends BroadcastReceiver {
         }
     }
 
+    /**
+     * Interface handle lost connection event.
+     */
     public interface OnLostConnectionListener {
         void onLostConnectionNotified(Context context);
     }
 
+    /**
+     * Interface handle established connection event.
+     */
     public interface OnConnectionEstablished {
         void onConnectionEstablished(Context context);
     }

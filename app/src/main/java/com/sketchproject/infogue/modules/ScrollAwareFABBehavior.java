@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 /**
+ * Scroll behavior for FloatingActionButton, button will hide down when scroll down and
+ * appear again when scroll up.
+ *
  * Sketch Project Studio
  * Created by Angga on 10/04/2016 18.16.
  */

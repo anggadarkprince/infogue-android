@@ -14,7 +14,6 @@ import java.util.Map;
  * Created by Angga on 10/04/2016 18.16 18.17.
  */
 public class SessionManager {
-
     public int PRIVATE_MODE = 0;
 
     private SharedPreferences pref;
@@ -53,7 +52,6 @@ public class SessionManager {
      * Create login session
      */
     public boolean createLoginSession(HashMap<String, Object> session) {
-        // Storing login data
         editor.putBoolean(IS_LOGIN, true);
 
         editor.putInt(KEY_ID, Integer.parseInt(String.valueOf(session.get(KEY_ID))));
@@ -69,7 +67,6 @@ public class SessionManager {
         editor.putInt(KEY_FOLLOWER, Integer.parseInt(String.valueOf(session.get(KEY_FOLLOWER))));
         editor.putInt(KEY_FOLLOWING, Integer.parseInt(String.valueOf(session.get(KEY_FOLLOWING))));
 
-        // commit changes
         return editor.commit();
     }
 
@@ -164,15 +161,13 @@ public class SessionManager {
     }
 
     /**
-     * Get stored session data
+     * Get stored session data.
      *
      * @return HashMap
      */
     @SuppressWarnings("unused")
     public HashMap<String, Object> getUserDetails() {
         HashMap<String, Object> user = new HashMap<>();
-
-        // Populate user data
         user.put(KEY_ID, pref.getInt(KEY_ID, 0));
         user.put(KEY_NAME, pref.getString(KEY_NAME, null));
         user.put(KEY_LOCATION, pref.getString(KEY_LOCATION, null));
@@ -188,7 +183,7 @@ public class SessionManager {
     }
 
     /**
-     * Retrieve all session
+     * Retrieve all session.
      *
      * @return Map
      */
@@ -211,7 +206,6 @@ public class SessionManager {
      * Clear session details
      */
     public boolean logoutUser() {
-        // Clearing all data from Shared Preferences
         editor.remove(KEY_ID);
         editor.remove(KEY_NAME);
         editor.remove(KEY_LOCATION);
@@ -231,7 +225,7 @@ public class SessionManager {
     }
 
     /**
-     * Quick check for login
+     * Quick check for login.
      **/
     public boolean isLoggedIn() {
         return pref.getBoolean(IS_LOGIN, false);

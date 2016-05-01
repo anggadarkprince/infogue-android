@@ -884,12 +884,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
             VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
 
         } else {
-            connectionDetector.snackbarDisconnectNotification(mScrollView, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    connectionDetector.dismissNotification();
-                }
-            });
+            connectionDetector.snackbarDisconnectNotification(mScrollView, null);
         }
     }
 }

@@ -116,7 +116,7 @@ public class CommentFragment extends Fragment {
                 }
 
                 @Override
-                public void onFirstSight(boolean isFirst) {
+                public void onReachTop(boolean isFirst) {
                     ((CommentActivity) getActivity()).setSwipeEnable(isFirst);
                 }
             });

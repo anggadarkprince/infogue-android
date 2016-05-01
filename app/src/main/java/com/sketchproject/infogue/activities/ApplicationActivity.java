@@ -106,6 +106,7 @@ public class ApplicationActivity extends AppCompatActivity implements
 
         connectionDetector = new ConnectionDetector(getBaseContext());
         connectionDetector.setLostConnectionListener(this);
+        connectionDetector.setEstablishedConnectionListener(this);
         session = new SessionManager(getBaseContext());
         objectPooling = new ObjectPooling();
 

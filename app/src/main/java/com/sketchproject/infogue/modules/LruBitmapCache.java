@@ -8,6 +8,8 @@ import android.util.DisplayMetrics;
 import com.android.volley.toolbox.ImageLoader;
 
 /**
+ * Custom caching class volley image loader.
+ *
  * Sketch Project Studio
  * Created by Angga on 22/04/2016 23.29.
  */
@@ -17,8 +19,8 @@ public class LruBitmapCache extends LruCache<String, Bitmap> implements ImageLoa
         super(maxSize);
     }
 
-    public LruBitmapCache(Context ctx) {
-        this(getCacheSize(ctx));
+    public LruBitmapCache(Context context) {
+        this(getCacheSize(context));
     }
 
     @Override
@@ -36,9 +38,14 @@ public class LruBitmapCache extends LruCache<String, Bitmap> implements ImageLoa
         put(url, bitmap);
     }
 
-    // Returns a cache size equal to approximately three screens worth of images.
-    public static int getCacheSize(Context ctx) {
-        final DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
+    /**
+     * Returns a cache size equal to approximately three screens worth of images.
+     *
+     * @param context parent context
+     * @return int size of cache
+     */
+    public static int getCacheSize(Context context) {
+        final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         final int screenWidth = displayMetrics.widthPixels;
         final int screenHeight = displayMetrics.heightPixels;
         // 4 bytes per pixel

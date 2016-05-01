@@ -9,6 +9,8 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
 /**
+ * Find absolute path by Uri, some case still given null value, but i'm working on it :).
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 18/04/2016 18.10.
  */
@@ -29,12 +31,15 @@ public class RealPathResolver {
         Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 column, sel, new String[]{id}, null);
 
-        int columnIndex = cursor.getColumnIndex(column[0]);
-
-        if (cursor.moveToFirst()) {
-            filePath = cursor.getString(columnIndex);
+        int columnIndex;
+        if (cursor != null) {
+            columnIndex = cursor.getColumnIndex(column[0]);
+            if (cursor.moveToFirst()) {
+                filePath = cursor.getString(columnIndex);
+            }
+            cursor.close();
         }
-        cursor.close();
+
         return filePath;
     }
 
@@ -57,9 +62,14 @@ public class RealPathResolver {
 
     public static String getRealPathFromURI_BelowAPI11(Context context, Uri contentUri) {
         String[] proj = {MediaStore.Images.Media.DATA};
-        Cursor cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
+        @SuppressLint("Recycle") Cursor cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
+        int column_index;
+        String path = "";
+        if (cursor != null) {
+            column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            path = cursor.getString(column_index);
+        }
+        return path;
     }
 }

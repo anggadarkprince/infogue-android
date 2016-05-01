@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 /**
+ * Custom class to make popup menu has icon.
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 14/04/2016 02.40.
  */
@@ -32,7 +34,7 @@ public class IconizedMenu implements MenuBuilder.Callback, MenuPresenter.Callbac
          *
          * @param menu The PopupMenu that was dismissed.
          */
-        public void onDismiss(IconizedMenu menu);
+        void onDismiss(IconizedMenu menu);
     }
 
     /**
@@ -121,10 +123,7 @@ public class IconizedMenu implements MenuBuilder.Callback, MenuPresenter.Callbac
      * @hide
      */
     public boolean onMenuItemSelected(MenuBuilder menu, MenuItem item) {
-        if (mMenuItemClickListener != null) {
-            return mMenuItemClickListener.onMenuItemClick(item);
-        }
-        return false;
+        return mMenuItemClickListener != null && mMenuItemClickListener.onMenuItemClick(item);
     }
 
     /**
@@ -182,6 +181,6 @@ public class IconizedMenu implements MenuBuilder.Callback, MenuPresenter.Callbac
          * @param item {@link MenuItem} that was clicked
          * @return <code>true</code> if the event was handled, <code>false</code> otherwise.
          */
-        public boolean onMenuItemClick(MenuItem item);
+        boolean onMenuItemClick(MenuItem item);
     }
 }
