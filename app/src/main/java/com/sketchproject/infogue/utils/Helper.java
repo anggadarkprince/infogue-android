@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorRes;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -21,6 +22,8 @@ import com.sketchproject.infogue.R;
 import java.io.ByteArrayOutputStream;
 
 /**
+ * Static helper function collection.
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 12/04/2016 14.27.
  */
@@ -83,6 +86,15 @@ public class Helper {
         return dialog;
     }
 
+    /**
+     * Force button dialog to match with current theme.
+     * I have no idea to fix button dialog theme so i figure out this approach works perfectly
+     * but not cool right,,, i'm working on it :)
+     *
+     * @param context parent context
+     * @param dialog  which has the button
+     * @return the dialog itself
+     */
     public static AlertDialog setDialogButtonTheme(Context context, AlertDialog dialog) {
         Button mButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
         if (mButton != null) {
@@ -100,6 +112,17 @@ public class Helper {
         return dialog;
     }
 
+    /**
+     * Create colored toast, I'm pretty sure it must be separated into single class that
+     * extend Toast and change the make(...) method to paint the view, but i prefer easy way,
+     * still try to figure out how to keep rounded view, but yeah,, i'm still work fucking on it,
+     * ops, sorry for my bad language.
+     *
+     * @param context parent context
+     * @param message resource toast message id
+     * @param color   resource color id
+     * @return custom toast
+     */
     public static Toast toastColor(Context context, @StringRes int message, @ColorRes int color) {
         Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
         View view = toast.getView();
@@ -114,6 +137,15 @@ public class Helper {
         return toast;
     }
 
+    /**
+     * Create colored toast, like the other toastColor(...) method but it passed plain string
+     * instead resource string id, more useful with custom message from server :)
+     *
+     * @param context parent context
+     * @param message string message
+     * @param color   resource color id
+     * @return custom toast
+     */
     public static Toast toastColor(Context context, String message, @ColorRes int color) {
         Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
         View view = toast.getView();
@@ -128,6 +160,13 @@ public class Helper {
         return toast;
     }
 
+    /**
+     * Build slug from string title like "The beautiful day in 1992" turns "the-beautiful-day-in-1992"
+     * or "Super massive black hole O'creaz MO on July" turns "super-massive-black-hole-ocreaz-mo-on-july"
+     *
+     * @param title article title
+     * @return slug string
+     */
     public static String createSlug(String title) {
         String trimmed = title.trim();
         String slug = trimmed
@@ -137,6 +176,13 @@ public class Helper {
         return slug.toLowerCase();
     }
 
+    /**
+     * Wrap article in post activity with simple style to wrap image and make it fit
+     * with its container.
+     *
+     * @param html string content
+     * @return string wrapped html
+     */
     public static String wrapHtmlString(String html) {
         return "<html>" +
                 "<head>" +
@@ -146,7 +192,14 @@ public class Helper {
                 "</html>";
     }
 
-    public static byte[] getFileDataFromDrawable(Context context, int id) {
+    /**
+     * Turn drawable resource into byte array.
+     *
+     * @param context parent context
+     * @param id      drawable resource id
+     * @return byte array
+     */
+    public static byte[] getFileDataFromDrawable(Context context, @DrawableRes int id) {
         Drawable drawable = ContextCompat.getDrawable(context, id);
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -154,6 +207,12 @@ public class Helper {
         return byteArrayOutputStream.toByteArray();
     }
 
+    /**
+     * Turn drawable into byte array.
+     *
+     * @param drawable data
+     * @return byte array
+     */
     public static byte[] getFileDataFromDrawable(Drawable drawable) {
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

@@ -85,7 +85,7 @@ public class VolleySingleton {
 
     /**
      * Get image loader.
-     * 
+     *
      * @return ImageLoader
      */
     public ImageLoader getImageLoader() {
