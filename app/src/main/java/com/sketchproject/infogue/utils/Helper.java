@@ -162,7 +162,7 @@ public class Helper {
 
     /**
      * Build slug from string title like "The beautiful day in 1992" turns "the-beautiful-day-in-1992"
-     * or "Super massive black hole O'creaz MO on July" turns "super-massive-black-hole-ocreaz-mo-on-july"
+     * or "Super massive black hole O'creaz MO on July" turns "super-massive-black-hole-o-creaz-mo-on-july"
      *
      * @param title article title
      * @return slug string

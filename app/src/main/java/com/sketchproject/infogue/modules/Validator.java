@@ -1,7 +1,6 @@
 package com.sketchproject.infogue.modules;
 
 import android.util.Log;
-import android.util.Patterns;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -16,7 +15,6 @@ import java.util.Locale;
  * Sketch Project Studio
  * Created by Angga on 16/04/2016 13.29.
  */
-@SuppressWarnings("unused")
 public class Validator {
 
     /**
@@ -64,7 +62,7 @@ public class Validator {
      * @return boolean email format validation
      */
     public boolean isValidEmail(String email) {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     /**
@@ -146,11 +144,7 @@ public class Validator {
     public boolean isNumeric(Object value, boolean isSignedOnly) {
         try {
             int result = Integer.parseInt(value.toString());
-            if (isSignedOnly && result >= 0) {
-                return true;
-            } else {
-                return true;
-            }
+            return !isSignedOnly || result >= 0;
         } catch (NumberFormatException e) {
             return false;
         }
@@ -279,7 +273,7 @@ public class Validator {
      * @return boolean
      */
     public boolean maxValue(int value, int maxValue) {
-        return value >= maxValue;
+        return value <= maxValue;
     }
 
     /**
@@ -290,7 +284,7 @@ public class Validator {
      * @return boolean
      */
     public boolean maxValue(float value, float maxValue) {
-        return value >= maxValue;
+        return value <= maxValue;
     }
 
     /**
@@ -301,7 +295,7 @@ public class Validator {
      * @return boolean
      */
     public boolean maxValue(double value, double maxValue) {
-        return value >= maxValue;
+        return value <= maxValue;
     }
 
     /**
