@@ -200,7 +200,7 @@ public class FollowerFragment extends Fragment {
                 followerAdapter.notifyItemInserted(allFollowers.size() - 1);
             }
 
-            Log.i("Infogue/Comment" + mType, "URL " + apiFollowerUrl);
+            Log.i("Infogue/Contributor", mType+" URL " + apiFollowerUrl);
             JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, apiFollowerUrl, null,
                     new Response.Listener<JSONObject>() {
                         @Override

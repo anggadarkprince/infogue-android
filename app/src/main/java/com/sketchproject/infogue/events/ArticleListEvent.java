@@ -37,7 +37,7 @@ import java.util.Map;
 
 /**
  * Article events list.
- * <p>
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 29/04/2016 10.37.
  */
@@ -136,7 +136,7 @@ public class ArticleListEvent {
 
         String rateMessage;
         if (rate > 3) {
-            rateMessage = "Awesome!, you give 5 Stars on \n\r\"" + article.getTitle() + "\"";
+            rateMessage = "Awesome!, you give " + rate + " Stars on \n\r\"" + article.getTitle() + "\"";
         } else {
             rateMessage = "Too bad!, you give under 3 Stars on \n\r\"" + article.getTitle() + "\"";
         }

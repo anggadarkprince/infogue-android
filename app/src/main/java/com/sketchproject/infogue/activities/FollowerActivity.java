@@ -57,6 +57,12 @@ public class FollowerActivity extends AppCompatActivity implements
             String query = extras.getString(SearchActivity.QUERY_STRING);
             String activityTitle = extras.getString(SCREEN_REQUEST);
 
+            Fragment fragment = FollowerFragment.newInstance(1, id, username, activityTitle, query);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.fragment, fragment);
+            fragmentTransaction.commit();
+
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 if (query != null) {
@@ -64,12 +70,6 @@ public class FollowerActivity extends AppCompatActivity implements
                 }
                 getSupportActionBar().setTitle(activityTitle);
             }
-
-            Fragment fragment = FollowerFragment.newInstance(1, id, username, activityTitle, query);
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.fragment, fragment);
-            fragmentTransaction.commit();
         }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);

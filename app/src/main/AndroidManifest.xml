@@ -8,6 +8,9 @@
     <!-- Application need to save session file. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <!-- Application need to write session file. -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <!-- Application need to check internet connection to perform the request. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 

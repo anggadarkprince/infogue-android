@@ -37,7 +37,7 @@ import org.json.JSONObject;
 
 /**
  * A {@link AppCompatActivity} subclass, show contributor profile.
- * <p>
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 15/012/2016 10.37
  */
@@ -56,6 +56,9 @@ public class ProfileActivity extends AppCompatActivity {
     private String username;
     private boolean isFollowing;
     private boolean isAfterLogin;
+
+    private Contributor tempContributor;
+    private View tempButtonFollow;
 
     /**
      * Perform initialization of ProfileActivity.
@@ -155,6 +158,12 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Build event and display buttons depend on profile info.
+     *
+     * @param idContributor       profile id
+     * @param usernameContributor profile username
+     */
     private void buildProfileEventHandler(final int idContributor, final String usernameContributor) {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -297,8 +306,13 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void toggleFollowHandler(final Button mFollowButton) {
-        new FollowerListEvent(this, contributor, mFollowButton).followContributor();
+    /**
+     * Toggle follow control.
+     */
+    private void toggleFollowHandler(View followButton) {
+        tempContributor = FollowerListEvent.contributor;
+        tempButtonFollow = FollowerListEvent.followButton;
+        new FollowerListEvent(this, contributor, followButton).followContributor();
         isFollowing = !isFollowing;
     }
 
@@ -396,6 +410,11 @@ public class ProfileActivity extends AppCompatActivity {
             if (isAfterLogin) {
                 launchMainActivity();
             } else {
+                if (tempContributor != null && tempButtonFollow != null) {
+                    FollowerListEvent.contributor = tempContributor;
+                    FollowerListEvent.followButton = tempButtonFollow;
+                }
+
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, isFollowing);
                 setResult(AppCompatActivity.RESULT_OK, returnIntent);
@@ -426,6 +445,11 @@ public class ProfileActivity extends AppCompatActivity {
         if (isAfterLogin) {
             launchMainActivity();
         } else {
+            if (tempContributor != null && tempButtonFollow != null) {
+                FollowerListEvent.contributor = tempContributor;
+                FollowerListEvent.followButton = tempButtonFollow;
+            }
+
             Intent returnIntent = new Intent();
             returnIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, isFollowing);
             setResult(AppCompatActivity.RESULT_OK, returnIntent);

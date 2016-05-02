@@ -177,8 +177,7 @@ public class SearchActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        new FollowerListEvent(this)
-                .handleProfileResult(requestCode, resultCode, data);
+        new FollowerListEvent(this).handleProfileResult(requestCode, resultCode, data);
     }
 
     /**

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.sketchproject.infogue.activities.ApplicationActivity;
@@ -31,6 +32,7 @@ public class Splash extends Activity {
 
         TwitterAuthConfig authConfig = new TwitterAuthConfig(LoginFragment.TWITTER_KEY, LoginFragment.TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig));
+        Fabric.with(this, new Crashlytics());
 
         DBHelper dbHelper = new DBHelper(getApplicationContext());
         DatabaseManager.initializeInstance(dbHelper);

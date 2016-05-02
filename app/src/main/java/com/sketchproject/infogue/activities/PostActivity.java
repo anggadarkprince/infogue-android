@@ -53,7 +53,7 @@ import me.gujun.android.taggroup.TagGroup;
 
 /**
  * A {@link AppCompatActivity} subclass, show post article.
- *
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 20/012/2016 10.37.
  */
@@ -187,7 +187,6 @@ public class PostActivity extends AppCompatActivity {
                                 articleModel.setId(article.getInt(Article.ID));
                                 articleModel.setTitle(article.getString(Article.TITLE));
                                 articleModel.setSlug(article.getString(Article.SLUG));
-                                articleModel.setFeatured(article.getString(Article.FEATURED_REF));
                                 buildArticle(article, author);
 
                                 contributorModel = new Contributor();
@@ -281,12 +280,6 @@ public class PostActivity extends AppCompatActivity {
             JSONObject category = subcategory.getJSONObject(Article.CATEGORY);
             JSONArray tags = article.getJSONArray(Article.TAGS);
 
-            Glide.with(getBaseContext())
-                    .load(article.getString(Article.FEATURED_REF))
-                    .placeholder(R.drawable.placeholder_rectangle)
-                    .centerCrop()
-                    .crossFade()
-                    .into(mArticleFeatured);
             mArticleTitle.setText(article.getString(Article.TITLE));
             mArticleCategory.setText(category.getString(Category.CATEGORY).toUpperCase());
             mArticleContributor.setText(author.getString(Contributor.NAME));

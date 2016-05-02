@@ -31,6 +31,7 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.sketchproject.infogue.R;
@@ -67,8 +68,8 @@ import io.fabric.sdk.android.Fabric;
  * Created by Angga on 1/04/2016 10.37.
  */
 public class LoginFragment extends Fragment implements Validator.ViewValidation {
-    public static final String TWITTER_KEY = "Rg1JqRPoxbflYe7XtQGCkcKsw";
-    public static final String TWITTER_SECRET = "tVI6dgYF89AHNTkVz3yqywoE9WvjrF4ZVdq2dmk0l2bndLdW9d";
+    public static final String TWITTER_KEY = "8iEnLLV6kqIWBYr6zX0gCNh9r";
+    public static final String TWITTER_SECRET = "PgmZDv95YgKi7vdg8yGSvFXYaQsHYsmbqJ7PiSSiVmjPmpXOS8";
 
     private static final String VENDOR_MOBILE = "mobile";
     private static final String VENDOR_FACEBOOK = "facebook";
@@ -104,6 +105,8 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(getContext(), new Twitter(authConfig));
     }
 
     /**
@@ -150,11 +153,6 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                     values.put(Contributor.EMAIL, object.getString("email"));
                                     values.put(Contributor.AVATAR, object.getJSONObject("picture").getJSONObject("data").getString("url"));
                                     values.put(Contributor.COVER, object.getJSONObject("cover").getString("source"));
-
-                                    for (Map.Entry<String, String> entry : values.entrySet()) {
-                                        Log.i("Infogue/Facebook", entry.getValue() + " : " + entry.getKey());
-                                    }
-
                                     loginRequest(VENDOR_FACEBOOK, values);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -183,9 +181,6 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         });
 
         // Twitter Fabric
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(getContext(), new Twitter(authConfig));
-
         loginButtonTwitter = (TwitterLoginButton) view.findViewById(R.id.login_button_twitter);
         loginButtonTwitter.setCallback(new Callback<TwitterSession>() {
             @Override
@@ -205,12 +200,11 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                         Map<String, String> values = new HashMap<>();
                         values.put(Contributor.ID, user.idStr);
                         values.put(Contributor.NAME, user.name);
-                        values.put(Contributor.EMAIL, user.screenName);
-                        values.put(Contributor.AVATAR, user.profileImageUrl);
+                        values.put(Contributor.USERNAME, user.screenName);
+                        values.put(Contributor.AVATAR, user.profileImageUrlHttps);
                         values.put(Contributor.COVER, user.profileBannerUrl);
                         values.put(Contributor.LOCATION, user.location);
                         values.put(Contributor.ABOUT, user.description);
-                        loginRequest(VENDOR_FACEBOOK, values);
 
                         for (Map.Entry<String, String> entry : values.entrySet()) {
                             Log.i("Infogue/Twitter", entry.getValue() + " : " + entry.getKey());
@@ -313,8 +307,12 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-        loginButtonTwitter.onActivityResult(requestCode, resultCode, data);
+        if(callbackManager != null){
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        }
+        if(loginButtonTwitter != null){
+            loginButtonTwitter.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     /**
@@ -420,6 +418,8 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
             url = APIBuilder.URL_API_OAUTH_TWITTER;
         }
 
+        Log.i("Infogue/url", url);
+
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -479,6 +479,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
+                        LoginManager.getInstance().logOut();
 
                         String errorMessage = getString(R.string.error_unknown);
                         String errorTitle = "";

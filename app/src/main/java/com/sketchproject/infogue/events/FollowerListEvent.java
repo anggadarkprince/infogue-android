@@ -42,8 +42,8 @@ import java.util.Map;
  */
 public class FollowerListEvent {
     private Context context;
-    private static Contributor contributor;
-    private static View followButton;
+    public static Contributor contributor;
+    public static View followButton;
 
     /**
      * Initialize Follower event list.
@@ -154,6 +154,7 @@ public class FollowerListEvent {
         if (requestCode == ProfileActivity.PROFILE_RESULT_CODE && data != null) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 boolean isFollowing = data.getBooleanExtra(SessionManager.KEY_IS_FOLLOWING, false);
+                Log.i("Infogue/Result", String.valueOf(isFollowing));
                 contributor.setIsFollowing(isFollowing);
                 toggleFollowButton(contributor.isFollowing());
             }
@@ -349,16 +350,20 @@ public class FollowerListEvent {
     private void toggleFollowButton(boolean isFollowing){
         if (isFollowing) {
             if(followButton instanceof ImageButton){
+                Log.i("Infogue/Result", "following image button");
                 ((ImageButton)followButton).setImageResource(R.drawable.btn_unfollow);
             } else if (followButton instanceof Button){
+                Log.i("Infogue/Result", "following button");
                 followButton.setBackgroundResource(R.drawable.btn_primary);
                 ((Button)followButton).setTextColor(ContextCompat.getColor(context, R.color.light));
                 ((Button)followButton).setText(R.string.action_unfollow);
             }
         } else {
             if(followButton instanceof ImageButton){
+                Log.i("Infogue/Result", "unfollowing image button");
                 ((ImageButton)followButton).setImageResource(R.drawable.btn_follow);
             } else if (followButton instanceof Button){
+                Log.i("Infogue/Result", "unfollowing button");
                 followButton.setBackgroundResource(R.drawable.btn_toggle);
                 ((Button)followButton).setTextColor(ContextCompat.getColor(context, R.color.primary));
                 ((Button)followButton).setText(R.string.action_follow);

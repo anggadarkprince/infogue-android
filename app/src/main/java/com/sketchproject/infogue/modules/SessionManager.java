@@ -4,11 +4,16 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
+import com.sketchproject.infogue.fragments.LoginFragment;
 import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Handle session data and preferences.
@@ -22,6 +27,7 @@ public class SessionManager {
 
     private SharedPreferences pref;
     private Editor editor;
+    private Context mContext;
 
     private static final String PREF_NAME = "com.sketchproject.infogue";
     private static final String IS_LOGIN = "isLoggedIn";
@@ -47,6 +53,7 @@ public class SessionManager {
      * @param context parent context
      */
     public SessionManager(Context context) {
+        mContext = context;
         pref = context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
         editor = pref.edit();
         editor.apply();
@@ -219,7 +226,11 @@ public class SessionManager {
         editor.remove(KEY_STATUS);
         editor.remove(IS_LOGIN);
 
+        FacebookSdk.sdkInitialize(mContext);
         LoginManager.getInstance().logOut();
+
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(LoginFragment.TWITTER_KEY, LoginFragment.TWITTER_SECRET);
+        Fabric.with(mContext, new Twitter(authConfig));
         Twitter.logOut();
 
         // editor.clear();
