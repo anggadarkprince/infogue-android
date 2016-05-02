@@ -21,6 +21,7 @@ import java.util.Map;
  * Sketch Project Studio
  * Created by Angga on 27/04/2016 12.05.
  */
+@SuppressWarnings("unused")
 public class VolleyMultipartRequest extends Request<NetworkResponse> {
     private final String twoHyphens = "--";
     private final String lineEnd = "\r\n";

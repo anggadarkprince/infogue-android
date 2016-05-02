@@ -207,7 +207,10 @@ public class ArticleEditActivity extends ArticleCreateActivity {
                 }
         );
 
-        articleRequest.setRetryPolicy(new DefaultRetryPolicy(50000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        articleRequest.setRetryPolicy(new DefaultRetryPolicy(
+                APIBuilder.TIMEOUT_SHORT,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(articleRequest);
     }
 }

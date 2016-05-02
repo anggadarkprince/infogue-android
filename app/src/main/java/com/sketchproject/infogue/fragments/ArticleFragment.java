@@ -41,7 +41,7 @@ import java.util.List;
  * A fragment representing a list of Items.
  * Activities containing this fragment MUST implement the {@link OnArticleInteractionListener}
  * interface.
- *
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 26/04/2016 19.09.
  */
@@ -83,7 +83,7 @@ public class ArticleFragment extends Fragment {
     private List<Article> allArticles = new ArrayList<>();
     private ArticleRecyclerViewAdapter articleAdapter;
     private OnArticleInteractionListener mArticleListListener;
-    private OnArticleEditableFragmentInteractionListener mArticleEditableListener;
+    private OnArticleEditableInteractionListener mArticleEditableListener;
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
 
@@ -97,6 +97,12 @@ public class ArticleFragment extends Fragment {
     public ArticleFragment() {
     }
 
+    /**
+     * Default newInstance with column params
+     *
+     * @param columnCount column layout
+     * @return fragment object of ArticleFragment
+     */
     @SuppressWarnings("unused")
     public static ArticleFragment newInstance(int columnCount) {
         ArticleFragment fragment = new ArticleFragment();
@@ -106,6 +112,16 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Show article list fragment by author.
+     *
+     * @param columnCount column layout
+     * @param id          article author
+     * @param username    article author
+     * @param isMyArticle status if this fragment contain logged user article then show
+     *                    with editable function
+     * @return fragment object of ArticleFragment
+     */
     public static ArticleFragment newInstanceAuthor(int columnCount, int id, String username, boolean isMyArticle) {
         ArticleFragment fragment = new ArticleFragment();
 
@@ -119,6 +135,13 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Show article list fragment by keywords.
+     *
+     * @param columnCount column layout
+     * @param query       keyword when search article
+     * @return fragment object of ArticleFragment
+     */
     public static ArticleFragment newInstanceQuery(int columnCount, String query) {
         ArticleFragment fragment = new ArticleFragment();
         Bundle args = new Bundle();
@@ -129,6 +152,13 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Show article list by tag.
+     *
+     * @param columnCount column layout
+     * @param tag         slug tag
+     * @return fragment object of ArticleFragment
+     */
     public static ArticleFragment newInstanceTag(int columnCount, String tag) {
         ArticleFragment fragment = new ArticleFragment();
         Bundle args = new Bundle();
@@ -139,6 +169,13 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Show article list by featured category.
+     *
+     * @param columnCount column layout
+     * @param featured    slug featured
+     * @return fragment object of ArticleFragment
+     */
     public static ArticleFragment newInstanceFeatured(int columnCount, String featured) {
         ArticleFragment fragment = new ArticleFragment();
 
@@ -150,6 +187,14 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Show article list by category.
+     *
+     * @param columnCount column layout
+     * @param categoryId  id of category
+     * @param category    slug of category
+     * @return fragment object of ArticleFragment
+     */
     public static ArticleFragment newInstanceCategory(int columnCount, int categoryId, String category) {
         ArticleFragment fragment = new ArticleFragment();
 
@@ -162,6 +207,16 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Show article by subcategory.
+     *
+     * @param columnCount   column layout
+     * @param categoryId    id of category
+     * @param category      slug of category
+     * @param subcategoryId id of sub category
+     * @param subcategory   slug of sub category
+     * @return fragment object of ArticleFragment
+     */
     @SuppressWarnings("unused")
     public static ArticleFragment newInstanceSubCategory(int columnCount, int categoryId, String category, int subcategoryId, String subcategory) {
         ArticleFragment fragment = new ArticleFragment();
@@ -177,6 +232,11 @@ public class ArticleFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Perform initialization of ArticleFragment.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -221,6 +281,14 @@ public class ArticleFragment extends Fragment {
         apiArticleUrlFirstPage = apiArticleUrl;
     }
 
+    /**
+     * Called after onCreate() and before onCreated()
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate view
+     * @param container          If non-null, this is the parent view that the fragment's attached
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from previous
+     * @return return the view
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_article_list, container, false);
@@ -230,6 +298,7 @@ public class ArticleFragment extends Fragment {
             Context context = view.getContext();
             recyclerView = (RecyclerView) view;
 
+            // determine column of list
             LinearLayoutManager linearLayoutManager;
             if (mColumnCount <= 1) {
                 linearLayoutManager = new LinearLayoutManager(context);
@@ -237,11 +306,14 @@ public class ArticleFragment extends Fragment {
                 linearLayoutManager = new GridLayoutManager(context, mColumnCount);
             }
 
+            // if article list authored by logged user then prefer editable view holder
             if (mMyArticle) {
                 articleAdapter = new ArticleRecyclerViewAdapter(allArticles, mArticleListListener, mArticleEditableListener);
             } else {
                 articleAdapter = new ArticleRecyclerViewAdapter(allArticles, mArticleListListener, hasHeader);
             }
+
+            // set the adapter and attach custom scroll listener that triggered onLoadMore() and onReachTop()
             recyclerView.setAdapter(articleAdapter);
             recyclerView.setLayoutManager(linearLayoutManager);
             recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
@@ -254,6 +326,7 @@ public class ArticleFragment extends Fragment {
 
                 @Override
                 public void onReachTop(boolean isFirst) {
+                    // activate swipe function when list reach top only, find out where do fragment attached
                     if (getActivity() instanceof ArticleActivity) {
                         ((ArticleActivity) getActivity()).setSwipeEnable(isFirst);
                     } else if (getActivity() instanceof ApplicationActivity) {
@@ -271,6 +344,9 @@ public class ArticleFragment extends Fragment {
     }
 
     /**
+     * Actually we do not use page variable from scroll listener, because web
+     * service take care the pagination.
+     *
      * @param page starts at 0
      */
     private void loadArticles(final int page) {
@@ -288,6 +364,7 @@ public class ArticleFragment extends Fragment {
                             try {
                                 String status = response.getString("status");
                                 JSONObject articles = response.getJSONObject("articles");
+
                                 String nextUrl = articles.getString("next_page_url");
                                 int currentPage = articles.getInt("current_page");
                                 int lastPage = articles.getInt("last_page");
@@ -336,26 +413,27 @@ public class ArticleFragment extends Fragment {
                                     allArticles.addAll(moreArticles);
 
                                     if (allArticles.size() <= 0) {
-                                        isEndOfPage = true;
                                         Log.i("INFOGUE/Article", "Empty on page " + page);
+                                        isEndOfPage = true;
                                         Article emptyArticle = new Article(0, null, "Empty page");
                                         allArticles.add(emptyArticle);
                                     } else if (currentPage >= lastPage) {
-                                        isEndOfPage = true;
                                         Log.i("INFOGUE/Article", "End on page " + page);
+                                        isEndOfPage = true;
                                         Article endArticle = new Article(-1, null, "End of page");
                                         allArticles.add(endArticle);
                                     }
 
                                     articleAdapter.notifyItemRangeInserted(curSize, allArticles.size() - 1);
-                                    Log.i("INFOGUE/Article", "Load More page " + page);
                                 } else {
-                                    Helper.toastColor(getContext(), R.string.error_server, R.color.color_warning_transparent);
+                                    Log.i("INFOGUE/Article", "Error on page " + page);
+                                    Helper.toastColor(getContext(), R.string.error_unknown, R.color.color_warning_transparent);
 
                                     isEndOfPage = true;
-                                    Log.i("INFOGUE/Article", "Empty on page " + page);
-                                    Article emptyArticle = new Article(0, null, "Empty page");
-                                    allArticles.add(emptyArticle);
+                                    Article failureArticle = new Article();
+                                    failureArticle.setId(-2);
+                                    failureArticle.setTitle(getString(R.string.error_unknown));
+                                    allArticles.add(failureArticle);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -375,16 +453,15 @@ public class ArticleFragment extends Fragment {
                             allArticles.remove(allArticles.size() - 1);
                             articleAdapter.notifyItemRemoved(allArticles.size());
 
+                            String errorMessage = getString(R.string.error_unknown);
                             NetworkResponse networkResponse = error.networkResponse;
-                            String errorMessage = getActivity().getString(R.string.error_unknown);
                             if (networkResponse == null) {
                                 if (error.getClass().equals(TimeoutError.class)) {
-                                    errorMessage = getActivity().getString(R.string.error_timeout);
+                                    errorMessage = getString(R.string.error_timeout);
                                 } else if (error.getClass().equals(NoConnectionError.class)) {
                                     errorMessage = getString(R.string.error_no_connection);
                                 }
-                            }
-                            else{
+                            } else {
                                 if (networkResponse.statusCode == 404) {
                                     errorMessage = getString(R.string.error_not_found);
                                 } else if (networkResponse.statusCode == 500) {
@@ -397,20 +474,27 @@ public class ArticleFragment extends Fragment {
 
                             // add error view holder
                             isEndOfPage = true;
-                            Article emptyArticle = new Article(0, null, "Error page");
-                            allArticles.add(emptyArticle);
+                            Article errorArticle = new Article();
+                            errorArticle.setId(-2);
+                            errorArticle.setTitle(errorMessage);
+                            allArticles.add(errorArticle);
                         }
                     }
             );
+
             articleRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    15000,
+                    APIBuilder.TIMEOUT_SHORT,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
             VolleySingleton.getInstance(getContext()).addToRequestQueue(articleRequest);
         }
     }
 
+    /**
+     * Remove view holder by ID.
+     *
+     * @param id article id
+     */
     public void deleteArticleRow(int id) {
         Log.i("INFOGUE/Article", "Delete id : " + id);
         for (int i = 0; i < allArticles.size(); i++) {
@@ -421,6 +505,11 @@ public class ArticleFragment extends Fragment {
         }
     }
 
+    /**
+     * Reload article list.
+     *
+     * @param swipeRefresh swipe view
+     */
     public void refreshArticleList(SwipeRefreshLayout swipeRefresh) {
         swipeRefreshLayout = swipeRefresh;
         isEndOfPage = false;
@@ -429,10 +518,18 @@ public class ArticleFragment extends Fragment {
         loadArticles(0);
     }
 
+    /**
+     * Force list to scrolling top.
+     */
     public void scrollToTop() {
         recyclerView.smoothScrollToPosition(0);
     }
 
+    /**
+     * Attach event listener.
+     *
+     * @param context parent context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -444,10 +541,10 @@ public class ArticleFragment extends Fragment {
             mArticleListListener = (OnArticleInteractionListener) context;
 
             if (mMyArticle) {
-                if (context instanceof OnArticleEditableFragmentInteractionListener) {
-                    mArticleEditableListener = (OnArticleEditableFragmentInteractionListener) context;
+                if (context instanceof OnArticleEditableInteractionListener) {
+                    mArticleEditableListener = (OnArticleEditableInteractionListener) context;
                 } else {
-                    throw new RuntimeException(context.toString() + " must implement OnArticleEditableFragmentInteractionListener");
+                    throw new RuntimeException(context.toString() + " must implement OnArticleEditableInteractionListener");
                 }
             }
         } else {
@@ -455,6 +552,9 @@ public class ArticleFragment extends Fragment {
         }
     }
 
+    /**
+     * Clear listener when detached.
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -478,7 +578,12 @@ public class ArticleFragment extends Fragment {
         void onArticleLongClickInteraction(View view, Article article);
     }
 
-    public interface OnArticleEditableFragmentInteractionListener {
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment, event which capable to interact with editable function,
+     * just use when authorize user confirmed.
+     */
+    public interface OnArticleEditableInteractionListener {
         void onBrowseClicked(View view, Article article);
 
         void onShareClicked(View view, Article article);

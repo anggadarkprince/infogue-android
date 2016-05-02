@@ -2,7 +2,7 @@ package com.sketchproject.infogue.models;
 
 /**
  * Category model data.
- *
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 24/04/2016 09.16.
  */
@@ -14,7 +14,7 @@ public class Category {
     private int id;
     private String category;
 
-    public Category(){
+    public Category() {
 
     }
 

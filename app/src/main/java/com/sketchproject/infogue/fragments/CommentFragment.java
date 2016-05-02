@@ -68,7 +68,14 @@ public class CommentFragment extends Fragment {
     public CommentFragment() {
     }
 
-    @SuppressWarnings("unused")
+    /**
+     * Default newInstance to show comment list by article id and slug.
+     *
+     * @param columnCount column layout
+     * @param articleId id of article
+     * @param articleSlug slug article
+     * @return fragment object of CommentFragment
+     */
     public static CommentFragment newInstance(int columnCount, int articleId, String articleSlug) {
         CommentFragment fragment = new CommentFragment();
         Bundle args = new Bundle();
@@ -79,6 +86,11 @@ public class CommentFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Perform initialization of CommentFragment.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +104,14 @@ public class CommentFragment extends Fragment {
         }
     }
 
+    /**
+     * Called after onCreate() and before onCreated()
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate view
+     * @param container          If non-null, this is the parent view that the fragment's attached
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from previous
+     * @return return the view
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_comment_list, container, false);
@@ -133,6 +153,12 @@ public class CommentFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Actually we do not use page variable from scroll listener, because web
+     * service take care the pagination.
+     *
+     * @param page starts at 0
+     */
     private void loadComments(final int page) {
         if (!isEndOfPage && apiCommentUrl != null) {
             if (swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing()) {
@@ -147,8 +173,8 @@ public class CommentFragment extends Fragment {
                         public void onResponse(JSONObject response) {
                             try {
                                 String status = response.getString("status");
-
                                 JSONObject comments = response.getJSONObject("comments");
+
                                 String nextUrl = comments.getString("next_page_url");
                                 int currentPage = comments.getInt("current_page");
                                 int lastPage = comments.getInt("last_page");
@@ -192,27 +218,27 @@ public class CommentFragment extends Fragment {
 
                                     if (allComments.size() <= 0) {
                                         isEndOfPage = true;
-                                        Log.i("INFOGUE/Comment", "EMPTY on page " + page);
+                                        Log.i("Infogue/Comment", "EMPTY on page " + page);
                                         Comment emptyComment = new Comment();
                                         emptyComment.setId(0);
                                         allComments.add(emptyComment);
                                     } else if (currentPage >= lastPage) {
                                         isEndOfPage = true;
-                                        Log.i("INFOGUE/Comment", "END on page " + page);
+                                        Log.i("Infogue/Comment", "END on page " + page);
                                         Comment endComment = new Comment();
                                         endComment.setId(-1);
                                         allComments.add(endComment);
                                     }
 
                                     commentAdapter.notifyItemRangeInserted(curSize, allComments.size() - 1);
-                                    Log.i("INFOGUE/Comment", "Load More page " + page);
                                 } else {
+                                    Log.i("Infogue/Comment", "Error on page " + page);
                                     Helper.toastColor(getContext(), R.string.error_unknown, R.color.color_warning_transparent);
 
-                                    // add error view holder
                                     isEndOfPage = true;
                                     Comment failureComment = new Comment();
-                                    failureComment.setId(-1);
+                                    failureComment.setId(-2);
+                                    failureComment.setComment(getString(R.string.error_unknown));
                                     allComments.add(failureComment);
                                 }
 
@@ -251,14 +277,15 @@ public class CommentFragment extends Fragment {
 
                             // add error view holder
                             isEndOfPage = true;
-                            Comment failureComment = new Comment();
-                            failureComment.setId(-1);
-                            allComments.add(failureComment);
+                            Comment errorComment = new Comment();
+                            errorComment.setId(-2);
+                            errorComment.setComment(errorMessage);
+                            allComments.add(errorComment);
                         }
                     }
             );
             contributorRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    15000,
+                    APIBuilder.TIMEOUT_SHORT,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
@@ -266,6 +293,11 @@ public class CommentFragment extends Fragment {
         }
     }
 
+    /**
+     * Reload comment list.
+     *
+     * @param swipeRefresh swipe view
+     */
     public void refreshCommentList(SwipeRefreshLayout swipeRefresh) {
         swipeRefreshLayout = swipeRefresh;
         isEndOfPage = false;
@@ -274,6 +306,11 @@ public class CommentFragment extends Fragment {
         loadComments(0);
     }
 
+    /**
+     * Attach event listener.
+     *
+     * @param context parent context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -284,6 +321,9 @@ public class CommentFragment extends Fragment {
         }
     }
 
+    /**
+     * Clear listener when detached.
+     */
     @Override
     public void onDetach() {
         super.onDetach();

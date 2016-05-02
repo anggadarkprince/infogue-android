@@ -2,7 +2,6 @@ package com.sketchproject.infogue.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -22,7 +21,7 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass. show alert by categorizing to danger, warning, success
  * and info type and messages.
- *
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 21/04/2016 19.09.
  */
@@ -39,15 +38,31 @@ public class AlertFragment extends Fragment {
     private TextView mAlertMessage;
     private ImageButton mAlertDismiss;
 
+    /**
+     * Default constructor
+     */
     public AlertFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * Called after onCreate() and before onCreated()
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate view
+     * @param container          If non-null, this is the parent view that the fragment's attached
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from previous
+     * @return return the view
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_alert, container, false);
     }
 
+    /**
+     * Method when parent activity was created.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -78,11 +93,19 @@ public class AlertFragment extends Fragment {
         }
     }
 
+    /**
+     * Add custom listener when user click button close.
+     *
+     * @param listener close button listener
+     */
     @SuppressWarnings("unused")
     public void setOnDismissListener(View.OnClickListener listener) {
         mAlertDismiss.setOnClickListener(listener);
     }
 
+    /**
+     * Fadeout and hide alert view.
+     */
     public void dismiss() {
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
         mAlertContainer.setVisibility(View.GONE);
@@ -97,6 +120,9 @@ public class AlertFragment extends Fragment {
                 });
     }
 
+    /**
+     * Animate and show alert view.
+     */
     public void show() {
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
         final View alert = getView();
@@ -114,19 +140,40 @@ public class AlertFragment extends Fragment {
         }
     }
 
+    /**
+     * Custom alert title.
+     *
+     * @param title string title
+     */
     public void setAlertTitle(String title) {
         mAlertTitle.setText(title);
     }
 
+    /**
+     * Display single line message.
+     *
+     * @param message single text message
+     */
     public void setAlertMessage(String message) {
         mAlertMessage.setText(message);
     }
 
+    /**
+     * Render html alert message.
+     *
+     * @param message html string
+     */
+    @SuppressWarnings("unused")
     public void setAlertMessageHtml(String message) {
         mAlertMessage.setText(Html.fromHtml(message));
         mAlertMessage.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
+    /**
+     * Build multiple alert messages.
+     *
+     * @param messages text info for alert
+     */
     public void setAlertMessage(List<String> messages) {
         String allMessages = "";
         for (int i = 0; i < messages.size(); i++) {
@@ -138,38 +185,42 @@ public class AlertFragment extends Fragment {
         setAlertMessage(allMessages);
     }
 
-    @SuppressLint("SetTextI18n")
+    /**
+     * Determine alert type.
+     *
+     * @param type of alert
+     */
     public void setAlertType(int type) {
         switch (type) {
             case ALERT_SUCCESS:
                 mAlertContainer.setBackgroundResource(R.color.color_success);
                 mAlertIcon.setImageResource(R.drawable.ic_check);
-                mAlertTitle.setText("Action was perform successfully!");
-                mAlertMessage.setText("Success message appear here...");
+                mAlertTitle.setText(R.string.placeholder_alert_success_title);
+                mAlertMessage.setText(R.string.placeholder_alert_success_message);
                 break;
             case ALERT_INFO:
                 mAlertContainer.setBackgroundResource(R.color.color_info);
                 mAlertIcon.setImageResource(R.drawable.ic_info);
-                mAlertTitle.setText("Hey, take a look!");
-                mAlertMessage.setText("Info message appear here...");
+                mAlertTitle.setText(R.string.placeholder_alert_info_title);
+                mAlertMessage.setText(R.string.placeholder_alert_info_message);
                 break;
             case ALERT_WARNING:
                 mAlertContainer.setBackgroundResource(R.color.color_warning);
                 mAlertIcon.setImageResource(R.drawable.ic_warning);
-                mAlertTitle.setText("Warning, take a look!");
-                mAlertMessage.setText("Warning message appear here...");
+                mAlertTitle.setText(R.string.placeholder_alert_warning_title);
+                mAlertMessage.setText(R.string.placeholder_alert_warning_message);
                 break;
             case ALERT_DANGER:
                 mAlertContainer.setBackgroundResource(R.color.color_danger);
                 mAlertIcon.setImageResource(R.drawable.ic_error);
-                mAlertTitle.setText("Whops, something is getting wrong!");
-                mAlertMessage.setText("Error message appear here...");
+                mAlertTitle.setText(R.string.placeholder_alert_danger_title);
+                mAlertMessage.setText(R.string.placeholder_alert_danger_message);
                 break;
             default:
                 mAlertContainer.setBackgroundResource(R.color.primary);
                 mAlertIcon.setImageResource(R.drawable.ic_whatshot);
-                mAlertTitle.setText("Alert Default!");
-                mAlertMessage.setText("This is an alert message...");
+                mAlertTitle.setText(R.string.placeholder_alert_default_title);
+                mAlertMessage.setText(R.string.placeholder_alert_default_message);
                 break;
         }
     }

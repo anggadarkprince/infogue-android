@@ -293,10 +293,11 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
                 return params;
             }
         };
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(15000,
+
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                APIBuilder.TIMEOUT_MEDIUM,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(postRequest);
     }
 

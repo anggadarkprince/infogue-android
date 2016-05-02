@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Article model data.
- *
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 12/04/2016 22.09.
  */
@@ -178,6 +178,7 @@ public class Article {
         this.view = view;
     }
 
+    @SuppressWarnings("unused")
     public int getRating() {
         return rating;
     }

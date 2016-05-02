@@ -64,6 +64,7 @@ public class DatabaseManager {
     /**
      * Close database
      */
+    @SuppressWarnings("unused")
     public synchronized void closeDatabase() {
         mDatabase.close();
     }
@@ -95,6 +96,7 @@ public class DatabaseManager {
          * @param data model T
          * @return object model T
          */
+        @SuppressWarnings("unused")
         T findData(T data);
 
         /**
@@ -104,6 +106,7 @@ public class DatabaseManager {
          * @param reference to perform update
          * @return boolean
          */
+        @SuppressWarnings("unused")
         boolean updateData(T data, Object reference);
 
         /**
@@ -112,6 +115,7 @@ public class DatabaseManager {
          * @param data model T
          * @return boolean
          */
+        @SuppressWarnings("unused")
         boolean deleteData(T data);
     }
 }

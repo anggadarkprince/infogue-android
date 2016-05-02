@@ -16,6 +16,7 @@ import java.util.Map;
  * Sketch Project Studio
  * Created by Angga on 10/04/2016 18.16 18.17.
  */
+@SuppressWarnings("unused")
 public class SessionManager {
     public int PRIVATE_MODE = 0;
 
@@ -158,7 +159,6 @@ public class SessionManager {
      * @param username reference unique user identity of session data
      * @return boolean indicate is me or not
      */
-    @SuppressWarnings("unused")
     public boolean isMe(String username) {
         return getSessionData(SessionManager.KEY_ID, "").equals(username);
     }
@@ -168,7 +168,6 @@ public class SessionManager {
      *
      * @return HashMap
      */
-    @SuppressWarnings("unused")
     public HashMap<String, Object> getUserDetails() {
         HashMap<String, Object> user = new HashMap<>();
         user.put(KEY_ID, pref.getInt(KEY_ID, 0));
@@ -190,7 +189,6 @@ public class SessionManager {
      *
      * @return Map
      */
-    @SuppressWarnings("unused")
     public Map<String, ?> getAllSession() {
         return pref.getAll();
     }
@@ -200,7 +198,6 @@ public class SessionManager {
      *
      * @return int
      */
-    @SuppressWarnings("unused")
     public int getSessionSize() {
         return pref.getAll().size();
     }

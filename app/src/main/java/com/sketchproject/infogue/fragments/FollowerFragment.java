@@ -41,7 +41,7 @@ import java.util.List;
  * A fragment representing a list of follower Items.
  * Activities containing this fragment MUST implement the {@link OnFollowerInteractionListener}
  * interface.
- *
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 11/04/2016 10.37.
  */
@@ -82,6 +82,16 @@ public class FollowerFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Default newInstance to show type of contributor list by owner and related logged id.
+     *
+     * @param columnCount column layout
+     * @param id          related with logged id
+     * @param username    list owner
+     * @param type        kind of screen
+     * @param query       to search contributor
+     * @return fragment object of FollowerFragment
+     */
     public static FollowerFragment newInstance(int columnCount, int id, String username, String type, String query) {
         FollowerFragment fragment = new FollowerFragment();
         Bundle args = new Bundle();
@@ -94,6 +104,11 @@ public class FollowerFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Perform initialization of FollowerFragment.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,6 +138,14 @@ public class FollowerFragment extends Fragment {
         }
     }
 
+    /**
+     * Called after onCreate() and before onCreated()
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate view
+     * @param container          If non-null, this is the parent view that the fragment's attached
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from previous
+     * @return return the view
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_follower_list, container, false);
@@ -165,6 +188,9 @@ public class FollowerFragment extends Fragment {
     }
 
     /**
+     * Actually we do not use page variable from scroll listener, because web
+     * service take care the pagination.
+     *
      * @param page starts at 0
      */
     private void loadFollowers(final int page) {
@@ -174,7 +200,7 @@ public class FollowerFragment extends Fragment {
                 followerAdapter.notifyItemInserted(allFollowers.size() - 1);
             }
 
-            Log.i("INFOGUE/" + mType, "URL " + apiFollowerUrl);
+            Log.i("Infogue/Comment" + mType, "URL " + apiFollowerUrl);
             JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, apiFollowerUrl, null,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -210,7 +236,7 @@ public class FollowerFragment extends Fragment {
 
                                             Contributor contributor = new Contributor();
                                             contributor.setId(contributorData.getInt(Contributor.ID));
-                                            contributor.setToken(contributorData.getString(Contributor.API_TOKEN));
+                                            contributor.setApiToken(contributorData.getString(Contributor.API_TOKEN));
                                             contributor.setUsername(contributorData.getString(Contributor.USERNAME));
                                             contributor.setName(contributorData.getString(Contributor.NAME));
                                             contributor.setEmail(contributorData.getString(Contributor.EMAIL));
@@ -232,24 +258,25 @@ public class FollowerFragment extends Fragment {
 
                                     if (allFollowers.size() <= 0) {
                                         isEndOfPage = true;
-                                        Log.i("INFOGUE/Contributor", "EMPTY on page " + page);
+                                        Log.i("Infogue/Contributor", "EMPTY on page " + page);
                                         Contributor emptyContributor = new Contributor(0, null);
                                         allFollowers.add(emptyContributor);
                                     } else if (currentPage >= lastPage) {
                                         isEndOfPage = true;
-                                        Log.i("INFOGUE/Contributor", "END on page " + page);
+                                        Log.i("Infogue/Contributor", "END on page " + page);
                                         Contributor endContributor = new Contributor(-1, null);
                                         allFollowers.add(endContributor);
                                     }
 
                                     followerAdapter.notifyItemRangeInserted(curSize, allFollowers.size() - 1);
-                                    Log.i("INFOGUE/Contributor", "Load More page " + page);
                                 } else {
                                     Helper.toastColor(getContext(), R.string.error_unknown, R.color.color_warning_transparent);
 
                                     // add error view holder
                                     isEndOfPage = true;
-                                    Contributor failureContributor = new Contributor(-1, null);
+                                    Contributor failureContributor = new Contributor();
+                                    failureContributor.setId(-2);
+                                    failureContributor.setName(getString(R.string.error_unknown));
                                     allFollowers.add(failureContributor);
                                 }
 
@@ -288,13 +315,15 @@ public class FollowerFragment extends Fragment {
 
                             // add error view holder
                             isEndOfPage = true;
-                            Contributor failureContributor = new Contributor(-1, null);
-                            allFollowers.add(failureContributor);
+                            Contributor errorContributor = new Contributor();
+                            errorContributor.setId(-2);
+                            errorContributor.setName(errorMessage);
+                            allFollowers.add(errorContributor);
                         }
                     }
             );
             contributorRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    15000,
+                    APIBuilder.TIMEOUT_SHORT,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
@@ -302,6 +331,11 @@ public class FollowerFragment extends Fragment {
         }
     }
 
+    /**
+     * Reload follower list.
+     *
+     * @param swipeRefresh swipe view
+     */
     public void refreshArticleList(SwipeRefreshLayout swipeRefresh) {
         swipeRefreshLayout = swipeRefresh;
         isEndOfPage = false;
@@ -310,6 +344,11 @@ public class FollowerFragment extends Fragment {
         loadFollowers(0);
     }
 
+    /**
+     * Attach event listener.
+     *
+     * @param context parent context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -320,6 +359,9 @@ public class FollowerFragment extends Fragment {
         }
     }
 
+    /**
+     * Clear listener when detached.
+     */
     @Override
     public void onDetach() {
         super.onDetach();

@@ -14,6 +14,7 @@ import android.provider.MediaStore;
  * Sketch Project Studio
  * Created by Angga on 18/04/2016 18.10.
  */
+@SuppressWarnings("unused")
 public class RealPathResolver {
     @SuppressLint("NewApi")
     public static String getRealPathFromURI_API19(Context context, Uri uri) {
@@ -61,8 +62,8 @@ public class RealPathResolver {
     }
 
     public static String getRealPathFromURI_BelowAPI11(Context context, Uri contentUri) {
-        String[] proj = {MediaStore.Images.Media.DATA};
-        @SuppressLint("Recycle") Cursor cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
+        String[] projection = {MediaStore.Images.Media.DATA};
+        @SuppressLint("Recycle") Cursor cursor = context.getContentResolver().query(contentUri, projection, null, null, null);
         int column_index;
         String path = "";
         if (cursor != null) {

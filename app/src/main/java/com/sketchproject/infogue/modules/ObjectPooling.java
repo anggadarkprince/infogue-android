@@ -31,6 +31,7 @@ public class ObjectPooling {
      *
      * @param objectList objects with label.
      */
+    @SuppressWarnings("unused")
     public ObjectPooling(List<HashMap<String, Object>> objectList) {
         objects = objectList;
     }
@@ -40,6 +41,7 @@ public class ObjectPooling {
      *
      * @param maxSize number of objects can handle.
      */
+    @SuppressWarnings("unused")
     public ObjectPooling(int maxSize) {
         isFixedSize = true;
         max = maxSize;
@@ -91,6 +93,7 @@ public class ObjectPooling {
      * @param label related label which object want to destroyed
      * @return object which destroyed
      */
+    @SuppressWarnings("unused")
     public Object unpool(String label) {
         for (HashMap object : objects) {
             if (object.get(KEY_LABEL).equals(label)) {
@@ -122,6 +125,7 @@ public class ObjectPooling {
      *
      * @return boolean
      */
+    @SuppressWarnings("unused")
     public boolean isFixedSize() {
         return isFixedSize;
     }

@@ -8,10 +8,12 @@ import android.widget.TextView;
 import com.sketchproject.infogue.R;
 
 /**
+ * Info view holder to display message like end, empty or error messages.
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 16/04/2016 18.19.
  */
-public class ListInfoViewHolder  extends RecyclerView.ViewHolder {
+public class ListInfoViewHolder extends RecyclerView.ViewHolder {
     public ImageView mLogoImage;
     public TextView mMessageView;
 
@@ -23,6 +25,6 @@ public class ListInfoViewHolder  extends RecyclerView.ViewHolder {
 
     @Override
     public String toString() {
-        return super.toString() + " End of list " + mMessageView.getText();
+        return super.toString() + " Comment : " + mMessageView.getText();
     }
 }

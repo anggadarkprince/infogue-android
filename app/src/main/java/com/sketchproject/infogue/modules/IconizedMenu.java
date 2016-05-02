@@ -17,6 +17,7 @@ import android.view.View;
  * Sketch Project Studio
  * Created by Angga on 14/04/2016 02.40.
  */
+@SuppressWarnings("unused")
 public class IconizedMenu implements MenuBuilder.Callback, MenuPresenter.Callback {
     private Context mContext;
     private MenuBuilder mMenu;

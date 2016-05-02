@@ -351,7 +351,7 @@ public class ProfileActivity extends AppCompatActivity {
                 }
         );
         contributorRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000,
+                APIBuilder.TIMEOUT_SHORT,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 

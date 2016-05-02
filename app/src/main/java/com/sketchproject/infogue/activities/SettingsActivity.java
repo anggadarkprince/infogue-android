@@ -113,6 +113,11 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
     private String mRealPathCover;
     private boolean mIsSaved;
 
+    /**
+     * Perform initialization of SettingsActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -244,6 +249,10 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         retrieveProfile();
     }
 
+    /**
+     * Check if confirmation dialog is showing then close it, or if not show to confirm
+     * user when discard the article.
+     */
     @Override
     public void onBackPressed() {
         if (dialogDiscard != null && dialogDiscard.isShowing()) {
@@ -253,12 +262,24 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         }
     }
 
+    /**
+     * Create option menu and make actionbar display search view.
+     *
+     * @param menu list option menu
+     * @return boolean
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.save, menu);
         return true;
     }
 
+    /**
+     * Handle action when menu clicked.
+     *
+     * @param item selected menu
+     * @return boolean
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -273,6 +294,9 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Placeholder validator method to handle populating inputs.
+     */
     @Override
     public void preValidation() {
         contributor = new Contributor();
@@ -308,6 +332,11 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         }
     }
 
+    /**
+     * Placeholder validator method to handle validation rules.
+     *
+     * @return boolean
+     */
     @Override
     public boolean onValidateView() {
         boolean isInvalid = false;
@@ -538,6 +567,11 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         return !isInvalid;
     }
 
+    /**
+     * Validator placeholder function to handle process after validation.
+     *
+     * @param isValid indicate input form is valid or not
+     */
     @Override
     public void postValidation(boolean isValid) {
         if (isValid) {
@@ -569,11 +603,11 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
             String realPath;
 
             if (Build.VERSION.SDK_INT < 19) {
-                realPath = RealPathResolver.getRealPathFromURI_API11to18(this, data.getData());
+                //realPath = RealPathResolver.getRealPathFromURI_API11to18(this, data.getData());
             } else {
-                realPath = RealPathResolver.getRealPathFromURI_API19(this, data.getData());
+                //realPath = RealPathResolver.getRealPathFromURI_API19(this, data.getData());
             }
-
+            realPath = "image picked";
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 if (requestCode == PICK_IMAGE_AVATAR) {
@@ -689,7 +723,8 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                     }
                 }
         );
-        contributorRequest.setRetryPolicy(new DefaultRetryPolicy(15000,
+        contributorRequest.setRetryPolicy(new DefaultRetryPolicy(
+                APIBuilder.TIMEOUT_SHORT,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(contributorRequest);
@@ -881,6 +916,10 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                 }
             };
 
+            multipartRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    APIBuilder.TIMEOUT_LONG,
+                    APIBuilder.NO_RETRY,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
 
         } else {

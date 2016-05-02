@@ -7,7 +7,7 @@ import android.util.Log;
 /**
  * Custom OnScrollListener to detect when scroll content reach bottom (almost) to prepare
  * another event like load more data.
- *
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 11/04/2016 10.49 10.49.
  */
@@ -40,8 +40,8 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
      * but first we check if we are waiting for the previous load to finish.
      *
      * @param view The RecyclerView which scrolled.
-     * @param dx The amount of horizontal scroll.
-     * @param dy The amount of vertical scroll.
+     * @param dx   The amount of horizontal scroll.
+     * @param dy   The amount of vertical scroll.
      */
     @Override
     public void onScrolled(RecyclerView view, int dx, int dy) {
@@ -70,10 +70,11 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
         // the visibleThreshold and need to reload more data.
         // If we do need to reload some more data, we execute onLoadMore to fetch the data.
         if (!loading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
-            Log.i("Infogue/List", "Load more");
             currentPage++;
             onLoadMore(currentPage, totalItemCount);
             loading = true;
+
+            Log.i("Infogue/List", "Load more page " + currentPage);
         }
 
         if (mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
@@ -87,7 +88,7 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
     /**
      * Defines the process for actually loading more data based on page
      *
-     * @param page current page begin from 0
+     * @param page            current page begin from 0
      * @param totalItemsCount total item has been loaded
      */
     public abstract void onLoadMore(int page, int totalItemsCount);

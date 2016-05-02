@@ -1,6 +1,5 @@
 package com.sketchproject.infogue.adapters;
 
-import android.annotation.SuppressLint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +24,9 @@ import java.util.List;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Contributor} and makes a call to the
  * specified {@link OnFollowerInteractionListener}.
+ * <p>
+ * Sketch Project Studio
+ * Created by Angga on 14/04/2016 08.54.
  */
 public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -32,6 +34,7 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     private static final int VIEW_TYPE_FOLLOWER = 1;
     private static final int VIEW_TYPE_END = 2;
     private static final int VIEW_TYPE_EMPTY = 3;
+    private static final int VIEW_TYPE_ERROR = 4;
 
     private final List<Contributor> mContributors;
     private final OnFollowerInteractionListener mListener;
@@ -39,29 +42,52 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     private int mLastPosition = -1;
     private String mScreenType;
 
+    /**
+     * Default constructor.
+     *
+     * @param items    collection of comments data
+     * @param listener listener when interaction with view holder
+     * @param type     of screen
+     */
     public FollowerRecyclerViewAdapter(List<Contributor> items, FollowerFragment.OnFollowerInteractionListener listener, String type) {
         mContributors = items;
         mListener = listener;
         mScreenType = type;
     }
 
+    /**
+     * Get specific type of list, if follower null mean loading, the rest depend on their id value.
+     *
+     * @param position of view holder
+     * @return int type list
+     */
     @Override
     public int getItemViewType(int position) {
         if (mContributors.get(position) == null) {
             return VIEW_TYPE_LOADING;
-        }
-        else{
+        } else {
             Contributor contributor = mContributors.get(position);
-            if (contributor.getId() == -1) {
-                return VIEW_TYPE_END;
+            if (contributor.getId() > 0) {
+                return VIEW_TYPE_FOLLOWER;
             } else if (contributor.getId() == 0) {
                 return VIEW_TYPE_EMPTY;
+            } else if (contributor.getId() == -1) {
+                return VIEW_TYPE_END;
+            } else if (contributor.getId() == -2) {
+                return VIEW_TYPE_ERROR;
             }
 
-            return VIEW_TYPE_FOLLOWER;
+            return VIEW_TYPE_END;
         }
     }
 
+    /**
+     * Creating view holder each list type.
+     *
+     * @param parent   holder parent
+     * @param viewType type has retrieve from getItemViewType()
+     * @return ViewHolder
+     */
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
@@ -75,13 +101,21 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         } else if (viewType == VIEW_TYPE_EMPTY) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
             return new ListInfoViewHolder(view);
+        } else if (viewType == VIEW_TYPE_ERROR) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
+            return new ListInfoViewHolder(view);
         }
 
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_loading, parent, false);
         return new LoadingViewHolder(view);
     }
 
-    @SuppressLint("SetTextI18n")
+    /**
+     * Perform action and attribute when holder bind into list.
+     *
+     * @param holder   list view holder
+     * @param position current position
+     */
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         Animation animation = AnimationUtils.loadAnimation(holder.itemView.getContext(), (position > mLastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
@@ -104,13 +138,12 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 }
 
                 SessionManager session = new SessionManager(followerHolder.itemView.getContext());
-                if(session.isLoggedIn()){
+                if (session.isLoggedIn()) {
                     boolean isActivated = followerHolder.mItem.getStatus().equals(Contributor.STATUS_ACTIVATED);
                     boolean isMe = session.isMe(followerHolder.mItem.getId());
-                    if(isMe || !isActivated){
+                    if (isMe || !isActivated) {
                         followerHolder.mFollowButton.setVisibility(View.GONE);
-                    }
-                    else{
+                    } else {
                         followerHolder.mFollowButton.setVisibility(View.VISIBLE);
                     }
                 }
@@ -156,22 +189,40 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 break;
             case VIEW_TYPE_EMPTY:
                 final ListInfoViewHolder emptyHolder = (ListInfoViewHolder) holder;
-                emptyHolder.mMessageView.setText("NO "+ mScreenType.toUpperCase()+" AVAILABLE");
+                String label = "NO " + mScreenType.toUpperCase() + " AVAILABLE";
+                emptyHolder.mMessageView.setText(label);
+                break;
+            case VIEW_TYPE_ERROR:
+                final ListInfoViewHolder errorHolder = (ListInfoViewHolder) holder;
+                errorHolder.mMessageView.setText(mContributors.get(holder.getAdapterPosition()).getName());
                 break;
         }
     }
 
+    /**
+     * Clear animation when holder detached.
+     *
+     * @param holder list view holder
+     */
     @Override
     public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
         holder.itemView.clearAnimation();
     }
 
+    /**
+     * Count total items.
+     *
+     * @return total of articles
+     */
     @Override
     public int getItemCount() {
         return mContributors.size();
     }
 
+    /**
+     * Follower view holder.
+     */
     public class FollowerViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mNameView;
@@ -180,6 +231,11 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         public final ImageView mAvatarImage;
         public Contributor mItem;
 
+        /**
+         * Default constructor.
+         *
+         * @param view holder
+         */
         public FollowerViewHolder(View view) {
             super(view);
             mView = view;

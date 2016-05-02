@@ -15,6 +15,7 @@ import android.view.animation.LinearInterpolator;
  * Sketch Project Studio
  * Created by Angga on 10/04/2016 18.16.
  */
+@SuppressWarnings("unused")
 public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
     public ScrollAwareFABBehavior(Context context, AttributeSet attrs) {
         super();

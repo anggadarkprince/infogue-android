@@ -33,7 +33,7 @@ import com.sketchproject.infogue.utils.APIBuilder;
  */
 public class ArticleActivity extends AppCompatActivity implements
         ArticleFragment.OnArticleInteractionListener,
-        ArticleFragment.OnArticleEditableFragmentInteractionListener {
+        ArticleFragment.OnArticleEditableInteractionListener {
 
     public static final String DISCARD_ARTICLE = "discard";
     public static final String SAVE_ARTICLE = "save";

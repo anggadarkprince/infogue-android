@@ -121,6 +121,11 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
     protected String realPathFeatured;
     protected String apiUrl;
 
+    /**
+     * Perform initialization of ArticleCreateActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -452,6 +457,13 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         }
     }
 
+    /**
+     * Collect information from pick image for featured image.
+     *
+     * @param requestCode code request when profile activity called
+     * @param resultCode  result state for now just catch RESULT_OK
+     * @param data        data from activity called is follow or unfollow
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -461,10 +473,12 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
             Uri uri = data.getData();
 
             if (Build.VERSION.SDK_INT < 19) {
-                realPathFeatured = RealPathResolver.getRealPathFromURI_API11to18(getBaseContext(), data.getData());
+                //realPathFeatured = RealPathResolver.getRealPathFromURI_API11to18(getBaseContext(), data.getData());
             } else {
-                realPathFeatured = RealPathResolver.getRealPathFromURI_API19(getBaseContext(), data.getData());
+                //realPathFeatured = RealPathResolver.getRealPathFromURI_API19(getBaseContext(), data.getData());
             }
+
+            realPathFeatured = "image picked";
 
             isNewFeatured = true;
 
@@ -478,12 +492,24 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         }
     }
 
+    /**
+     * Create option menu and make actionbar display search view.
+     *
+     * @param menu list option menu
+     * @return boolean
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.save, menu);
         return true;
     }
 
+    /**
+     * Handle action when menu clicked.
+     *
+     * @param item selected menu
+     * @return boolean
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -498,6 +524,10 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Check if confirmation dialog is showing then close it, or if not show to confirm
+     * user when discard the article.
+     */
     @Override
     public void onBackPressed() {
         if (confirmationDialog != null && confirmationDialog.isShowing()) {
@@ -904,7 +934,10 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                     return params;
                 }
             };
-            multipartRequest.setRetryPolicy(new DefaultRetryPolicy(50000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            multipartRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    APIBuilder.TIMEOUT_LONG,
+                    APIBuilder.NO_RETRY,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
         } else {
             connectionDetector.snackbarDisconnectNotification(mSelectButton, null);

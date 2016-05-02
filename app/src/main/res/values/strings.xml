@@ -384,5 +384,17 @@
     <string name="message_facebook_cancel">Facebook login attempt canceled</string>
     <string name="message_facebook_failed">Facebook login attempt failed</string>
     <string name="message_twitter_failure">Login with Twitter failure</string>
+    <string name="label_no_article">NO ARTICLE AVAILABLE</string>
+    <string name="label_no_comment">NO COMMENTS AVAILABLE</string>
+    <string name="placeholder_alert_success_title">Action was perform successfully!</string>
+    <string name="placeholder_alert_success_message">Success message appear here...</string>
+    <string name="placeholder_alert_info_title">Hey, take a look!</string>
+    <string name="placeholder_alert_info_message">Info message appear here...</string>
+    <string name="placeholder_alert_warning_title">Warning, take a look!</string>
+    <string name="placeholder_alert_warning_message">Warning message appear here...</string>
+    <string name="placeholder_alert_danger_title">Whops, something is getting wrong!</string>
+    <string name="placeholder_alert_danger_message">Error message appear here...</string>
+    <string name="placeholder_alert_default_title">Alert Default!</string>
+    <string name="placeholder_alert_default_message">This is an alert message...</string>
 
 </resources>

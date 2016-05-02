@@ -7,6 +7,8 @@ import android.widget.ProgressBar;
 import com.sketchproject.infogue.R;
 
 /**
+ * Loading view holder to display progress bar.
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 16/04/2016 18.19.
  */

@@ -352,7 +352,10 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
             }
         };
 
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(50000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                APIBuilder.TIMEOUT_LONG,
+                APIBuilder.NO_RETRY,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getContext()).addToRequestQueue(postRequest);
     }
 }

@@ -18,6 +18,7 @@ import com.sketchproject.infogue.R;
  * Sketch Project Studio
  * Created by Angga on 10/04/2016 18.17.
  */
+@SuppressWarnings("unused")
 public class ConnectionDetector extends BroadcastReceiver {
     private OnLostConnectionListener mLostListener;
     private OnConnectionEstablished mEstablishedListener;

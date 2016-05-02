@@ -4,7 +4,7 @@ import java.util.Date;
 
 /**
  * Contributor model data.
- *
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 10/04/2016 21.32.
  */
@@ -55,7 +55,7 @@ public class Contributor {
     public static final String STATUS_SUSPENDED = "suspended";
 
     private int id;
-    private String token;
+    private String apiToken;
     private String username;
     private String email;
     private String password;
@@ -308,11 +308,12 @@ public class Contributor {
         this.status = status;
     }
 
-    public String getToken() {
-        return token;
+    @SuppressWarnings("unused")
+    public String getApiToken() {
+        return apiToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setApiToken(String apiToken) {
+        this.apiToken = apiToken;
     }
 }

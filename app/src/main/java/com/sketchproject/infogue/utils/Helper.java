@@ -199,6 +199,7 @@ public class Helper {
      * @param id      drawable resource id
      * @return byte array
      */
+    @SuppressWarnings("unused")
     public static byte[] getFileDataFromDrawable(Context context, @DrawableRes int id) {
         Drawable drawable = ContextCompat.getDrawable(context, id);
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();

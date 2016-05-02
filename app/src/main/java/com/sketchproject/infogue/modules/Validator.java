@@ -16,6 +16,7 @@ import java.util.Locale;
  * Sketch Project Studio
  * Created by Angga on 16/04/2016 13.29.
  */
+@SuppressWarnings("unused")
 public class Validator {
 
     /**

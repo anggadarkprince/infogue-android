@@ -62,7 +62,7 @@ import io.fabric.sdk.android.Fabric;
 
 /**
  * A simple {@link Fragment} subclass to handle login screen inside view pager.
- *
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 1/04/2016 10.37.
  */
@@ -109,8 +109,8 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
     /**
      * Init views and preparing login UI.
      *
-     * @param inflater The LayoutInflater object that can be used to inflate view
-     * @param container parent (activity) container
+     * @param inflater           The LayoutInflater object that can be used to inflate view
+     * @param container          parent (activity) container
      * @param savedInstanceState latest instance state
      * @return View
      */
@@ -150,6 +150,11 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                     values.put(Contributor.EMAIL, object.getString("email"));
                                     values.put(Contributor.AVATAR, object.getJSONObject("picture").getJSONObject("data").getString("url"));
                                     values.put(Contributor.COVER, object.getJSONObject("cover").getString("source"));
+
+                                    for (Map.Entry<String, String> entry : values.entrySet()) {
+                                        Log.i("Infogue/Facebook", entry.getValue() + " : " + entry.getKey());
+                                    }
+
                                     loginRequest(VENDOR_FACEBOOK, values);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -196,17 +201,22 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                     @Override
                     public void success(Result<User> result) {
                         User user = result.data;
-                        String name = user.name;
-                        String username = user.screenName;
-                        String location = user.location;
-                        String email = user.email;
-                        String about = user.description;
-                        String avatar = user.profileImageUrl;
-                        String cover = user.profileBannerUrl;
 
-                        // loginRequest(VENDOR_TWITTER, values);
+                        Map<String, String> values = new HashMap<>();
+                        values.put(Contributor.ID, user.idStr);
+                        values.put(Contributor.NAME, user.name);
+                        values.put(Contributor.EMAIL, user.screenName);
+                        values.put(Contributor.AVATAR, user.profileImageUrl);
+                        values.put(Contributor.COVER, user.profileBannerUrl);
+                        values.put(Contributor.LOCATION, user.location);
+                        values.put(Contributor.ABOUT, user.description);
+                        loginRequest(VENDOR_FACEBOOK, values);
 
-                        Log.i("Infogue/twitter", name + " " + username + " " + location + " " + email + " " + about + " " + avatar + " " + cover);
+                        for (Map.Entry<String, String> entry : values.entrySet()) {
+                            Log.i("Infogue/Twitter", entry.getValue() + " : " + entry.getKey());
+                        }
+
+                        loginRequest(VENDOR_TWITTER, values);
                     }
 
                     @Override
@@ -537,7 +547,10 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
             }
         };
 
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(30000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                APIBuilder.TIMEOUT_MEDIUM,
+                APIBuilder.NO_RETRY,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getContext()).addToRequestQueue(postRequest);
     }
 

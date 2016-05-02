@@ -53,6 +53,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A {@link AppCompatActivity} subclass, show search result of article and contributor.
+ * <p>
+ * Sketch Project Studio
+ * Created by Angga on 25/012/2016 10.37
+ */
 public class SearchActivity extends AppCompatActivity implements
         FollowerFragment.OnFollowerInteractionListener,
         ArticleFragment.OnArticleInteractionListener {
@@ -79,6 +85,11 @@ public class SearchActivity extends AppCompatActivity implements
     private int mResultArticle;
     private String mSearchQuery;
 
+    /**
+     * Perform initialization of SearchActivity.
+     *
+     * @param savedInstanceState saved last state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,11 +122,22 @@ public class SearchActivity extends AppCompatActivity implements
         handleIntent(getIntent());
     }
 
+    /**
+     * Handle when new intent comes.
+     *
+     * @param intent data passed from search action bar.
+     */
     @Override
     protected void onNewIntent(Intent intent) {
         handleIntent(intent);
     }
 
+    /**
+     * Create option menu and make actionbar display search view.
+     *
+     * @param menu list option menu
+     * @return boolean
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search, menu);
@@ -128,6 +150,12 @@ public class SearchActivity extends AppCompatActivity implements
         return true;
     }
 
+    /**
+     * Handle action when menu clicked.
+     *
+     * @param item selected menu
+     * @return boolean
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -139,6 +167,13 @@ public class SearchActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Check if there is result from profile activity, if so update button follow state.
+     *
+     * @param requestCode code request when profile activity called
+     * @param resultCode  result state for now just catch RESULT_OK
+     * @param data        data from activity called is follow or unfollow
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -146,18 +181,38 @@ public class SearchActivity extends AppCompatActivity implements
                 .handleProfileResult(requestCode, resultCode, data);
     }
 
+    /**
+     * Triggered when user click the follower row view holder.
+     *
+     * @param contributor   contain contributor model data
+     * @param followControl button follow view (castable to ImageButton)
+     */
     @Override
     public void onFollowerInteraction(Contributor contributor, View followControl) {
         new FollowerListEvent(this, contributor, followControl)
                 .viewProfile();
     }
 
+    /**
+     * Triggered when user click follow toggle button.
+     *
+     * @param view          row article list recycler view holder
+     * @param followControl button follow view (castable to ImageButton)
+     * @param contributor   contain contributor model data
+     */
     @Override
     public void onFollowerControlInteraction(View view, View followControl, final Contributor contributor) {
         new FollowerListEvent(this, contributor, followControl)
                 .followContributor();
     }
 
+    /**
+     * Show popup and show more action to interact with related contributor.
+     *
+     * @param view          row article list recycler view holder
+     * @param followControl button follow view (castable to ImageButton)
+     * @param contributor   contain contributor model data
+     */
     @Override
     public void onFollowerLongClickInteraction(View view, View followControl, Contributor contributor) {
         new FollowerContextBuilder(this, contributor, followControl)
@@ -165,12 +220,24 @@ public class SearchActivity extends AppCompatActivity implements
                 .show();
     }
 
+    /**
+     * Interaction with article row.
+     *
+     * @param view    row article list recycler view holder
+     * @param article contain article model data
+     */
     @Override
     public void onArticleInteraction(View view, Article article) {
         new ArticleListEvent(this, article)
                 .viewArticle();
     }
 
+    /**
+     * Show popup and show more action to interact with related article.
+     *
+     * @param view    row article list recycler view holder
+     * @param article plain old java object for article
+     */
     @Override
     public void onArticlePopupInteraction(View view, final Article article) {
         new ArticlePopupBuilder(this, view, article)
@@ -178,6 +245,12 @@ public class SearchActivity extends AppCompatActivity implements
                 .show();
     }
 
+    /**
+     * When user do long tap on view holder, show identical action like popup.
+     *
+     * @param view    row article list recycler view holder
+     * @param article plain old java object for article
+     */
     @Override
     public void onArticleLongClickInteraction(View view, final Article article) {
         new ArticleContextBuilder(this, article)
@@ -185,6 +258,11 @@ public class SearchActivity extends AppCompatActivity implements
                 .show();
     }
 
+    /**
+     * Handle query from search bar.
+     *
+     * @param intent contain query string
+     */
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
@@ -198,6 +276,11 @@ public class SearchActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Show and hide progress bar.
+     *
+     * @param show state of progress
+     */
     private void showProgress(final boolean show) {
         int mediumAnimTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);
 
@@ -225,6 +308,9 @@ public class SearchActivity extends AppCompatActivity implements
                 });
     }
 
+    /**
+     * Make request to serve by passing query keyword.
+     */
     private void setupSearchResult() {
         showProgress(true);
         String url = APIBuilder.getApiSearchUrl(mSearchQuery, APIBuilder.SEARCH_BOTH, session.getSessionData(SessionManager.KEY_ID, 0));
@@ -295,14 +381,20 @@ public class SearchActivity extends AppCompatActivity implements
                     }
                 }
         );
+
         menuRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000,
+                APIBuilder.TIMEOUT_SHORT,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(menuRequest);
     }
 
+    /**
+     * Populate contributors result into list and attach them.
+     *
+     * @param contributors collection from database
+     * @throws JSONException
+     */
     private void populateContributorResult(JSONArray contributors) throws JSONException {
         final LinearLayoutManager layoutContributor;
         if (mColumnCount <= 1) {
@@ -318,7 +410,7 @@ public class SearchActivity extends AppCompatActivity implements
 
                 Contributor contributor = new Contributor();
                 contributor.setId(contributorData.getInt(Contributor.ID));
-                contributor.setToken(contributorData.getString(Contributor.API_TOKEN));
+                contributor.setApiToken(contributorData.getString(Contributor.API_TOKEN));
                 contributor.setUsername(contributorData.getString(Contributor.USERNAME));
                 contributor.setName(contributorData.getString(Contributor.NAME));
                 contributor.setEmail(contributorData.getString(Contributor.EMAIL));
@@ -364,6 +456,12 @@ public class SearchActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Populate articles result into list and attach them.
+     *
+     * @param articles collection from database
+     * @throws JSONException
+     */
     private void populateArticleResult(JSONArray articles) throws JSONException {
         LinearLayoutManager layoutArticle;
         if (mColumnCount <= 1) {
@@ -427,5 +525,4 @@ public class SearchActivity extends AppCompatActivity implements
             mViewAllArticleButton.setVisibility(View.GONE);
         }
     }
-
 }

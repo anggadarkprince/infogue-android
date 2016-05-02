@@ -2,11 +2,12 @@ package com.sketchproject.infogue.models;
 
 /**
  * Comment model data.
- *
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 26/04/2016 18.40.
  */
 public class Comment {
+    @SuppressWarnings("unused")
     public static final String TABLE = "comments";
     public static final String ID = "id";
     public static final String CONTENT = "comment";
@@ -38,6 +39,7 @@ public class Comment {
         this.id = id;
     }
 
+    @SuppressWarnings("unused")
     public int getArticleId() {
         return articleId;
     }
@@ -46,6 +48,7 @@ public class Comment {
         this.articleId = articleId;
     }
 
+    @SuppressWarnings("unused")
     public int getContributorId() {
         return contributorId;
     }

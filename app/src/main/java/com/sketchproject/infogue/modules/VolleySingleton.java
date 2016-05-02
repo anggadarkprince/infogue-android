@@ -11,10 +11,11 @@ import com.android.volley.toolbox.Volley;
 
 /**
  * Singleton volley to populate request into single queue.
- *
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 22/04/2016 22.58.
  */
+@SuppressWarnings("unused")
 public class VolleySingleton {
     private static VolleySingleton mInstance;
     private RequestQueue mRequestQueue;

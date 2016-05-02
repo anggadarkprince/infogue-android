@@ -1,8 +1,6 @@
 package com.sketchproject.infogue.adapters;
 
-import android.annotation.SuppressLint;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
-import com.sketchproject.infogue.fragments.ArticleFragment.OnArticleEditableFragmentInteractionListener;
+import com.sketchproject.infogue.fragments.ArticleFragment.OnArticleEditableInteractionListener;
 import com.sketchproject.infogue.fragments.ArticleFragment.OnArticleInteractionListener;
 import com.sketchproject.infogue.fragments.holders.ListInfoViewHolder;
 import com.sketchproject.infogue.fragments.holders.LoadingViewHolder;
@@ -27,6 +25,9 @@ import java.util.List;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Article} and makes a call to the
  * specified {@link OnArticleInteractionListener}.
+ * <p>
+ * Sketch Project Studio
+ * Created by Angga on 13/04/2016 08.54.
  */
 public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -36,15 +37,23 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     private static final int VIEW_TYPE_ROW_EDITABLE = 3;
     private static final int VIEW_TYPE_END = 4;
     private static final int VIEW_TYPE_EMPTY = 5;
+    private static final int VIEW_TYPE_ERROR = 6;
 
     private final List<Article> mArticles;
     private final ArticleFragment.OnArticleInteractionListener mInteractionListener;
-    private final OnArticleEditableFragmentInteractionListener mEditableListener;
+    private final OnArticleEditableInteractionListener mEditableListener;
 
     private boolean mHeader;
     private boolean mIsEditable;
     private int mLastPosition = -1;
 
+    /**
+     * Constructor for article has header.
+     *
+     * @param items        collection of article objects
+     * @param listListener listener when interaction with view holder
+     * @param hasHeader    is list has header
+     */
     public ArticleRecyclerViewAdapter(List<Article> items, OnArticleInteractionListener listListener, boolean hasHeader) {
         mArticles = items;
         mInteractionListener = listListener;
@@ -53,34 +62,58 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         mIsEditable = false;
     }
 
-    public ArticleRecyclerViewAdapter(List<Article> items, ArticleFragment.OnArticleInteractionListener listListener, OnArticleEditableFragmentInteractionListener editableListener) {
+    /**
+     * Constructor with editable listener.
+     *
+     * @param items            collection of article objects
+     * @param listListener     listener when interact with view holder
+     * @param editableListener listener when interact with view holder
+     */
+    public ArticleRecyclerViewAdapter(List<Article> items, ArticleFragment.OnArticleInteractionListener listListener, OnArticleEditableInteractionListener editableListener) {
         mArticles = items;
         mInteractionListener = listListener;
         mEditableListener = editableListener;
         mIsEditable = true;
     }
 
+    /**
+     * Get specific type of list, if article null mean loading, the rest depend on their id value.
+     *
+     * @param position of view holder
+     * @return int type list
+     */
     @Override
     public int getItemViewType(int position) {
         if (mArticles.get(position) == null) {
             return VIEW_TYPE_LOADING;
         } else {
             Article article = mArticles.get(position);
-            if (article.getId() == -1) {
-                return VIEW_TYPE_END;
+
+            if (article.getId() > 0 && position == 0 && mHeader) {
+                return VIEW_TYPE_HEADER;
+            } else if (article.getId() > 0 && mIsEditable) {
+                return VIEW_TYPE_ROW_EDITABLE;
+            } else if (article.getId() > 0) {
+                return VIEW_TYPE_ROW;
             } else if (article.getId() == 0) {
                 return VIEW_TYPE_EMPTY;
-            } else if (article.getId() > 0 && position == 0 && mHeader) {
-                return VIEW_TYPE_HEADER;
+            } else if (article.getId() == -1) {
+                return VIEW_TYPE_END;
+            } else if (article.getId() == -2) {
+                return VIEW_TYPE_ERROR;
             }
 
-            if (mIsEditable) {
-                return VIEW_TYPE_ROW_EDITABLE;
-            }
-            return VIEW_TYPE_ROW;
+            return VIEW_TYPE_END;
         }
     }
 
+    /**
+     * Creating view holder each list type.
+     *
+     * @param parent   holder parent
+     * @param viewType type has retrieve from getItemViewType()
+     * @return ViewHolder
+     */
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
@@ -100,13 +133,21 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         } else if (viewType == VIEW_TYPE_EMPTY) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
             return new ListInfoViewHolder(view);
+        } else if (viewType == VIEW_TYPE_ERROR) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
+            return new ListInfoViewHolder(view);
         }
 
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_loading, parent, false);
         return new LoadingViewHolder(view);
     }
 
-    @SuppressLint("SetTextI18n")
+    /**
+     * Perform action and attribute when holder bind into list.
+     *
+     * @param holder   list view holder
+     * @param position current position
+     */
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         Animation animation = AnimationUtils.loadAnimation(holder.itemView.getContext(), (holder.getAdapterPosition() > mLastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
@@ -154,13 +195,12 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 rowEditableHolder.mCategoryView.setText(mArticles.get(holder.getAdapterPosition()).getCategory());
 
                 if (contentUpdate != null && !contentUpdate.equals("null") && !contentUpdate.trim().isEmpty()) {
-                    Log.i("Infogue/Article", contentUpdate);
                     rowEditableHolder.mStatusView.setText(Article.STATUS_UPDATED.toUpperCase());
-                    rowEditableHolder.mControlBar.setBackgroundResource(R.color.color_hazard_light);
-                    //rowEditableHolder.mBrowse.setBackgroundResource(R.color.color_hazard);
-                    //rowEditableHolder.mShare.setBackgroundResource(R.color.color_hazard_medium);
-                    //rowEditableHolder.mEdit.setBackgroundResource(R.color.color_hazard_hard);
-                    //rowEditableHolder.mDelete.setBackgroundResource(R.color.color_hazard_darker);
+                    rowEditableHolder.mControlBar.setBackgroundResource(R.color.color_warning_light);
+                    //rowEditableHolder.mBrowse.setBackgroundResource(R.color.color_warning);
+                    //rowEditableHolder.mShare.setBackgroundResource(R.color.color_warning_medium);
+                    //rowEditableHolder.mEdit.setBackgroundResource(R.color.color_warning_hard);
+                    //rowEditableHolder.mDelete.setBackgroundResource(R.color.color_warning_darker);
                 } else {
                     rowEditableHolder.mStatusView.setText(status.toUpperCase());
                     switch (status) {
@@ -247,16 +287,25 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             case VIEW_TYPE_END:
                 final ListInfoViewHolder endHolder = (ListInfoViewHolder) holder;
                 endHolder.mMessageView.setVisibility(View.GONE);
-                Log.i("INFOGUE", "END");
                 break;
             case VIEW_TYPE_EMPTY:
                 final ListInfoViewHolder emptyHolder = (ListInfoViewHolder) holder;
-                emptyHolder.mMessageView.setText("NO ARTICLE AVAILABLE");
-                Log.i("INFOGUE", "EMPTY");
+                emptyHolder.mMessageView.setText(R.string.label_no_article);
+                break;
+            case VIEW_TYPE_ERROR:
+                final ListInfoViewHolder errorHolder = (ListInfoViewHolder) holder;
+                errorHolder.mMessageView.setText(mArticles.get(holder.getAdapterPosition()).getTitle());
                 break;
         }
     }
 
+    /**
+     * Binding event into views.
+     *
+     * @param view    view passing the event
+     * @param more    view button ellipsis
+     * @param article model article data
+     */
     private void setDefaultRowEventListener(View view, View more, final Article article) {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -289,17 +338,30 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         }
     }
 
+    /**
+     * Clear animation when holder detached.
+     *
+     * @param holder list view holder
+     */
     @Override
     public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
         holder.itemView.clearAnimation();
     }
 
+    /**
+     * Count total items.
+     *
+     * @return total of articles
+     */
     @Override
     public int getItemCount() {
         return mArticles.size();
     }
 
+    /**
+     * Default article header view holder.
+     */
     public class ArticleHeaderViewHolder extends RecyclerView.ViewHolder {
         public View mView;
         public TextView mTitleView;
@@ -309,6 +371,11 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         public ImageView mFeaturedImage;
         public Article mItem;
 
+        /**
+         * Default constructor.
+         *
+         * @param view holder
+         */
         public ArticleHeaderViewHolder(View view) {
             super(view);
             mView = view;
@@ -325,6 +392,9 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         }
     }
 
+    /**
+     * Default article row view holder.
+     */
     public class ArticleRowViewHolder extends RecyclerView.ViewHolder {
         public View mView;
         public TextView mTitleView;
@@ -333,6 +403,11 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         public ImageView mMoreImage;
         public Article mItem;
 
+        /**
+         * Default constructor.
+         *
+         * @param view holder
+         */
         public ArticleRowViewHolder(View view) {
             super(view);
             mView = view;
@@ -348,6 +423,9 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         }
     }
 
+    /**
+     * Article view holder with editable functionality.
+     */
     public class ArticleEditableViewHolder extends RecyclerView.ViewHolder {
         public View mView;
         public TextView mTitleView;
@@ -363,6 +441,11 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         public RelativeLayout mControlBar;
         public Article mItem;
 
+        /**
+         * Default constructor.
+         *
+         * @param view holder
+         */
         public ArticleEditableViewHolder(View view) {
             super(view);
             mView = view;
@@ -383,6 +466,5 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         public String toString() {
             return super.toString() + " editable '" + mTitleView.getText() + "'";
         }
-
     }
 }

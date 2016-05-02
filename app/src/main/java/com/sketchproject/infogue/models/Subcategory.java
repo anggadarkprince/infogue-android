@@ -2,7 +2,7 @@ package com.sketchproject.infogue.models;
 
 /**
  * Subcategory model data.
- *
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 24/04/2016 09.20.
  */
@@ -18,7 +18,7 @@ public class Subcategory {
     private String subcategory;
     private String label;
 
-    public Subcategory(){
+    public Subcategory() {
 
     }
 

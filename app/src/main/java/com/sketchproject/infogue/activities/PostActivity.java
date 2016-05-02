@@ -262,7 +262,10 @@ public class PostActivity extends AppCompatActivity {
                     }
                 }
         );
-        articleRequest.setRetryPolicy(new DefaultRetryPolicy(15000, 3, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        articleRequest.setRetryPolicy(new DefaultRetryPolicy(
+                APIBuilder.TIMEOUT_SHORT,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(articleRequest);
     }
 
