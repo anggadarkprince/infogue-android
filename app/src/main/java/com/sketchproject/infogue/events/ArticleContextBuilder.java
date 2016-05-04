@@ -53,9 +53,18 @@ public class ArticleContextBuilder {
                     " ArticleContextBuilder(Context dialogContext, Article data) instead");
         }
 
-        final int menu = new SessionManager(dialogContext).isMe(data.getAuthorId()) ?
-                R.array.items_article_editable : R.array.items_article;
-        final String[] items = context.getResources().getStringArray(R.array.items_article);
+        SessionManager session = new SessionManager(dialogContext);
+
+        final int menu;
+        final String[] items;
+        if(session.isLoggedIn() && session.isMe(data.getAuthorId())){
+            menu = R.array.items_article_editable;
+            items = context.getResources().getStringArray(R.array.items_article_editable);
+        }
+        else{
+            menu = R.array.items_article;
+            items = context.getResources().getStringArray(R.array.items_article);
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(dialogContext);
         builder.setItems(menu, new DialogInterface.OnClickListener() {

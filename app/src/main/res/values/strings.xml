@@ -376,11 +376,11 @@
     <string name="message_invalid_comment">Invalid comment data</string>
     <string name="message_comment_posted">Comment has been posted!</string>
     <string name="label_article_worst">WORST ARTICLE</string>
-    <string name="label_article_bad">BAD ARTICLE</string>
-    <string name="label_article_good">GOOD ARTICLE</string>
-    <string name="label_article_excellent">EXCELLENT ARTICLE</string>
-    <string name="label_article_great">GREAT ARTICLE</string>
-    <string name="label_article_unrated">UNRATED ARTICLE</string>
+    <string name="label_article_bad">BAD</string>
+    <string name="label_article_good">GOOD</string>
+    <string name="label_article_excellent">EXCELLENT</string>
+    <string name="label_article_great">GREAT</string>
+    <string name="label_article_unrated">UNRATED</string>
     <string name="message_facebook_cancel">Facebook login attempt canceled</string>
     <string name="message_facebook_failed">Facebook login attempt failed</string>
     <string name="message_twitter_failure">Login with Twitter failure</string>

@@ -74,7 +74,7 @@ public class Helper {
         builder.setPositiveButton(textIdPositive, positiveListener);
         builder.setNegativeButton(textIdNegative, negativeListener);
         if (textIdNeutral != 0 && neutralListener != null) {
-            builder.setNeutralButton(textIdNegative, negativeListener);
+            builder.setNeutralButton(textIdNeutral, neutralListener);
         }
 
         AlertDialog dialog = builder.create();

@@ -280,6 +280,11 @@ public class RegisterFragment extends Fragment implements Validator.ViewValidati
                                 alert.setAlertType(AlertFragment.ALERT_SUCCESS);
                                 alert.setAlertTitle(getString(R.string.label_registration_complete));
                                 alert.setAlertMessage(getString(R.string.message_activation_link));
+
+                                mNameView.setText("");
+                                mEmailView.setText("");
+                                mUsernameView.setText("");
+                                mPasswordView.setText("");
                             } else {
                                 alert.setAlertType(AlertFragment.ALERT_WARNING);
                                 alert.setAlertMessage(message);

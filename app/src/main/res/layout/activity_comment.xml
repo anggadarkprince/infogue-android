@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light"
     android:fitsSystemWindows="true"
-    tools:context="com.sketchproject.infogue.activities.CommentActivity">
+    tools:context=".activities.CommentActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

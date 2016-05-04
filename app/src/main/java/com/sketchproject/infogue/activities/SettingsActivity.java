@@ -658,11 +658,26 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                                 mContact.setText(contributor.getString(Contributor.CONTACT));
                                 mGenderMaleRadio.setChecked(contributor.getString(Contributor.GENDER).equals(Contributor.GENDER_MALE));
                                 mGenderFemaleRadio.setChecked(contributor.getString(Contributor.GENDER).equals(Contributor.GENDER_FEMALE));
+                                if(!mGenderMaleRadio.isChecked() && !mGenderFemaleRadio.isChecked()){
+                                    mGenderMaleRadio.setChecked(true);
+                                }
                                 mBirthdayInput.setText(contributor.getString(Contributor.BIRTHDAY));
-                                mFacebookInput.setText(contributor.getString(Contributor.FACEBOOK));
-                                mTwitterInput.setText(contributor.getString(Contributor.TWITTER));
-                                mGooglePlusInput.setText(contributor.getString(Contributor.GOOGLE_PLUS));
-                                mInstagramInput.setText(contributor.getString(Contributor.INSTAGRAM));
+                                if(!contributor.getString(Contributor.FACEBOOK).equals("null")){
+                                    mFacebookInput.setText(contributor.getString(Contributor.FACEBOOK));
+                                }
+
+                                if(!contributor.getString(Contributor.TWITTER).equals("null")){
+                                    mTwitterInput.setText(contributor.getString(Contributor.TWITTER));
+                                }
+
+                                if(!contributor.getString(Contributor.GOOGLE_PLUS).equals("null")){
+                                    mGooglePlusInput.setText(contributor.getString(Contributor.GOOGLE_PLUS));
+                                }
+
+                                if(!contributor.getString(Contributor.INSTAGRAM).equals("null")){
+                                    mInstagramInput.setText(contributor.getString(Contributor.INSTAGRAM));
+                                }
+
                                 mNotificationSubscribeCheck.setChecked(contributor.getInt(Contributor.SUBSCRIPTION) == 1);
                                 mNotificationMessageCheck.setChecked(contributor.getInt(Contributor.MESSAGE) == 1);
                                 mNotificationFollowerCheck.setChecked(contributor.getInt(Contributor.FOLLOWER) == 1);

@@ -157,7 +157,7 @@ public class SessionManager {
      * @return boolean indicate is me or not
      */
     public boolean isMe(int id) {
-        return getSessionData(SessionManager.KEY_ID, 0) == id;
+        return id != 0 && getSessionData(SessionManager.KEY_ID, 0) == id;
     }
 
     /**

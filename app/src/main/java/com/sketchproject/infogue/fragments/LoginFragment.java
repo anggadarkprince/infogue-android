@@ -2,12 +2,18 @@ package com.sketchproject.infogue.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.Signature;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +60,8 @@ import com.twitter.sdk.android.core.models.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -107,6 +115,21 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         super.onCreate(savedInstanceState);
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(getContext(), new Twitter(authConfig));
+
+        try {
+            // production cR2/TiSmw6dQDwkh13ep2f27jco=
+            @SuppressLint("PackageManagerGetSignatures")
+            PackageInfo info = getActivity().getPackageManager().getPackageInfo(
+                    "com.sketchproject.infogue",
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (NameNotFoundException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -313,6 +336,12 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         if(loginButtonTwitter != null){
             loginButtonTwitter.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        VolleySingleton.getInstance(getContext()).getRequestQueue().cancelAll("login");
     }
 
     /**
@@ -548,6 +577,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
             }
         };
 
+        postRequest.setTag("login");
         postRequest.setRetryPolicy(new DefaultRetryPolicy(
                 APIBuilder.TIMEOUT_MEDIUM,
                 APIBuilder.NO_RETRY,
