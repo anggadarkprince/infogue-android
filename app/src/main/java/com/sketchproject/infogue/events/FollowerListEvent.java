@@ -59,6 +59,17 @@ public class FollowerListEvent {
      *
      * @param context         parent context
      * @param contributorData model data of contributor
+     */
+    public FollowerListEvent(Context context, Contributor contributorData) {
+        this.context = context;
+        contributor = contributorData;
+    }
+
+    /**
+     * Initialize Follower event list.
+     *
+     * @param context         parent context
+     * @param contributorData model data of contributor
      * @param buttonControl   toggle button follow (castable to ImageButton)
      */
     public FollowerListEvent(Context context, Contributor contributorData, View buttonControl) {

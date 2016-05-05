@@ -167,7 +167,7 @@ public class CommentFragment extends Fragment {
             }
 
             Log.i("Infogue/Comment", "URL " + apiCommentUrl);
-            JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, apiCommentUrl, null,
+            JsonObjectRequest commentRequest = new JsonObjectRequest(Request.Method.GET, apiCommentUrl, null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
@@ -284,13 +284,20 @@ public class CommentFragment extends Fragment {
                         }
                     }
             );
-            contributorRequest.setRetryPolicy(new DefaultRetryPolicy(
+
+            commentRequest.setTag("comment");
+            commentRequest.setRetryPolicy(new DefaultRetryPolicy(
                     APIBuilder.TIMEOUT_SHORT,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-            VolleySingleton.getInstance(getContext()).addToRequestQueue(contributorRequest);
+            VolleySingleton.getInstance(getContext()).addToRequestQueue(commentRequest);
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        VolleySingleton.getInstance(getContext()).getRequestQueue().cancelAll("comment");
     }
 
     /**

@@ -35,8 +35,10 @@
             android:orientation="vertical">
 
             <RelativeLayout
+                android:id="@+id/btn_write_comment"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="@color/light">
 
                 <TextView
                     android:id="@+id/label_comment"

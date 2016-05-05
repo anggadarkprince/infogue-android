@@ -262,10 +262,10 @@
                     android:layout_height="24dp"
                     android:layout_toEndOf="@id/rating_label"
                     android:layout_toRightOf="@id/rating_label"
-                    android:numStars="5"
-                    android:isIndicator="false"
-                    android:progressDrawable="@drawable/ic_rating"
                     android:drawingCacheQuality="high"
+                    android:isIndicator="false"
+                    android:numStars="5"
+                    android:progressDrawable="@drawable/ic_rating"
                     android:stepSize="1" />
 
                 <TextView
@@ -325,7 +325,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/action_leave_comment"
-                android:textColor="@color/light" />
+                android:textColor="@color/light"
+                android:textSize="14sp" />
 
         </android.support.v7.widget.ButtonBarLayout>
 

@@ -169,7 +169,7 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        VolleySingleton.getInstance(getBaseContext()).getRequestQueue().cancelAll("article");
+        VolleySingleton.getInstance(getBaseContext()).getRequestQueue().cancelAll("post");
     }
 
     /**
@@ -267,7 +267,7 @@ public class PostActivity extends AppCompatActivity {
                     }
                 }
         );
-        articleRequest.setTag("article");
+        articleRequest.setTag("post");
         articleRequest.setRetryPolicy(new DefaultRetryPolicy(
                 APIBuilder.TIMEOUT_SHORT,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,

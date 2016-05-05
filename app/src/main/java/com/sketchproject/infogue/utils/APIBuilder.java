@@ -185,6 +185,17 @@ public class APIBuilder {
     }
 
     /**
+     * Build contributor url.
+     * http://infogue.id/api/contributor/{anggadarkprince}
+     *
+     * @param username contributor identity
+     * @return string url
+     */
+    public static String getApiContributorUrl(String username, int loggedId) {
+        return BASE_URL_API + "contributor/" + username + "?contributor_id=" + loggedId;
+    }
+
+    /**
      * Build article post url request for edit just retrieve the article.
      * http://infogue.id/api/article/brand-new-day
      *
@@ -250,7 +261,7 @@ public class APIBuilder {
      * @param token user token activation
      * @return string url
      */
-    public static String getResendEmail(String token){
+    public static String getResendEmail(String token) {
         return APIBuilder.BASE_URL + "auth/resend/" + token;
     }
 

@@ -2,6 +2,7 @@ package com.sketchproject.infogue.activities;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -29,9 +31,11 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.events.FollowerListEvent;
 import com.sketchproject.infogue.fragments.CommentFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.models.Comment;
@@ -90,6 +94,7 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
         progress = new ProgressDialog(CommentActivity.this);
         progress.setMessage(getString(R.string.label_submit_comment));
         progress.setIndeterminate(true);
+        progress.setCanceledOnTouchOutside(false);
 
         @SuppressLint("InflateParams")
         View mFormComment = getLayoutInflater().inflate(R.layout.fragment_comment_form, null);
@@ -146,6 +151,21 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         if (fab != null) {
             fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (session.isLoggedIn()) {
+                        launchCommentForm();
+                    } else {
+                        Intent authIntent = new Intent(getBaseContext(), AuthenticationActivity.class);
+                        startActivity(authIntent);
+                    }
+                }
+            });
+        }
+
+        RelativeLayout mWriteComment = (RelativeLayout) findViewById(R.id.btn_write_comment);
+        if(mWriteComment != null){
+            mWriteComment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (session.isLoggedIn()) {
@@ -221,7 +241,6 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progress.dismiss();
                         formCommentDialog.dismiss();
                         mCommentInput.setText("");
 
@@ -243,12 +262,14 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        progress.dismiss();
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progress.dismiss();
+                        error.printStackTrace();
+
                         NetworkResponse networkResponse = error.networkResponse;
                         String errorMessage = getString(R.string.error_unknown);
                         if (networkResponse == null) {
@@ -280,6 +301,7 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
                             }
                         }
                         Helper.toastColor(getBaseContext(), errorMessage, R.color.color_danger_transparent);
+                        progress.dismiss();
                     }
                 }
         ) {
@@ -357,6 +379,99 @@ public class CommentActivity extends AppCompatActivity implements CommentFragmen
      */
     @Override
     public void onCommentListClicked(Comment comment) {
-        // interact with comment list, for now do nothing! because we doesn't need to perform more further
+        retrieveProfile(comment.getUsername());
+    }
+
+    /**
+     * Retrieve profile info.
+     */
+    private void retrieveProfile(String username) {
+        progress.setMessage(getString(R.string.label_retrieve_setting_progress));
+        progress.show();
+
+        final Context context = this;
+        String url = APIBuilder.getApiContributorUrl(username, new SessionManager(context).getSessionData(SessionManager.KEY_ID, 0));
+        JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String status = response.getString(APIBuilder.RESPONSE_STATUS);
+                            JSONObject contributor = response.getJSONObject(Contributor.DATA);
+
+                            if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
+                                Contributor contributorModel = new Contributor();
+                                contributorModel.setId(contributor.getInt(Contributor.ID));
+                                contributorModel.setUsername(contributor.getString(Contributor.USERNAME));
+                                contributorModel.setName(contributor.getString(Contributor.NAME));
+                                contributorModel.setLocation(contributor.getString(Contributor.LOCATION));
+                                contributorModel.setAbout(contributor.getString(Contributor.ABOUT));
+                                contributorModel.setAvatar(contributor.getString(Contributor.AVATAR_REF));
+                                contributorModel.setCover(contributor.getString(Contributor.COVER_REF));
+                                contributorModel.setArticle(contributor.getInt(Contributor.ARTICLE));
+                                contributorModel.setFollowers(contributor.getInt(Contributor.FOLLOWERS));
+                                contributorModel.setFollowing(contributor.getInt(Contributor.FOLLOWING));
+                                contributorModel.setStatus(contributor.getString(Contributor.STATUS));
+                                contributorModel.setIsFollowing(contributor.getInt(Contributor.IS_FOLLOWING) == 1);
+                                new FollowerListEvent(context, contributorModel).viewProfile();
+                            } else {
+                                Log.w("Infogue/Profile", getString(R.string.error_unknown));
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        progress.dismiss();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+
+                        NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = context.getString(R.string.error_unknown);
+                        if (networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                errorMessage = context.getString(R.string.error_timeout);
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage = context.getString(R.string.error_no_connection);
+                            }
+                        } else {
+                            String result = new String(networkResponse.data);
+                            try {
+                                JSONObject response = new JSONObject(result);
+                                String status = response.optString(APIBuilder.RESPONSE_STATUS);
+
+                                if (status.equals(APIBuilder.REQUEST_NOT_FOUND) && networkResponse.statusCode == 404) {
+                                    errorMessage = context.getString(R.string.error_not_found);
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 500) {
+                                    errorMessage = context.getString(R.string.error_server);
+                                } else if (status.equals(APIBuilder.REQUEST_FAILURE) && networkResponse.statusCode == 503) {
+                                    errorMessage = context.getString(R.string.error_maintenance);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                errorMessage = context.getString(R.string.error_parse_data);
+                            }
+                        }
+                        Helper.toastColor(context, errorMessage, R.color.color_danger_transparent);
+                    }
+                }
+        );
+        contributorRequest.setTag("profile");
+        contributorRequest.setRetryPolicy(new DefaultRetryPolicy(
+                APIBuilder.TIMEOUT_SHORT,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(contributorRequest);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        VolleySingleton.getInstance(getBaseContext()).getRequestQueue().cancelAll("profile");
     }
 }

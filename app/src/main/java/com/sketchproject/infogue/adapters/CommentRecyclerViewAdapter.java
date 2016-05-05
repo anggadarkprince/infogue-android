@@ -129,7 +129,7 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                         .placeholder(R.drawable.placeholder_square)
                         .into(commentHolder.mAvatarImage);
 
-                commentHolder.mView.setOnClickListener(new View.OnClickListener() {
+                commentHolder.mNameView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (null != mInteractionListener) {

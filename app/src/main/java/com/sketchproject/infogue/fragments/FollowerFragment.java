@@ -322,13 +322,20 @@ public class FollowerFragment extends Fragment {
                         }
                     }
             );
+
+            contributorRequest.setTag("follower");
             contributorRequest.setRetryPolicy(new DefaultRetryPolicy(
                     APIBuilder.TIMEOUT_SHORT,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
             VolleySingleton.getInstance(getContext()).addToRequestQueue(contributorRequest);
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        VolleySingleton.getInstance(getContext()).getRequestQueue().cancelAll("follower");
     }
 
     /**
