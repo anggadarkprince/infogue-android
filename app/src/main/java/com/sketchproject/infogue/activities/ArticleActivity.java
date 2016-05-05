@@ -185,7 +185,9 @@ public class ArticleActivity extends AppCompatActivity implements
                 snackbarView.setBackgroundResource(R.color.color_success);
                 swipeRefreshLayout.setRefreshing(true);
                 ArticleFragment fragment = (ArticleFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
-                fragment.refreshArticleList(swipeRefreshLayout);
+                if(fragment != null){
+                    fragment.refreshArticleList(swipeRefreshLayout);
+                }
             } else {
                 snackbar.setText(R.string.error_server);
                 snackbarView.setBackgroundResource(R.color.color_danger);

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
@@ -109,9 +110,14 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
     private EditText mNewPasswordInput;
     private EditText mConfirmPasswordInput;
 
+    private TextInputLayout mPasswordLayout;
+    private TextInputLayout mNewPasswordLayout;
+    private TextInputLayout mConfirmPasswordLayout;
+
     private String mRealPathAvatar;
     private String mRealPathCover;
     private boolean mIsSaved;
+    private boolean mIsLoginViaSocial;
 
     /**
      * Perform initialization of SettingsActivity.
@@ -160,6 +166,9 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         mPasswordInput = (EditText) findViewById(R.id.input_password);
         mNewPasswordInput = (EditText) findViewById(R.id.input_new_password);
         mConfirmPasswordInput = (EditText) findViewById(R.id.input_confirm_password);
+        mPasswordLayout = (TextInputLayout) findViewById(R.id.input_layout_password);
+        mNewPasswordLayout = (TextInputLayout) findViewById(R.id.input_layout_new_password);
+        mConfirmPasswordLayout = (TextInputLayout) findViewById(R.id.input_layout_confirm_password);
         mBirthdayInput = (EditText) findViewById(R.id.input_birthday);
         mBirthdayInput.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -504,27 +513,29 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
             }
         }
 
-        boolean isPasswordEmpty = validator.isEmpty(contributor.getPassword());
-        if (isPasswordEmpty) {
-            validationMessage.add(getString(R.string.error_password_current));
-            focusView = mPasswordInput;
-            isInvalid = true;
-        }
-
-        // validation of new password
-        boolean isNewPasswordEmpty = validator.isEmpty(mNewPasswordInput.getText().toString(), true);
-        boolean isConfirmPasswordEmpty = validator.isEmpty(mConfirmPasswordInput.getText().toString(), true);
-        if (!isNewPasswordEmpty || !isConfirmPasswordEmpty) {
-            boolean isNewPasswordConfirmed = mConfirmPasswordInput.getText().toString().equals(mNewPasswordInput.getText().toString());
-            boolean isNewPasswordValidRange = validator.rangeLength(contributor.getNewPassword(), 6, 20);
-            if (!isNewPasswordConfirmed || !isNewPasswordValidRange) {
-                if (!isNewPasswordConfirmed) {
-                    validationMessage.add(getString(R.string.error_password_confirmed));
-                } else {
-                    validationMessage.add(getString(R.string.error_password_range));
+        if(!mIsLoginViaSocial){
+            // validation of new password
+            boolean isNewPasswordEmpty = validator.isEmpty(mNewPasswordInput.getText().toString(), true);
+            boolean isConfirmPasswordEmpty = validator.isEmpty(mConfirmPasswordInput.getText().toString(), true);
+            if (!isNewPasswordEmpty || !isConfirmPasswordEmpty) {
+                boolean isPasswordEmpty = validator.isEmpty(contributor.getPassword());
+                if (isPasswordEmpty) {
+                    validationMessage.add(getString(R.string.error_password_current));
+                    focusView = mPasswordInput;
+                    isInvalid = true;
                 }
-                focusView = mConfirmPasswordInput;
-                isInvalid = true;
+
+                boolean isNewPasswordConfirmed = mConfirmPasswordInput.getText().toString().equals(mNewPasswordInput.getText().toString());
+                boolean isNewPasswordValidRange = validator.rangeLength(contributor.getNewPassword(), 6, 20);
+                if (!isNewPasswordConfirmed || !isNewPasswordValidRange) {
+                    if (!isNewPasswordConfirmed) {
+                        validationMessage.add(getString(R.string.error_password_confirmed));
+                    } else {
+                        validationMessage.add(getString(R.string.error_password_range));
+                    }
+                    focusView = mConfirmPasswordInput;
+                    isInvalid = true;
+                }
             }
         }
 
@@ -655,7 +666,11 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                                 mNameInput.setText(contributor.getString(Contributor.NAME));
                                 mLocationInput.setText(contributor.getString(Contributor.LOCATION));
                                 mAboutInput.setText(contributor.getString(Contributor.ABOUT));
-                                mContact.setText(contributor.getString(Contributor.CONTACT));
+
+                                if(!contributor.getString(Contributor.CONTACT).equals("null")){
+                                    mContact.setText(contributor.getString(Contributor.CONTACT));
+                                }
+
                                 mGenderMaleRadio.setChecked(contributor.getString(Contributor.GENDER).equals(Contributor.GENDER_MALE));
                                 mGenderFemaleRadio.setChecked(contributor.getString(Contributor.GENDER).equals(Contributor.GENDER_FEMALE));
                                 if(!mGenderMaleRadio.isChecked() && !mGenderFemaleRadio.isChecked()){
@@ -685,6 +700,19 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                                 mPushNotificationSwitch.setChecked(contributor.getInt(Contributor.MOBILE) == 1);
                                 mUsernameInput.setText(contributor.getString(Contributor.USERNAME));
                                 mEmailInput.setText(contributor.getString(Contributor.EMAIL));
+
+                                String vendor = contributor.getString(Contributor.VENDOR);
+                                boolean vendorWeb = vendor.equalsIgnoreCase("web");
+                                boolean vendorMobile = vendor.equalsIgnoreCase("mobile");
+                                int view = View.VISIBLE;
+                                mIsLoginViaSocial = false;
+                                if(!vendorWeb && !vendorMobile){
+                                    view = View.GONE;
+                                    mIsLoginViaSocial = true;
+                                }
+                                mPasswordLayout.setVisibility(view);
+                                mNewPasswordLayout.setVisibility(view);
+                                mConfirmPasswordLayout.setVisibility(view);
                             } else {
                                 Log.w("Infogue/Profile", getString(R.string.error_unknown));
                                 Helper.toastColor(getBaseContext(), R.string.error_unknown, R.color.color_warning_transparent);

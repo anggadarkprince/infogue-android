@@ -14,6 +14,7 @@ public class Contributor {
     public static final String FOREIGN = "contributor_id";
     public static final String TOKEN = "token";
     public static final String API_TOKEN = "api_token";
+    public static final String VENDOR = "vendor";
     public static final String USERNAME = "username";
     public static final String EMAIL = "email";
     public static final String NAME = "name";

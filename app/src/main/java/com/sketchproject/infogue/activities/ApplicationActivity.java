@@ -428,7 +428,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        signOutUser();
+                        finish();
                     }
                 },
                 new DialogInterface.OnClickListener() {

@@ -550,7 +550,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                         errorTitle = "Suspended";
                                     }
                                 } else if (login.equals(APIBuilder.REQUEST_MISMATCH) && networkResponse.statusCode == 401) {
-                                    errorMessage = getString(R.string.error_unauthorized);
+                                    errorMessage = message;
                                 } else if (status.equals(APIBuilder.REQUEST_EXIST) && networkResponse.statusCode == 400) {
                                     errorMessage = message; // catch credentials exist when using oAuth
                                 }
