@@ -147,11 +147,12 @@ public class ApplicationActivity extends AppCompatActivity implements
             if (drawer != null) {
                 drawer.openDrawer(GravityCompat.START);
             }
-            downloadCategoryMenu();
         } else {
             CategoryRepository categoryRepository = new CategoryRepository();
             populateMenu(categoryRepository.retrieveData());
         }
+
+        downloadCategoryMenu();
 
         // define swipe to refresh layout and delegate event through home fragment or direct article fragment
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
@@ -187,7 +188,10 @@ public class ApplicationActivity extends AppCompatActivity implements
      * Build category from server to local repository
      */
     private void downloadCategoryMenu() {
-        progress.show();
+        if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
+            progress.show();
+        }
+
         JsonObjectRequest menuRequest = new JsonObjectRequest(Request.Method.GET, APIBuilder.URL_API_CATEGORY, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -234,20 +238,24 @@ public class ApplicationActivity extends AppCompatActivity implements
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        progress.dismiss();
+                        if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
+                            progress.dismiss();
+                        }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
-                        progress.dismiss();
-                        confirmRetry();
+                        if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
+                            progress.dismiss();
+                            confirmRetry();
+                        }
                     }
                 }
         );
         menuRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000,
+                APIBuilder.TIMEOUT_SHORT,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
