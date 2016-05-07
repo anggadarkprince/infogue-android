@@ -763,8 +763,8 @@ public class ApplicationActivity extends AppCompatActivity implements
         String category = item.getTitle().toString();
 
         if (id == R.id.nav_website) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.BASE_URL));
-            startActivity(browserIntent);
+            Intent aboutActivity = new Intent(ApplicationActivity.this, AboutActivity.class);
+            startActivity(aboutActivity);
         } else if (id == R.id.nav_rating) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APIBuilder.URL_APP));
             startActivity(browserIntent);

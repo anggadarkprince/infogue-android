@@ -210,11 +210,11 @@
     <string name="action_long_unfollow">Unfollow Contributor</string>
 
     <string name="about_thanks">Thanks for using our app</string>
-    <string name="about_credit">Infogue.id was originally develop by Infogue Developer Team and Angga Ari Wijaya.</string>
+    <string name="about_credit">INFOGUE.ID merupakan sebuah aplikasi portal informasi multi author yang beralamat web di www.infogue.id dimana siapa saja dapat dapat mengirimkan beritanya kapanpun dan dimanapun.\n\nBerupaya menerapkan fleksebilitas seorang jurnalisme atau seorang awampun dalam meliput atau meyampaikan informasi  dan menuliskannya secara kreatif ,cerdas dan berimbang.\n\nInfogue.id was originally develop by Infogue Developer Team.</string>
     <string name="about_copyright">© Copyright 2016 Sketch Project Studio</string>
     <string name="about_copyright_owner">All rights reserved by respective owner</string>
     <string name="about_contact_title">Developer Contact</string>
-    <string name="about_contact_content">Mobile (+62) 85655479868\nEmail sketchprojectstudio@gmail.com\nJava 6 No 5 Jember, East Java - Indonesia</string>
+    <string name="about_contact_content">Mobile (+62) 85655479868\nEmail sketchprojectstudio@gmail.com\nGresik, East Java - Indonesia</string>
     <string name="about_social">Follow our social account</string>
 
     <string name="menu_home">Home</string>
