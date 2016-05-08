@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "752579668890",
+    "project_id": "infogue-7c318"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:752579668890:android:806a711b6db900cb",
+        "android_client_info": {
+          "package_name": "com.sketchproject.infogue"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBq6BsBzvn5PX2L88TFNC9D6fN-JeOxE6U"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-74498739-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

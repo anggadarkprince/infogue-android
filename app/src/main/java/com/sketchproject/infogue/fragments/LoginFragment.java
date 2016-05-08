@@ -604,6 +604,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
             user.put(SessionManager.KEY_AVATAR, result.getString(Contributor.AVATAR_REF));
             user.put(SessionManager.KEY_COVER, result.getString(Contributor.COVER_REF));
             user.put(SessionManager.KEY_STATUS, result.getString(Contributor.STATUS));
+            user.put(SessionManager.KEY_NOTIFICATION, result.getInt(Contributor.MOBILE) == 1);
             user.put(SessionManager.KEY_ARTICLE, result.getInt(Contributor.ARTICLE));
             user.put(SessionManager.KEY_FOLLOWER, result.getInt(Contributor.FOLLOWERS));
             user.put(SessionManager.KEY_FOLLOWING, result.getInt(Contributor.FOLLOWING));

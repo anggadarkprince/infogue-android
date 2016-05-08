@@ -45,7 +45,10 @@ public class SessionManager {
     public static final String KEY_TOKEN = "token";
     public static final String KEY_IS_FOLLOWING = "followed";
     public static final String KEY_STATUS = "status";
+    public static final String KEY_NOTIFICATION = "notification";
     public static final String KEY_USER_LEARNED = "learned";
+    public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
+    public static final String REGISTRATION_COMPLETE = "registrationComplete";
 
     /**
      * Default constructor of SessionManager

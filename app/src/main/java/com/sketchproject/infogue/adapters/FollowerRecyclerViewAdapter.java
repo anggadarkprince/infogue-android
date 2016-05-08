@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.FollowerFragment;
 import com.sketchproject.infogue.fragments.FollowerFragment.OnFollowerInteractionListener;
-import com.sketchproject.infogue.fragments.holders.ListInfoViewHolder;
+import com.sketchproject.infogue.fragments.holders.InfoViewHolder;
 import com.sketchproject.infogue.fragments.holders.LoadingViewHolder;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.SessionManager;
@@ -97,13 +97,13 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             return new FollowerViewHolder(view);
         } else if (viewType == VIEW_TYPE_END) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
-            return new ListInfoViewHolder(view);
+            return new InfoViewHolder(view);
         } else if (viewType == VIEW_TYPE_EMPTY) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
-            return new ListInfoViewHolder(view);
+            return new InfoViewHolder(view);
         } else if (viewType == VIEW_TYPE_ERROR) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
-            return new ListInfoViewHolder(view);
+            return new InfoViewHolder(view);
         }
 
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_loading, parent, false);
@@ -184,16 +184,16 @@ public class FollowerRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 progressbarHolder.mProgressBar.setIndeterminate(true);
                 break;
             case VIEW_TYPE_END:
-                final ListInfoViewHolder endHolder = (ListInfoViewHolder) holder;
+                final InfoViewHolder endHolder = (InfoViewHolder) holder;
                 endHolder.mMessageView.setVisibility(View.GONE);
                 break;
             case VIEW_TYPE_EMPTY:
-                final ListInfoViewHolder emptyHolder = (ListInfoViewHolder) holder;
+                final InfoViewHolder emptyHolder = (InfoViewHolder) holder;
                 String label = "NO " + mScreenType.toUpperCase() + " AVAILABLE";
                 emptyHolder.mMessageView.setText(label);
                 break;
             case VIEW_TYPE_ERROR:
-                final ListInfoViewHolder errorHolder = (ListInfoViewHolder) holder;
+                final InfoViewHolder errorHolder = (InfoViewHolder) holder;
                 errorHolder.mMessageView.setText(mContributors.get(holder.getAdapterPosition()).getName());
                 break;
         }

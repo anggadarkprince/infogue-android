@@ -23,6 +23,7 @@ public class APIBuilder {
     public static final String URL_API_REGISTER = BASE_URL_API + "account/register";
     public static final String URL_API_OAUTH_FACEBOOK = BASE_URL_API + "oauth/facebook";
     public static final String URL_API_OAUTH_TWITTER = BASE_URL_API + "oauth/twitter";
+    public static final String URL_API_GCM_REGISTER = BASE_URL_API + "gcm/register";
 
     public static final String URL_APP = "http://play.google.com/store/apps/details?id=com.sketchproject.infogue";
     public static final String URL_DISQUS_TEMPLATE = "http://infogue.angga-ari.com/mobiletemplate.html";
@@ -316,7 +317,7 @@ public class APIBuilder {
      * @return string url
      */
     public static String getShareArticleText(String slug) {
-        return "Hey checkout infogue.id article " + BASE_URL + slug + " via infogue.id";
+        return BASE_URL + slug;
     }
 
     /**

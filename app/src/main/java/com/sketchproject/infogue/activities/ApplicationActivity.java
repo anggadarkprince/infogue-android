@@ -58,6 +58,7 @@ import com.sketchproject.infogue.models.Repositories.SubcategoryRepository;
 import com.sketchproject.infogue.models.Subcategory;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.ObjectPooling;
+import com.sketchproject.infogue.modules.RegistrationIntentService;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.APIBuilder;
@@ -173,6 +174,9 @@ public class ApplicationActivity extends AppCompatActivity implements
                 }
             });
         }
+
+        Intent i = new Intent(this, RegistrationIntentService.class);
+        startService(i);
     }
 
     /**

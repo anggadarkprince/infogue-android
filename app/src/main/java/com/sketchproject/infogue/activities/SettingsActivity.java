@@ -853,6 +853,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                             session.setSessionData(SessionManager.KEY_ABOUT, contributorUpdated.getString(Contributor.ABOUT));
                             session.setSessionData(SessionManager.KEY_AVATAR, contributorUpdated.getString(Contributor.AVATAR_REF));
                             session.setSessionData(SessionManager.KEY_COVER, contributorUpdated.getString(Contributor.COVER_REF));
+                            session.setSessionData(SessionManager.KEY_NOTIFICATION, contributorUpdated.getInt(Contributor.MOBILE) == 1);
                         } else {
                             alert.setAlertType(AlertFragment.ALERT_INFO);
                             alert.setAlertMessage(getString(R.string.error_unknown));

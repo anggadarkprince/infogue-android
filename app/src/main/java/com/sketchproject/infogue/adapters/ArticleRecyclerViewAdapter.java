@@ -16,7 +16,7 @@ import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.ArticleFragment.OnArticleEditableInteractionListener;
 import com.sketchproject.infogue.fragments.ArticleFragment.OnArticleInteractionListener;
-import com.sketchproject.infogue.fragments.holders.ListInfoViewHolder;
+import com.sketchproject.infogue.fragments.holders.InfoViewHolder;
 import com.sketchproject.infogue.fragments.holders.LoadingViewHolder;
 import com.sketchproject.infogue.models.Article;
 
@@ -129,13 +129,13 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             return new ArticleEditableViewHolder(view);
         } else if (viewType == VIEW_TYPE_END) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
-            return new ListInfoViewHolder(view);
+            return new InfoViewHolder(view);
         } else if (viewType == VIEW_TYPE_EMPTY) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
-            return new ListInfoViewHolder(view);
+            return new InfoViewHolder(view);
         } else if (viewType == VIEW_TYPE_ERROR) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_info, parent, false);
-            return new ListInfoViewHolder(view);
+            return new InfoViewHolder(view);
         }
 
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_loading, parent, false);
@@ -285,15 +285,15 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 progressbarHolder.mProgressBar.setIndeterminate(true);
                 break;
             case VIEW_TYPE_END:
-                final ListInfoViewHolder endHolder = (ListInfoViewHolder) holder;
+                final InfoViewHolder endHolder = (InfoViewHolder) holder;
                 endHolder.mMessageView.setVisibility(View.GONE);
                 break;
             case VIEW_TYPE_EMPTY:
-                final ListInfoViewHolder emptyHolder = (ListInfoViewHolder) holder;
+                final InfoViewHolder emptyHolder = (InfoViewHolder) holder;
                 emptyHolder.mMessageView.setText(R.string.label_no_article);
                 break;
             case VIEW_TYPE_ERROR:
-                final ListInfoViewHolder errorHolder = (ListInfoViewHolder) holder;
+                final InfoViewHolder errorHolder = (InfoViewHolder) holder;
                 errorHolder.mMessageView.setText(mArticles.get(holder.getAdapterPosition()).getTitle());
                 break;
         }

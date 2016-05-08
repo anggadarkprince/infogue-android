@@ -13,11 +13,11 @@ import com.sketchproject.infogue.R;
  * Sketch Project Studio
  * Created by Angga on 16/04/2016 18.19.
  */
-public class ListInfoViewHolder extends RecyclerView.ViewHolder {
+public class InfoViewHolder extends RecyclerView.ViewHolder {
     public ImageView mLogoImage;
     public TextView mMessageView;
 
-    public ListInfoViewHolder(View view) {
+    public InfoViewHolder(View view) {
         super(view);
         mLogoImage = (ImageView) view.findViewById(R.id.logo);
         mMessageView = (TextView) view.findViewById(R.id.message);

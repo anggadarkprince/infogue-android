@@ -14,14 +14,14 @@
         android:id="@+id/credit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:alpha="0.8"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="15dp"
             android:singleLine="false"
             android:text="@string/about_thanks"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title"
@@ -48,7 +48,7 @@
             android:layout_marginTop="20dp"
             android:autoLink="all"
             android:text="@string/about_credit"
-            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:textColor="@color/light" />
 
         <TextView
@@ -81,7 +81,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="20dp"
             android:text="@string/about_social"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
             android:textColor="@color/light"

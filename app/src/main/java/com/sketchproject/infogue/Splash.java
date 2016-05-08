@@ -13,6 +13,7 @@ import com.sketchproject.infogue.activities.FeaturedActivity;
 import com.sketchproject.infogue.database.DBHelper;
 import com.sketchproject.infogue.database.DatabaseManager;
 import com.sketchproject.infogue.fragments.LoginFragment;
+import com.sketchproject.infogue.modules.RegistrationIntentService;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -36,6 +37,9 @@ public class Splash extends Activity {
 
         DBHelper dbHelper = new DBHelper(getApplicationContext());
         DatabaseManager.initializeInstance(dbHelper);
+
+        Intent i = new Intent(this, RegistrationIntentService.class);
+        startService(i);
 
         final int SPLASH_TIME_OUT = 3000;
         new Handler().postDelayed(new Runnable() {
