@@ -10,113 +10,250 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".activities.AboutActivity">
 
-    <LinearLayout
-        android:id="@+id/credit"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:alpha="0.8"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
-            android:singleLine="false"
-            android:text="@string/about_thanks"
-            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title"
-            android:textColor="@color/light" />
+            android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/logo_content_description"
-            android:src="@drawable/img_logo_medium" />
+            <LinearLayout
+                android:id="@+id/credit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:alpha="0.8"
+                android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/about_copyright"
-            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-            android:textColor="@color/light"
-            android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:singleLine="false"
+                    android:text="@string/about_thanks"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title"
+                    android:textColor="@color/light" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:autoLink="all"
-            android:text="@string/about_credit"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textColor="@color/light" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:autoLink="all"
+                    android:text="@string/about_credit"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="@color/light" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="@string/about_copyright_owner"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textColor="@color/light" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="Follow Us On Facebook"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+                    android:textColor="@color/light"
+                    android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/about_contact_title"
-            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-            android:textColor="@color/light"
-            android:textStyle="bold" />
+                <ImageButton
+                    android:id="@+id/btn_facebook_infogue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:background="@color/transparent"
+                    android:contentDescription="@string/facebook_content_description"
+                    android:src="@drawable/btn_facebook" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:autoLink="all"
-            android:text="@string/about_contact_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textColor="@color/light"
-            android:textColorLink="@color/primary" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="InfoGue Team :"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title"
+                    android:textColor="@color/light"
+                    android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/about_social"
-            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-            android:textColor="@color/light"
-            android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Heri Purnomo"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+                    android:textColor="@color/light"
+                    android:textStyle="bold" />
 
-    </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Owner"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="@color/light" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/credit"
-        android:paddingTop="15dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Enis Kustiawati"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+                    android:textColor="@color/light"
+                    android:textStyle="bold" />
 
-        <ImageButton
-            android:id="@+id/btn_facebook"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
-            android:background="@color/transparent"
-            android:contentDescription="@string/facebook_content_description"
-            android:src="@drawable/btn_facebook" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Project Manager"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="@color/light" />
 
-        <ImageButton
-            android:id="@+id/btn_twitter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginStart="5dp"
-            android:layout_toEndOf="@id/btn_facebook"
-            android:layout_toRightOf="@id/btn_facebook"
-            android:background="@color/transparent"
-            android:contentDescription="@string/twitter_content_description"
-            android:scaleType="fitStart"
-            android:src="@drawable/btn_twitter" />
-    </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Ade Kurniawan"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+                    android:textColor="@color/light"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Partnership Manager"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="@color/light" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Haning Pambudi"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+                    android:textColor="@color/light"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Content Editor"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="@color/light" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Risky M"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+                    android:textColor="@color/light"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Content Editor"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="@color/light" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="30dp"
+                    android:layout_marginTop="10dp"
+                    android:autoLink="all"
+                    android:text="Ingin penjadi penulis tetap , dan ingin mendapat Royalti dari yang anda tulis ?, Layangkan saja email ke admin@infogue.id syarat dan ketentuan berlaku."
+                    android:textColor="@color/light" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="25dp"
+                    android:contentDescription="@string/logo_content_description"
+                    android:src="@drawable/img_logo_medium" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="InfoGue.id v1.0.0"
+                    android:textColor="@color/light" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/about_copyright"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+                    android:textColor="@color/light"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/about_copyright_owner"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="@color/light" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/about_contact_title"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+                    android:textColor="@color/light"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:autoLink="all"
+                    android:text="@string/about_contact_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="@color/light"
+                    android:textColorLink="@color/primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/about_social"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+                    android:textColor="@color/light"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="15dp">
+
+                <ImageButton
+                    android:id="@+id/btn_facebook"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:background="@color/transparent"
+                    android:contentDescription="@string/facebook_content_description"
+                    android:src="@drawable/btn_facebook" />
+
+                <ImageButton
+                    android:id="@+id/btn_twitter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_toEndOf="@id/btn_facebook"
+                    android:layout_toRightOf="@id/btn_facebook"
+                    android:background="@color/transparent"
+                    android:contentDescription="@string/twitter_content_description"
+                    android:scaleType="fitStart"
+                    android:src="@drawable/btn_twitter" />
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </RelativeLayout>
