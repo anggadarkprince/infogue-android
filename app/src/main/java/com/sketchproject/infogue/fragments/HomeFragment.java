@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * Home with tab fragment.
- *
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 6/04/2016 10.37.
  */
@@ -33,6 +33,12 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
+    /**
+     * Factory method to create HomeFragment
+     *
+     * @param newInstance set new instance
+     * @return HomeFragment
+     */
     public static HomeFragment newInstance(boolean newInstance) {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
@@ -42,7 +48,7 @@ public class HomeFragment extends Fragment {
     }
 
     /**
-     * Perform initialization of AuthenticationActivity.
+     * Perform initialization of HomeFragment.
      *
      * @param savedInstanceState saved last state
      */

@@ -41,7 +41,7 @@ import java.util.List;
  * A fragment representing a list of Items.
  * Activities containing this fragment MUST implement the {@link OnArticleInteractionListener}
  * interface.
- * <p>
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 26/04/2016 19.09.
  */
@@ -89,6 +89,8 @@ public class ArticleFragment extends Fragment {
 
     private String apiArticleUrl = "";
     private String apiArticleUrlFirstPage = "";
+
+    private String requestLabel = "";
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -258,24 +260,31 @@ public class ArticleFragment extends Fragment {
         if (mSubcategoryId > 0 && mSubcategory != null) {
             Log.i("INFOGUE/Article", "Sub Category " + mSubcategory + " ID : " + mSubcategoryId);
             apiArticleUrl = APIBuilder.getApiCategoryUrl(mCategory, mSubcategory, 0);
+            requestLabel = mSubcategory;
         } else if (mCategoryId > 0 && mCategory != null) {
             Log.i("INFOGUE/Article", "Category " + mCategory + " ID : " + mCategoryId);
             apiArticleUrl = APIBuilder.getApiCategoryUrl(mCategory, null, 0);
+            requestLabel = mCategory;
         } else if (mFeatured != null) {
             hasHeader = true;
             Log.i("INFOGUE/Article", "Featured : " + mFeatured);
             apiArticleUrl = APIBuilder.getApiFeaturedUrl(mFeatured, 0);
+            requestLabel = mFeatured;
         } else if (mAuthorId != 0) {
             Log.i("INFOGUE/Article", "Contributor ID : " + String.valueOf(mAuthorId) + " Username : " + mAuthorUsername);
             apiArticleUrl = APIBuilder.getApiArticleUrl(mAuthorId, mAuthorUsername, mMyArticle, mQuery);
+            requestLabel = mAuthorUsername;
         } else if (mTag != null && !mTag.isEmpty()) {
             Log.i("INFOGUE/Article", "Tag : " + mTag);
             apiArticleUrl = APIBuilder.getApiTagUrl(mTag);
+            requestLabel = mTag;
         } else if (mQuery != null && !mQuery.isEmpty()) {
             Log.i("INFOGUE/Article", "Query : " + mQuery);
             apiArticleUrl = APIBuilder.getApiSearchUrl(mQuery, APIBuilder.SEARCH_ARTICLE, mAuthorId);
+            requestLabel = "search";
         } else {
             Log.i("INFOGUE/Article", "Default");
+            requestLabel = "article";
         }
 
         apiArticleUrlFirstPage = apiArticleUrl;
@@ -361,6 +370,7 @@ public class ArticleFragment extends Fragment {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
+                            Log.i("INFOGUE/Article", "MASUK REQUEST");
                             try {
                                 String status = response.getString("status");
                                 JSONObject articles = response.getJSONObject("articles");
@@ -494,7 +504,8 @@ public class ArticleFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        VolleySingleton.getInstance(getContext()).getRequestQueue().cancelAll("articles");
+        VolleySingleton.getInstance(getContext()).getRequestQueue().cancelAll(requestLabel);
+        Log.i("INFOGUE/Article", "Stop Article Request " + requestLabel);
     }
 
     /**
