@@ -242,7 +242,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
+                        if (progress.isShowing()) {
                             progress.dismiss();
                         }
                     }
