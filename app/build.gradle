@@ -40,7 +40,7 @@ dependencies {
     compile 'me.gujun.android.taggroup:library:1.4@aar'
     compile 'jp.wasabeef:richeditor-android:1.2.0'
     compile 'com.android.volley:volley:1.0.0'
-    compile 'com.facebook.android:facebook-android-sdk:4.11.0'
+    compile 'com.facebook.android:facebook-android-sdk:4.+'
     compile('com.twitter.sdk.android:twitter:1.13.0@aar') {
         transitive = true;
     }

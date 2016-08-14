@@ -117,7 +117,8 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         Fabric.with(getContext(), new Twitter(authConfig));
 
         try {
-            // production cR2/TiSmw6dQDwkh13ep2f27jco=
+            // production TTvDckJ5JQA/e6HAA7G85qbeCiM=
+            // debug 4lMi0G2MgOAQj7shrMfSF4IlG9Y=
             @SuppressLint("PackageManagerGetSignatures")
             PackageInfo info = getActivity().getPackageManager().getPackageInfo(
                     "com.sketchproject.infogue",
