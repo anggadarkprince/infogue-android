@@ -276,7 +276,7 @@ public class ArticleFragment extends Fragment {
             requestLabel = mAuthorUsername;
         } else if (mTag != null && !mTag.isEmpty()) {
             Log.i("INFOGUE/Article", "Tag : " + mTag);
-            apiArticleUrl = APIBuilder.getApiTagUrl(mTag);
+            apiArticleUrl = APIBuilder.getApiTagUrl(mTag.replace(" ", "-"));
             requestLabel = mTag;
         } else if (mQuery != null && !mQuery.isEmpty()) {
             Log.i("INFOGUE/Article", "Query : " + mQuery);
