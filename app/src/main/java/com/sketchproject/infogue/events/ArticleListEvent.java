@@ -259,6 +259,7 @@ public class ArticleListEvent {
         postIntent.putExtra(Article.SLUG, article.getSlug());
         postIntent.putExtra(Article.FEATURED, article.getFeatured());
         postIntent.putExtra(Article.TITLE, article.getTitle());
+        postIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(postIntent);
     }
 

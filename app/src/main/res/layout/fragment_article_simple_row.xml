@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/space_medium"
+    android:paddingLeft="@dimen/space_large"
+    android:paddingRight="@dimen/space_large"
+    android:background="@drawable/btn_light">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="15dp"
+        android:layout_marginEnd="15dp"
+        android:textColor="@color/gray"
+        android:layout_toEndOf="@id/featured"
+        android:layout_toRightOf="@id/featured"
+        android:lineSpacingMultiplier="1"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:text="Buble party begin, crowd of society around the city wd of society around th"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:layout_toEndOf="@id/featured"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@id/featured"
+        android:text="13 January 2016"
+        android:textSize="12sp"
+        android:layout_marginBottom="@dimen/space_medium"
+        android:textColor="@color/primary" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_below="@id/date"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#DCDCDC"/>
+
+</RelativeLayout>

@@ -186,7 +186,7 @@ public class Helper {
     public static String wrapHtmlString(String html) {
         return "<html>" +
                 "<head>" +
-                "<style>img{display: inline; height: auto; max-width: 100%;}</style>" +
+                "<style>body{font-size: 0.85em;} img{display: inline; height: auto; width: 100%;}</style>" +
                 "</head>" +
                 "<body>" + html + "</body>" +
                 "</html>";

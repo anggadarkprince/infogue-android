@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -31,8 +33,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.adapters.SimpleArticleRecyclerViewAdapter;
 import com.sketchproject.infogue.events.ArticleListEvent;
 import com.sketchproject.infogue.events.FollowerListEvent;
+import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.models.Category;
 import com.sketchproject.infogue.models.Contributor;
@@ -78,6 +82,8 @@ public class PostActivity extends AppCompatActivity {
     private TextView mContributorName;
     private TextView mContributorLocation;
     private ImageButton mContributorFollowButton;
+    private TextView mRelatedLabel;
+    private RecyclerView mRelatedArticleRecycler;
 
     private Article articleModel;
     private Contributor contributorModel;
@@ -128,6 +134,9 @@ public class PostActivity extends AppCompatActivity {
         mContributorButton = (RelativeLayout) findViewById(R.id.btn_contributor);
         mContributorFollowButton = (ImageButton) findViewById(R.id.btn_follow_control);
 
+        mRelatedLabel = (TextView) findViewById(R.id.related_label);
+        mRelatedArticleRecycler = (RecyclerView) findViewById(R.id.related_article_list);
+
         mArticleTags.setOnTagClickListener(new TagGroup.OnTagClickListener() {
             @Override
             public void onTagClick(String tag) {
@@ -151,13 +160,6 @@ public class PostActivity extends AppCompatActivity {
 
             mArticleWrapper.setVisibility(View.GONE);
 
-            Glide.with(getBaseContext())
-                    .load(extras.getString(Article.FEATURED))
-                    .placeholder(R.drawable.placeholder_rectangle)
-                    .centerCrop()
-                    .crossFade()
-                    .into(mArticleFeatured);
-
             retrieveArticle();
         } else {
             progress.dismiss();
@@ -169,7 +171,7 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        VolleySingleton.getInstance(getBaseContext()).getRequestQueue().cancelAll("post");
+        VolleySingleton.getInstance(getBaseContext()).getRequestQueue().cancelAll(articleSlug);
     }
 
     /**
@@ -188,6 +190,7 @@ public class PostActivity extends AppCompatActivity {
                             if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
                                 final JSONObject article = response.getJSONObject(Article.DATA);
                                 final JSONObject author = article.getJSONObject(Contributor.DATA);
+                                final JSONArray related = article.getJSONArray(Article.RELATED);
 
                                 articleModel = new Article();
                                 articleModel.setId(article.getInt(Article.ID));
@@ -209,6 +212,8 @@ public class PostActivity extends AppCompatActivity {
                                 contributorModel.setFollowing(author.getInt(Contributor.FOLLOWING));
                                 contributorModel.setIsFollowing(author.getInt(Contributor.IS_FOLLOWING) == 1);
                                 buildAuthor(author);
+
+                                buildRelated(related);
 
                                 mArticleWrapper.setVisibility(View.VISIBLE);
 
@@ -267,7 +272,7 @@ public class PostActivity extends AppCompatActivity {
                     }
                 }
         );
-        articleRequest.setTag("post");
+        articleRequest.setTag(articleSlug);
         articleRequest.setRetryPolicy(new DefaultRetryPolicy(
                 APIBuilder.TIMEOUT_SHORT,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
@@ -286,6 +291,13 @@ public class PostActivity extends AppCompatActivity {
             JSONObject subcategory = article.getJSONObject(Article.SUBCATEGORY);
             JSONObject category = subcategory.getJSONObject(Article.CATEGORY);
             JSONArray tags = article.getJSONArray(Article.TAGS);
+
+            Glide.with(getBaseContext())
+                    .load(APIBuilder.BASE_URL + "images/featured/" + article.getString(Article.FEATURED))
+                    .placeholder(R.drawable.placeholder_rectangle)
+                    .centerCrop()
+                    .crossFade()
+                    .into(mArticleFeatured);
 
             mArticleTitle.setText(article.getString(Article.TITLE));
             mArticleCategory.setText(category.getString(Category.CATEGORY).toUpperCase());
@@ -394,6 +406,53 @@ public class PostActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Construct related articles.
+     *
+     * @param relatedArticle article list
+     * @throws JSONException
+     */
+    private void buildRelated(JSONArray relatedArticle) throws JSONException {
+        LinearLayoutManager layoutArticle = new LinearLayoutManager(getBaseContext());
+
+        List<Article> allArticles = new ArrayList<>();
+        if (relatedArticle != null) {
+            for (int i = 0; i < relatedArticle.length(); i++) {
+                JSONObject articleData = relatedArticle.getJSONObject(i);
+
+                Article article = new Article();
+                article.setSlug(articleData.getString(Article.SLUG));
+                article.setTitle(articleData.getString(Article.TITLE));
+                article.setPublishedAt(articleData.getString(Article.CREATED_AT));
+
+                allArticles.add(article);
+            }
+        }
+        if (allArticles.size() <= 0) {
+            //mRelatedArticleRecycler.setVisibility(View.GONE);
+            mRelatedLabel.setText(R.string.label_no_related_article);
+        }
+        final Context context = this;
+        SimpleArticleRecyclerViewAdapter articleAdapter = new SimpleArticleRecyclerViewAdapter(allArticles, new ArticleFragment.OnArticleInteractionListener() {
+            @Override
+            public void onArticleInteraction(View view, Article article) {
+                new ArticleListEvent(context, article).viewArticle();
+            }
+
+            @Override
+            public void onArticlePopupInteraction(View view, Article article) {
+
+            }
+
+            @Override
+            public void onArticleLongClickInteraction(View view, Article article) {
+
+            }
+        });
+        mRelatedArticleRecycler.setAdapter(articleAdapter);
+        mRelatedArticleRecycler.setLayoutManager(layoutArticle);
     }
 
     /**

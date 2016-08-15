@@ -34,6 +34,7 @@ public class Article {
     public static final String RATE = "rate";
     public static final String DATA = "article";
     public static final String COMMENT = "comment";
+    public static final String RELATED = "related";
 
     public static final String STATUS_PENDING = "pending";
     public static final String STATUS_UPDATED = "updated";
