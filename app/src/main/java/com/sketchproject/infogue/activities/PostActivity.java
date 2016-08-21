@@ -14,7 +14,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -118,6 +120,14 @@ public class PostActivity extends AppCompatActivity {
         mArticlePublished = (TextView) findViewById(R.id.article_published);
         mArticleContent = (WebView) findViewById(R.id.article_content);
         if (mArticleContent != null) {
+            mArticleContent.setWebChromeClient(new WebChromeClient());
+            mArticleContent.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    return false;
+                }
+            });
+            mArticleContent.getSettings().setJavaScriptEnabled(true);
             mArticleContent.getSettings().setBuiltInZoomControls(false);
             mArticleContent.getSettings().setDisplayZoomControls(false);
             mArticleContent.setScrollContainer(false);
