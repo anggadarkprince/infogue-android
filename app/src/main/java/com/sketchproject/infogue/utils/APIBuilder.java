@@ -5,7 +5,7 @@ package com.sketchproject.infogue.utils;
  * Created by Angga on 12/04/2016 17.33.
  */
 public class APIBuilder {
-    public static final String BASE_URL = "http://www.infogue.id/";
+    public static final String BASE_URL = "http://192.168.43.141:8000/";
     public static final String BASE_URL_API = BASE_URL + "api/";
     public static final String URL_HELP = BASE_URL + "faq";
     public static final String URL_FORGOT = BASE_URL + "auth/forgot";

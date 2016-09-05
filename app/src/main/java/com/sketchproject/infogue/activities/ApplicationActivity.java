@@ -63,6 +63,9 @@ import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.APIBuilder;
 import com.sketchproject.infogue.utils.Helper;
+import com.startapp.android.publish.StartAppAd;
+import com.startapp.android.publish.StartAppSDK;
+import com.startapp.android.publish.splash.SplashConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,6 +95,8 @@ public class ApplicationActivity extends AppCompatActivity implements
     private ObjectPooling objectPooling;
     private ProgressDialog progress;
 
+    private StartAppAd startAppAd = new StartAppAd(this);
+
     /**
      * Perform initialization of ApplicationActivity.
      *
@@ -100,6 +105,19 @@ public class ApplicationActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        StartAppSDK.init(this, "208367057", true);
+
+        /** Create Splash Ad **/
+        if(Math.random() < 0.2){
+            StartAppAd.showSplash(this, savedInstanceState,
+                    new SplashConfig()
+                            .setTheme(SplashConfig.Theme.GLOOMY)
+                            .setLogo(R.drawable.img_logo_medium)
+                            .setAppName("Infogue Social Public Portal")
+            );
+        }
+
         setContentView(R.layout.activity_application);
 
         DBHelper dbHelper = new DBHelper(getApplicationContext());
@@ -555,6 +573,18 @@ public class ApplicationActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startAppAd.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        startAppAd.onPause();
+    }
+
     /**
      * Take care of popping the fragment back stack or finishing the activity
      * as appropriate. if drawer opened then close it, if dialog confirmation logout or exit
@@ -574,6 +604,9 @@ public class ApplicationActivity extends AppCompatActivity implements
                     confirmExit();
                 }
             }
+        }
+        if(Math.random() < 0.4){
+            startAppAd.onBackPressed();
         }
     }
 
@@ -632,7 +665,9 @@ public class ApplicationActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+        if(Math.random() < 0.4){
+            StartAppAd.showAd(this);
+        }
         switch (id) {
             case R.id.action_login:
                 Intent loginIntent = new Intent(getBaseContext(), AuthenticationActivity.class);
@@ -727,8 +762,10 @@ public class ApplicationActivity extends AppCompatActivity implements
      */
     @Override
     public void onArticleInteraction(View view, Article article) {
-        new ArticleListEvent(this, article)
-                .viewArticle();
+        new ArticleListEvent(this, article).viewArticle();
+        if(Math.random() < 0.4){
+            StartAppAd.showAd(this);
+        }
     }
 
     /**

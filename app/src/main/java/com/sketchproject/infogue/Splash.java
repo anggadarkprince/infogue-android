@@ -15,6 +15,8 @@ import com.sketchproject.infogue.database.DatabaseManager;
 import com.sketchproject.infogue.fragments.LoginFragment;
 import com.sketchproject.infogue.modules.RegistrationIntentService;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.startapp.android.publish.StartAppAd;
+import com.startapp.android.publish.StartAppSDK;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 

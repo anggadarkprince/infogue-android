@@ -47,6 +47,8 @@ import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.APIBuilder;
 import com.sketchproject.infogue.utils.Helper;
+import com.startapp.android.publish.StartAppAd;
+import com.startapp.android.publish.StartAppSDK;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -93,6 +95,8 @@ public class PostActivity extends AppCompatActivity {
     private ProgressDialog progress;
     private Context context;
 
+    private StartAppAd startAppAd = new StartAppAd(this);
+
     /**
      * Perform initialization of PostActivity.
      *
@@ -101,6 +105,9 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        StartAppSDK.init(this, "208367057", true);
+
         setContentView(R.layout.activity_post);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -182,6 +189,26 @@ public class PostActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         VolleySingleton.getInstance(getBaseContext()).getRequestQueue().cancelAll(articleSlug);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startAppAd.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        startAppAd.onPause();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(Math.random() < 0.2){
+            startAppAd.onBackPressed();
+        }
+        super.onBackPressed();
     }
 
     /**
