@@ -11,7 +11,7 @@
         <item name="android:popupBackground">@color/light</item>
     </style>
 
-    <style name="AppTheme" parent="AppTheme.Base"/>
+    <style name="AppTheme" parent="AppTheme.Base" />
 
     <style name="AppTheme.Navigation" parent="AppTheme.Base">
         <item name="android:textColorSecondary">#aaffffff</item>

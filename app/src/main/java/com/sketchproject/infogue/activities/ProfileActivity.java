@@ -248,7 +248,13 @@ public class ProfileActivity extends AppCompatActivity {
                 mFollowButton.setVisibility(View.GONE);
             }
             if (mMessageButton != null) {
-                mMessageButton.setVisibility(View.GONE);
+                mMessageButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent messageIntent = new Intent(getBaseContext(), MessageActivity.class);
+                        startActivity(messageIntent);
+                    }
+                });
             }
             if (mInfoButton != null) {
                 mInfoButton.setVisibility(View.GONE);
@@ -276,7 +282,6 @@ public class ProfileActivity extends AppCompatActivity {
                 });
             }
             if (mMessageButton != null) {
-                mMessageButton.setVisibility(View.VISIBLE);
                 mMessageButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

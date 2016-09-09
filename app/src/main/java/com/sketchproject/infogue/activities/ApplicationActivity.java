@@ -76,7 +76,7 @@ import java.util.List;
 
 /**
  * A {@link AppCompatActivity} subclass as main activity, handle home and article fragment.
- *
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 1/04/2016 10.37.
  */
@@ -109,7 +109,7 @@ public class ApplicationActivity extends AppCompatActivity implements
         StartAppSDK.init(this, "208367057", true);
 
         /** Create Splash Ad **/
-        if(Math.random() < 0.2){
+        if (Math.random() < 0.2) {
             StartAppAd.showSplash(this, savedInstanceState,
                     new SplashConfig()
                             .setTheme(SplashConfig.Theme.GLOOMY)
@@ -605,7 +605,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                 }
             }
         }
-        if(Math.random() < 0.4){
+        if (Math.random() < 0.4) {
             startAppAd.onBackPressed();
         }
     }
@@ -665,7 +665,7 @@ public class ApplicationActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(Math.random() < 0.4){
+        if (Math.random() < 0.4) {
             StartAppAd.showAd(this);
         }
         switch (id) {
@@ -749,6 +749,12 @@ public class ApplicationActivity extends AppCompatActivity implements
                     startActivity(followingIntent);
                 }
                 break;
+            case R.id.action_messages:
+                if (session.isLoggedIn()) {
+                    Intent messageIntent = new Intent(getBaseContext(), MessageActivity.class);
+                    startActivity(messageIntent);
+                }
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -763,7 +769,7 @@ public class ApplicationActivity extends AppCompatActivity implements
     @Override
     public void onArticleInteraction(View view, Article article) {
         new ArticleListEvent(this, article).viewArticle();
-        if(Math.random() < 0.4){
+        if (Math.random() < 0.4) {
             StartAppAd.showAd(this);
         }
     }

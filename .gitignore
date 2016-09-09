@@ -1,6 +1,6 @@
 *.iml
 .gradle
-.apk
+*.apk
 Thumbs.db
 /local.properties
 /.idea/workspace.xml
