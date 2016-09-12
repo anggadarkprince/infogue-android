@@ -51,7 +51,7 @@ public class IconizedMenu implements MenuBuilder.Callback, MenuPresenter.Callbac
         mMenu.setCallback(this);
         mAnchor = anchor;
         mPopup = new MenuPopupHelper(context, mMenu, anchor);
-        mPopup.setCallback(this);
+        mPopup.setPresenterCallback(this);
         mPopup.setForceShowIcon(true);
     }
 

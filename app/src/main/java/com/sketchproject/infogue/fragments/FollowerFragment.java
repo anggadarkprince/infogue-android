@@ -41,7 +41,7 @@ import java.util.List;
  * A fragment representing a list of follower Items.
  * Activities containing this fragment MUST implement the {@link OnFollowerInteractionListener}
  * interface.
- * <p>
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 11/04/2016 10.37.
  */
@@ -169,6 +169,7 @@ public class FollowerFragment extends Fragment {
                 @Override
                 public void onLoadMore(final int page, int totalItemsCount) {
                     if (!isFirstCall) {
+                        Log.i("Infogue/Contributor", mType + " second");
                         loadFollowers(page);
                     }
                 }
@@ -180,7 +181,7 @@ public class FollowerFragment extends Fragment {
             });
 
             if (isFirstCall) {
-                isFirstCall = false;
+                Log.i("Infogue/Contributor", mType + " first");
                 loadFollowers(0);
             }
         }
@@ -200,7 +201,7 @@ public class FollowerFragment extends Fragment {
                 followerAdapter.notifyItemInserted(allFollowers.size() - 1);
             }
 
-            Log.i("Infogue/Contributor", mType+" URL " + apiFollowerUrl);
+            Log.i("Infogue/Contributor", mType + " URL " + apiFollowerUrl);
             JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, apiFollowerUrl, null,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -283,6 +284,7 @@ public class FollowerFragment extends Fragment {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+                            isFirstCall = false;
                         }
                     },
                     new Response.ErrorListener() {
@@ -319,6 +321,8 @@ public class FollowerFragment extends Fragment {
                             errorContributor.setId(-2);
                             errorContributor.setName(errorMessage);
                             allFollowers.add(errorContributor);
+
+                            isFirstCall = false;
                         }
                     }
             );

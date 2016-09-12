@@ -95,7 +95,6 @@ public class MessageFragment extends Fragment {
             });
 
             if (isFirstCall) {
-                isFirstCall = false;
                 loadMessages(0);
             }
         }
@@ -189,6 +188,7 @@ public class MessageFragment extends Fragment {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+                            isFirstCall = false;
                         }
                     },
                     new Response.ErrorListener() {
@@ -225,6 +225,8 @@ public class MessageFragment extends Fragment {
                             errorMsg.setId(-2);
                             errorMsg.setMessage(errorMessage);
                             allMessages.add(errorMsg);
+
+                            isFirstCall = false;
                         }
                     }
             );
@@ -304,6 +306,7 @@ public class MessageFragment extends Fragment {
      */
     public interface OnMessageInteractionListener {
         void onMessageListClicked(Message message);
+
         void onDeleteMessage(Message message);
     }
 }

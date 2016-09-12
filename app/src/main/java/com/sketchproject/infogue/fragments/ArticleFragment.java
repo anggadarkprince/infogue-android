@@ -345,7 +345,6 @@ public class ArticleFragment extends Fragment {
             });
 
             if (isFirstCall) {
-                isFirstCall = false;
                 loadArticles(0);
             }
         }
@@ -370,7 +369,6 @@ public class ArticleFragment extends Fragment {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.i("INFOGUE/Article", "MASUK REQUEST");
                             try {
                                 String status = response.getString("status");
                                 JSONObject articles = response.getJSONObject("articles");
@@ -448,6 +446,7 @@ public class ArticleFragment extends Fragment {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+                            isFirstCall = false;
                         }
                     },
                     new Response.ErrorListener() {
@@ -488,6 +487,8 @@ public class ArticleFragment extends Fragment {
                             errorArticle.setId(-2);
                             errorArticle.setTitle(errorMessage);
                             allArticles.add(errorArticle);
+
+                            isFirstCall = false;
                         }
                     }
             );

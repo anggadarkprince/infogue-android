@@ -483,8 +483,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
                                     profileIntent.putExtra(SessionManager.KEY_IS_FOLLOWING, false);
                                     profileIntent.putExtra(AuthenticationActivity.AFTER_LOGIN, true);
 
-                                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    profileIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 
                                     startActivity(profileIntent);
                                 } else {

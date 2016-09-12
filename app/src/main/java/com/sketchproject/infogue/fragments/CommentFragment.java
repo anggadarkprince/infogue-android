@@ -40,7 +40,7 @@ import java.util.List;
  * A fragment representing a list of comment Items.
  * Activities containing this fragment MUST implement the {@link OnCommentInteractionListener}
  * interface.
- *
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 26/04/2016 19.09.
  */
@@ -72,7 +72,7 @@ public class CommentFragment extends Fragment {
      * Default newInstance to show comment list by article id and slug.
      *
      * @param columnCount column layout
-     * @param articleId id of article
+     * @param articleId   id of article
      * @param articleSlug slug article
      * @return fragment object of CommentFragment
      */
@@ -245,6 +245,7 @@ public class CommentFragment extends Fragment {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+                            isFirstCall = false;
                         }
                     },
                     new Response.ErrorListener() {
@@ -281,6 +282,8 @@ public class CommentFragment extends Fragment {
                             errorComment.setId(-2);
                             errorComment.setComment(errorMessage);
                             allComments.add(errorComment);
+
+                            isFirstCall = false;
                         }
                     }
             );
