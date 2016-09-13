@@ -44,9 +44,9 @@
 
                 <fragment
                     android:id="@+id/alert_fragment"
+                    android:name="com.sketchproject.infogue.fragments.AlertFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:name="com.sketchproject.infogue.fragments.AlertFragment"
                     android:layout_marginBottom="10dp"
                     tools:layout="@layout/fragment_alert" />
 
@@ -64,7 +64,7 @@
                         android:layout_marginBottom="10dp"
                         android:alpha="0.5"
                         android:text="@string/label_title_basic_info"
-                        android:textColor="@color/gray" />
+                        android:textColor="@color/gray_dark" />
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/input_layout_title"
@@ -89,7 +89,7 @@
                         android:id="@+id/spinner_category"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:ms_arrowColor="@color/gray"
+                        app:ms_arrowColor="@color/gray_dark"
                         app:ms_baseColor="@color/primary"
                         app:ms_errorColor="@color/color_danger"
                         app:ms_floatingLabelText="@string/prompt_category"
@@ -102,7 +102,7 @@
                         android:id="@+id/spinner_subcategory"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:ms_arrowColor="@color/gray"
+                        app:ms_arrowColor="@color/gray_dark"
                         app:ms_baseColor="@color/primary"
                         app:ms_errorColor="@color/color_danger"
                         app:ms_floatingLabelText="@string/prompt_subcategory"
@@ -127,7 +127,7 @@
                         android:layout_marginBottom="5dp"
                         android:alpha="0.5"
                         android:text="@string/label_title_featured"
-                        android:textColor="@color/gray" />
+                        android:textColor="@color/gray_dark" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -137,22 +137,22 @@
                             android:id="@+id/featured_image"
                             android:layout_width="match_parent"
                             android:layout_height="150dp"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="@string/featured_content_description"
                             android:scaleType="centerCrop"
                             android:src="@drawable/dummy_featured_1"
-                            android:layout_marginBottom="10dp"
-                            android:visibility="gone"
-                            android:contentDescription="@string/featured_content_description"/>
+                            android:visibility="gone" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_below="@id/featured_image"
                             android:layout_marginBottom="10dp"
                             android:layout_marginTop="8dp"
                             android:paddingEnd="10dp"
                             android:paddingLeft="10dp"
                             android:paddingRight="10dp"
                             android:paddingStart="10dp"
-                            android:layout_below="@id/featured_image"
                             android:text="@string/label_input_image_featured"
                             android:textColor="@color/primary"
                             android:textSize="13sp" />
@@ -163,8 +163,8 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_marginBottom="10dp"
                             android:layout_below="@id/featured_image"
+                            android:layout_marginBottom="10dp"
                             android:background="@drawable/btn_primary"
                             android:minHeight="35dp"
                             android:paddingLeft="10dp"
@@ -190,7 +190,7 @@
                         android:layout_marginBottom="10dp"
                         android:alpha="0.5"
                         android:text="@string/label_title_seo"
-                        android:textColor="@color/gray" />
+                        android:textColor="@color/gray_dark" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -249,7 +249,7 @@
                         android:layout_marginBottom="10dp"
                         android:alpha="0.5"
                         android:text="@string/label_title_content"
-                        android:textColor="@color/gray" />
+                        android:textColor="@color/gray_dark" />
 
                     <TextView
                         android:layout_width="match_parent"

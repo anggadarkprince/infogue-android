@@ -6,7 +6,8 @@
     <color name="primary_transparent">#dd00bcd4</color>
     <color name="accent">#0cd2eb</color>
     <color name="dark">#1a1a1a</color>
-    <color name="gray">#555555</color>
+    <color name="gray_dark">#555555</color>
+    <color name="gray">#cfcfcf</color>
     <color name="gray_light">#dcdcdc</color>
     <color name="background">#ededed</color>
     <color name="light">#ffffff</color>

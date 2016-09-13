@@ -51,7 +51,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@string/placeholder_location"
-            android:textColor="@color/gray"
+            android:textColor="@color/gray_dark"
             android:textSize="12sp" />
 
         <ImageView
@@ -93,7 +93,7 @@
         android:layout_height="40dp"
         android:layout_marginTop="10dp"
         android:background="@color/background"
-        android:textColor="@color/gray"
-        android:text="@string/action_cancel" />
+        android:text="@string/action_cancel"
+        android:textColor="@color/gray_dark" />
 
 </LinearLayout>

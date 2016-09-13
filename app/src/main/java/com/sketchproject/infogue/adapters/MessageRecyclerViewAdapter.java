@@ -14,7 +14,6 @@ import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.MessageFragment.OnMessageInteractionListener;
 import com.sketchproject.infogue.fragments.holders.InfoViewHolder;
 import com.sketchproject.infogue.fragments.holders.LoadingViewHolder;
-import com.sketchproject.infogue.models.Comment;
 import com.sketchproject.infogue.models.Message;
 
 import java.util.List;
@@ -22,7 +21,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link Comment} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link Message} and makes a call to the
  * specified {@link OnMessageInteractionListener}.
  * <p>
  * Sketch Project Studio
@@ -183,7 +182,7 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     /**
      * Count total items.
      *
-     * @return total of comments
+     * @return total of messages
      */
     @Override
     public int getItemCount() {
@@ -191,7 +190,7 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     }
 
     /**
-     * Comment view holder.
+     * Message view holder.
      */
     public class MessageViewHolder extends RecyclerView.ViewHolder {
         public final View mView;

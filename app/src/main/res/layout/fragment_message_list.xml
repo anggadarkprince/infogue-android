@@ -6,7 +6,7 @@
     android:name=".fragments.MessageFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/light"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.sketchproject.infogue.fragments.MessageFragment"
     tools:listitem="@layout/fragment_message_row" />

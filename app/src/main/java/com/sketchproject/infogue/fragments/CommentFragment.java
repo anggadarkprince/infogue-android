@@ -146,7 +146,6 @@ public class CommentFragment extends Fragment {
             });
 
             if (isFirstCall) {
-                isFirstCall = false;
                 loadComments(0);
             }
         }

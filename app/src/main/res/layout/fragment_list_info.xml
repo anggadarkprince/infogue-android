@@ -10,10 +10,10 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:alpha="0.6"
         android:padding="10dp"
         android:src="@drawable/img_logo_small"
-        android:tint="@color/gray"
-        android:alpha="0.6"
+        android:tint="@color/gray_dark"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -23,9 +23,9 @@
         android:layout_below="@id/logo"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp"
-        android:text="NO ARTICLE AVAILABLE"
-        android:textColor="@color/gray"
         android:alpha="0.4"
+        android:text="NO ARTICLE AVAILABLE"
+        android:textColor="@color/gray_dark"
         tools:ignore="HardcodedText" />
 
 </RelativeLayout>

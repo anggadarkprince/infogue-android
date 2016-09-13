@@ -149,7 +149,7 @@
                 android:layout_margin="@dimen/text_margin"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/placeholder_article_detail"
-                android:textColor="@color/gray" />
+                android:textColor="@color/gray_dark" />
 
             <RelativeLayout
                 android:id="@+id/btn_contributor"
@@ -213,7 +213,7 @@
                         android:paddingRight="50dp"
                         android:singleLine="true"
                         android:text="@string/placeholder_location"
-                        android:textColor="@color/gray"
+                        android:textColor="@color/gray_dark"
                         android:textSize="12sp"
                         tools:ignore="RtlSymmetry" />
 
@@ -253,7 +253,7 @@
                     android:layout_marginRight="10dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/label_rating"
-                    android:textColor="@color/gray" />
+                    android:textColor="@color/gray_dark" />
 
                 <RatingBar
                     android:id="@+id/article_rating"
@@ -295,7 +295,7 @@
                     android:layout_marginTop="3dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/label_tags"
-                    android:textColor="@color/gray" />
+                    android:textColor="@color/gray_dark" />
 
                 <me.gujun.android.taggroup.TagGroup
                     android:id="@+id/article_tags"

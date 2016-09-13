@@ -57,7 +57,7 @@
             android:paddingRight="50dp"
             android:singleLine="true"
             android:text="Jakarta, Indonesia"
-            android:textColor="@color/gray"
+            android:textColor="@color/gray_dark"
             android:textSize="12sp" />
 
         <ImageButton

@@ -29,8 +29,9 @@
         android:layout_toRightOf="@id/avatar"
         android:ellipsize="end"
         android:text="Angga Ari Wijaya"
-        android:textColor="@color/gray"
+        android:textColor="@color/primary"
         android:textSize="15sp"
+        android:textStyle="bold"
         tools:ignore="HardcodedText" />
 
     <TextView
@@ -39,16 +40,16 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/name"
         android:layout_marginBottom="3dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginRight="40dp"
-        android:layout_marginTop="3dp"
+        android:layout_marginEnd="45dp"
+        android:layout_marginRight="45dp"
+        android:layout_marginTop="2dp"
         android:layout_toEndOf="@id/avatar"
         android:layout_toRightOf="@id/avatar"
         android:ellipsize="end"
         android:singleLine="true"
-        android:text="Hi, good morning, I came across your profile today"
-        android:textColor="@color/primary"
-        android:textSize="12sp" />
+        android:text="@string/placeholder_message"
+        android:textColor="@color/gray_dark"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/date"
@@ -58,20 +59,20 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_toEndOf="@id/avatar"
         android:layout_toRightOf="@id/avatar"
-        android:text="2 hours ago"
+        android:text="@string/placeholder_time_ago"
         android:textColor="@color/black_overlay"
-        android:textSize="11sp"
+        android:textSize="12sp"
         tools:ignore="SmallSp" />
 
     <ImageView
         android:id="@+id/btn_delete"
         android:layout_width="40dp"
         android:layout_height="35dp"
-        android:padding="5dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:contentDescription="@string/delete_content_description"
+        android:padding="5dp"
         android:src="@drawable/ic_delete"
         android:tint="@color/gray_light" />
 

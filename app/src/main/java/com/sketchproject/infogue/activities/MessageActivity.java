@@ -2,6 +2,7 @@ package com.sketchproject.infogue.activities;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -82,6 +83,10 @@ public class MessageActivity extends AppCompatActivity implements MessageFragmen
     @Override
     public void onMessageListClicked(Message message) {
         Log.i("Infogue/Message", message.getName());
+        Intent conversationIntent = new Intent(MessageActivity.this, ConversationActivity.class);
+        conversationIntent.putExtra(Message.USERNAME, message.getUsername());
+        conversationIntent.putExtra(Message.CONTRIBUTOR_ID, message.getContributorId());
+        startActivity(conversationIntent);
     }
 
     @Override

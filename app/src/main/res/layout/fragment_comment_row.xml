@@ -65,7 +65,7 @@
             android:layout_toEndOf="@id/avatar"
             android:layout_toRightOf="@id/avatar"
             android:text="@string/placeholder_about"
-            android:textColor="@color/gray"
+            android:textColor="@color/gray_dark"
             android:textSize="14sp" />
 
     </RelativeLayout>

@@ -114,7 +114,7 @@
                     android:layout_marginBottom="10dp"
                     android:alpha="0.5"
                     android:text="@string/label_title_basic_info"
-                    android:textColor="@color/gray" />
+                    android:textColor="@color/gray_dark" />
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/input_layout_name"
@@ -160,7 +160,7 @@
                         android:layout_marginStart="10dp"
                         android:alpha="0.5"
                         android:text="@string/hint_location"
-                        android:textColor="@color/gray" />
+                        android:textColor="@color/gray_dark" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -189,7 +189,7 @@
                         android:layout_marginStart="10dp"
                         android:alpha="0.5"
                         android:text="@string/hint_description"
-                        android:textColor="@color/gray" />
+                        android:textColor="@color/gray_dark" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -262,13 +262,13 @@
                         android:id="@+id/input_birthday"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:hint="@string/prompt_birthday"
                         android:inputType="date"
                         android:paddingEnd="10dp"
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
-                        android:paddingStart="10dp"
-                        android:focusable="false"/>
+                        android:paddingStart="10dp" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -290,7 +290,7 @@
                     android:layout_marginBottom="10dp"
                     android:alpha="0.5"
                     android:text="@string/label_title_social_network"
-                    android:textColor="@color/gray" />
+                    android:textColor="@color/gray_dark" />
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/input_layout_facebook"
@@ -317,7 +317,7 @@
                         android:layout_marginStart="10dp"
                         android:alpha="0.5"
                         android:text="@string/hint_facebook"
-                        android:textColor="@color/gray" />
+                        android:textColor="@color/gray_dark" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -346,7 +346,7 @@
                         android:layout_marginStart="10dp"
                         android:alpha="0.5"
                         android:text="@string/hint_twitter"
-                        android:textColor="@color/gray" />
+                        android:textColor="@color/gray_dark" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -375,7 +375,7 @@
                         android:layout_marginStart="10dp"
                         android:alpha="0.5"
                         android:text="@string/hint_googleplus"
-                        android:textColor="@color/gray" />
+                        android:textColor="@color/gray_dark" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -404,7 +404,7 @@
                         android:layout_marginStart="10dp"
                         android:alpha="0.5"
                         android:text="@string/hint_instagram"
-                        android:textColor="@color/gray" />
+                        android:textColor="@color/gray_dark" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -426,7 +426,7 @@
                     android:layout_marginBottom="10dp"
                     android:alpha="0.5"
                     android:text="@string/label_title_subscription"
-                    android:textColor="@color/gray" />
+                    android:textColor="@color/gray_dark" />
 
                 <CheckBox
                     android:id="@+id/notification_subscribe"
@@ -470,7 +470,7 @@
                     android:layout_marginBottom="10dp"
                     android:alpha="0.5"
                     android:text="@string/label_title_mobile"
-                    android:textColor="@color/gray" />
+                    android:textColor="@color/gray_dark" />
 
                 <android.support.v7.widget.SwitchCompat
                     android:id="@+id/push_notification"
@@ -496,7 +496,7 @@
                     android:layout_marginBottom="10dp"
                     android:alpha="0.5"
                     android:text="@string/label_title_account"
-                    android:textColor="@color/gray" />
+                    android:textColor="@color/gray_dark" />
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/input_layout_email"

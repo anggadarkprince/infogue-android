@@ -79,7 +79,7 @@
                     android:layout_centerHorizontal="true"
                     android:autoLink="all"
                     android:text="@string/placeholder_location"
-                    android:textColor="@color/gray"
+                    android:textColor="@color/gray_dark"
                     android:textColorLink="@color/primary"
                     android:textSize="15sp" />
 
@@ -109,7 +109,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/placeholder_statistic"
-                            android:textColor="@color/gray"
+                            android:textColor="@color/gray_dark"
                             android:textSize="30sp" />
 
                         <TextView
@@ -129,7 +129,7 @@
                         android:layout_width="1dp"
                         android:layout_height="50dp"
                         android:layout_marginTop="5dp"
-                        android:background="@color/gray" />
+                        android:background="@color/gray_dark" />
 
                     <RelativeLayout
                         android:id="@+id/btn_followers"
@@ -145,7 +145,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/placeholder_statistic"
-                            android:textColor="@color/gray"
+                            android:textColor="@color/gray_dark"
                             android:textSize="30sp" />
 
                         <TextView
@@ -165,7 +165,7 @@
                         android:layout_width="1dp"
                         android:layout_height="50dp"
                         android:layout_marginTop="5dp"
-                        android:background="@color/gray" />
+                        android:background="@color/gray_dark" />
 
                     <RelativeLayout
                         android:id="@+id/btn_following"
@@ -182,7 +182,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/placeholder_statistic"
-                            android:textColor="@color/gray"
+                            android:textColor="@color/gray_dark"
                             android:textSize="30sp" />
 
                         <TextView
@@ -216,7 +216,7 @@
                     android:paddingLeft="25dp"
                     android:paddingRight="25dp"
                     android:text="@string/placeholder_about"
-                    android:textColor="@color/gray"
+                    android:textColor="@color/gray_dark"
                     android:textColorLink="@color/primary"
                     android:textSize="15sp" />
 

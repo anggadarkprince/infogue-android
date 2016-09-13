@@ -102,11 +102,11 @@ public class Helper {
         }
         Button mButton2 = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
         if (mButton2 != null) {
-            mButton2.setTextColor(ContextCompat.getColor(context, R.color.gray));
+            mButton2.setTextColor(ContextCompat.getColor(context, R.color.gray_dark));
         }
         Button mButton3 = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
         if (mButton3 != null) {
-            mButton3.setTextColor(ContextCompat.getColor(context, R.color.gray));
+            mButton3.setTextColor(ContextCompat.getColor(context, R.color.gray_dark));
         }
 
         return dialog;

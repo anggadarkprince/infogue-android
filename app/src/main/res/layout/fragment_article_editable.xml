@@ -30,7 +30,7 @@
         android:lineSpacingMultiplier="1"
         android:maxLines="3"
         android:text="@string/placeholder_article_title"
-        android:textColor="@color/gray"
+        android:textColor="@color/gray_dark"
         android:textSize="15sp" />
 
     <ImageView
@@ -85,12 +85,12 @@
             android:layout_height="36dp"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
             android:gravity="center"
             android:padding="5dp"
             android:singleLine="true"
-            android:ellipsize="end"
             android:text="PUBLISHED"
-            android:fontFamily="sans-serif-medium"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/light" />
 
@@ -98,8 +98,8 @@
             android:id="@+id/btn_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:background="@color/color_danger"
             android:contentDescription="@string/delete_content_description"
             android:minHeight="36dp"
