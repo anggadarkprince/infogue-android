@@ -117,7 +117,7 @@ public class APIBuilder {
      * http://infogue.id/api/contributor/{anggadarkprince}/{followers}
      * http://infogue.id/api/contributor/{anggadarkprince}/{following}
      * http://infogue.id/api/contributor/{anggadarkprince}/{following}?contributor_id={3}
-     * <p>
+     * <p/>
      * page query not defined here because next request retrieve url from server
      * http://infogue.id/api/contributor/{anggadarkprince}/{following}?contributor_id={3}&page={2}
      *
@@ -184,6 +184,27 @@ public class APIBuilder {
      */
     public static String getApiContributorUrl(String username) {
         return BASE_URL_API + "contributor/" + username;
+    }
+
+    /**
+     * Build conversation url.
+     * http://infogue.id/api/message/conversation/{anggadarkprince}
+     *
+     * @param username contributor who interact with
+     * @return string url
+     */
+    public static String getApiConversationUrl(String username) {
+        return BASE_URL_API + "message/conversation/" + username;
+    }
+
+    /**
+     * Build conversation url.
+     * http://infogue.id/api/message
+     *
+     * @return string url
+     */
+    public static String getApiMessageUrl() {
+        return BASE_URL_API + "message";
     }
 
     /**

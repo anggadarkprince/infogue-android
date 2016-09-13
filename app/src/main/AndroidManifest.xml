@@ -205,6 +205,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sketchproject.infogue.activities.ProfileActivity" />
         </activity>
+        <activity
+            android:name=".activities.ConversationActivity"
+            android:label="@string/title_activity_conversation"
+            android:parentActivityName=".activities.MessageActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize|stateHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sketchproject.infogue.activities.MessageActivity" />
+        </activity>
     </application>
 
 </manifest>
