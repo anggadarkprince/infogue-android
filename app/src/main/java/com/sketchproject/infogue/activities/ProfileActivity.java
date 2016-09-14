@@ -3,6 +3,9 @@ package com.sketchproject.infogue.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,7 +27,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
+import com.sketchproject.infogue.events.ArticleContextBuilder;
+import com.sketchproject.infogue.events.ArticleListEvent;
+import com.sketchproject.infogue.events.ArticlePopupBuilder;
 import com.sketchproject.infogue.events.FollowerListEvent;
+import com.sketchproject.infogue.fragments.ArticleFragment;
+import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;
@@ -41,7 +49,7 @@ import org.json.JSONObject;
  * Sketch Project Studio
  * Created by Angga on 15/012/2016 10.37
  */
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements ArticleFragment.OnArticleInteractionListener {
 
     public static final int PROFILE_RESULT_CODE = 200;
 
@@ -165,11 +173,13 @@ public class ProfileActivity extends AppCompatActivity {
      * @param usernameContributor profile username
      */
     private void buildProfileEventHandler(final int idContributor, final String usernameContributor) {
+        // set action bar title with opened username
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(usernameContributor);
         }
 
+        // set listener for article stat to open detail of article of this user
         View mArticleButton = findViewById(R.id.btn_article);
         if (mArticleButton != null) {
             mArticleButton.setOnClickListener(new View.OnClickListener() {
@@ -187,6 +197,7 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
 
+        // set listener for follower stat to open detail of followers of this user
         View mFollowerButton = findViewById(R.id.btn_followers);
         if (mFollowerButton != null) {
             mFollowerButton.setOnClickListener(new View.OnClickListener() {
@@ -205,6 +216,7 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
 
+        // set listener for following stats to open detail of following of this user
         View mFollowingButton = findViewById(R.id.btn_following);
         if (mFollowingButton != null) {
             mFollowingButton.setOnClickListener(new View.OnClickListener() {
@@ -223,12 +235,15 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
 
+        // initialize control button such as message, detail and info (open web)
         final Button mDetailButton = (Button) findViewById(R.id.btn_detail);
         final ImageButton mMessageButton = (ImageButton) findViewById(R.id.btn_message);
         final ImageButton mInfoButton = (ImageButton) findViewById(R.id.btn_info);
         final Button mFollowButton = (Button) findViewById(R.id.btn_follow_control);
 
-        // Open my profile
+        // Open my profile if the user id was passed from another activity is equal with current session
+        // try to update profile, change info button with detail button (larger) info and hide
+        // follow control and message button
         int loggedUserId = session.getSessionData(SessionManager.KEY_ID, 0);
         if (session.isLoggedIn() && loggedUserId == idContributor) {
             updateProfileInBackground();
@@ -259,7 +274,9 @@ public class ProfileActivity extends AppCompatActivity {
             if (mInfoButton != null) {
                 mInfoButton.setVisibility(View.GONE);
             }
-        } else { // Open another contributor
+        } else {
+            // Open another contributor, prefer small button info instead detail button
+            // show follow control and message button as well
             if (mDetailButton != null) {
                 mDetailButton.setVisibility(View.GONE);
             }
@@ -268,6 +285,7 @@ public class ProfileActivity extends AppCompatActivity {
                 mFollowButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        // able to follow people if they logged in and make sure network is available
                         if (session.isLoggedIn()) {
                             if (connectionDetector.isNetworkAvailable()) {
                                 toggleFollowHandler(mFollowButton);
@@ -275,6 +293,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 connectionDetector.snackbarDisconnectNotification(findViewById(R.id.scroll_container), null);
                             }
                         } else {
+                            // instead bring me a login screen
                             Intent authIntent = new Intent(getBaseContext(), AuthenticationActivity.class);
                             startActivity(authIntent);
                         }
@@ -303,16 +322,25 @@ public class ProfileActivity extends AppCompatActivity {
                 });
             }
 
+            // set current following status by check idFollowing variable that passed from activity
             if (isFollowing) {
                 stateFollow(mFollowButton);
             } else {
                 stateUnfollow(mFollowButton);
             }
         }
+
+        // replacing stream fragment
+        Fragment fragment = ArticleFragment.newInstanceStream(1, loggedUserId, username);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment, fragment);
+        fragmentTransaction.commit();
     }
 
     /**
-     * Toggle follow control.
+     * Toggle follow control. User make changing of follow state with someone,
+     * if they followed before then now they are not following anymore, vice versa.
      */
     private void toggleFollowHandler(View followButton) {
         tempContributor = FollowerListEvent.contributor;
@@ -323,6 +351,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     /**
      * Update session or profile info.
+     * While user create new article, follow people then need to update session info,
+     * such as stats but silently and do not return any error messages.
      */
     private void updateProfileInBackground() {
         JsonObjectRequest contributorRequest = new JsonObjectRequest(Request.Method.GET, APIBuilder.getApiContributorUrl(username), null,
@@ -377,12 +407,23 @@ public class ProfileActivity extends AppCompatActivity {
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(contributorRequest);
     }
 
+    /**
+     * Change button follow control into follow state. after making request to following someone.
+     *
+     * @param mFollowButton follow control button
+     */
     private void stateFollow(Button mFollowButton) {
         mFollowButton.setBackgroundResource(R.drawable.btn_primary);
         mFollowButton.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.light));
         mFollowButton.setText(getString(R.string.action_unfollow));
     }
 
+    /**
+     * Current state is following and turns into unfollow, when user tap on this state will change
+     * into filled button and now they are following someone.
+     *
+     * @param mFollowButton follow control button
+     */
     private void stateUnfollow(Button mFollowButton) {
         mFollowButton.setBackgroundResource(R.drawable.btn_toggle);
         mFollowButton.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.primary));
@@ -464,13 +505,34 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * After login we need to launch new ApplicationActivity because it never exist or has been destroyed.
+     * After login we need to launch new ApplicationActivity
+     * because it never exist or has been destroyed.
      */
     private void launchMainActivity() {
         Intent applicationIntent = new Intent(getBaseContext(), ApplicationActivity.class);
-        applicationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        applicationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         applicationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(applicationIntent);
         finish();
+    }
+
+    @Override
+    public void onArticleInteraction(View view, Article article) {
+        new ArticleListEvent(this, article)
+                .viewArticle();
+    }
+
+    @Override
+    public void onArticlePopupInteraction(View view, Article article) {
+        new ArticlePopupBuilder(this, view, article)
+                .buildPopup()
+                .show();
+    }
+
+    @Override
+    public void onArticleLongClickInteraction(View view, Article article) {
+        new ArticleContextBuilder(this, article)
+                .buildContext()
+                .show();
     }
 }

@@ -41,41 +41,41 @@ import java.util.List;
  * A fragment representing a list of Items.
  * Activities containing this fragment MUST implement the {@link OnArticleInteractionListener}
  * interface.
- * <p/>
+ * <p>
  * Sketch Project Studio
  * Created by Angga on 26/04/2016 19.09.
  */
 public class ArticleFragment extends Fragment {
-
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String ARG_CATEGORY_ID = "category-id";
-    private static final String ARG_CATEGORY = "category";
-    private static final String ARG_SUBCATEGORY_ID = "subcategory-id";
-    private static final String ARG_SUBCATEGORY = "subcategory";
-    private static final String ARG_FEATURED = "featured";
-    private static final String ARG_AUTHOR_ID = "author-id";
-    private static final String ARG_AUTHOR_USERNAME = "author-username";
-    private static final String ARG_AUTHOR_IS_ME = "author-is-me";
-    private static final String ARG_QUERY = "search-query";
-    private static final String ARG_TAG = "tag";
 
     public static final String FEATURED_LATEST = "latest";
     public static final String FEATURED_POPULAR = "popular";
     public static final String FEATURED_TRENDING = "trending";
     public static final String FEATURED_RANDOM = "random";
     public static final String FEATURED_HEADLINE = "headline";
-
+    private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_CATEGORY_ID = "category-id";
+    private static final String ARG_CATEGORY = "category";
+    private static final String ARG_SUBCATEGORY_ID = "subcategory-id";
+    private static final String ARG_SUBCATEGORY = "subcategory";
+    private static final String ARG_FEATURED = "featured";
+    private static final String ARG_LOGGED_ID = "logged-id";
+    private static final String ARG_USERNAME = "username";
+    private static final String ARG_IS_MY_ARTICLE = "my-article";
+    private static final String ARG_STREAM = "stream";
+    private static final String ARG_QUERY = "search-query";
+    private static final String ARG_TAG = "tag";
     private int mColumnCount = 1;
     private int mCategoryId = 0;
     private int mSubcategoryId = 0;
+    private int mLoggedId;
+    private String mUsername;
     private String mCategory;
     private String mSubcategory;
     private String mFeatured;
-    private int mAuthorId;
-    private String mAuthorUsername;
     private String mQuery;
     private String mTag;
-    private boolean mMyArticle = false;
+    private boolean mStream = false;
+    private boolean mIsMyArticle = false;
     private boolean hasHeader = false;
     private boolean isFirstCall = true;
     private boolean isEndOfPage = false;
@@ -118,7 +118,7 @@ public class ArticleFragment extends Fragment {
      * Show article list fragment by author.
      *
      * @param columnCount column layout
-     * @param id          article author
+     * @param id          current logged id
      * @param username    article author
      * @param isMyArticle status if this fragment contain logged user article then show
      *                    with editable function
@@ -129,9 +129,28 @@ public class ArticleFragment extends Fragment {
 
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-        args.putInt(ARG_AUTHOR_ID, id);
-        args.putString(ARG_AUTHOR_USERNAME, username);
-        args.putBoolean(ARG_AUTHOR_IS_ME, isMyArticle);
+        args.putInt(ARG_LOGGED_ID, id);
+        args.putString(ARG_USERNAME, username);
+        args.putBoolean(ARG_IS_MY_ARTICLE, isMyArticle);
+
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    /**
+     * @param columnCount column or layout
+     * @param id          current logged id
+     * @param username    of profile owner
+     * @return fragment object of ArticleFragment
+     */
+    public static ArticleFragment newInstanceStream(int columnCount, int id, String username) {
+        ArticleFragment fragment = new ArticleFragment();
+
+        Bundle args = new Bundle();
+        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putInt(ARG_LOGGED_ID, id);
+        args.putString(ARG_USERNAME, username);
+        args.putBoolean(ARG_STREAM, true);
 
         fragment.setArguments(args);
         return fragment;
@@ -146,6 +165,7 @@ public class ArticleFragment extends Fragment {
      */
     public static ArticleFragment newInstanceQuery(int columnCount, String query) {
         ArticleFragment fragment = new ArticleFragment();
+
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putString(ARG_QUERY, query);
@@ -250,11 +270,12 @@ public class ArticleFragment extends Fragment {
             mCategory = getArguments().getString(ARG_CATEGORY);
             mSubcategory = getArguments().getString(ARG_SUBCATEGORY);
             mFeatured = getArguments().getString(ARG_FEATURED);
-            mAuthorId = getArguments().getInt(ARG_AUTHOR_ID);
-            mAuthorUsername = getArguments().getString(ARG_AUTHOR_USERNAME);
-            mMyArticle = getArguments().getBoolean(ARG_AUTHOR_IS_ME);
+            mLoggedId = getArguments().getInt(ARG_LOGGED_ID);
+            mUsername = getArguments().getString(ARG_USERNAME);
+            mIsMyArticle = getArguments().getBoolean(ARG_IS_MY_ARTICLE);
             mQuery = getArguments().getString(ARG_QUERY);
             mTag = getArguments().getString(ARG_TAG);
+            mStream = getArguments().getBoolean(ARG_STREAM);
         }
 
         if (mSubcategoryId > 0 && mSubcategory != null) {
@@ -270,17 +291,21 @@ public class ArticleFragment extends Fragment {
             Log.i("INFOGUE/Article", "Featured : " + mFeatured);
             apiArticleUrl = APIBuilder.getApiFeaturedUrl(mFeatured, 0);
             requestLabel = mFeatured;
-        } else if (mAuthorId != 0) {
-            Log.i("INFOGUE/Article", "Contributor ID : " + String.valueOf(mAuthorId) + " Username : " + mAuthorUsername);
-            apiArticleUrl = APIBuilder.getApiArticleUrl(mAuthorId, mAuthorUsername, mMyArticle, mQuery);
-            requestLabel = mAuthorUsername;
+        } else if (mStream) {
+            Log.i("INFOGUE/Article", "Stream : " + mUsername);
+            apiArticleUrl = APIBuilder.getApiStreamUrl(mUsername, mLoggedId);
+            requestLabel = "search";
+        } else if (mLoggedId != 0) {
+            Log.i("INFOGUE/Article", "Contributor ID : " + String.valueOf(mLoggedId) + " Username : " + mUsername);
+            apiArticleUrl = APIBuilder.getApiArticleUrl(mLoggedId, mUsername, mIsMyArticle, mQuery);
+            requestLabel = mUsername;
         } else if (mTag != null && !mTag.isEmpty()) {
             Log.i("INFOGUE/Article", "Tag : " + mTag);
             apiArticleUrl = APIBuilder.getApiTagUrl(mTag.replace(" ", "-"));
             requestLabel = mTag;
         } else if (mQuery != null && !mQuery.isEmpty()) {
             Log.i("INFOGUE/Article", "Query : " + mQuery);
-            apiArticleUrl = APIBuilder.getApiSearchUrl(mQuery, APIBuilder.SEARCH_ARTICLE, mAuthorId);
+            apiArticleUrl = APIBuilder.getApiSearchUrl(mQuery, APIBuilder.SEARCH_ARTICLE, mLoggedId);
             requestLabel = "search";
         } else {
             Log.i("INFOGUE/Article", "Default");
@@ -316,7 +341,7 @@ public class ArticleFragment extends Fragment {
             }
 
             // if article list authored by logged user then prefer editable view holder
-            if (mMyArticle) {
+            if (mIsMyArticle) {
                 articleAdapter = new ArticleRecyclerViewAdapter(allArticles, mArticleListListener, mArticleEditableListener);
             } else {
                 articleAdapter = new ArticleRecyclerViewAdapter(allArticles, mArticleListListener, hasHeader);
@@ -553,13 +578,13 @@ public class ArticleFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (getArguments() != null) {
-            mMyArticle = getArguments().getBoolean(ARG_AUTHOR_IS_ME);
+            mIsMyArticle = getArguments().getBoolean(ARG_IS_MY_ARTICLE);
         }
 
         if (context instanceof OnArticleInteractionListener) {
             mArticleListListener = (OnArticleInteractionListener) context;
 
-            if (mMyArticle) {
+            if (mIsMyArticle) {
                 if (context instanceof OnArticleEditableInteractionListener) {
                     mArticleEditableListener = (OnArticleEditableInteractionListener) context;
                 } else {

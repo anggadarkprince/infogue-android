@@ -117,7 +117,7 @@ public class APIBuilder {
      * http://infogue.id/api/contributor/{anggadarkprince}/{followers}
      * http://infogue.id/api/contributor/{anggadarkprince}/{following}
      * http://infogue.id/api/contributor/{anggadarkprince}/{following}?contributor_id={3}
-     * <p/>
+     * <p>
      * page query not defined here because next request retrieve url from server
      * http://infogue.id/api/contributor/{anggadarkprince}/{following}?contributor_id={3}&page={2}
      *
@@ -147,14 +147,14 @@ public class APIBuilder {
      * http://infogue.id/api/contributor/{anggadarkprince}/article
      * http://infogue.id/api/contributor/{anggadarkprince}/article?contributor_id={2}&my_article=true&query={keywords}
      *
-     * @param authorId       article author id used as user reference to check if they has following this username
+     * @param loggedId       article author id used as user reference to check if they has following this username
      * @param authorUsername article author username
      * @param isMyArticle    find out if it is my article
      * @param query          keyword when try to filter and search article
      * @return string url
      */
-    public static String getApiArticleUrl(int authorId, String authorUsername, boolean isMyArticle, String query) {
-        String author = "contributor_id=" + authorId;
+    public static String getApiArticleUrl(int loggedId, String authorUsername, boolean isMyArticle, String query) {
+        String author = "contributor_id=" + loggedId;
         String myArticle = "my_article=" + isMyArticle;
         String search = "query=" + query;
         String optionalQuery = "";
@@ -216,6 +216,18 @@ public class APIBuilder {
      */
     public static String getApiContributorUrl(String username, int loggedId) {
         return BASE_URL_API + "contributor/" + username + "?contributor_id=" + loggedId;
+    }
+
+    /**
+     * Build contributor stream url.
+     * http://infogue.id/api/contributor/{anggadarkprince}/stream
+     *
+     * @param username contributor identity
+     * @param loggedId logged user if exist
+     * @return string url
+     */
+    public static String getApiStreamUrl(String username, int loggedId) {
+        return BASE_URL_API + "contributor/" + username + "/stream?contributor_id=" + loggedId;
     }
 
     /**
