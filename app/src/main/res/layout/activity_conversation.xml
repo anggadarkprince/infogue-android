@@ -28,6 +28,63 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <RelativeLayout
+            android:id="@+id/receiver"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/light">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="5dp"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/placeholder_square" />
+
+            <EditText
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="50dp"
+                android:layout_marginRight="50dp"
+                android:layout_marginTop="2dp"
+                android:layout_toEndOf="@id/avatar"
+                android:layout_toRightOf="@id/avatar"
+                android:background="@color/light"
+                android:hint="@string/prompt_select_receiver"
+                android:padding="15dp"
+                android:singleLine="true"
+                android:textColor="@color/gray_dark" />
+
+            <ImageButton
+                android:id="@+id/reselect"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:background="@color/color_danger"
+                android:contentDescription="@string/change_receiver_content_description"
+                android:padding="5dp"
+                android:src="@drawable/ic_close"
+                android:textColor="@color/light" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/avatar"
+                android:alpha="0.8"
+                android:background="@color/gray_light" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/chat_box"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,8 +138,9 @@
         <FrameLayout
             android:id="@+id/fragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@id/chat_box" />
+            android:layout_height="wrap_content"
+            android:layout_above="@id/chat_box"
+            android:layout_below="@id/receiver" />
 
     </RelativeLayout>
 

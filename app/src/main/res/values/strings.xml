@@ -47,6 +47,8 @@
     <string name="prompt_image_title">Alternative title</string>
     <string name="prompt_image_link">Image link</string>
     <string name="prompt_message">Type a message here</string>
+    <string name="prompt_receiver_empty">Select user first</string>
+    <string name="prompt_select_receiver">Type a name or username</string>
 
     <string name="error_server">Oops, Something is getting wrong</string>
     <string name="error_unknown">Unknown error occurred</string>
@@ -269,6 +271,7 @@
     <string name="more_content_description">Button More</string>
     <string name="delete_content_description">Button Delete</string>
     <string name="comment_content_description">Leave a comment</string>
+    <string name="change_receiver_content_description">Delete receiver and select new one</string>
 
     <string name="placeholder_about">No Description</string>
     <string name="placeholder_statistic">0</string>

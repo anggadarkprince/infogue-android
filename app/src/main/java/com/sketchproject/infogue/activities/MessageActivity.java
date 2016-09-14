@@ -86,6 +86,9 @@ public class MessageActivity extends AppCompatActivity implements MessageFragmen
         Intent conversationIntent = new Intent(MessageActivity.this, ConversationActivity.class);
         conversationIntent.putExtra(Message.USERNAME, message.getUsername());
         conversationIntent.putExtra(Message.CONTRIBUTOR_ID, message.getContributorId());
+        conversationIntent.putExtra(Message.NAME, message.getName());
+        conversationIntent.putExtra(Message.AVATAR, message.getAvatar());
+        conversationIntent.putExtra(ConversationActivity.NEW_CONVERSATION, false);
         startActivity(conversationIntent);
     }
 

@@ -12,12 +12,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ConversationFragment;
 import com.sketchproject.infogue.models.Contributor;
@@ -36,7 +38,11 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ConversationActivity extends AppCompatActivity {
+    public static final String NEW_CONVERSATION = "new";
+
     private Validator validator;
     private ConnectionDetector connectionDetector;
     private SessionManager sessionManager;
@@ -58,48 +64,78 @@ public class ConversationActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            boolean newConversation = extras.getBoolean(ConversationActivity.NEW_CONVERSATION);
             String username = extras.getString(Message.USERNAME);
+            String name = extras.getString(Message.NAME);
+            String avatar = extras.getString(Message.AVATAR);
             id = extras.getInt(Message.CONTRIBUTOR_ID);
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                getSupportActionBar().setTitle(username);
+
+            EditText receiverEdit = (EditText) findViewById(R.id.username);
+            ImageButton reselectButton = (ImageButton) findViewById(R.id.reselect);
+            CircleImageView avatarImage = (CircleImageView) findViewById(R.id.avatar);
+
+            chatMessage = (EditText) findViewById(R.id.chat_message);
+            buttonSend = (FloatingActionButton) findViewById(R.id.btn_send);
+            buttonSend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String message = chatMessage.getText().toString();
+                    if (!validator.isEmpty(message)) {
+                        chatMessage.setEnabled(false);
+                        buttonSend.setEnabled(false);
+                        sendMessage(message, view);
+                    } else {
+                        final Snackbar snackbar = Snackbar.make(view, getString(R.string.error_message_required), Snackbar.LENGTH_SHORT);
+                        snackbar.getView().setBackgroundResource(R.color.color_danger);
+                        snackbar.setActionTextColor(ContextCompat.getColor(getBaseContext(), R.color.light));
+                        snackbar.setAction(getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                snackbar.dismiss();
+                            }
+                        });
+                        snackbar.show();
+                    }
+                }
+            });
+
+            String title = "New Conversation";
+            if (newConversation) {
+                chatMessage.setEnabled(false);
+                buttonSend.setEnabled(false);
+                chatMessage.setHint(R.string.prompt_receiver_empty);
+            } else {
+                // setup title and user who interact with
+                title = username;
+                receiverEdit.setText(name);
+                receiverEdit.setEnabled(false);
+                reselectButton.setVisibility(View.GONE);
+                Glide.with(getBaseContext())
+                        .load(avatar)
+                        .placeholder(R.drawable.placeholder_square)
+                        .into(avatarImage);
+
+                // add conversation fragment
+                Fragment fragment = ConversationFragment.newInstance(username);
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment, fragment);
+                fragmentTransaction.commit();
+
+                chatMessage.setEnabled(true);
+                buttonSend.setEnabled(true);
+                chatMessage.setHint(R.string.prompt_message);
             }
 
-            // add fragment
-            Fragment fragment = ConversationFragment.newInstance(username);
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.fragment, fragment);
-            fragmentTransaction.commit();
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setTitle(title);
+            }
+
         } else {
             Helper.toastColor(getBaseContext(), R.string.message_invalid_message, R.color.color_danger_transparent);
             finish();
         }
-
-        chatMessage = (EditText) findViewById(R.id.chat_message);
-        buttonSend = (FloatingActionButton) findViewById(R.id.btn_send);
-        buttonSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String message = chatMessage.getText().toString();
-                if (!validator.isEmpty(message)) {
-                    chatMessage.setEnabled(false);
-                    buttonSend.setEnabled(false);
-                    sendMessage(message, view);
-                } else {
-                    final Snackbar snackbar = Snackbar.make(view, getString(R.string.error_message_required), Snackbar.LENGTH_SHORT);
-                    snackbar.getView().setBackgroundResource(R.color.color_danger);
-                    snackbar.setActionTextColor(ContextCompat.getColor(getBaseContext(), R.color.light));
-                    snackbar.setAction(getString(R.string.action_ok), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            snackbar.dismiss();
-                        }
-                    });
-                    snackbar.show();
-                }
-            }
-        });
     }
 
     /**
