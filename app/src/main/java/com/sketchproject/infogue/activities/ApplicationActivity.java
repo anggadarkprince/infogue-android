@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -171,7 +173,18 @@ public class ApplicationActivity extends AppCompatActivity implements
             populateMenu(categoryRepository.retrieveData());
         }
 
-        downloadCategoryMenu();
+        // download the menu
+        if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
+            progress.show();
+            downloadCategoryMenu();
+        } else {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    downloadCategoryMenu();
+                }
+            }, 5000);
+        }
 
         // define swipe to refresh layout and delegate event through home fragment or direct article fragment
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
@@ -210,10 +223,6 @@ public class ApplicationActivity extends AppCompatActivity implements
      * Build category from server to local repository
      */
     private void downloadCategoryMenu() {
-        if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
-            progress.show();
-        }
-
         JsonObjectRequest menuRequest = new JsonObjectRequest(Request.Method.GET, APIBuilder.URL_API_CATEGORY, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -807,7 +816,7 @@ public class ApplicationActivity extends AppCompatActivity implements
      * @return boolean
      */
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Fragment fragment;
         String title;
         String subtitle;

@@ -25,6 +25,7 @@ import com.sketchproject.infogue.adapters.MessageRecyclerViewAdapter;
 import com.sketchproject.infogue.models.Message;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.modules.TimeAgo;
 import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.APIBuilder;
 import com.sketchproject.infogue.utils.Helper;
@@ -151,7 +152,7 @@ public class MessageFragment extends Fragment {
                                             message.setName(messageData.getString(Message.NAME));
                                             message.setMessage(messageData.getString(Message.MESSAGE));
                                             message.setAvatar(messageData.getString(Message.AVATAR));
-                                            message.setTimestamp(messageData.getString(Message.TIMESTAMP));
+                                            message.setTimestamp(new TimeAgo(getContext()).timeAgo(messageData.getString(Message.TIMESTAMP)));
                                             moreMessages.add(message);
                                         }
                                     }

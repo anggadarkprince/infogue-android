@@ -22,6 +22,7 @@ import com.sketchproject.infogue.models.Conversation;
 import com.sketchproject.infogue.models.Message;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
 import com.sketchproject.infogue.modules.SessionManager;
+import com.sketchproject.infogue.modules.TimeAgo;
 import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.APIBuilder;
 import com.sketchproject.infogue.utils.Helper;
@@ -165,6 +166,8 @@ public class ConversationFragment extends Fragment {
                                     allMessages.remove(allMessages.size() - 1);
                                     messageAdapter.notifyItemRemoved(allMessages.size());
 
+                                    TimeAgo timeAgo = new TimeAgo(getContext());
+
                                     // add new data
                                     List<Conversation> moreMessages = new ArrayList<>();
                                     if (data != null) {
@@ -176,7 +179,7 @@ public class ConversationFragment extends Fragment {
                                             message.setOwner(messageData.getString(Conversation.OWNER));
                                             message.setMessage(messageData.getString(Message.MESSAGE));
                                             message.setAvatar(messageData.getString(Message.AVATAR));
-                                            message.setTimestamp(messageData.getString(Message.TIMESTAMP));
+                                            message.setTimestamp(timeAgo.timeAgo(messageData.getString(Message.TIMESTAMP)));
                                             moreMessages.add(message);
 
                                             if (message.getId() > latestId) {
@@ -278,7 +281,7 @@ public class ConversationFragment extends Fragment {
         conversation.setOwner("me");
         conversation.setMessage(message);
         conversation.setAvatar(sessionManager.getSessionData(SessionManager.KEY_AVATAR, null));
-        conversation.setTimestamp(timeStamp);
+        conversation.setTimestamp(new TimeAgo(getContext()).timeAgo(timeStamp));
         allMessages.add(0, conversation);
         messageAdapter.notifyItemInserted(0);
         if (recyclerView != null) {

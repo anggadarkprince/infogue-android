@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/btn_light">
@@ -8,6 +9,7 @@
         android:id="@+id/border_top"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
+        android:alpha="0.5"
         android:background="@color/gray_light" />
 
     <RelativeLayout
@@ -41,9 +43,10 @@
             android:paddingEnd="50dp"
             android:paddingRight="50dp"
             android:singleLine="true"
-            android:text="Imelda Dwi Agustine"
+            android:text="@string/placeholder_name"
             android:textColor="@color/primary"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="RelativeOverlap,RtlSymmetry" />
 
         <TextView
             android:id="@+id/location"
@@ -56,9 +59,10 @@
             android:paddingEnd="50dp"
             android:paddingRight="50dp"
             android:singleLine="true"
-            android:text="Jakarta, Indonesia"
+            android:text="@string/placeholder_location"
             android:textColor="@color/gray_dark"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            tools:ignore="RtlSymmetry" />
 
         <ImageButton
             android:id="@+id/follow"
@@ -79,5 +83,6 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_below="@id/follower"
+        android:alpha="0.5"
         android:background="@color/gray_light" />
 </RelativeLayout>
