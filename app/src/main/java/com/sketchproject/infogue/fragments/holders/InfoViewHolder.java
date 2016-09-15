@@ -25,6 +25,6 @@ public class InfoViewHolder extends RecyclerView.ViewHolder {
 
     @Override
     public String toString() {
-        return super.toString() + " Comment : " + mMessageView.getText();
+        return super.toString() + " : " + mMessageView.getText();
     }
 }

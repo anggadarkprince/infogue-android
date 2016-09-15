@@ -7,6 +7,7 @@ package com.sketchproject.infogue.utils;
 public class APIBuilder {
     public static final String BASE_URL = "http://192.168.43.141:8000/";
     public static final String BASE_URL_API = BASE_URL + "api/";
+    public static final String ASSET_IMAGES_URL = BASE_URL + "images/";
     public static final String URL_HELP = BASE_URL + "faq";
     public static final String URL_FORGOT = BASE_URL + "auth/forgot";
     public static final String URL_FEEDBACK = BASE_URL + "contact";
@@ -117,7 +118,7 @@ public class APIBuilder {
      * http://infogue.id/api/contributor/{anggadarkprince}/{followers}
      * http://infogue.id/api/contributor/{anggadarkprince}/{following}
      * http://infogue.id/api/contributor/{anggadarkprince}/{following}?contributor_id={3}
-     * <p>
+     * <p/>
      * page query not defined here because next request retrieve url from server
      * http://infogue.id/api/contributor/{anggadarkprince}/{following}?contributor_id={3}&page={2}
      *
@@ -195,6 +196,16 @@ public class APIBuilder {
      */
     public static String getApiConversationUrl(String username) {
         return BASE_URL_API + "message/conversation/" + username;
+    }
+
+    /**
+     * Build contributor suggestion.
+     *
+     * @param query keyword name or username
+     * @return string url
+     */
+    public static String getApiContributorSuggestionUrl(String query) {
+        return BASE_URL_API + "contributor/search?query=" + query;
     }
 
     /**

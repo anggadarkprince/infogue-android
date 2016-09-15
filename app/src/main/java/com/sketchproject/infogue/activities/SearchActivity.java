@@ -55,7 +55,7 @@ import java.util.List;
 
 /**
  * A {@link AppCompatActivity} subclass, show search result of article and contributor.
- * <p>
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 25/012/2016 10.37
  */
@@ -312,7 +312,8 @@ public class SearchActivity extends AppCompatActivity implements
      */
     private void setupSearchResult() {
         showProgress(true);
-        String url = APIBuilder.getApiSearchUrl(mSearchQuery, APIBuilder.SEARCH_BOTH, session.getSessionData(SessionManager.KEY_ID, 0));
+        final String querySearch = mSearchQuery.replaceAll(" ", "+").trim();
+        String url = APIBuilder.getApiSearchUrl(querySearch, APIBuilder.SEARCH_BOTH, session.getSessionData(SessionManager.KEY_ID, 0));
         JsonObjectRequest menuRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override

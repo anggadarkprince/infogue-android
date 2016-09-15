@@ -126,7 +126,7 @@ public class FollowerFragment extends Fragment {
 
             if (mQuery != null && !mQuery.isEmpty()) {
                 Log.i("INFOGUE/Follower", "Query : " + mQuery);
-                apiFollowerUrl = APIBuilder.getApiSearchUrl(mQuery, APIBuilder.SEARCH_CONTRIBUTOR, mLoggedId);
+                apiFollowerUrl = APIBuilder.getApiSearchUrl(mQuery.trim().replaceAll(" ", "+"), APIBuilder.SEARCH_CONTRIBUTOR, mLoggedId);
             } else if (mUsername != null && !mUsername.isEmpty()) {
                 Log.i("INFOGUE/Follower", "Username : " + mUsername);
                 apiFollowerUrl = APIBuilder.getApiFollowerUrl(mType, mLoggedId, mUsername);

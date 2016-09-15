@@ -25,11 +25,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int VIEW_TYPE_LOADING = 0;
-    private static final int VIEW_TYPE_MESSAGE_OURS = 1;
-    private static final int VIEW_TYPE_MESSAGE_THEIRS = 2;
-    private static final int VIEW_TYPE_END = 3;
-    private static final int VIEW_TYPE_EMPTY = 4;
-    private static final int VIEW_TYPE_ERROR = 5;
+    private static final int VIEW_TYPE_LOADING_SEND = 1;
+    private static final int VIEW_TYPE_MESSAGE_OURS = 2;
+    private static final int VIEW_TYPE_MESSAGE_THEIRS = 3;
+    private static final int VIEW_TYPE_END = 4;
+    private static final int VIEW_TYPE_EMPTY = 5;
+    private static final int VIEW_TYPE_ERROR = 6;
 
     private final List<Conversation> mMessages;
 
@@ -66,6 +67,8 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                 return VIEW_TYPE_END;
             } else if (message.getId() == -2) {
                 return VIEW_TYPE_ERROR;
+            } else if (message.getId() == -3) {
+                return VIEW_TYPE_LOADING_SEND;
             }
 
             return VIEW_TYPE_END;
@@ -118,6 +121,7 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                 messageHolder.mMessageView.setText(conversation.getMessage());
                 Glide.with(messageHolder.mView.getContext())
                         .load(conversation.getAvatar())
+                        .dontAnimate()
                         .placeholder(R.drawable.placeholder_square)
                         .into(messageHolder.mAvatarImage);
 
@@ -135,8 +139,12 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                 emptyHolder.mMessageView.setText(R.string.label_no_message);
                 break;
             case VIEW_TYPE_ERROR:
+            case VIEW_TYPE_LOADING_SEND:
                 final InfoViewHolder errorHolder = (InfoViewHolder) holder;
                 errorHolder.mMessageView.setText(conversation.getMessage());
+                if (conversation.getId() == -3) {
+                    errorHolder.mLogoImage.setVisibility(View.GONE);
+                }
                 break;
         }
     }

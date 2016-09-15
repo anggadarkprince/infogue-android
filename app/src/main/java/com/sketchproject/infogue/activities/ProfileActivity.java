@@ -34,6 +34,7 @@ import com.sketchproject.infogue.events.FollowerListEvent;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.models.Contributor;
+import com.sketchproject.infogue.models.Message;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.VolleySingleton;
@@ -104,6 +105,8 @@ public class ProfileActivity extends AppCompatActivity implements ArticleFragmen
             contributor.setId(contributorId);
             contributor.setUsername(username);
             contributor.setIsFollowing(isFollowing);
+            contributor.setName(extras.getString(SessionManager.KEY_NAME));
+            contributor.setAvatar(extras.getString(SessionManager.KEY_AVATAR));
 
             String status = extras.getString(SessionManager.KEY_STATUS, "invalid");
             if (!status.equals(Contributor.STATUS_ACTIVATED)) {
@@ -304,9 +307,13 @@ public class ProfileActivity extends AppCompatActivity implements ArticleFragmen
                 mMessageButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String url = APIBuilder.getContributorConversationUrl(usernameContributor);
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                        startActivity(browserIntent);
+                        Intent conversationIntent = new Intent(ProfileActivity.this, ConversationActivity.class);
+                        conversationIntent.putExtra(Message.USERNAME, contributor.getUsername());
+                        conversationIntent.putExtra(Message.CONTRIBUTOR_ID, contributor.getId());
+                        conversationIntent.putExtra(Message.NAME, contributor.getName());
+                        conversationIntent.putExtra(Message.AVATAR, contributor.getAvatar());
+                        conversationIntent.putExtra(ConversationActivity.NEW_CONVERSATION, false);
+                        startActivity(conversationIntent);
                     }
                 });
             }

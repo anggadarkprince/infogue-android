@@ -1,6 +1,7 @@
 package com.sketchproject.infogue.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -128,8 +129,9 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 Glide.with(messageHolder.mView.getContext())
                         .load(mMessages.get(holder.getAdapterPosition()).getAvatar())
                         .placeholder(R.drawable.placeholder_square)
+                        .dontAnimate()
                         .into(messageHolder.mAvatarImage);
-
+                Log.i("Infogue/Message", mMessages.get(holder.getAdapterPosition()).getAvatar());
                 messageHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

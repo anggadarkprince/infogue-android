@@ -52,7 +52,9 @@ public class MessageActivity extends AppCompatActivity implements MessageFragmen
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    Intent conversationIntent = new Intent(MessageActivity.this, ConversationActivity.class);
+                    conversationIntent.putExtra(ConversationActivity.NEW_CONVERSATION, true);
+                    startActivityForResult(conversationIntent, ConversationActivity.NEW_CONVERSATION_CODE);
                 }
             });
         }
@@ -89,7 +91,22 @@ public class MessageActivity extends AppCompatActivity implements MessageFragmen
         conversationIntent.putExtra(Message.NAME, message.getName());
         conversationIntent.putExtra(Message.AVATAR, message.getAvatar());
         conversationIntent.putExtra(ConversationActivity.NEW_CONVERSATION, false);
-        startActivity(conversationIntent);
+        startActivityForResult(conversationIntent, ConversationActivity.NEW_CONVERSATION_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i("Infogue/Message", "onActivityResult " + resultCode);
+        if (requestCode == ConversationActivity.NEW_CONVERSATION_CODE && data != null) {
+            boolean conversationUpdate = data.getBooleanExtra(ConversationActivity.NEW_CONVERSATION, false);
+            if (conversationUpdate) {
+                swipeRefreshLayout.setRefreshing(true);
+                MessageFragment fragment = (MessageFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+                fragment.refreshMessageList(swipeRefreshLayout);
+                Log.i("Infogue/Message", "Updated Message");
+            }
+        }
     }
 
     @Override

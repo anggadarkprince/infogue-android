@@ -41,7 +41,7 @@ import java.util.List;
  * A fragment representing a list of Items.
  * Activities containing this fragment MUST implement the {@link OnArticleInteractionListener}
  * interface.
- * <p>
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 26/04/2016 19.09.
  */
@@ -305,7 +305,7 @@ public class ArticleFragment extends Fragment {
             requestLabel = mTag;
         } else if (mQuery != null && !mQuery.isEmpty()) {
             Log.i("INFOGUE/Article", "Query : " + mQuery);
-            apiArticleUrl = APIBuilder.getApiSearchUrl(mQuery, APIBuilder.SEARCH_ARTICLE, mLoggedId);
+            apiArticleUrl = APIBuilder.getApiSearchUrl(mQuery.trim().replaceAll(" ", "+"), APIBuilder.SEARCH_ARTICLE, mLoggedId);
             requestLabel = "search";
         } else {
             Log.i("INFOGUE/Article", "Default");

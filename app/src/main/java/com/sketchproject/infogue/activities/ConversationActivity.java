@@ -1,14 +1,13 @@
 package com.sketchproject.infogue.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -22,9 +21,11 @@ import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.ConversationFragment;
+import com.sketchproject.infogue.fragments.SuggestionFragment;
 import com.sketchproject.infogue.models.Contributor;
 import com.sketchproject.infogue.models.Message;
 import com.sketchproject.infogue.modules.ConnectionDetector;
+import com.sketchproject.infogue.modules.ObjectPooling;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.Validator;
 import com.sketchproject.infogue.modules.VolleySingleton;
@@ -40,15 +41,23 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ConversationActivity extends AppCompatActivity {
+public class ConversationActivity extends AppCompatActivity implements SuggestionFragment.OnContributorInteractionListener {
     public static final String NEW_CONVERSATION = "new";
+    public static final int NEW_CONVERSATION_CODE = 111;
 
     private Validator validator;
     private ConnectionDetector connectionDetector;
     private SessionManager sessionManager;
+    private ObjectPooling objectPooling;
+
+    private EditText receiverEdit;
+    private ImageButton reselectButton;
+    private CircleImageView avatarImage;
+
     private EditText chatMessage;
-    private FloatingActionButton buttonSend;
-    private int id;
+    private ImageButton buttonSend;
+    private int userId;
+    private boolean conversationUpdated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,84 +67,155 @@ public class ConversationActivity extends AppCompatActivity {
         validator = new Validator();
         connectionDetector = new ConnectionDetector(ConversationActivity.this);
         sessionManager = new SessionManager(ConversationActivity.this);
+        objectPooling = new ObjectPooling();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("New Conversation");
+        }
+        conversationUpdated = false;
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             boolean newConversation = extras.getBoolean(ConversationActivity.NEW_CONVERSATION);
-            String username = extras.getString(Message.USERNAME);
-            String name = extras.getString(Message.NAME);
-            String avatar = extras.getString(Message.AVATAR);
-            id = extras.getInt(Message.CONTRIBUTOR_ID);
 
-            EditText receiverEdit = (EditText) findViewById(R.id.username);
-            ImageButton reselectButton = (ImageButton) findViewById(R.id.reselect);
-            CircleImageView avatarImage = (CircleImageView) findViewById(R.id.avatar);
+            receiverEdit = (EditText) findViewById(R.id.username);
+            reselectButton = (ImageButton) findViewById(R.id.reselect);
+            avatarImage = (CircleImageView) findViewById(R.id.avatar);
 
             chatMessage = (EditText) findViewById(R.id.chat_message);
-            buttonSend = (FloatingActionButton) findViewById(R.id.btn_send);
+            chatMessage.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (validator.isEmpty(s.toString())) {
+                        buttonSend.setEnabled(false);
+                        buttonSend.setBackgroundResource(R.drawable.circle_featured_inactive);
+                    } else {
+                        buttonSend.setEnabled(true);
+                        buttonSend.setBackgroundResource(R.drawable.circle_featured_active);
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+
+            buttonSend = (ImageButton) findViewById(R.id.btn_send);
+            buttonSend.setEnabled(false);
+            buttonSend.setBackgroundResource(R.drawable.circle_featured_inactive);
             buttonSend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     String message = chatMessage.getText().toString();
-                    if (!validator.isEmpty(message)) {
-                        chatMessage.setEnabled(false);
-                        buttonSend.setEnabled(false);
-                        sendMessage(message, view);
-                    } else {
-                        final Snackbar snackbar = Snackbar.make(view, getString(R.string.error_message_required), Snackbar.LENGTH_SHORT);
-                        snackbar.getView().setBackgroundResource(R.color.color_danger);
-                        snackbar.setActionTextColor(ContextCompat.getColor(getBaseContext(), R.color.light));
-                        snackbar.setAction(getString(R.string.action_ok), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                snackbar.dismiss();
-                            }
-                        });
-                        snackbar.show();
-                    }
+                    sendMessage(message, view);
                 }
             });
 
-            String title = "New Conversation";
             if (newConversation) {
+                // setup chat box status
                 chatMessage.setEnabled(false);
-                buttonSend.setEnabled(false);
                 chatMessage.setHint(R.string.prompt_receiver_empty);
-            } else {
-                // setup title and user who interact with
-                title = username;
-                receiverEdit.setText(name);
-                receiverEdit.setEnabled(false);
-                reselectButton.setVisibility(View.GONE);
-                Glide.with(getBaseContext())
-                        .load(avatar)
-                        .placeholder(R.drawable.placeholder_square)
-                        .into(avatarImage);
 
-                // add conversation fragment
-                Fragment fragment = ConversationFragment.newInstance(username);
+                // add suggestion fragment
+                final SuggestionFragment suggestionFragment;
+                Object objectFragment = objectPooling.find(SuggestionFragment.class.getSimpleName());
+                if (objectFragment == null) {
+                    suggestionFragment = new SuggestionFragment();
+                    objectPooling.pool(suggestionFragment, SuggestionFragment.class.getSimpleName());
+                } else {
+                    suggestionFragment = (SuggestionFragment) objectFragment;
+                }
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment, fragment);
+                fragmentTransaction.replace(R.id.fragment, suggestionFragment);
                 fragmentTransaction.commit();
 
-                chatMessage.setEnabled(true);
-                buttonSend.setEnabled(true);
-                chatMessage.setHint(R.string.prompt_message);
-            }
+                // setup remove receiver event and status
+                reselectButton.setVisibility(View.GONE);
+                reselectButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        reselectButton.setVisibility(View.GONE);
+                        receiverEdit.setEnabled(true);
 
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                getSupportActionBar().setTitle(title);
-            }
+                        chatMessage.setEnabled(false);
+                        chatMessage.setHint(R.string.prompt_receiver_empty);
 
+                        // add suggestion fragment
+                        final SuggestionFragment suggestionFragment;
+                        Object objectFragment = objectPooling.find(SuggestionFragment.class.getSimpleName());
+                        if (objectFragment == null) {
+                            suggestionFragment = new SuggestionFragment();
+                            objectPooling.pool(suggestionFragment, SuggestionFragment.class.getSimpleName());
+                        } else {
+                            suggestionFragment = (SuggestionFragment) objectFragment;
+                        }
+                        FragmentManager fragmentManager = getSupportFragmentManager();
+                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.fragment, suggestionFragment);
+                        fragmentTransaction.commit();
+
+                        receiverEdit.setText("");
+                        receiverEdit.requestFocus();
+                        if (getSupportActionBar() != null) {
+                            getSupportActionBar().setTitle("New Conversation");
+                        }
+                    }
+                });
+
+                // set receiver text edit status and event
+                receiverEdit.setEnabled(true);
+                receiverEdit.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        suggestionFragment.fetchSuggestion(s.toString());
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+            } else {
+                // fetch info from extras
+                userId = extras.getInt(Message.CONTRIBUTOR_ID);
+                String username = extras.getString(Message.USERNAME);
+                String name = extras.getString(Message.NAME);
+                String avatar = extras.getString(Message.AVATAR);
+                reselectButton.setVisibility(View.GONE);
+
+                // setup title and user who interact with
+                setupConversation(userId, username, name, avatar);
+            }
         } else {
             Helper.toastColor(getBaseContext(), R.string.message_invalid_message, R.color.color_danger_transparent);
             finish();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (conversationUpdated) {
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra(ConversationActivity.NEW_CONVERSATION, true);
+            setResult(AppCompatActivity.RESULT_OK, returnIntent);
+            Log.i("Infogue/Conversation", "Updated Return");
+        }
+        super.onBackPressed();
     }
 
     /**
@@ -144,6 +224,12 @@ public class ConversationActivity extends AppCompatActivity {
      */
     private void sendMessage(final String message, View view) {
         if (connectionDetector.isNetworkAvailable()) {
+            final ConversationFragment conversationFragment = (ConversationFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+            conversationFragment.insertLoading();
+
+            chatMessage.setEnabled(false);
+            buttonSend.setEnabled(false);
+            buttonSend.setBackgroundResource(R.drawable.circle_featured_inactive);
             StringRequest sendMessageRequest = new StringRequest(Request.Method.POST, APIBuilder.getApiMessageUrl(),
                     new Response.Listener<String>() {
                         @Override
@@ -153,27 +239,29 @@ public class ConversationActivity extends AppCompatActivity {
                                 String status = result.getString(APIBuilder.RESPONSE_STATUS);
 
                                 if (status.equals(APIBuilder.REQUEST_SUCCESS)) {
-                                    ConversationFragment conversationFragment = (ConversationFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
                                     conversationFragment.insertNewMessage(sessionManager, message);
                                     chatMessage.setText("");
+                                    conversationUpdated = true;
                                 } else {
                                     Log.w("Infogue", "[Conversation] " + getString(R.string.error_unknown));
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                conversationFragment.removeLoading();
                             }
                             chatMessage.setEnabled(true);
-                            buttonSend.setEnabled(true);
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             String errorMessage = new Logger().networkRequestError(getBaseContext(), error, "Conversation");
-                            String rateMessage = errorMessage + "\r\nYour message was discarded";
-                            Helper.toastColor(getBaseContext(), rateMessage, R.color.color_danger);
+                            String errMessage = errorMessage + "\r\nYour message was discarded";
+                            Helper.toastColor(getBaseContext(), errMessage, R.color.color_danger);
                             chatMessage.setEnabled(true);
                             buttonSend.setEnabled(true);
+                            buttonSend.setBackgroundResource(R.drawable.circle_featured_active);
+                            conversationFragment.removeLoading();
                         }
                     }
             ) {
@@ -182,7 +270,7 @@ public class ConversationActivity extends AppCompatActivity {
                     Map<String, String> messageParams = new HashMap<>();
                     messageParams.put(Contributor.API_TOKEN, sessionManager.getSessionData(SessionManager.KEY_TOKEN, null));
                     messageParams.put("contributor_id", String.valueOf(sessionManager.getSessionData(SessionManager.KEY_ID, 0)));
-                    messageParams.put("receiver_id", String.valueOf(id));
+                    messageParams.put("receiver_id", String.valueOf(userId));
                     messageParams.put("message", message);
                     return messageParams;
                 }
@@ -196,5 +284,40 @@ public class ConversationActivity extends AppCompatActivity {
         } else {
             connectionDetector.snackbarDisconnectNotification(view, null);
         }
+    }
+
+    @Override
+    public void onContributorInteraction(View view, Contributor contributor) {
+        reselectButton.setVisibility(View.VISIBLE);
+        setupConversation(contributor.getId(),
+                contributor.getUsername(),
+                contributor.getName(),
+                contributor.getAvatar());
+    }
+
+    private void setupConversation(int userId, String username, String name, String avatar) {
+        this.userId = userId;
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(username);
+        }
+
+        receiverEdit.setText(name);
+        receiverEdit.setEnabled(false);
+        Glide.with(getBaseContext())
+                .load(avatar)
+                .dontAnimate()
+                .placeholder(R.drawable.placeholder_square)
+                .into(avatarImage);
+
+        // add conversation fragment
+        ConversationFragment conversationFragment = ConversationFragment.newInstance(username);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment, conversationFragment);
+        fragmentTransaction.commit();
+
+        chatMessage.setEnabled(true);
+        chatMessage.setHint(R.string.prompt_message);
     }
 }

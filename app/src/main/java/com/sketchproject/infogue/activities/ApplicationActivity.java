@@ -57,6 +57,7 @@ import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.models.Category;
 import com.sketchproject.infogue.models.Repositories.CategoryRepository;
 import com.sketchproject.infogue.models.Repositories.SubcategoryRepository;
+import com.sketchproject.infogue.models.Subcategory;
 import com.sketchproject.infogue.modules.ConnectionDetector;
 import com.sketchproject.infogue.modules.ObjectPooling;
 import com.sketchproject.infogue.modules.RegistrationIntentService;
@@ -182,7 +183,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                 public void run() {
                     downloadCategoryMenu();
                 }
-            }, 3000);
+            }, 1000);
         }
 
         // define swipe to refresh layout and delegate event through home fragment or direct article fragment
@@ -245,7 +246,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                                     category.setCategory(categoryObject.getString(Category.CATEGORY));
 
                                     categoryRepository.createData(category);
-/*
+
                                     JSONArray subcategories = categoryObject.getJSONArray(Subcategory.TABLE);
                                     for (int j = 0; j < subcategories.length(); j++) {
                                         JSONObject subcategoryObject = subcategories.getJSONObject(j);
@@ -258,7 +259,7 @@ public class ApplicationActivity extends AppCompatActivity implements
 
                                         subcategoryRepository.createData(subcategory);
                                     }
-*/
+
                                     populateMenu(categoryRepository.retrieveData());
                                 }
                                 session.setSessionData(SessionManager.KEY_USER_LEARNED, true);

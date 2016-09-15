@@ -233,8 +233,9 @@ public class ConversationFragment extends Fragment {
                             error.printStackTrace();
 
                             String errorMessage = new Logger().networkRequestError(getContext(), error, "Conversation");
-                            Helper.toastColor(getContext(), errorMessage, R.color.color_danger_transparent);
-
+                            if (errorMessage.equals(getString(R.string.error_not_found))) {
+                                errorMessage = "Your first message, be friendly";
+                            }
                             // remove last loading as well
                             allMessages.remove(allMessages.size() - 1);
                             messageAdapter.notifyItemRemoved(allMessages.size());
@@ -276,6 +277,8 @@ public class ConversationFragment extends Fragment {
     public void insertNewMessage(SessionManager sessionManager, String message) {
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Calendar.getInstance().getTime());
 
+        removeLoading();
+
         Conversation conversation = new Conversation();
         conversation.setId(latestId + 1);
         conversation.setOwner("me");
@@ -286,6 +289,24 @@ public class ConversationFragment extends Fragment {
         messageAdapter.notifyItemInserted(0);
         if (recyclerView != null) {
             recyclerView.scrollToPosition(0);
+        }
+    }
+
+    public void insertLoading() {
+        Conversation conversation = new Conversation();
+        conversation.setId(-3);
+        conversation.setMessage("Message is sending...");
+        allMessages.add(0, conversation);
+        messageAdapter.notifyItemInserted(0);
+        if (recyclerView != null) {
+            recyclerView.scrollToPosition(0);
+        }
+    }
+
+    public void removeLoading() {
+        if (allMessages.get(0).getId() == -3) {
+            allMessages.remove(0);
+            messageAdapter.notifyItemRemoved(1);
         }
     }
 }
