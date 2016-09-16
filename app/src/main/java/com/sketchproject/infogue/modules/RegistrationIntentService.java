@@ -34,8 +34,8 @@ import java.util.Map;
  * Created by Angga on 07/05/2016 14.56.
  */
 public class RegistrationIntentService extends IntentService {
-    private static final String[] TOPICS = {"article"};
-    //private SessionManager session = new SessionManager(this);
+    private static final String[] TOPICS = {"article", "message"};
+    private SessionManager session;
 
     public RegistrationIntentService() {
         super("RegistrationIntentService");
@@ -43,6 +43,7 @@ public class RegistrationIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        session = new SessionManager(this);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         try {
             InstanceID myID = InstanceID.getInstance(this);
@@ -59,11 +60,12 @@ public class RegistrationIntentService extends IntentService {
             subscribeTopics(registrationToken);
 
             sharedPreferences.edit().putBoolean(SessionManager.SENT_TOKEN_TO_SERVER, true).apply();
-            //session.setSessionData(SessionManager.SENT_TOKEN_TO_SERVER, true);
+            session.setSessionData(SessionManager.SENT_TOKEN_TO_SERVER, true);
+            session.setSessionData(SessionManager.KEY_TOKEN_GCM, registrationToken);
         } catch (IOException e) {
             e.printStackTrace();
             sharedPreferences.edit().putBoolean(SessionManager.SENT_TOKEN_TO_SERVER, false).apply();
-            //session.setSessionData(SessionManager.SENT_TOKEN_TO_SERVER, false);
+            session.setSessionData(SessionManager.SENT_TOKEN_TO_SERVER, false);
         }
 
         // Notify UI that registration has completed, so the progress indicator can be hidden.
@@ -135,6 +137,7 @@ public class RegistrationIntentService extends IntentService {
                 Map<String, String> params = new HashMap<>();
                 params.put(APIBuilder.METHOD, APIBuilder.METHOD_PUT);
                 params.put(Contributor.GCM_TOKEN, token);
+                params.put(Contributor.ID, String.valueOf(session.getSessionData(SessionManager.KEY_ID, 0)));
                 return params;
             }
         };

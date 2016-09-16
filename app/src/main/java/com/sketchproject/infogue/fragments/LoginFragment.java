@@ -597,6 +597,7 @@ public class LoginFragment extends Fragment implements Validator.ViewValidation 
         try {
             user.put(SessionManager.KEY_ID, result.getInt(Contributor.ID));
             user.put(SessionManager.KEY_TOKEN, result.getString(Contributor.API_TOKEN));
+            user.put(SessionManager.KEY_TOKEN_GCM, result.optString(Contributor.GCM_TOKEN, ""));
             user.put(SessionManager.KEY_USERNAME, result.getString(Contributor.USERNAME));
             user.put(SessionManager.KEY_NAME, result.getString(Contributor.NAME));
             user.put(SessionManager.KEY_LOCATION, result.getString(Contributor.LOCATION));

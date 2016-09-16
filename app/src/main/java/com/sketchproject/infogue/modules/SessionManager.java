@@ -43,6 +43,7 @@ public class SessionManager {
     public static final String KEY_COVER = "cover";
     public static final String KEY_USERNAME = "username";
     public static final String KEY_TOKEN = "token";
+    public static final String KEY_TOKEN_GCM = "gcm";
     public static final String KEY_IS_FOLLOWING = "followed";
     public static final String KEY_STATUS = "status";
     public static final String KEY_NOTIFICATION = "notification";
@@ -71,6 +72,7 @@ public class SessionManager {
         editor.putInt(KEY_ID, Integer.parseInt(String.valueOf(session.get(KEY_ID))));
         editor.putString(KEY_USERNAME, String.valueOf(session.get(KEY_USERNAME)));
         editor.putString(KEY_TOKEN, String.valueOf(session.get(KEY_TOKEN)));
+        editor.putString(KEY_TOKEN_GCM, String.valueOf(session.get(KEY_TOKEN_GCM)));
         editor.putString(KEY_NAME, String.valueOf(session.get(KEY_NAME)));
         editor.putString(KEY_LOCATION, String.valueOf(session.get(KEY_LOCATION)));
         editor.putString(KEY_ABOUT, String.valueOf(session.get(KEY_ABOUT)));
@@ -187,6 +189,7 @@ public class SessionManager {
         user.put(KEY_COVER, pref.getString(KEY_COVER, null));
         user.put(KEY_USERNAME, pref.getString(KEY_USERNAME, null));
         user.put(KEY_TOKEN, pref.getString(KEY_TOKEN, null));
+        user.put(KEY_TOKEN_GCM, pref.getString(KEY_TOKEN_GCM, null));
         user.put(KEY_ARTICLE, pref.getInt(KEY_ARTICLE, 0));
         user.put(KEY_FOLLOWER, pref.getInt(KEY_FOLLOWER, 0));
         user.put(KEY_FOLLOWING, pref.getInt(KEY_FOLLOWING, 0));
@@ -223,6 +226,7 @@ public class SessionManager {
         editor.remove(KEY_COVER);
         editor.remove(KEY_USERNAME);
         editor.remove(KEY_TOKEN);
+        editor.remove(KEY_TOKEN_GCM);
         editor.remove(KEY_ARTICLE);
         editor.remove(KEY_FOLLOWER);
         editor.remove(KEY_FOLLOWING);
