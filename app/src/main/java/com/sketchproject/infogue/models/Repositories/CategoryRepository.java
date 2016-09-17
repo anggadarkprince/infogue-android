@@ -3,6 +3,7 @@ package com.sketchproject.infogue.models.Repositories;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 
 import com.sketchproject.infogue.database.DatabaseManager;
 import com.sketchproject.infogue.models.Category;
@@ -12,7 +13,7 @@ import java.util.List;
 
 /**
  * Category repository handle CRUD operation on category table.
- * <p>
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 24/04/2016 09.47.
  */
@@ -36,6 +37,29 @@ public class CategoryRepository implements DatabaseManager.PersistDataOperator<C
         db.close();
 
         return newCategoryId != -1;
+    }
+
+    /**
+     * Insert a lot of category data.
+     *
+     * @param categories collection of Category objects
+     * @return status
+     */
+    public boolean createAllData(List<Category> categories) {
+        SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
+        db.beginTransaction();
+        SQLiteStatement stmt = db.compileStatement("insert into " + Category.TABLE + " (" + Category.ID + ", " + Category.CATEGORY + ") values (?, ?);");
+        for (int i = 0; i < categories.size(); i++) {
+            stmt.bindString(1, String.valueOf(categories.get(i).getId()));
+            stmt.bindString(2, categories.get(i).getCategory());
+            long entryID = stmt.executeInsert();
+            stmt.clearBindings();
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+
+        return true;
     }
 
     /**

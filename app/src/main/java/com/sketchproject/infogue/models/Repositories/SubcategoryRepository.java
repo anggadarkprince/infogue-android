@@ -3,6 +3,7 @@ package com.sketchproject.infogue.models.Repositories;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 
 import com.sketchproject.infogue.database.DatabaseManager;
 import com.sketchproject.infogue.models.Subcategory;
@@ -12,7 +13,7 @@ import java.util.List;
 
 /**
  * Subcategory repository handle CRUD operation on category table.
- * <p>
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 24/04/2016 09.52.
  */
@@ -38,6 +39,31 @@ public class SubcategoryRepository implements DatabaseManager.PersistDataOperato
         db.close();
 
         return newSubCategoryId != -1;
+    }
+
+    /**
+     * Insert a lot of category data.
+     *
+     * @param subcategories collection of Category objects
+     * @return status
+     */
+    public boolean createAllData(List<Subcategory> subcategories) {
+        SQLiteDatabase db = DatabaseManager.getInstance().getWritableDatabase();
+        db.beginTransaction();
+        SQLiteStatement stmt = db.compileStatement("insert into " + Subcategory.TABLE + " (" + Subcategory.ID + ", " + Subcategory.CATEGORY_ID + ", " + Subcategory.SUBCATEGORY + ", " + Subcategory.LABEL + ") values (?, ?, ?, ?);");
+        for (int i = 0; i < subcategories.size(); i++) {
+            stmt.bindString(1, String.valueOf(subcategories.get(i).getId()));
+            stmt.bindString(2, String.valueOf(subcategories.get(i).getCategoryId()));
+            stmt.bindString(3, String.valueOf(subcategories.get(i).getSubcategory()));
+            stmt.bindString(4, String.valueOf(subcategories.get(i).getLabel()));
+            long entryID = stmt.executeInsert();
+            stmt.clearBindings();
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+
+        return true;
     }
 
     /**

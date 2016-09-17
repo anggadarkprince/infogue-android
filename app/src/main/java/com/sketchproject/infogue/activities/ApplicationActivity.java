@@ -74,6 +74,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -238,14 +239,16 @@ public class ApplicationActivity extends AppCompatActivity implements
                                 SubcategoryRepository subcategoryRepository = new SubcategoryRepository();
                                 subcategoryRepository.clearData();
 
+                                List<Category> categoriesData = new ArrayList<>();
+                                List<Subcategory> subcategoriesData = new ArrayList<>();
+
                                 for (int i = 0; i < categories.length(); i++) {
                                     JSONObject categoryObject = categories.getJSONObject(i);
 
                                     Category category = new Category();
                                     category.setId(categoryObject.getInt(Category.ID));
                                     category.setCategory(categoryObject.getString(Category.CATEGORY));
-
-                                    categoryRepository.createData(category);
+                                    categoriesData.add(category);
 
                                     JSONArray subcategories = categoryObject.getJSONArray(Subcategory.TABLE);
                                     for (int j = 0; j < subcategories.length(); j++) {
@@ -256,12 +259,12 @@ public class ApplicationActivity extends AppCompatActivity implements
                                         subcategory.setCategoryId(subcategoryObject.getInt(Subcategory.CATEGORY_ID));
                                         subcategory.setSubcategory(subcategoryObject.getString(Subcategory.SUBCATEGORY));
                                         subcategory.setLabel(subcategoryObject.getString(Subcategory.LABEL));
-
-                                        subcategoryRepository.createData(subcategory);
+                                        subcategoriesData.add(subcategory);
                                     }
-
-                                    populateMenu(categoryRepository.retrieveData());
                                 }
+                                categoryRepository.createAllData(categoriesData);
+                                subcategoryRepository.createAllData(subcategoriesData);
+                                populateMenu(categoryRepository.retrieveData());
                                 session.setSessionData(SessionManager.KEY_USER_LEARNED, true);
                             } else {
                                 confirmRetry();
