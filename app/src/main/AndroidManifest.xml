@@ -221,6 +221,14 @@
             android:name=".activities.GalleryActivity"
             android:label="@string/title_activity_gallery"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.ImagePreviewActivity"
+            android:parentActivityName=".activities.GalleryActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sketchproject.infogue.activities.GalleryActivity" />
+        </activity>
     </application>
 
 </manifest>

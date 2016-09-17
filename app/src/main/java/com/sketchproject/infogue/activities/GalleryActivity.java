@@ -194,16 +194,18 @@ public class GalleryActivity extends AppCompatActivity implements GalleryFragmen
     }
 
     @Override
-    public void onImageClicked(Image image) {
+    public void onImageClicked(Image image, int position) {
         if (isCalledFromMain) {
-
+            Intent intent = new Intent(GalleryActivity.this, ImagePreviewActivity.class);
+            intent.putExtra("images", galleryFragment.getImages());
+            intent.putExtra("position", position);
+            startActivity(intent);
         } else {
             Intent returnIntent = new Intent();
             returnIntent.putExtra(Image.SOURCE, image.getSource());
             setResult(AppCompatActivity.RESULT_OK, returnIntent);
             finish();
         }
-
     }
 
     @Override

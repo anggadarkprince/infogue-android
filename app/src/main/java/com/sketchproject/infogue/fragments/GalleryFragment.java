@@ -206,6 +206,15 @@ public class GalleryFragment extends Fragment {
     }
 
     /**
+     * Retrieve all images in adapter
+     *
+     * @return list of images
+     */
+    public ArrayList<Image> getImages() {
+        return (ArrayList<Image>) allImages;
+    }
+
+    /**
      * Insert new image after uploaded.
      *
      * @param image new image
@@ -284,7 +293,7 @@ public class GalleryFragment extends Fragment {
      * activity.
      */
     public interface OnImageInteractionListener {
-        void onImageClicked(Image image);
+        void onImageClicked(Image image, int position);
 
         void onDeleteImage(Image image);
     }

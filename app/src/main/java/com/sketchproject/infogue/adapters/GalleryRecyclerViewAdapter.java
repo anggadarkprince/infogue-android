@@ -64,7 +64,7 @@ public class GalleryRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         final Image image = mImages.get(holder.getAdapterPosition());
 
         switch (getItemViewType(holder.getAdapterPosition())) {
@@ -80,7 +80,7 @@ public class GalleryRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 imageHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mImageListener.onImageClicked(image);
+                        mImageListener.onImageClicked(image, holder.getAdapterPosition());
                     }
                 });
 
