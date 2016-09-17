@@ -6,9 +6,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
@@ -32,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
@@ -45,11 +46,11 @@ import com.sketchproject.infogue.fragments.AlertFragment;
 import com.sketchproject.infogue.models.Article;
 import com.sketchproject.infogue.models.Category;
 import com.sketchproject.infogue.models.Contributor;
+import com.sketchproject.infogue.models.Image;
 import com.sketchproject.infogue.models.Repositories.CategoryRepository;
 import com.sketchproject.infogue.models.Repositories.SubcategoryRepository;
 import com.sketchproject.infogue.models.Subcategory;
 import com.sketchproject.infogue.modules.ConnectionDetector;
-import com.sketchproject.infogue.modules.RealPathResolver;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.Validator;
 import com.sketchproject.infogue.modules.VolleyMultipartRequest;
@@ -73,7 +74,7 @@ import me.gujun.android.taggroup.TagGroup;
 
 /**
  * A {@link AppCompatActivity} subclass contains article form and handle save operation.
- *
+ * <p/>
  * Sketch Project Studio
  * Created by Angga on 7/04/2016 10.37.
  */
@@ -83,7 +84,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
     public static final String RESULT_CODE = "resultCode";
     public static final int ARTICLE_FORM_CODE = 100;
 
-    protected final int PICK_IMAGE_REQUEST = 1;
+    protected final int PICK_FEATURED_REQUEST = 1;
+    protected final int PICK_IMAGE_REQUEST = 2;
 
     protected Validator validator;
     protected SessionManager session;
@@ -107,19 +109,19 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
     protected RadioButton mPublishedRadio;
     protected RadioButton mDraftRadio;
     protected Button mSaveButton;
-
     protected String[] mCategoryList = {};
     protected String[] mSubcategoryList = {};
     protected ArrayAdapter<String> adapterCategory;
     protected ArrayAdapter adapterSubcategory;
     protected List<Category> categoriesList;
     protected List<Subcategory> subcategoriesList;
-
     protected boolean isCalledFromMainActivity;
     protected boolean isNewFeatured;
     protected boolean isUpdate;
     protected String realPathFeatured;
     protected String apiUrl;
+    protected int counterImage;
+    private EditText imageLink;
 
     /**
      * Perform initialization of ArticleCreateActivity.
@@ -131,6 +133,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_form);
+        counterImage = 1;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -158,6 +161,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         mPublishedRadio = (RadioButton) findViewById(R.id.radio_published);
         mDraftRadio = (RadioButton) findViewById(R.id.radio_draft);
         mSaveButton = (Button) findViewById(R.id.btn_save_article);
+
+        mContentEditor.setHtml("<style>img{max-width:100%}</style>");
 
         if (mTitleInput.requestFocus()) {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -334,24 +339,47 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 params.setMargins(40, 0, 40, 5);
 
-                final EditText link = new EditText(v.getContext());
-                link.setHint(R.string.prompt_image_link);
-                link.setLayoutParams(params);
-                layout.addView(link);
+                LinearLayout.LayoutParams paramsLabel = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                paramsLabel.setMargins(47, 20, 47, 10);
+
+                final TextView imageLinkLabel = new TextView(v.getContext());
+                imageLinkLabel.setText(R.string.label_image_from_link);
+                imageLinkLabel.setLayoutParams(paramsLabel);
+                layout.addView(imageLinkLabel);
+
+                imageLink = new EditText(v.getContext());
+                imageLink.setHint(R.string.prompt_image_link);
+                imageLink.setLayoutParams(params);
+                layout.addView(imageLink);
 
                 final EditText title = new EditText(v.getContext());
                 title.setHint(R.string.prompt_image_title);
                 title.setLayoutParams(params);
                 layout.addView(title);
 
+                final TextView imageLocalLabel = new TextView(v.getContext());
+                imageLocalLabel.setText(R.string.label_image_from_local);
+                imageLocalLabel.setLayoutParams(paramsLabel);
+                layout.addView(imageLocalLabel);
+
+                final TextView selectLocalImage = new TextView(v.getContext());
+                selectLocalImage.setText(R.string.label_select_media);
+                selectLocalImage.setTextSize(16);
+                selectLocalImage.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.primary));
+                selectLocalImage.setLayoutParams(paramsLabel);
+                layout.addView(selectLocalImage);
+
                 final AlertDialog.Builder builder = new AlertDialog.Builder(ArticleCreateActivity.this);
                 builder.setTitle(R.string.action_insert_image);
-                builder.setMessage(getString(R.string.message_put_image));
+                //builder.setMessage(getString(R.string.message_put_image));
                 builder.setView(layout);
                 builder.setPositiveButton(R.string.action_insert_image, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mContentEditor.insertImage(link.getText().toString(), title.getText().toString());
+                        if (!imageLink.getText().toString().trim().isEmpty() && imageLink.getText().toString().length() > 0) {
+                            mContentEditor.insertImage(imageLink.getText().toString(), title.getText().toString());
+                        }
                     }
                 });
 
@@ -361,9 +389,16 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                         dialog.dismiss();
                     }
                 });
-
-                AlertDialog dialog = builder.create();
+                final AlertDialog dialog = builder.create();
                 dialog.show();
+
+                selectLocalImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(ArticleCreateActivity.this, GalleryActivity.class);
+                        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+                    }
+                });
                 Helper.setDialogButtonTheme(v.getContext(), dialog);
             }
         });
@@ -378,9 +413,9 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 params.setMargins(40, 0, 40, 5);
 
-                final EditText link = new EditText(v.getContext());
+                final EditText link;
+                link = new EditText(v.getContext());
                 link.setHint(R.string.prompt_link_url);
-                link.setText(APIBuilder.URL_APP);
                 link.setLayoutParams(params);
                 layout.addView(link);
 
@@ -419,8 +454,7 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                // Always show the chooser (if there are multiple options available)
-                startActivityForResult(Intent.createChooser(intent, getString(R.string.label_select_featured)), PICK_IMAGE_REQUEST);
+                startActivityForResult(Intent.createChooser(intent, getString(R.string.label_select_featured)), PICK_FEATURED_REQUEST);
             }
         });
 
@@ -468,26 +502,22 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-
-            Uri uri = data.getData();
-
-            if (Build.VERSION.SDK_INT < 19) {
-                //realPathFeatured = RealPathResolver.getRealPathFromURI_API11to18(getBaseContext(), data.getData());
-            } else {
-                //realPathFeatured = RealPathResolver.getRealPathFromURI_API19(getBaseContext(), data.getData());
-            }
-
-            realPathFeatured = "image picked";
-
-            isNewFeatured = true;
-
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                mFeaturedImage.setImageBitmap(bitmap);
-                mFeaturedImage.setVisibility(View.VISIBLE);
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (resultCode == RESULT_OK && data != null) {
+            if (requestCode == PICK_FEATURED_REQUEST && data.getData() != null) {
+                Uri uri = data.getData();
+                realPathFeatured = "image picked";
+                isNewFeatured = true;
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    mFeaturedImage.setImageBitmap(bitmap);
+                    mFeaturedImage.setVisibility(View.VISIBLE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (requestCode == PICK_IMAGE_REQUEST) {
+                String imageUrl = data.getStringExtra(Image.SOURCE);
+                Log.i("Infogue/Image", imageUrl);
+                imageLink.setText(imageUrl);
             }
         }
     }
@@ -624,14 +654,13 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
         if (categoriesList != null) {
             int index = mCategorySpinner.getSelectedItemPosition() - 1;
-            if(mCategorySpinner.getSelectedItemPosition() - 1 >= 0){
+            if (mCategorySpinner.getSelectedItemPosition() - 1 >= 0) {
                 int categoryId = categoriesList.get(index).getId();
                 String categoryLabel = categoriesList.get(index).getCategory();
 
                 article.setCategoryId(categoryId);
                 article.setCategory(categoryLabel);
-            }
-            else{
+            } else {
                 article.setCategoryId(0);
                 article.setCategory(null);
             }
@@ -641,14 +670,13 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
 
         if (subcategoriesList != null) {
             int index = mSubcategorySpinner.getSelectedItemPosition() - 1;
-            if(index >= 0){
+            if (index >= 0) {
                 int subcategoryId = subcategoriesList.get(index).getId();
                 String subcategoryLabel = subcategoriesList.get(index).getSubcategory();
 
                 article.setSubcategoryId(subcategoryId);
                 article.setSubcategory(subcategoryLabel);
-            }
-            else{
+            } else {
                 article.setSubcategoryId(0);
                 article.setSubcategory(null);
             }

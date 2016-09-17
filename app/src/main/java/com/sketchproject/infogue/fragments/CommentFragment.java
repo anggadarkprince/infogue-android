@@ -25,6 +25,7 @@ import com.sketchproject.infogue.activities.CommentActivity;
 import com.sketchproject.infogue.adapters.CommentRecyclerViewAdapter;
 import com.sketchproject.infogue.models.Comment;
 import com.sketchproject.infogue.modules.EndlessRecyclerViewScrollListener;
+import com.sketchproject.infogue.modules.TimeAgo;
 import com.sketchproject.infogue.modules.VolleySingleton;
 import com.sketchproject.infogue.utils.APIBuilder;
 import com.sketchproject.infogue.utils.Helper;
@@ -195,6 +196,7 @@ public class CommentFragment extends Fragment {
                                     }
 
                                     List<Comment> moreComments = new ArrayList<>();
+                                    TimeAgo timeAgo = new TimeAgo(getContext());
                                     if (data != null) {
                                         for (int i = 0; i < data.length(); i++) {
                                             JSONObject commentData = data.getJSONObject(i);
@@ -207,7 +209,7 @@ public class CommentFragment extends Fragment {
                                             comment.setName(commentData.getString(Comment.NAME));
                                             comment.setComment(commentData.getString(Comment.CONTENT));
                                             comment.setAvatar(commentData.getString(Comment.AVATAR));
-                                            comment.setTimestamp(commentData.getString(Comment.TIMESTAMP));
+                                            comment.setTimestamp(timeAgo.timeAgo(commentData.getString(Comment.TIMESTAMP)));
                                             moreComments.add(comment);
                                         }
                                     }

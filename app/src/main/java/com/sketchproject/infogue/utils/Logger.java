@@ -17,6 +17,10 @@ import org.json.JSONObject;
  * Created by angga on 13/09/16.
  */
 public class Logger {
+    public String networkRequestError(Context context, VolleyError error) {
+        return networkRequestError(context, error, String.valueOf(error.networkResponse.statusCode));
+    }
+
     public String networkRequestError(Context context, VolleyError error, String label) {
         error.printStackTrace();
         NetworkResponse networkResponse = error.networkResponse;

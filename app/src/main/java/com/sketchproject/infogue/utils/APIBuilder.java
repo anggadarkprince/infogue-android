@@ -15,6 +15,9 @@ public class APIBuilder {
     public static final String URL_API_UNFOLLOW = BASE_URL_API + "unfollow";
     public static final String URL_API_FOLLOW = BASE_URL_API + "follow";
     public static final String URL_API_MESSAGE = BASE_URL_API + "message";
+    public static final String URL_API_GALLERY = BASE_URL_API + "image/gallery";
+    public static final String URL_API_GALLERY_UPLOAD = BASE_URL_API + "image/upload";
+    public static final String URL_API_GALLERY_DELETE = BASE_URL_API + "image/delete";
     public static final String URL_API_ARTICLE = BASE_URL_API + "article";
     public static final String URL_API_HIT = BASE_URL_API + "article/hit";
     public static final String URL_API_RATE = BASE_URL_API + "article/rate";

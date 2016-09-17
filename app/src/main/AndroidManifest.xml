@@ -167,11 +167,13 @@
         <activity
             android:name=".activities.ArticleCreateActivity"
             android:label="@string/title_activity_article_create"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.ArticleEditActivity"
             android:label="@string/title_activity_article_edit"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.PostActivity"
             android:hardwareAccelerated="true"
@@ -215,6 +217,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sketchproject.infogue.activities.MessageActivity" />
         </activity>
+        <activity
+            android:name=".activities.GalleryActivity"
+            android:label="@string/title_activity_gallery"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

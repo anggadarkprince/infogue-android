@@ -200,12 +200,10 @@ public class Helper {
      * @return byte array
      */
     @SuppressWarnings("unused")
-    public static byte[] getFileDataFromDrawable(Context context, @DrawableRes int id) {
+    public static byte[] getFileDataFromResource(Context context, @DrawableRes int id) {
         Drawable drawable = ContextCompat.getDrawable(context, id);
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
-        return byteArrayOutputStream.toByteArray();
+        return getFileDataFromBitmap(bitmap);
     }
 
     /**
@@ -216,8 +214,18 @@ public class Helper {
      */
     public static byte[] getFileDataFromDrawable(Drawable drawable) {
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        return getFileDataFromBitmap(bitmap);
+    }
+
+    /**
+     * Turn bitmap into byte array
+     *
+     * @param bitmap data image
+     * @return byte array
+     */
+    public static byte[] getFileDataFromBitmap(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
         return byteArrayOutputStream.toByteArray();
     }
 }

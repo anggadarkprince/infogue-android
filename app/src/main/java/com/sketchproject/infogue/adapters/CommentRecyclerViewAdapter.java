@@ -127,6 +127,7 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 Glide.with(commentHolder.mView.getContext())
                         .load(mComments.get(holder.getAdapterPosition()).getAvatar())
                         .placeholder(R.drawable.placeholder_square)
+                        .dontAnimate()
                         .into(commentHolder.mAvatarImage);
 
                 commentHolder.mNameView.setOnClickListener(new View.OnClickListener() {

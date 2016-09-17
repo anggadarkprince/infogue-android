@@ -764,6 +764,13 @@ public class ApplicationActivity extends AppCompatActivity implements
                     startActivity(messageIntent);
                 }
                 break;
+            case R.id.action_media:
+                if (session.isLoggedIn()) {
+                    Intent mediaIntent = new Intent(getBaseContext(), GalleryActivity.class);
+                    mediaIntent.putExtra(GalleryActivity.CALLED_FROM_MAIN, true);
+                    startActivity(mediaIntent);
+                }
+                break;
         }
 
         return super.onOptionsItemSelected(item);

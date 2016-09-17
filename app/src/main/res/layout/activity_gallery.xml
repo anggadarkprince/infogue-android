@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.sketchproject.infogue.activities.MessageActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:elevation="2dp">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="40dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <fragment
+            android:id="@+id/fragment"
+            android:name="com.sketchproject.infogue.fragments.GalleryFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout="@layout/fragment_gallery_list" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <android.support.v7.widget.ButtonBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <Button
+            android:id="@+id/btn_upload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_primary_dark"
+            android:text="@string/label_upload_new_image"
+            android:textColor="@color/light"
+            android:textStyle="bold" />
+    </android.support.v7.widget.ButtonBarLayout>
+
+</android.support.design.widget.CoordinatorLayout>

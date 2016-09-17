@@ -17,6 +17,7 @@
     <string name="title_activity_sign_in">Contributor Sign In</string>
     <string name="title_activity_sign_up">Create an Account</string>
     <string name="title_activity_message">Messages</string>
+    <string name="title_activity_gallery">Gallery</string>
     <string name="title_activity_conversation">Conversation</string>
 
     <string name="prompt_name">Full Name</string>
@@ -146,6 +147,7 @@
     <string name="label_dialog_save_article">Save Article</string>
     <string name="label_dialog_discard_setting">Discard Settings</string>
     <string name="label_dialog_save_setting">Save Settings</string>
+    <string name="label_dialog_delete_image">Delete Image</string>
     <string name="label_separator_articles">ARTICLES</string>
     <string name="label_separator_contributors">CONTRIBUTORS</string>
     <string name="label_radio_male">Male</string>
@@ -157,6 +159,7 @@
     <string name="label_switch_push_notification">Enable Push Notification</string>
     <string name="label_save_setting_progress">Saving Settings</string>
     <string name="label_save_article_progress">Saving Article</string>
+    <string name="label_upload_image_progress">Uploading Image</string>
     <string name="label_delete_article_progress">Deleting article</string>
     <string name="label_delete_message_progress">Deleting message</string>
     <string name="label_retrieve_setting_progress">Retrieving account data</string>
@@ -166,6 +169,7 @@
     <string name="label_related_article">RELATED ARTICLE</string>
     <string name="label_no_related_article">NO RELATED ARTICLE</string>
     <string name="label_select_featured">Select Featured</string>
+    <string name="label_select_image">Select Image</string>
     <string name="label_title_login">Log In</string>
     <string name="label_title_register">Register</string>
     <string name="label_submit_comment">Submitting comment</string>
@@ -178,7 +182,12 @@
     <string name="label_no_article">NO ARTICLE AVAILABLE</string>
     <string name="label_no_comment">NO COMMENTS AVAILABLE</string>
     <string name="label_no_message">NO MESSAGES AVAILABLE</string>
+    <string name="label_no_image">NO IMAGES AVAILABLE</string>
     <string name="label_stream">STREAM</string>
+    <string name="label_upload_new_image">UPLOAD NEW IMAGE</string>
+    <string name="label_image_from_link">Image from link</string>
+    <string name="label_image_from_local">Local image</string>
+    <string name="label_select_media">SELECT IMAGE FROM MEDIA</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -187,6 +196,7 @@
     <string name="action_create_account">Create Account</string>
     <string name="action_register">Register</string>
     <string name="action_messages">Messages</string>
+    <string name="action_media">Media</string>
     <string name="action_settings">Settings</string>
     <string name="action_profile">Profile</string>
     <string name="action_sign_out">Sign Out</string>
@@ -386,6 +396,7 @@
     <string name="message_save_article">Save and waiting for editor confirmation?</string>
     <string name="message_discard_setting">Are you sure want to discard current settings?</string>
     <string name="message_save_setting">Save current account info and settings?</string>
+    <string name="message_delete_image">Are you sure want to delete this image?</string>
     <string name="message_try_again">Please try again!</string>
     <string name="message_account_updated">Account successfully updated</string>
     <string name="message_validation_warning">Oops, check your inputs!</string>
