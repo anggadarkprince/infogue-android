@@ -229,6 +229,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sketchproject.infogue.activities.GalleryActivity" />
         </activity>
+        <activity
+            android:name=".activities.WalletActivity"
+            android:label="@string/title_activity_wallet"
+            android:parentActivityName=".activities.ApplicationActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sketchproject.infogue.activities.ApplicationActivity" />
+        </activity>
     </application>
 
 </manifest>

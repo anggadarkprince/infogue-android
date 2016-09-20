@@ -767,6 +767,12 @@ public class ApplicationActivity extends AppCompatActivity implements
                     startActivity(messageIntent);
                 }
                 break;
+            case R.id.action_wallet:
+                if (session.isLoggedIn()) {
+                    Intent walletIntent = new Intent(getBaseContext(), WalletActivity.class);
+                    startActivity(walletIntent);
+                }
+                break;
             case R.id.action_media:
                 if (session.isLoggedIn()) {
                     Intent mediaIntent = new Intent(getBaseContext(), GalleryActivity.class);
