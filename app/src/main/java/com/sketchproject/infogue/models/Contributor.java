@@ -33,6 +33,9 @@ public class Contributor {
     public static final String FOLLOWER = "email_follow";
     public static final String FEED = "email_feed";
     public static final String MOBILE = "mobile_notification";
+    public static final String BANK_ID = "bank_id";
+    public static final String BANK_ACCOUNT_NAME = "account_name";
+    public static final String BANK_ACCOUNT_NUMBER = "account_number";
     public static final String AVATAR = "avatar";
     public static final String AVATAR_REF = "avatar_ref";
     public static final String COVER = "cover";
@@ -77,6 +80,9 @@ public class Contributor {
     private boolean notificationFollower;
     private boolean notificationStream;
     private boolean pushNotification;
+    private int bankId;
+    private String accountName;
+    private String accountNumber;
     private String avatar;
     private String cover;
     private String status;
@@ -317,5 +323,29 @@ public class Contributor {
 
     public void setApiToken(String apiToken) {
         this.apiToken = apiToken;
+    }
+
+    public int getBankId() {
+        return bankId;
+    }
+
+    public void setBankId(int bankId) {
+        this.bankId = bankId;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
     }
 }

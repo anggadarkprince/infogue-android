@@ -109,6 +109,8 @@
     <string name="error_instagram_invalid_url">Instagram is invalid URL format</string>
     <string name="error_instagram_invalid_domain">Instagram must begin with domain instagram.com</string>
     <string name="error_instagram_invalid_length">Instagram may not be greater than 30 characters</string>
+    <string name="error_account_name_invalid_length">Bank account name may not be greater than 50 characters</string>
+    <string name="error_account_number_invalid_length">Bank account number may not be greater than 15 characters</string>
     <string name="error_comment_required">Comment can\'t be blank</string>
     <string name="error_message_required">Message can\'t be blank</string>
 
@@ -449,5 +451,9 @@
     <string name="time_ago_months">%d months</string>
     <string name="time_ago_year">about a year</string>
     <string name="time_ago_years">%d years</string>
+    <string name="label_title_bank">BANK ACCOUNT</string>
+    <string name="prompt_account_name">Bank account name</string>
+    <string name="prompt_account_number">Bank account number</string>
+    <string name="prompt_bank">Select Bank</string>
 
 </resources>

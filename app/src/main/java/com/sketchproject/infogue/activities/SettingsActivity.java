@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -38,9 +39,10 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.R;
 import com.sketchproject.infogue.fragments.AlertFragment;
+import com.sketchproject.infogue.models.Bank;
 import com.sketchproject.infogue.models.Contributor;
+import com.sketchproject.infogue.models.Repositories.BankRepository;
 import com.sketchproject.infogue.modules.ConnectionDetector;
-import com.sketchproject.infogue.modules.RealPathResolver;
 import com.sketchproject.infogue.modules.SessionManager;
 import com.sketchproject.infogue.modules.Validator;
 import com.sketchproject.infogue.modules.VolleyMultipartRequest;
@@ -63,9 +65,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import fr.ganfra.materialspinner.MaterialSpinner;
+
 /**
  * Setting activity handle user configuration and password.
- * <p>
+ * <p/>
  * Sketch Project Studio
  * Created by Angga 20/04/2016 19:32
  */
@@ -104,6 +108,9 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
     private CheckBox mNotificationFollowerCheck;
     private CheckBox mNotificationStreamCheck;
     private SwitchCompat mPushNotificationSwitch;
+    private MaterialSpinner mBankSpinner;
+    private EditText mAccountNameInput;
+    private EditText mAccountNumberInput;
     private EditText mUsernameInput;
     private EditText mEmailInput;
     private EditText mPasswordInput;
@@ -113,6 +120,8 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
     private TextInputLayout mPasswordLayout;
     private TextInputLayout mNewPasswordLayout;
     private TextInputLayout mConfirmPasswordLayout;
+
+    private List<Bank> bankList;
 
     private String mRealPathAvatar;
     private String mRealPathCover;
@@ -161,6 +170,9 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         mNotificationFollowerCheck = (CheckBox) findViewById(R.id.notification_follower);
         mNotificationStreamCheck = (CheckBox) findViewById(R.id.notification_stream);
         mPushNotificationSwitch = (SwitchCompat) findViewById(R.id.push_notification);
+        mBankSpinner = (MaterialSpinner) findViewById(R.id.spinner_bank);
+        mAccountNameInput = (EditText) findViewById(R.id.input_account_name);
+        mAccountNumberInput = (EditText) findViewById(R.id.input_account_number);
         mUsernameInput = (EditText) findViewById(R.id.input_username);
         mEmailInput = (EditText) findViewById(R.id.input_email);
         mPasswordInput = (EditText) findViewById(R.id.input_password);
@@ -184,6 +196,17 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                 }
             }
         });
+
+        // populate bank spinner
+        BankRepository bankRepository = new BankRepository();
+        bankList = bankRepository.retrieveData();
+        String[] bankArray = new String[bankList.size()];
+        for (int k = 0; k < bankList.size(); k++) {
+            bankArray[k] = bankList.get(k).getBank();
+        }
+        ArrayAdapter<String> adapterCategory = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, bankArray);
+        adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mBankSpinner.setAdapter(adapterCategory);
 
         Button mChangeAvatarButton = (Button) findViewById(R.id.btn_change_avatar);
         if (mChangeAvatarButton != null) {
@@ -326,11 +349,19 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
         contributor.setNotificationFollower(mNotificationFollowerCheck.isChecked());
         contributor.setNotificationStream(mNotificationStreamCheck.isChecked());
         contributor.setPushNotification(mPushNotificationSwitch.isChecked());
+        contributor.setAccountName(mAccountNameInput.getText().toString());
+        contributor.setAccountNumber(mAccountNumberInput.getText().toString());
         contributor.setAvatar(mRealPathAvatar);
         contributor.setCover(mRealPathCover);
         contributor.setContact(mContact.getText().toString());
         contributor.setGender(mGenderMaleRadio.isChecked() ? Contributor.GENDER_MALE :
                 mGenderFemaleRadio.isChecked() ? Contributor.GENDER_FEMALE : Contributor.GENDER_OTHER);
+        if (bankList != null) {
+            int index = mBankSpinner.getSelectedItemPosition() - 1;
+            if (index >= 0) {
+                contributor.setBankId(bankList.get(index).getId());
+            }
+        }
         try {
             DateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd", Locale.getDefault());
             Date birthday = simpleDateFormat.parse(mBirthdayInput.getText().toString());
@@ -513,7 +544,27 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
             }
         }
 
-        if(!mIsLoginViaSocial){
+        // validation of bank account name
+        if (!validator.isEmpty(contributor.getAccountName())) {
+            boolean isAccountNameValidLength = validator.maxLength(contributor.getAccountName(), 50);
+            if (!isAccountNameValidLength) {
+                validationMessage.add(getString(R.string.error_account_name_invalid_length));
+                focusView = mAccountNameInput;
+                isInvalid = true;
+            }
+        }
+
+        // validation of bank account number
+        if (!validator.isEmpty(contributor.getAccountNumber())) {
+            boolean isAccountNumberValidLength = validator.maxLength(contributor.getAccountNumber(), 15);
+            if (!isAccountNumberValidLength) {
+                validationMessage.add(getString(R.string.error_account_number_invalid_length));
+                focusView = mAccountNumberInput;
+                isInvalid = true;
+            }
+        }
+
+        if (!mIsLoginViaSocial) {
             // validation of new password
             boolean isNewPasswordEmpty = validator.isEmpty(mNewPasswordInput.getText().toString(), true);
             boolean isConfirmPasswordEmpty = validator.isEmpty(mConfirmPasswordInput.getText().toString(), true);
@@ -667,30 +718,47 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                                 mLocationInput.setText(contributor.getString(Contributor.LOCATION));
                                 mAboutInput.setText(contributor.getString(Contributor.ABOUT));
 
-                                if(!contributor.getString(Contributor.CONTACT).equals("null")){
+                                if (!contributor.getString(Contributor.CONTACT).equals("null")) {
                                     mContact.setText(contributor.getString(Contributor.CONTACT));
                                 }
 
                                 mGenderMaleRadio.setChecked(contributor.getString(Contributor.GENDER).equals(Contributor.GENDER_MALE));
                                 mGenderFemaleRadio.setChecked(contributor.getString(Contributor.GENDER).equals(Contributor.GENDER_FEMALE));
-                                if(!mGenderMaleRadio.isChecked() && !mGenderFemaleRadio.isChecked()){
+                                if (!mGenderMaleRadio.isChecked() && !mGenderFemaleRadio.isChecked()) {
                                     mGenderMaleRadio.setChecked(true);
                                 }
                                 mBirthdayInput.setText(contributor.getString(Contributor.BIRTHDAY));
-                                if(!contributor.getString(Contributor.FACEBOOK).equals("null")){
+                                if (!contributor.getString(Contributor.FACEBOOK).equals("null")) {
                                     mFacebookInput.setText(contributor.getString(Contributor.FACEBOOK));
                                 }
 
-                                if(!contributor.getString(Contributor.TWITTER).equals("null")){
+                                if (!contributor.getString(Contributor.TWITTER).equals("null")) {
                                     mTwitterInput.setText(contributor.getString(Contributor.TWITTER));
                                 }
 
-                                if(!contributor.getString(Contributor.GOOGLE_PLUS).equals("null")){
+                                if (!contributor.getString(Contributor.GOOGLE_PLUS).equals("null")) {
                                     mGooglePlusInput.setText(contributor.getString(Contributor.GOOGLE_PLUS));
                                 }
 
-                                if(!contributor.getString(Contributor.INSTAGRAM).equals("null")){
+                                if (!contributor.getString(Contributor.INSTAGRAM).equals("null")) {
                                     mInstagramInput.setText(contributor.getString(Contributor.INSTAGRAM));
+                                }
+
+                                if (contributor.optInt(Contributor.BANK_ID, 0) != 0) {
+                                    for (int i = 0; i < bankList.size(); i++) {
+                                        if (bankList.get(i).getId() == contributor.getInt(Contributor.BANK_ID)) {
+                                            mBankSpinner.setSelection(i + 1);
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (!contributor.getString(Contributor.BANK_ACCOUNT_NAME).equals("null")) {
+                                    mAccountNameInput.setText(contributor.getString(Contributor.BANK_ACCOUNT_NAME));
+                                }
+
+                                if (!contributor.getString(Contributor.BANK_ACCOUNT_NUMBER).equals("null")) {
+                                    mAccountNumberInput.setText(contributor.getString(Contributor.BANK_ACCOUNT_NUMBER));
                                 }
 
                                 mNotificationSubscribeCheck.setChecked(contributor.getInt(Contributor.SUBSCRIPTION) == 1);
@@ -706,7 +774,7 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                                 boolean vendorMobile = vendor.equalsIgnoreCase("mobile");
                                 int view = View.VISIBLE;
                                 mIsLoginViaSocial = false;
-                                if(!vendorWeb && !vendorMobile){
+                                if (!vendorWeb && !vendorMobile) {
                                     view = View.GONE;
                                     mIsLoginViaSocial = true;
                                 }
@@ -941,6 +1009,9 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
                     params.put(Contributor.FOLLOWER, String.valueOf(contributor.isNotificationFollower() ? 1 : 0));
                     params.put(Contributor.FEED, String.valueOf(contributor.isNotificationStream() ? 1 : 0));
                     params.put(Contributor.MOBILE, String.valueOf(contributor.isPushNotification() ? 1 : 0));
+                    params.put(Contributor.BANK_ID, String.valueOf(contributor.getBankId()));
+                    params.put(Contributor.BANK_ACCOUNT_NAME, contributor.getAccountName());
+                    params.put(Contributor.BANK_ACCOUNT_NUMBER, contributor.getAccountNumber());
                     params.put(Contributor.PASSWORD, String.valueOf(contributor.getPassword()));
                     params.put(Contributor.NEW_PASSWORD, String.valueOf(contributor.getNewPassword()));
                     return params;
