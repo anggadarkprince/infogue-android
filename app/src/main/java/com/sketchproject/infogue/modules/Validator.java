@@ -47,7 +47,7 @@ public class Validator {
             return String.valueOf(value).isEmpty();
         } else {
             try {
-                int result = Integer.parseInt(value.toString());
+                double result = Double.parseDouble(value.toString());
                 return result == 0;
             } catch (NumberFormatException e) {
                 return false;

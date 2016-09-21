@@ -1,7 +1,9 @@
 package com.sketchproject.infogue.activities;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -63,6 +65,16 @@ public class WalletActivity extends AppCompatActivity implements TransactionFrag
         balance = (TextView) findViewById(R.id.balance);
         deferred = (TextView) findViewById(R.id.deferred);
         buttonWithdraw = (Button) findViewById(R.id.btn_withdraw);
+        buttonWithdraw.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentWithdrawal = new Intent(WalletActivity.this, WithdrawalActivity.class);
+                intentWithdrawal.putExtra("balance", balanceValue);
+                intentWithdrawal.putExtra("deferred", deferredValue);
+                intentWithdrawal.putExtra("min", minWithdrawal);
+                startActivityForResult(intentWithdrawal, WithdrawalActivity.WITHDRAWAL);
+            }
+        });
 
         formatter = NumberFormat.getInstance(Locale.getDefault());
         transactionFragment = (TransactionFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
@@ -74,9 +86,31 @@ public class WalletActivity extends AppCompatActivity implements TransactionFrag
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-                    transactionFragment.refreshMessageList(swipeRefreshLayout);
+                    transactionFragment.refreshTransactionList(swipeRefreshLayout);
                 }
             });
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == WithdrawalActivity.WITHDRAWAL) {
+            if (resultCode == AppCompatActivity.RESULT_OK) {
+                final Snackbar snackbar = Snackbar.make(swipeRefreshLayout, R.string.message_withdraw_saved, Snackbar.LENGTH_LONG);
+                snackbar.setActionTextColor(ContextCompat.getColor(getBaseContext(), R.color.light));
+                snackbar.setAction(R.string.action_ok, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        snackbar.dismiss();
+                    }
+                });
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundResource(R.color.color_success);
+
+                swipeRefreshLayout.setRefreshing(true);
+                transactionFragment.refreshTransactionList(swipeRefreshLayout);
+            }
         }
     }
 
@@ -125,6 +159,15 @@ public class WalletActivity extends AppCompatActivity implements TransactionFrag
 
                         String successMessage = "You have cancelled transaction ID#" + transaction.getId();
                         Helper.toastColor(WalletActivity.this, successMessage, R.color.color_warning_transparent);
+
+                        deferredValue -= transaction.getAmount().doubleValue();
+                        deferred.setText(getString(R.string.label_deferred, formatter.format(deferredValue)));
+                        if (deferredValue > 0) {
+                            deferred.setVisibility(View.VISIBLE);
+                        } else {
+                            deferred.setVisibility(View.GONE);
+                        }
+
                         cancelTransaction(transaction.getId());
                     } else {
                         connectionDetector.snackbarDisconnectNotification(findViewById(R.id.btn_withdraw), null);

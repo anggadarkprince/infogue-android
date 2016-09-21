@@ -106,7 +106,7 @@ public class PostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        StartAppSDK.init(this, "208367057", true);
+        StartAppSDK.init(this, getString(R.string.startapp_app_id), true);
 
         setContentView(R.layout.activity_post);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -205,7 +205,7 @@ public class PostActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(Math.random() < 0.2){
+        if(Math.random() < 0.3){
             startAppAd.onBackPressed();
         }
         super.onBackPressed();

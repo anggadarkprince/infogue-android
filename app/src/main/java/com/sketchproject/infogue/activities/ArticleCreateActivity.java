@@ -469,6 +469,8 @@ public class ArticleCreateActivity extends AppCompatActivity implements Validato
         alert = (AlertFragment) getSupportFragmentManager().findFragmentById(R.id.alert_fragment);
         progress = new ProgressDialog(ArticleCreateActivity.this);
         progress.setIndeterminate(true);
+        progress.setCancelable(false);
+        progress.setCanceledOnTouchOutside(false);
 
         isNewFeatured = false;
         apiUrl = APIBuilder.URL_API_ARTICLE;

@@ -19,6 +19,7 @@
     <string name="title_activity_message">Messages</string>
     <string name="title_activity_gallery">Gallery</string>
     <string name="title_activity_wallet">Wallet</string>
+    <string name="title_activity_withdraw">Withdraw Application</string>
     <string name="title_activity_conversation">Conversation</string>
 
     <string name="prompt_name">Full Name</string>
@@ -74,6 +75,9 @@
     <string name="error_email_required">Email is required</string>
     <string name="error_email_invalid">Email address is invalid</string>
     <string name="error_email_length">Email may not be greater than 30 characters</string>
+    <string name="error_opt_required">%s is required</string>
+    <string name="error_opt_min_value" formatted="false">%s may not be greater than %s</string>
+    <string name="error_opt_max_value" formatted="false">%s may not be less than %s</string>
     <string name="error_name_required">Name is required</string>
     <string name="error_name_person">Invalid person name character</string>
     <string name="error_name_length">Name may not be greater than 50 characters</string>
@@ -165,6 +169,7 @@
     <string name="label_checkbox_stream">Email me when I got new stream</string>
     <string name="label_switch_push_notification">Enable Push Notification</string>
     <string name="label_save_setting_progress">Saving Settings</string>
+    <string name="label_save_withdraw_progress">Send Withdraw Request</string>
     <string name="label_save_article_progress">Saving Article</string>
     <string name="label_upload_image_progress">Uploading Image</string>
     <string name="label_delete_article_progress">Deleting article</string>
@@ -425,6 +430,7 @@
     <string name="message_article_discarded">Article is discarded!</string>
     <string name="message_article_invalid">Invalid Article Result!</string>
     <string name="message_article_saved">Article successfully saved!</string>
+    <string name="message_withdraw_saved">Withdrawal request has been sent!</string>
     <string name="message_delete_message">Are you sure delete this message?</string>
     <string name="message_request_timeout">Request server time out</string>
     <string name="message_activation_link">Activation link has been sent to your email.</string>
@@ -448,6 +454,9 @@
     <string name="facebook_app_id">577855965712128</string>
     <string name="fb_login_protocol_scheme">fb577855965712128</string>
 
+    <string name="startapp_account_id">107357054</string>
+    <string name="startapp_app_id">207360271</string>
+
     <string name="time_ago_prefix" />
     <string name="time_ago_suffix">ago</string>
     <string name="time_ago_seconds">less than a minute</string>
@@ -461,5 +470,6 @@
     <string name="time_ago_months">%d months</string>
     <string name="time_ago_year">about a year</string>
     <string name="time_ago_years">%d years</string>
+    <string name="label_no_data">No Data</string>
 
 </resources>

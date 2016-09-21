@@ -111,10 +111,10 @@ public class ApplicationActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        StartAppSDK.init(this, "208367057", true);
+        StartAppSDK.init(this, getString(R.string.startapp_app_id), true);
 
         /** Create Splash Ad **/
-        if (Math.random() < 0.1) {
+        if (Math.random() < 0.2) {
             StartAppAd.showSplash(this, savedInstanceState,
                     new SplashConfig()
                             .setTheme(SplashConfig.Theme.GLOOMY)

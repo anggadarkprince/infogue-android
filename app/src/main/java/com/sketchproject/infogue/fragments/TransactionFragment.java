@@ -107,7 +107,7 @@ public class TransactionFragment extends Fragment {
             }
 
             Log.i("Infogue/Transaction", "URL " + apiTransactionUrl);
-            JsonObjectRequest messageRequest = new JsonObjectRequest(Request.Method.GET, apiTransactionUrl, null,
+            JsonObjectRequest transactionRequest = new JsonObjectRequest(Request.Method.GET, apiTransactionUrl, null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
@@ -200,12 +200,12 @@ public class TransactionFragment extends Fragment {
                     }
             );
 
-            messageRequest.setTag("transaction");
-            messageRequest.setRetryPolicy(new DefaultRetryPolicy(
+            transactionRequest.setTag("transaction");
+            transactionRequest.setRetryPolicy(new DefaultRetryPolicy(
                     APIBuilder.TIMEOUT_SHORT,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            VolleySingleton.getInstance(getContext()).addToRequestQueue(messageRequest);
+            VolleySingleton.getInstance(getContext()).addToRequestQueue(transactionRequest);
         }
     }
 
@@ -231,11 +231,11 @@ public class TransactionFragment extends Fragment {
     }
 
     /**
-     * Reload message list.
+     * Reload transaction list.
      *
      * @param swipeRefresh swipe view
      */
-    public void refreshMessageList(SwipeRefreshLayout swipeRefresh) {
+    public void refreshTransactionList(SwipeRefreshLayout swipeRefresh) {
         swipeRefreshLayout = swipeRefresh;
         isEndOfPage = false;
         apiTransactionUrl = apiTransactionUrlFirstPage;

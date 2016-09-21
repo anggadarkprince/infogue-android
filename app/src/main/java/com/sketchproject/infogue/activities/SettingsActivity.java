@@ -151,6 +151,8 @@ public class SettingsActivity extends AppCompatActivity implements Validator.Vie
 
         progress = new ProgressDialog(SettingsActivity.this);
         progress.setIndeterminate(true);
+        progress.setCancelable(false);
+        progress.setCanceledOnTouchOutside(false);
 
         mScrollView = (ScrollView) findViewById(R.id.scroll_container);
         mAvatarImage = (ImageView) findViewById(R.id.avatar);

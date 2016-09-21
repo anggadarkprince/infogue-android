@@ -238,6 +238,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sketchproject.infogue.activities.ApplicationActivity" />
         </activity>
+        <activity
+            android:name=".activities.WithdrawalActivity"
+            android:label="@string/title_activity_withdraw"
+            android:parentActivityName=".activities.WalletActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize|stateHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sketchproject.infogue.activities.WalletActivity" />
+        </activity>
+
     </application>
 
 </manifest>

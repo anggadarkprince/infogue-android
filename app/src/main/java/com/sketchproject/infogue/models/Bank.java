@@ -1,5 +1,7 @@
 package com.sketchproject.infogue.models;
 
+import com.sketchproject.infogue.utils.APIBuilder;
+
 /**
  * Sketch Project Studio
  * Created by angga on 21/09/16.
@@ -41,6 +43,10 @@ public class Bank {
 
     public String getLogo() {
         return logo;
+    }
+
+    public String getLogoUrl() {
+        return APIBuilder.BASE_URL + "images/banks/" + getLogo();
     }
 
     public void setLogo(String logo) {
