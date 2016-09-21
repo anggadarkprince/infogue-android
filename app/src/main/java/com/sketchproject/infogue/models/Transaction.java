@@ -19,6 +19,9 @@ public class Transaction {
     public static final String STATUS_CANCEL = "cancel";
     public static final String STATUS_SUCCESS = "success";
 
+    public static final String TYPE_REWARD = "reward";
+    public static final String TYPE_WITHDRAWAL = "withdrawal";
+
     private int id;
     private String type;
     private String description;

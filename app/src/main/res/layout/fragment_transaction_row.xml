@@ -8,6 +8,17 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="25dp">
 
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="36dp"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="15dp"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/ic_card"
+        android:tint="@color/gray"
+        tools:ignore="ContentDescription" />
+
     <TextView
         android:id="@+id/type"
         android:layout_width="wrap_content"
@@ -16,29 +27,13 @@
         android:layout_marginEnd="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginTop="1dp"
-        android:layout_toEndOf="@id/avatar"
-        android:layout_toRightOf="@id/avatar"
+        android:layout_toEndOf="@id/icon"
+        android:layout_toRightOf="@id/icon"
         android:text="Withdrawal"
         android:textColor="@color/primary"
         android:textSize="15sp"
         android:textStyle="bold"
         tools:ignore="HardcodedText" />
-
-    <TextView
-        android:id="@+id/status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/type"
-        android:layout_toRightOf="@id/type"
-        android:background="@color/color_warning"
-        android:paddingBottom="2dp"
-        android:paddingLeft="6dp"
-        android:paddingRight="6dp"
-        android:paddingTop="2dp"
-        android:text="@string/placeholder_status"
-        android:textColor="@color/light"
-        android:textSize="12sp"
-        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/description"
@@ -47,8 +42,8 @@
         android:layout_below="@id/type"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="1dp"
-        android:layout_toEndOf="@id/avatar"
-        android:layout_toRightOf="@id/avatar"
+        android:layout_toEndOf="@id/icon"
+        android:layout_toRightOf="@id/icon"
         android:ellipsize="end"
         android:maxLines="2"
         android:text="@string/placeholder_transaction"
@@ -60,7 +55,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/description"
-        android:paddingBottom="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_toEndOf="@id/icon"
+        android:layout_toRightOf="@id/icon"
         android:paddingTop="2dp"
         android:text="@string/placeholder_amount"
         android:textSize="18sp"
@@ -79,27 +76,24 @@
         android:textSize="13sp"
         tools:ignore="RelativeOverlap" />
 
-    <Button
-        android:id="@+id/btn_delete"
-        style="?android:attr/borderlessButtonStyle"
+    <TextView
+        android:id="@+id/status"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_below="@id/description"
         android:layout_marginBottom="20dp"
-        android:alpha="0.2"
-        android:background="@color/transparent"
-        android:contentDescription="@string/delete_content_description"
-        android:drawableLeft="@drawable/ic_delete"
-        android:drawablePadding="4dp"
-        android:drawableStart="@drawable/ic_delete"
-        android:padding="5dp"
-        android:text="@string/action_cancel"
-        android:textAllCaps="true"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        android:tint="@color/gray_light" />
+        android:layout_marginTop="3dp"
+        android:background="@color/color_warning"
+        android:paddingBottom="2dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:paddingTop="2dp"
+        android:text="@string/placeholder_status"
+        android:textColor="@color/light"
+        android:textSize="12sp"
+        android:textStyle="bold" />
 
     <View
         android:layout_width="match_parent"

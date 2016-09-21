@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Infogue</string>
     <string name="title_activity_featured">Featured</string>
     <string name="title_activity_login">Sign in</string>
@@ -51,6 +51,9 @@
     <string name="prompt_message">Type a message here</string>
     <string name="prompt_receiver_empty">Who receive the message?</string>
     <string name="prompt_select_receiver">Type a name or username</string>
+    <string name="prompt_account_name">Bank account name</string>
+    <string name="prompt_account_number">Bank account number</string>
+    <string name="prompt_bank">Select Bank</string>
 
     <string name="error_server">Oops, Something is getting wrong</string>
     <string name="error_unknown">Unknown error occurred</string>
@@ -194,6 +197,10 @@
     <string name="label_image_from_local">Local image</string>
     <string name="label_select_media">SELECT IMAGE FROM MEDIA</string>
     <string name="label_balance">BALANCE</string>
+    <string name="label_title_bank">BANK ACCOUNT</string>
+    <string name="label_please_wait" tools:ignore="TypographyEllipsis">Please Wait...</string>
+    <string name="label_currency">IDR %s</string>
+    <string name="label_deferred">Deferred withdrawal IDR %s</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -324,7 +331,6 @@
     <string name="placeholder_message">Hi, good morning, I came across your profile today</string>
     <string name="placeholder_transaction">You\'ve got 20.000 for article Autem minus dolor ab doloribus temporibus magni.</string>
     <string name="placeholder_amount">IDR 200.000</string>
-    <string name="placeholder_deferred">Deferred withdrawal IDR 200.000</string>
     <string name="placeholder_status">PENDING</string>
     <string name="large_text">
         <![CDATA[
@@ -451,9 +457,5 @@
     <string name="time_ago_months">%d months</string>
     <string name="time_ago_year">about a year</string>
     <string name="time_ago_years">%d years</string>
-    <string name="label_title_bank">BANK ACCOUNT</string>
-    <string name="prompt_account_name">Bank account name</string>
-    <string name="prompt_account_number">Bank account number</string>
-    <string name="prompt_bank">Select Bank</string>
 
 </resources>

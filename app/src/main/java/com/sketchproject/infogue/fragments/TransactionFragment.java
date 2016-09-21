@@ -113,12 +113,18 @@ public class TransactionFragment extends Fragment {
                         public void onResponse(JSONObject response) {
                             try {
                                 String status = response.getString("status");
-                                JSONObject messages = response.getJSONObject("transactions");
+                                JSONObject transactions = response.getJSONObject("transactions");
+                                double balance = response.getDouble("balance");
+                                double deferred = response.getDouble("deferred");
 
-                                String nextUrl = messages.getString("next_page_url");
-                                int currentPage = messages.getInt("current_page");
-                                int lastPage = messages.getInt("last_page");
-                                JSONArray data = messages.optJSONArray("data");
+                                if(getContext() instanceof WalletActivity){
+                                    ((WalletActivity) getContext()).updateBalanceAndDeferred(balance, deferred);
+                                }
+
+                                String nextUrl = transactions.getString("next_page_url");
+                                int currentPage = transactions.getInt("current_page");
+                                int lastPage = transactions.getInt("last_page");
+                                JSONArray data = transactions.optJSONArray("data");
 
                                 apiTransactionUrl = nextUrl + "&" + apiTransactionParams;
 

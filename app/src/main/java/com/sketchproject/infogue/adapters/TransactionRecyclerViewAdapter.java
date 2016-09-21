@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sketchproject.infogue.R;
@@ -77,11 +77,19 @@ public class TransactionRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
                 NumberFormat formatter = NumberFormat.getInstance(Locale.getDefault());
                 transactionHolder.mItem = transaction;
                 transactionHolder.mType.setText(transaction.getType().toUpperCase());
-                transactionHolder.mAmount.setText("IDR " + formatter.format(transaction.getAmount().longValue()));
                 transactionHolder.mStatus.setText(transaction.getStatus().toUpperCase());
                 transactionHolder.mDescription.setText(transaction.getDescription());
                 transactionHolder.mDate.setText(transaction.getDate());
-                transactionHolder.mItem = transaction;
+
+                String sign;
+                if (transaction.getType().toLowerCase().equals(Transaction.TYPE_WITHDRAWAL)) {
+                    transactionHolder.mIcon.setImageResource(R.drawable.ic_card);
+                    sign = "-";
+                } else {
+                    transactionHolder.mIcon.setImageResource(R.drawable.ic_money);
+                    sign = "+";
+                }
+                transactionHolder.mAmount.setText(sign + " IDR " + formatter.format(transaction.getAmount().longValue()));
 
                 switch (transaction.getStatus().toLowerCase()) {
                     case Transaction.STATUS_PENDING:
@@ -98,17 +106,13 @@ public class TransactionRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
                         break;
                 }
 
-                if (transaction.getStatus().toLowerCase().equals(Transaction.STATUS_PENDING)) {
-                    transactionHolder.mDelete.setVisibility(View.VISIBLE);
-                    transactionHolder.mDelete.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            mTransactionListener.onDeleteTransaction(transaction);
-                        }
-                    });
-                } else {
-                    transactionHolder.mDelete.setVisibility(View.GONE);
-                }
+                transactionHolder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        mTransactionListener.onDeleteTransaction(transaction);
+                        return true;
+                    }
+                });
 
                 transactionHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -141,7 +145,7 @@ public class TransactionRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
         public final TextView mDescription;
         public final TextView mAmount;
         public final TextView mDate;
-        public final Button mDelete;
+        public final ImageView mIcon;
         public Transaction mItem;
 
         public TransactionViewHolder(View view) {
@@ -152,7 +156,7 @@ public class TransactionRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
             mDescription = (TextView) view.findViewById(R.id.description);
             mAmount = (TextView) view.findViewById(R.id.amount);
             mDate = (TextView) view.findViewById(R.id.date);
-            mDelete = (Button) view.findViewById(R.id.btn_delete);
+            mIcon = (ImageView) view.findViewById(R.id.icon);
         }
 
         @Override
