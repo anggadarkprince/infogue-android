@@ -9,8 +9,8 @@ android {
         applicationId "com.sketchproject.infogue"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 6
-        versionName "1.6.0"
+        versionCode 7
+        versionName "1.7.0"
     }
     buildTypes {
         release {
