@@ -116,9 +116,10 @@ public class TransactionFragment extends Fragment {
                                 JSONObject transactions = response.getJSONObject("transactions");
                                 double balance = response.getDouble("balance");
                                 double deferred = response.getDouble("deferred");
+                                double min = response.getDouble("minWithdrawal");
 
-                                if(getContext() instanceof WalletActivity){
-                                    ((WalletActivity) getContext()).updateBalanceAndDeferred(balance, deferred);
+                                if (getContext() instanceof WalletActivity) {
+                                    ((WalletActivity) getContext()).updateBalanceAndDeferred(balance, deferred, min);
                                 }
 
                                 String nextUrl = transactions.getString("next_page_url");
@@ -215,16 +216,16 @@ public class TransactionFragment extends Fragment {
     }
 
     /**
-     * Remove view holder by ID.
+     * Cancel view holder by ID.
      *
      * @param id article id
      */
-    public void deleteTransactionRow(int id) {
-        Log.i("INFOGUE/Transaction", "Delete id : " + id);
+    public void cancelTransactionRow(int id) {
+        Log.i("INFOGUE/Transaction", "Cancel id : " + id);
         for (int i = 0; i < allTransactions.size(); i++) {
             if (allTransactions.get(i) != null && allTransactions.get(i).getId() == id) {
-                allTransactions.remove(i);
-                transactionAdapter.notifyItemRemoved(i);
+                allTransactions.get(i).setStatus(Transaction.STATUS_CANCEL);
+                transactionAdapter.notifyItemChanged(i);
             }
         }
     }

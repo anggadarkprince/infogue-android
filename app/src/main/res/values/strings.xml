@@ -154,6 +154,7 @@
     <string name="label_dialog_discard_setting">Discard Settings</string>
     <string name="label_dialog_save_setting">Save Settings</string>
     <string name="label_dialog_delete_image">Delete Image</string>
+    <string name="label_dialog_cancel_withdrawal">Cancel Withdrawal</string>
     <string name="label_separator_articles">ARTICLES</string>
     <string name="label_separator_contributors">CONTRIBUTORS</string>
     <string name="label_radio_male">Male</string>
@@ -219,6 +220,8 @@
     <string name="action_about">About</string>
     <string name="action_exit">Exit</string>
     <string name="action_cancel">Cancel</string>
+    <string name="action_cancel_withdrawal">Cancel Withdrawal</string>
+    <string name="action_dismiss">Dismiss</string>
     <string name="action_feedback">Feedback</string>
     <string name="action_help"><![CDATA[Help & FAQ]]></string>
     <string name="action_rating">Rate App</string>
@@ -415,6 +418,7 @@
     <string name="message_discard_setting">Are you sure want to discard current settings?</string>
     <string name="message_save_setting">Save current account info and settings?</string>
     <string name="message_delete_image">Are you sure want to delete this image?</string>
+    <string name="message_cancel_withdrawal">Are you sure want to cancel this transaction?</string>
     <string name="message_try_again">Please try again!</string>
     <string name="message_account_updated">Account successfully updated</string>
     <string name="message_validation_warning">Oops, check your inputs!</string>

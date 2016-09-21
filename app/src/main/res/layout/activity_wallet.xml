@@ -63,7 +63,7 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:text="@string/action_withdraw"
-                android:textColor="@color/gray_dark"
+                android:textColor="@color/gray"
                 tools:ignore="RelativeOverlap" />
 
         </RelativeLayout>
