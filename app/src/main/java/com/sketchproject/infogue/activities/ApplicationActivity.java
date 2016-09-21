@@ -51,6 +51,7 @@ import com.sketchproject.infogue.database.DatabaseManager;
 import com.sketchproject.infogue.events.ArticleContextBuilder;
 import com.sketchproject.infogue.events.ArticleListEvent;
 import com.sketchproject.infogue.events.ArticlePopupBuilder;
+import com.sketchproject.infogue.events.FeatureListEvent;
 import com.sketchproject.infogue.fragments.ArticleFragment;
 import com.sketchproject.infogue.fragments.HomeFragment;
 import com.sketchproject.infogue.models.Article;
@@ -97,6 +98,7 @@ public class ApplicationActivity extends AppCompatActivity implements
     private AlertDialog dialogConfirmation;
     private ObjectPooling objectPooling;
     private ProgressDialog progress;
+    private FeatureListEvent featureListEvent;
 
     private StartAppAd startAppAd = new StartAppAd(this);
 
@@ -112,7 +114,7 @@ public class ApplicationActivity extends AppCompatActivity implements
         StartAppSDK.init(this, "208367057", true);
 
         /** Create Splash Ad **/
-        if (Math.random() < 0.2) {
+        if (Math.random() < 0.1) {
             StartAppAd.showSplash(this, savedInstanceState,
                     new SplashConfig()
                             .setTheme(SplashConfig.Theme.GLOOMY)
@@ -125,6 +127,8 @@ public class ApplicationActivity extends AppCompatActivity implements
 
         DBHelper dbHelper = new DBHelper(getApplicationContext());
         DatabaseManager.initializeInstance(dbHelper);
+
+        featureListEvent = new FeatureListEvent(ApplicationActivity.this);
 
         connectionDetector = new ConnectionDetector(getBaseContext());
         connectionDetector.setLostConnectionListener(this);
@@ -174,11 +178,12 @@ public class ApplicationActivity extends AppCompatActivity implements
             populateMenu(categoryRepository.retrieveData());
         }
 
-        // download the menu
+        // download the menu for the first time
         if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
             progress.show();
             downloadCategoryMenu();
         } else {
+            // download menu silently
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -266,14 +271,24 @@ public class ApplicationActivity extends AppCompatActivity implements
                                 subcategoryRepository.createAllData(subcategoriesData);
                                 populateMenu(categoryRepository.retrieveData());
                                 session.setSessionData(SessionManager.KEY_USER_LEARNED, true);
+
+                                if(featureListEvent.needDownloadBankData()){
+                                    featureListEvent.downloadBankData(progress);
+                                } else {
+                                    if (progress.isShowing()) {
+                                        progress.dismiss();
+                                    }
+                                }
                             } else {
-                                confirmRetry();
+                                if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
+                                    confirmRetry();
+                                }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        }
-                        if (progress.isShowing()) {
-                            progress.dismiss();
+                            if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
+                                confirmRetry();
+                            }
                         }
                     }
                 },
@@ -282,7 +297,6 @@ public class ApplicationActivity extends AppCompatActivity implements
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
                         if (!session.getSessionData(SessionManager.KEY_USER_LEARNED, false)) {
-                            progress.dismiss();
                             confirmRetry();
                         }
                     }
@@ -436,7 +450,8 @@ public class ApplicationActivity extends AppCompatActivity implements
     /**
      * Show confirm dialog before decide to retry download menu category
      */
-    private void confirmRetry() {
+    public void confirmRetry() {
+        progress.dismiss();
         dialogConfirmation = Helper.createDialog(this,
                 R.string.action_retry,
                 R.string.message_request_timeout,
@@ -445,6 +460,7 @@ public class ApplicationActivity extends AppCompatActivity implements
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        progress.show();
                         downloadCategoryMenu();
                     }
                 },

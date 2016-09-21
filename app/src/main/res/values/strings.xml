@@ -165,6 +165,7 @@
     <string name="label_delete_message_progress">Deleting message</string>
     <string name="label_retrieve_setting_progress">Retrieving account data</string>
     <string name="label_retrieve_category_progress">Downloading Category Menu</string>
+    <string name="label_retrieve_feature_progress">Upgrading Feature Content</string>
     <string name="label_retrieve_article_progress">Loading Article Data</string>
     <string name="label_registration_complete">Registration Complete</string>
     <string name="label_related_article">RELATED ARTICLE</string>

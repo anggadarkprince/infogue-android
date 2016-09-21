@@ -26,6 +26,7 @@ public class APIBuilder {
     public static final String URL_API_RATE = BASE_URL_API + "article/rate";
     public static final String URL_API_FEATURED = BASE_URL_API + "featured";
     public static final String URL_API_CATEGORY = BASE_URL_API + "category";
+    public static final String URL_API_BANK = BASE_URL_API + "bank";
     public static final String URL_API_SETTING = BASE_URL_API + "account";
     public static final String URL_API_LOGIN = BASE_URL_API + "account/login";
     public static final String URL_API_REGISTER = BASE_URL_API + "account/register";
